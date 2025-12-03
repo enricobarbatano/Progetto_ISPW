@@ -1,0 +1,25 @@
+# Maven target folder
+/target/
+
+# Maven release backups
+release.properties
+
+# IntelliJ
+.idea/
+*.iml
+out/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# VSCode
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
