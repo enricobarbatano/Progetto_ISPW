@@ -3,11 +3,12 @@ package com.ispw.dao.factory;
 
 import com.ispw.dao.interfaces.GeneralUserDAO;
 
-public class DbmsDAOFactory extends DAOFactory {
+public class MemoryDAOFactory extends DAOFactory {
 
     @Override
     public GeneralUserDAO getGeneralUserDAO() {
-        throw new UnsupportedOperationException("DbmsDAOFactory non implementata ancora.");
+        throw new UnsupportedOperationException("MemoryDAOFactory non implementata ancora.");
     }
 }
+
 
