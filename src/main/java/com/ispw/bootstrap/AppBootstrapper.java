@@ -39,7 +39,7 @@ public final class AppBootstrapper {
 
             } catch (SQLException e) {
                 System.err.println("Errore connessione DB: " + e.getMessage());
-                e.printStackTrace();
+                
                 return;
             }
         }
@@ -53,7 +53,7 @@ public final class AppBootstrapper {
                 Files.createDirectories(root);
             } catch (Exception e) {
                 System.err.println("Impossibile creare directory root per FILE_SYSTEM: " + root);
-                e.printStackTrace();
+                
                 return;
             }
 
