@@ -5,7 +5,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ispw.bean.UtenteBean;
-import com.ispw.controller.logic.interfaces.notifica.*;
+import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaConfiguraRegole;
+import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaDisdetta;
+import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaGestioneAccount;
+import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaPenalita;
+import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaPrenotazione;
+import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaRegistrazione;
+
 
 public class LogicControllerGestioneNotifica implements
         GestioneNotificaConfiguraRegole,
@@ -18,12 +24,13 @@ public class LogicControllerGestioneNotifica implements
     // =======================
     //  NOTIFICHE DISDETTA
     // =======================
-
+        private static final String UTENTE_NULL = "utente=null";
     /** Invia (simulato) conferma cancellazione prenotazione. */
     @Override
     public void inviaConfermaCancellazione(UtenteBean utente, String dettaglio) {
+        
         if (utente == null) {
-            warn("Conferma cancellazione", "utente=null", dettaglio);
+            warn("Conferma cancellazione", UTENTE_NULL, dettaglio);
             return;
         }
         info("Conferma cancellazione", destinatario(utente), dettaglio);
@@ -37,7 +44,7 @@ public class LogicControllerGestioneNotifica implements
     @Override
     public void inviaConfermaRegistrazione(UtenteBean utente) {
         if (utente == null) {
-            warn("Conferma registrazione", "utente=null", null);
+            warn("Conferma registrazione", UTENTE_NULL, null);
             return;
         }
         info("Conferma registrazione", destinatario(utente), null);
@@ -51,7 +58,7 @@ public class LogicControllerGestioneNotifica implements
     @Override
     public void inviaConfermaAggiornamentoAccount(UtenteBean utente) {
         if (utente == null) {
-            warn("Aggiornamento account", "utente=null", null);
+            warn("Aggiornamento account", UTENTE_NULL, null);
             return;
         }
         info("Aggiornamento account", destinatario(utente), null);
@@ -78,7 +85,7 @@ public class LogicControllerGestioneNotifica implements
     @Override
     public void inviaConfermaPrenotazione(UtenteBean utente, String dettaglio) {
         if (utente == null) {
-            warn("Conferma prenotazione", "utente=null", dettaglio);
+            warn("Conferma prenotazione", UTENTE_NULL, dettaglio);
             return;
         }
         info("Conferma prenotazione", destinatario(utente), dettaglio);
