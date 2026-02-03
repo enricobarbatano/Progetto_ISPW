@@ -11,7 +11,9 @@ public class StatoPagamentoBean  {
     private LocalDateTime dataPagamento;
     private String messaggio;        // eventuale descrizione/esito gateway
 
-    public StatoPagamentoBean() {}
+    public StatoPagamentoBean() {
+        //Nota: costruttore no-args intenzionalmente vuoto.
+    }
 
     public boolean isSuccesso() { return successo; }
     public void setSuccesso(boolean successo) { this.successo = successo; }

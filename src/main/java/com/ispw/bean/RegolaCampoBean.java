@@ -9,7 +9,9 @@ public class RegolaCampoBean  {
     private Boolean attivo;
     private Boolean flagManutenzione;
 
-    public RegolaCampoBean() {}
+    public RegolaCampoBean() {
+        //Nota: costruttore no-args intenzionalmente vuoto.
+    }
 
     public int getIdCampo() { return idCampo; }
     public void setIdCampo(int idCampo) { this.idCampo = idCampo; }

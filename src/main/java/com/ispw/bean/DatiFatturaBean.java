@@ -16,7 +16,9 @@ public class DatiFatturaBean  {
     private BigDecimal importo;
     private LocalDate dataOperazione;
 
-    public DatiFatturaBean() {}
+    public DatiFatturaBean() {
+        //Nota: costruttore no-args intenzionalmente vuoto.
+    }
 
     public String getCodiceFiscaleCliente() { return codiceFiscaleCliente; }
     public void setCodiceFiscaleCliente(String codiceFiscaleCliente) { this.codiceFiscaleCliente = codiceFiscaleCliente; }

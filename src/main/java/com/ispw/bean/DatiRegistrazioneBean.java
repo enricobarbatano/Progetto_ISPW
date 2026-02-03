@@ -9,7 +9,9 @@ public class DatiRegistrazioneBean  {
     private String email;
     private String password;
 
-    public DatiRegistrazioneBean() {}
+    public DatiRegistrazioneBean() {
+        //Nota: costruttore no-args intenzionalmente vuoto.
+    }
 
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }

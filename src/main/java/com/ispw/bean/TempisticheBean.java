@@ -11,7 +11,9 @@ public class TempisticheBean {
     private LocalTime oraChiusura;
     private int preavvisoMinimoMinuti;
 
-    public TempisticheBean() {}
+    public TempisticheBean() {
+        //Nota: costruttore no-args intenzionalmente vuoto.
+    }
 
     public int getDurataSlotMinuti() { return durataSlotMinuti; }
     public void setDurataSlotMinuti(int durataSlotMinuti) { this.durataSlotMinuti = durataSlotMinuti; }

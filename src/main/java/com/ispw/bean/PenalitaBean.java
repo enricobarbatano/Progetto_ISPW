@@ -8,7 +8,9 @@ public class PenalitaBean  {
     private BigDecimal valorePenalita;
     private int preavvisoMinimoMinuti;
 
-    public PenalitaBean() {}
+    public PenalitaBean() {
+        //Nota: costruttore no-args intenzionalmente vuoto.
+    }
 
     public BigDecimal getValorePenalita() { return valorePenalita; }
     public void setValorePenalita(BigDecimal valorePenalita) { this.valorePenalita = valorePenalita; }

@@ -13,7 +13,9 @@ public class DatiPenalitaBean  {
     private String motivazione;
     private LocalDate dataDecorrenza;
 
-    public DatiPenalitaBean() {}
+    public DatiPenalitaBean() {
+        //Nota: costruttore no-args intenzionalmente vuoto.
+    }
 
     public int getIdUtente() { return idUtente; }
     public void setIdUtente(int idUtente) { this.idUtente = idUtente; }
