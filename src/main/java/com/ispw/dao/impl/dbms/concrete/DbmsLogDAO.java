@@ -1,15 +1,20 @@
 package com.ispw.dao.impl.dbms.concrete;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import com.ispw.dao.impl.dbms.base.DbmsDAO;
 import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
 import com.ispw.dao.interfaces.LogDAO;
 import com.ispw.model.entity.SystemLog;
 import com.ispw.model.enums.TipoOperazione;
-
-import java.sql.*;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * DAO DBMS per SystemLog (append-only).
@@ -19,27 +24,28 @@ import java.util.Optional;
  * SonarCloud: try-with-resources, no System.out, costanti, early return.
  */
 public final class DbmsLogDAO extends DbmsDAO<Integer, SystemLog> implements LogDAO {
-
+    
+    private static final String da=" FROM ";
+    private static final String select="SELECT ";
     // ======= Costanti SQL (adatta i nomi a schema reale) =======
     private static final String TBL = "system_log";
     private static final String COLS = "id_log, timestamp, tipo_operazione, id_utente_coinvolto, descrizione";
 
     private static final String SQL_SELECT_ONE =
-            "SELECT " + COLS + " FROM " + TBL + " WHERE id_log = ?";
+            select + COLS + da + TBL + " WHERE id_log = ?";
 
     private static final String SQL_INSERT =
             "INSERT INTO " + TBL + " (timestamp, tipo_operazione, id_utente_coinvolto, descrizione) VALUES (?, ?, ?, ?)";
 
     private static final String SQL_EXISTS =
-            "SELECT 1 FROM " + TBL + " WHERE id_log = ?";
+            select + "1" + da + TBL + " WHERE id_log = ?";
 
     private static final String SQL_FIND_BY_UTENTE =
-            "SELECT " + COLS + " FROM " + TBL + " WHERE id_utente_coinvolto = ? " +
+            select + COLS + da + TBL + " WHERE id_utente_coinvolto = ? " +
             "ORDER BY timestamp DESC, id_log DESC";
 
     private static final String SQL_FIND_LAST =
-            "SELECT " + COLS + " FROM " + TBL + " ORDER BY timestamp DESC, id_log DESC LIMIT ?";
-
+            select + COLS + da + TBL + " ORDER BY timestamp DESC, id_log DESC LIMIT ?";
     private static final int MIN_LIMIT = 1;
 
     public DbmsLogDAO(ConnectionFactory cf) {

@@ -1,18 +1,22 @@
 
 package com.ispw.dao.impl.dbms.concrete;
 
-import com.ispw.dao.impl.dbms.base.DbmsDAO;
-import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
-import com.ispw.dao.interfaces.GeneralUserDAO;
-import com.ispw.model.entity.GeneralUser;     // abstract
-import com.ispw.model.entity.UtenteFinale;   // concreto da istanziare (sostituisci se diverso)
-import com.ispw.model.enums.Ruolo;
-import com.ispw.model.enums.StatoAccount;
-
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;     // abstract
+import java.sql.Statement;   // concreto da istanziare (sostituisci se diverso)
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+
+import com.ispw.dao.impl.dbms.base.DbmsDAO;
+import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
+import com.ispw.dao.interfaces.GeneralUserDAO;
+import com.ispw.model.entity.GeneralUser;
+import com.ispw.model.entity.UtenteFinale;
+import com.ispw.model.enums.Ruolo;
+import com.ispw.model.enums.StatoAccount;
 
 /**
  * DAO DBMS per GeneralUser.
@@ -22,29 +26,28 @@ import java.util.Optional;
  * - validazioni input (early return).
  */
 public final class DbmsGeneralUserDAO extends DbmsDAO<Integer, GeneralUser> implements GeneralUserDAO {
-
+    private static final String ID_UTENTE= "id_utente";
     // ======= Costanti SQL (adatta al tuo schema reale) =======
     private static final String TBL  = "general_user";
     private static final String COLS = "id_utente, nome, email, password, stato_account, ruolo";
 
     private static final String SQL_SELECT_ONE =
-            "SELECT " + COLS + " FROM " + TBL + " WHERE id_utente = ?";
+            "SELECT " + COLS + " FROM " + TBL + " WHERE " + ID_UTENTE + " = ?";
 
     private static final String SQL_SELECT_BY_EMAIL =
             "SELECT " + COLS + " FROM " + TBL + " WHERE LOWER(email) = ?";
 
     private static final String SQL_EXISTS =
-            "SELECT 1 FROM " + TBL + " WHERE id_utente = ?";
+            "SELECT 1 FROM " + TBL + " WHERE " + ID_UTENTE + " = ?";
 
     private static final String SQL_INSERT =
             "INSERT INTO " + TBL + " (nome, email, password, stato_account, ruolo) VALUES (?, ?, ?, ?, ?)";
 
     private static final String SQL_UPDATE =
-            "UPDATE " + TBL + " SET nome = ?, email = ?, password = ?, stato_account = ?, ruolo = ? WHERE id_utente = ?";
+            "UPDATE " + TBL + " SET nome = ?, email = ?, password = ?, stato_account = ?, ruolo = ? WHERE " + ID_UTENTE + " = ?";
 
     private static final String SQL_DELETE =
-            "DELETE FROM " + TBL + " WHERE id_utente = ?";
-
+            "DELETE FROM " + TBL + " WHERE " + ID_UTENTE + " = ?";
     public DbmsGeneralUserDAO(ConnectionFactory cf) {
         super(cf);
     }
