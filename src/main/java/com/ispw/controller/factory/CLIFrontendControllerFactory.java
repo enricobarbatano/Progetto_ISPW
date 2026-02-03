@@ -1,3 +1,4 @@
+// src/main/java/com/ispw/controller/factory/CLIFrontendControllerFactory.java
 package com.ispw.controller.factory;
 
 
@@ -9,6 +10,7 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     @Override
     public void startApplication() {
         System.out.println("Avvio CLI...");
-        // new CLINavigator().start();
+
+    
     }
 }

@@ -1,28 +1,8 @@
 package com.ispw.dao.factory;
 
+import com.ispw.dao.interfaces.*;
 
-import com.ispw.dao.impl.memory.concrete.InMemoryCampoDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryFatturaDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryGeneralUserDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryGestoreDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryLogDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryPagamentoDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryPenalitaDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryPrenotazioneDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryRegolePenalitaDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryRegoleTempisticheDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryUtenteFinaleDAO;
-import com.ispw.dao.interfaces.CampoDAO;
-import com.ispw.dao.interfaces.FatturaDAO;
-import com.ispw.dao.interfaces.GeneralUserDAO;
-import com.ispw.dao.interfaces.GestoreDAO;
-import com.ispw.dao.interfaces.LogDAO;
-import com.ispw.dao.interfaces.PagamentoDAO;
-import com.ispw.dao.interfaces.PenalitaDAO;
-import com.ispw.dao.interfaces.PrenotazioneDAO;
-import com.ispw.dao.interfaces.RegolePenalitaDAO;
-import com.ispw.dao.interfaces.RegoleTempisticheDAO;
-import com.ispw.dao.interfaces.UtenteFinaleDAO;
+import com.ispw.dao.impl.memory.concrete.*;
 
 public final class MemoryDAOFactory extends DAOFactory {
 

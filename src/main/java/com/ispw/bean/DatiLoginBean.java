@@ -1,9 +1,5 @@
 package com.ispw.bean;
 
-
-
-
-
 public class DatiLoginBean {
     private String email;
     private String password;

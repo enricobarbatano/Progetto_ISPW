@@ -1,42 +1,73 @@
 package com.ispw.dao.impl.memory.concrete;
 
-import java.util.Comparator;
-import java.util.List;
-
 import com.ispw.dao.impl.memory.In_MemoryDAO;
 import com.ispw.dao.interfaces.LogDAO;
 import com.ispw.model.entity.SystemLog;
 
-public class InMemoryLogDAO extends In_MemoryDAO<Integer, SystemLog> implements LogDAO {
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+/**
+ * DAO InMemory per SystemLog (append-only).
+ * SonarCloud-friendly: comparator riutilizzabile, nessun System.out, controlli input.
+ */
+public final class InMemoryLogDAO extends In_MemoryDAO<Integer, SystemLog> implements LogDAO {
+
+    private static final int MIN_LIMIT = 1;
+
+    /**
+     * Ordina per timestamp DESC (null last) e, a parità, per id DESC.
+     */
+    private static final Comparator<SystemLog> ORDER_BY_TS_DESC_ID_DESC =
+            Comparator.comparing(SystemLog::getTimestamp, Comparator.nullsLast(Comparator.naturalOrder()))
+                      .thenComparingInt(SystemLog::getIdLog)
+                      .reversed();
 
     public InMemoryLogDAO() {
-        super(true);
+        super(true); // store condiviso per classe concreta
     }
 
     @Override
     protected Integer getId(SystemLog entity) {
-        // TODO: usa il tuo getter reale (es. entity.getIdLog())
-        throw new UnsupportedOperationException("TODO: SystemLog.getIdLog()");
+        return entity.getIdLog();
     }
 
     @Override
     public void append(SystemLog log) {
-        // append-only: in pratica store (se vuoi davvero append-only, usa un id sempre nuovo)
-        store(log);
+        Objects.requireNonNull(log, "log non può essere null");
+        if (log.getTimestamp() == null) {
+            log.setTimestamp(LocalDateTime.now());
+        }
+        if (log.getIdLog() == 0) {
+            final int next = store.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
+            log.setIdLog(next);
+        }
+        super.store(log); // append
     }
 
     @Override
     public List<SystemLog> findByUtente(int idUtente) {
-        // TODO: sostituisci con getter reale (es. log.getIdUtenteCoinvolto())
-        return filter(l -> l.getIdUtenteCoinvolto() == idUtente);
+        return snapshotValues().stream()
+                .filter(l -> l.getIdUtenteCoinvolto() == idUtente)
+                .sorted(ORDER_BY_TS_DESC_ID_DESC)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<SystemLog> findLast(int limit) {
-        // TODO: se hai timestamp, ordina per timestamp; altrimenti per id
+        final int safeLimit = Math.max(MIN_LIMIT, limit);
         return snapshotValues().stream()
-                .sorted(Comparator.comparing(SystemLog::getTimestamp).reversed())
-                .limit(limit)
-                .toList();
+                .sorted(ORDER_BY_TS_DESC_ID_DESC)
+                .limit(safeLimit)
+                .collect(Collectors.toList());
+    }
+
+    /** Append-only: vietato cancellare log. */
+    @Override
+    public void delete(Integer id) {
+        throw new UnsupportedOperationException("SystemLog è append-only: delete non consentita");
     }
 }
