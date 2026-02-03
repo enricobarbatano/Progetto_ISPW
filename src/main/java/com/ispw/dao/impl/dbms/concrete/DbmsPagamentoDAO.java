@@ -16,6 +16,7 @@ import com.ispw.model.enums.StatoPagamento;
  * DAO DBMS per Pagamento (JDBC minimale).
  * - Usa gli helper di DbmsDAO (executeUpdate/queryOne/queryList/queryExists).
  * - Mappa BigDecimal e LocalDateTime <-> SQL DECIMAL/TIMESTAMP.
+ * - ID auto-generato dal DB (generated keys).
  * - Nessuna logica applicativa qui: solo persistenza.
  */
 public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements PagamentoDAO {
@@ -30,9 +31,10 @@ public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements Pag
     private static final String SQL_EXISTS =
         "SELECT 1 FROM pagamenti WHERE id_pagamento=?";
 
+    // INSERT senza id_pagamento: è auto-generato dal DB
     private static final String SQL_INSERT =
-        "INSERT INTO pagamenti (id_pagamento, id_prenotazione, importo_finale, metodo, stato, data_pagamento) " +
-        "VALUES (?, ?, ?, ?, ?, ?)";
+        "INSERT INTO pagamenti (id_prenotazione, importo_finale, metodo, stato, data_pagamento) " +
+        "VALUES (?, ?, ?, ?, ?)";
 
     private static final String SQL_UPDATE =
         "UPDATE pagamenti SET id_prenotazione=?, importo_finale=?, metodo=?, stato=?, data_pagamento=? " +
@@ -41,11 +43,11 @@ public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements Pag
     private static final String SQL_DELETE =
         "DELETE FROM pagamenti WHERE id_pagamento=?";
 
-    // Se possono esistere più pagamenti per una prenotazione, prendo il più recente
+    // Se possono esistere più pagamenti per una prenotazione, prendo il più recente (ordine deterministico)
     private static final String SQL_FIND_BY_PRENOTAZIONE =
         "SELECT id_pagamento, id_prenotazione, importo_finale, metodo, stato, data_pagamento " +
         "FROM pagamenti WHERE id_prenotazione=? " +
-        "ORDER BY data_pagamento DESC";
+        "ORDER BY data_pagamento DESC, id_pagamento DESC";
 
     public DbmsPagamentoDAO(ConnectionFactory cf) {
         super(cf);
@@ -105,7 +107,7 @@ public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements Pag
 
     @Override
     public boolean exists(Integer id) {
-        if (id == null) return false;
+        if (id == null || id <= 0) return false;
         return queryExists(SQL_EXISTS, ps -> ps.setInt(1, id));
     }
 
@@ -129,19 +131,29 @@ public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements Pag
     // Helper insert/update
     // =====================
     private void insert(Pagamento p) {
-        executeUpdate(SQL_INSERT, ps -> {
-            ps.setInt(1, p.getIdPagamento());
-            ps.setInt(2, p.getIdPrenotazione());
-            if (p.getImportoFinale() != null) ps.setBigDecimal(3, p.getImportoFinale());
-            else ps.setNull(3, Types.DECIMAL);
+        try (var c = openConnection();
+             var ps = c.prepareStatement(SQL_INSERT, java.sql.Statement.RETURN_GENERATED_KEYS)) {
 
-            ps.setString(4, p.getMetodo() != null ? p.getMetodo().name() : null);
-            ps.setString(5, p.getStato()  != null ? p.getStato().name()  : null);
+            ps.setInt(1, p.getIdPrenotazione());
+            if (p.getImportoFinale() != null) ps.setBigDecimal(2, p.getImportoFinale());
+            else ps.setNull(2, Types.DECIMAL);
+
+            ps.setString(3, p.getMetodo() != null ? p.getMetodo().name() : null);
+            ps.setString(4, p.getStato()  != null ? p.getStato().name()  : null);
 
             LocalDateTime dt = p.getDataPagamento();
-            if (dt != null) ps.setTimestamp(6, Timestamp.valueOf(dt));
-            else ps.setNull(6, Types.TIMESTAMP);
-        });
+            if (dt != null) ps.setTimestamp(5, Timestamp.valueOf(dt));
+            else ps.setNull(5, Types.TIMESTAMP);
+
+            ps.executeUpdate();
+            try (var gk = ps.getGeneratedKeys()) {
+                if (gk.next()) {
+                    p.setIdPagamento(gk.getInt(1));
+                }
+            }
+        } catch (java.sql.SQLException e) {
+            throw wrap(e);
+        }
     }
 
     private void update(Pagamento p) {

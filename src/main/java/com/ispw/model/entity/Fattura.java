@@ -5,7 +5,8 @@ import java.time.LocalDate;
 
 public final class Fattura implements Serializable {
     private int idFattura;
-    private int idPrenotazione; // FK
+    private int idPrenotazione;      // FK verso prenotazione
+    private int idUtente;            // <-- NUOVO: FK verso utente
     private String codiceFiscaleCliente;
     private LocalDate dataEmissione;
     private String linkPdf;
@@ -15,6 +16,9 @@ public final class Fattura implements Serializable {
 
     public int getIdPrenotazione() { return idPrenotazione; }
     public void setIdPrenotazione(int idPrenotazione) { this.idPrenotazione = idPrenotazione; }
+
+    public int getIdUtente() { return idUtente; }
+    public void setIdUtente(int idUtente) { this.idUtente = idUtente; }
 
     public String getCodiceFiscaleCliente() { return codiceFiscaleCliente; }
     public void setCodiceFiscaleCliente(String codiceFiscaleCliente) { this.codiceFiscaleCliente = codiceFiscaleCliente; }

@@ -1,6 +1,9 @@
 package com.ispw.dao.impl.filesystem.concrete;
 
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 
 import com.ispw.dao.impl.filesystem.FileSystemDAO;
@@ -10,14 +13,15 @@ import com.ispw.model.enums.Permesso;
 
 public class FileSystemGestoreDAO extends FileSystemDAO<Integer, Gestore> implements GestoreDAO {
 
+    private static final String FILE_NAME = "gestore.ser";
+
     public FileSystemGestoreDAO(Path storageDir) {
-        super(storageDir, "gestore.ser", new JavaBinaryMapCodec<>());
+        super(storageDir, FILE_NAME, new JavaBinaryMapCodec<>());
     }
 
     @Override
     protected Integer getId(Gestore entity) {
-        // TODO: return entity.getIdGestore() o getIdUtente()
-        throw new UnsupportedOperationException("TODO: Gestore.getId...");
+        return entity != null ? entity.getIdUtente() : 0; // chiave = idUtente
     }
 
     @Override
@@ -27,26 +31,52 @@ public class FileSystemGestoreDAO extends FileSystemDAO<Integer, Gestore> implem
 
     @Override
     public Gestore findByEmail(String email) {
-        throw new UnsupportedOperationException("TODO: findByEmail()");
+        final String norm = normalizeEmail(email);
+        if (norm == null || norm.isBlank()) return null;
+        return this.cache.values().stream()
+                .filter(g -> g != null && g.getEmail() != null
+                          && g.getEmail().trim().toLowerCase(Locale.ROOT).equals(norm))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public Set<Permesso> getPermessi(int idGestore) {
-        throw new UnsupportedOperationException("TODO: getPermessi()");
+        final Gestore g = load(idGestore);
+        if (g == null || g.getPermessi() == null) return Collections.emptySet();
+        // ritorno un Set immutabile costruito dalla List
+        return Set.copyOf(g.getPermessi());
     }
 
     @Override
     public boolean hasPermesso(int idGestore, Permesso permesso) {
-        throw new UnsupportedOperationException("TODO: hasPermesso()");
+        final Gestore g = load(idGestore);
+        return g != null && g.getPermessi() != null && g.getPermessi().contains(permesso);
     }
 
     @Override
     public void assegnaPermesso(int idGestore, Permesso permesso) {
-        throw new UnsupportedOperationException("TODO: assegnaPermesso()");
+        Objects.requireNonNull(permesso, "permesso non può essere null");
+        final Gestore g = load(idGestore);
+        if (g == null) return;
+        var list = g.getPermessi(); // è una List<Permesso>
+        if (list != null && !list.contains(permesso) && list.add(permesso)) {
+            store(g); // persisti su file
+        }
     }
 
     @Override
     public void rimuoviPermesso(int idGestore, Permesso permesso) {
-        throw new UnsupportedOperationException("TODO: rimuoviPermesso()");
+        Objects.requireNonNull(permesso, "permesso non può essere null");
+        final Gestore g = load(idGestore);
+        if (g == null) return;
+        var list = g.getPermessi();
+        if (list != null && list.remove(permesso)) {
+            store(g); // persisti su file
+        }
+    }
+
+    private static String normalizeEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
     }
 }

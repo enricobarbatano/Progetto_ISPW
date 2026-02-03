@@ -97,15 +97,15 @@ public final class DbmsDAOFactory extends DAOFactory {
         return prenotazioneDAO;
     }
 
-    @Override
-    public synchronized RegolePenalitaDAO getRegolePenalitaDAO() {
-        if (regolePenalitaDAO == null) regolePenalitaDAO = DbmsRegolePenalitaDAO.getInstance();
-        return regolePenalitaDAO;
+    
+    @Override public synchronized RegoleTempisticheDAO getRegoleTempisticheDAO() {
+    if (regoleTempisticheDAO == null) regoleTempisticheDAO = new DbmsRegoleTempisticheDAO(cf);
+    return regoleTempisticheDAO;
     }
 
-    @Override
-    public synchronized RegoleTempisticheDAO getRegoleTempisticheDAO() {
-        if (regoleTempisticheDAO == null) regoleTempisticheDAO = DbmsRegoleTempisticheDAO.getInstance();
-        return regoleTempisticheDAO;
+    @Override public synchronized RegolePenalitaDAO getRegolePenalitaDAO() {
+    if (regolePenalitaDAO == null) regolePenalitaDAO = new DbmsRegolePenalitaDAO(cf);
+    return regolePenalitaDAO;
     }
+
 }

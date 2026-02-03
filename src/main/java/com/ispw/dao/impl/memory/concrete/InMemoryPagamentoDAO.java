@@ -1,38 +1,15 @@
 package com.ispw.dao.impl.memory.concrete;
 
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.ispw.dao.impl.memory.In_MemoryDAO;
 import com.ispw.dao.interfaces.PagamentoDAO;
 import com.ispw.model.entity.Pagamento;
 
-public class InMemoryPagamentoDAO extends In_MemoryDAO<Integer, Pagamento> implements PagamentoDAO {
-
-    private static final AtomicInteger SEQ = new AtomicInteger(0);
-
+public final class InMemoryPagamentoDAO extends In_MemoryDAO<Integer, Pagamento> implements PagamentoDAO {
     public InMemoryPagamentoDAO() { super(true); }
-
-    @Override
-    protected Integer getId(Pagamento entity) {
-        return entity.getIdPagamento(); // entity: int → autoboxing
+    @Override protected Integer getId(Pagamento e) { return e != null ? e.getIdPagamento() : 0; }
+    @Override public Pagamento findByPrenotazione(int idPrenotazione) {
+        return snapshotValues().stream()
+            .filter(p -> p != null && p.getIdPrenotazione() == idPrenotazione)
+            .findFirst().orElse(null);
     }
-
-    @Override
-    public void store(Pagamento entity) {
-        if (entity.getIdPagamento() <= 0) {
-            entity.setIdPagamento(SEQ.incrementAndGet());
-        }
-        super.store(entity);
-    }
-
-    @Override
-    public Pagamento findByPrenotazione(int idPrenotazione) {
-        List<Pagamento> all = snapshotValues();
-        return all.stream()
-                  .filter(p -> p.getIdPrenotazione() == idPrenotazione)
-                  .findFirst()
-                  .orElse(null);
-    }
-
 }
