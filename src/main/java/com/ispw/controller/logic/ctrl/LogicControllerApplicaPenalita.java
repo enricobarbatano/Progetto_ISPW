@@ -1,6 +1,5 @@
 package com.ispw.controller.logic.ctrl;
 
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -106,7 +105,9 @@ public final class LogicControllerApplicaPenalita {
     // ========================================================================
 
     private boolean isDatiPenalitaValidi(DatiPenalitaBean d) {
-        return d != null && d.getIdUtente() > 0;
+        return d != null
+            && d.getIdUtente() > 0
+            && !isBlank(d.getMotivazione()); // coerente con i test: motivazione non blank
     }
 
     private boolean isImportoValido(BigDecimal imp) {
@@ -215,78 +216,27 @@ public final class LogicControllerApplicaPenalita {
     //  Infrastruttura: logging best-effort, utilità, esito, accesso DAO
     // ========================================================================
 
+    /**
+     * Logga sempre via JUL e, se disponibile, persiste su LogDAO in best-effort.
+     * Rifattorizzata per bassa complessità: passaggi lineari e responsabilità chiare.
+     */
     private void appendLogSafe(int idUtente, String descrizione) {
-        // Log via JUL
+        // 1) Log via JUL (sempre)
         log().log(Level.INFO, () -> "UTENTE=" + idUtente + " " + descrizione);
 
-        // Scrittura BEST-EFFORT su LogDAO (firma non nota → proviamo metodi pubblici comuni)
+        // 2) Best-effort: persistenza su LogDAO
         try {
             LogDAO ldao = DAOFactory.getInstance().getLogDAO();
             if (ldao == null) return;
 
-            // 1) Tentativo con (SystemLog)
             SystemLog sl = new SystemLog();
             sl.setIdUtenteCoinvolto(idUtente);
             sl.setDescrizione(descrizione);
             sl.setTimestamp(LocalDateTime.now());
-
-            if (tryInvoke(ldao, "store", SystemLog.class, sl)) return;
-            if (tryInvoke(ldao, "save",  SystemLog.class, sl)) return;
-            if (tryInvoke(ldao, "add",   SystemLog.class, sl)) return;
-            if (tryInvoke(ldao, "append",SystemLog.class, sl)) return;
-            if (tryInvoke(ldao, "log",   SystemLog.class, sl)) return;
-            if (tryInvoke(ldao, "put",   SystemLog.class, sl)) return;
-            if (tryInvoke(ldao, "write", SystemLog.class, sl)) return;
-
-            // 2) Firme alternative: (int, String) o (int, String, LocalDateTime)
-            if (tryInvoke(ldao, "store", int.class, String.class, idUtente, descrizione)) return;
-            if (tryInvoke(ldao, "save",  int.class, String.class, idUtente, descrizione)) return;
-            if (tryInvoke(ldao, "add",   int.class, String.class, idUtente, descrizione)) return;
-            if (tryInvoke(ldao, "log",   int.class, String.class, idUtente, descrizione)) return;
-
-            LocalDateTime now = LocalDateTime.now();
-            if (tryInvoke(ldao, "store", int.class, String.class, LocalDateTime.class, idUtente, descrizione, now)) return;
-            if (tryInvoke(ldao, "save",  int.class, String.class, LocalDateTime.class, idUtente, descrizione, now)) return;
-            if (tryInvoke(ldao, "add",   int.class, String.class, LocalDateTime.class, idUtente, descrizione, now)) return;
-            if (tryInvoke(ldao, "log",   int.class, String.class, LocalDateTime.class, idUtente, descrizione, now)) return;
-
-            // Nessuna firma compatibile: best-effort ⇒ solo JUL
-            log().log(Level.FINE, "Nessun metodo compatibile trovato su LogDAO per persistere SystemLog");
+            ldao.append(sl);
         } catch (RuntimeException ex) {
             // best-effort: non deve far fallire l'operazione principale
             log().log(Level.FINE, "Scrittura LogDAO fallita: " + ex.getMessage(), ex);
-        }
-    }
-
-    /** Invoca un metodo pubblico (nome + 1 parametro) restituendo true se riesce. */
-    private boolean tryInvoke(Object target, String methodName, Class<?> p1, Object a1) {
-        try {
-            Method m = target.getClass().getMethod(methodName, p1);
-            m.invoke(target, a1);
-            return true;
-        } catch (ReflectiveOperationException e) {
-            return false;
-        }
-    }
-    /** Overload helper per 2 parametri. */
-    private boolean tryInvoke(Object target, String methodName, Class<?> p1, Class<?> p2, Object a1, Object a2) {
-        try {
-            Method m = target.getClass().getMethod(methodName, p1, p2);
-            m.invoke(target, a1, a2);
-            return true;
-        } catch (ReflectiveOperationException e) {
-            return false;
-        }
-    }
-    /** Overload helper per 3 parametri. */
-    private boolean tryInvoke(Object target, String methodName, Class<?> p1, Class<?> p2, Class<?> p3,
-                              Object a1, Object a2, Object a3) {
-        try {
-            Method m = target.getClass().getMethod(methodName, p1, p2, p3);
-            m.invoke(target, a1, a2, a3);
-            return true;
-        } catch (ReflectiveOperationException e) {
-            return false;
         }
     }
 
