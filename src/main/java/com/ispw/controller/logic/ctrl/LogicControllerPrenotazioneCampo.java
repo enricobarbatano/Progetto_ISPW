@@ -41,9 +41,9 @@ public class LogicControllerPrenotazioneCampo {
     // Costanti di servizio
     // ========================
     private static final int DEFAULT_DURATA_MIN = 60;
-    private static final String MSG_SLOT_NON_DISP   = "[PRENOT] Slot non disponibile: campo={0} {1} {2}-{3}";
-    private static final String MSG_NO_PREN_DA_PAG  = "Nessuna prenotazione da pagare";
-    private static final String MSG_INPUT_NON_VALIDO= "Input non valido";
+    private static final String MSG_SLOT_NON_DISP    = "[PRENOT] Slot non disponibile: campo={0} {1} {2}-{3}";
+    private static final String MSG_NO_PREN_DA_PAG   = "Nessuna prenotazione da pagare";
+    private static final String MSG_INPUT_NON_VALIDO = "Input non valido";
 
     // ========================
     // Logger on-demand (no static field) – S1312
@@ -113,9 +113,9 @@ public class LogicControllerPrenotazioneCampo {
 
         var slots = dispCtrl.verificaDisponibilita(pv);
         boolean disponibile = slots.stream().anyMatch(d ->
-                Objects.equals(d.getData(), data.toString())
-                        && Objects.equals(d.getOraInizio(), inizio.toString())
-                        && Objects.equals(d.getOraFine(),  inizio.plusMinutes(durataMin).toString())
+                Objects.equals(d.getData(),     data.toString())
+             && Objects.equals(d.getOraInizio(), inizio.toString())
+             && Objects.equals(d.getOraFine(),   inizio.plusMinutes(durataMin).toString())
         );
         if (!disponibile) {
             log().log(Level.WARNING, MSG_SLOT_NON_DISP, new Object[]{idCampo, data, inizio, fine});
@@ -146,64 +146,110 @@ public class LogicControllerPrenotazioneCampo {
 
     // =============================================================================
     // 3) COMPLETA PRENOTAZIONE (pagamento → conferma → fattura → notifica)
+    //    Rifattorizzato per ridurre la complessità cognitiva, senza cambiare la logica.
     // =============================================================================
     public StatoPagamentoBean completaPrenotazione(DatiPagamentoBean dati,
                                                    SessioneUtenteBean sessione,
                                                    GestionePagamentoPrenotazione payCtrl,
                                                    GestioneFatturaPrenotazione   fattCtrl,
                                                    GestioneNotificaPrenotazione  notiCtrl) {
-        if (dati == null || sessione == null || sessione.getUtente() == null
-                || payCtrl == null || fattCtrl == null || notiCtrl == null) {
+        // 1) Validazioni iniziali (early return)
+        if (!isCheckoutInputValid(dati, sessione, payCtrl, fattCtrl, notiCtrl)) {
             return esitoPagamento(false, "KO", MSG_INPUT_NON_VALIDO);
         }
 
+        // 2) Identificazione utente da sessione
         final String email = normalizeEmail(sessione.getUtente().getEmail());
-        if (email == null) return esitoPagamento(false, "KO", "Sessione senza email");
-
+        if (email == null) {
+            return esitoPagamento(false, "KO", "Sessione senza email");
+        }
         final var user = userDAO().findByEmail(email);
-        if (user == null) return esitoPagamento(false, "KO", "Utente inesistente");
-
-        // 1) prenotazione da pagare (prima disponibile)
-        var daPagare = prenotazioneDAO().findByUtenteAndStato(user.getIdUtente(), StatoPrenotazione.DA_PAGARE);
-        if (daPagare.isEmpty()) return esitoPagamento(false, "KO", MSG_NO_PREN_DA_PAG);
-        Prenotazione p = daPagare.get(0);
-
-        // 2) pagamento
-        StatoPagamento statoEnum = payCtrl.richiediPagamentoPrenotazione(dati, p.getIdPrenotazione());
-        boolean success = isPagamentoOk(statoEnum);
-
-        // 3) post-pagamento
-        if (success) {
-            prenotazioneDAO().updateStato(p.getIdPrenotazione(), StatoPrenotazione.CONFERMATA);
-
-            DatiFatturaBean fatt = new DatiFatturaBean();
-            fatt.setCodiceFiscaleCliente(email); // placeholder; sostituire con CF reale
-            fattCtrl.generaFatturaPrenotazione(fatt, p.getIdPrenotazione());
-
-            notiCtrl.inviaConfermaPrenotazione(sessione.getUtente(),
-                    "Prenotazione #" + p.getIdPrenotazione() + " confermata");
+        if (user == null) {
+            return esitoPagamento(false, "KO", "Utente inesistente");
         }
 
-        // 4) composizione bean esito preferendo ciò che è stato persistito
+        // 3) Prenotazione da pagare
+        final Prenotazione p = getFirstDaPagare(user.getIdUtente());
+        if (p == null) {
+            return esitoPagamento(false, "KO", MSG_NO_PREN_DA_PAG);
+        }
+
+        // 4) Pagamento
+        final StatoPagamento statoEnum = payCtrl.richiediPagamentoPrenotazione(dati, p.getIdPrenotazione());
+        final boolean success = isPagamentoOk(statoEnum);
+
+        // 5) Post-pagamento (solo se successo): conferma → fattura → notifica
+        if (success) {
+            postPagamentoActions(p, email, fattCtrl, notiCtrl, sessione);
+        }
+
+        // 6) Esito: preferisci quanto persistito dal PagamentoDAO; altrimenti fallback
+        return composeEsito(p, success, statoEnum);
+    }
+
+    /* ========================= Helper estratti (nessuna logica cambiata) ========================= */
+
+    private boolean isCheckoutInputValid(DatiPagamentoBean dati,
+                                         SessioneUtenteBean sessione,
+                                         GestionePagamentoPrenotazione payCtrl,
+                                         GestioneFatturaPrenotazione   fattCtrl,
+                                         GestioneNotificaPrenotazione  notiCtrl) {
+        return dati != null
+            && sessione != null
+            && sessione.getUtente() != null
+            && payCtrl != null
+            && fattCtrl != null
+            && notiCtrl != null;
+    }
+
+    private Prenotazione getFirstDaPagare(int idUtente) {
+        var daPagare = prenotazioneDAO().findByUtenteAndStato(idUtente, StatoPrenotazione.DA_PAGARE);
+        return daPagare.isEmpty() ? null : daPagare.get(0);
+    }
+
+    /**
+     * Conferma prenotazione + emette fattura + invia notifica (solo in caso di successo).
+     * Non cambia i messaggi né le modalità di invocazione.
+     */
+    private void postPagamentoActions(Prenotazione p,
+                                      String email,
+                                      GestioneFatturaPrenotazione fattCtrl,
+                                      GestioneNotificaPrenotazione notiCtrl,
+                                      SessioneUtenteBean sessione) {
+        prenotazioneDAO().updateStato(p.getIdPrenotazione(), StatoPrenotazione.CONFERMATA);
+
+        DatiFatturaBean fatt = new DatiFatturaBean();
+        // NB: rimane invariato il placeholder già presente
+        fatt.setCodiceFiscaleCliente(email);
+        fattCtrl.generaFatturaPrenotazione(fatt, p.getIdPrenotazione());
+
+        notiCtrl.inviaConfermaPrenotazione(sessione.getUtente(),
+                "Prenotazione #" + p.getIdPrenotazione() + " confermata");
+    }
+
+    /**
+     * Ricompone lo stato di pagamento preferendo quanto scritto dal DAO;
+     * se assente, usa il fallback identico all’implementazione originale.
+     */
+    private StatoPagamentoBean composeEsito(Prenotazione p, boolean success, StatoPagamento statoEnum) {
         Pagamento pag = pagamentoDAO().findByPrenotazione(p.getIdPrenotazione());
         if (pag != null) {
             StatoPagamentoBean bean = new StatoPagamentoBean();
             bean.setSuccesso(success);
             bean.setStato(pag.getStato() != null ? pag.getStato().name() : (success ? "PAGATO" : "KO"));
-            bean.setIdTransazione(newTxId("PX"));
+            bean.setIdTransazione(newTxId("PX")); // invariato
             bean.setDataPagamento(pag.getDataPagamento());
             bean.setMessaggio(success ? "Pagamento eseguito" : "Pagamento rifiutato");
             return bean;
         }
-
-        // fallback minimale
+        // Fallback minimale (invariato)
         return esitoPagamento(success,
                 (statoEnum != null ? statoEnum.name() : (success ? "PAGATO" : "KO")),
                 success ? "Pagamento eseguito" : "Pagamento rifiutato");
     }
 
     // =========================
-    // Helper
+    // Helper generali
     // =========================
     private boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
 
