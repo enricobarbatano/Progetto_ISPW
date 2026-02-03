@@ -1,27 +1,44 @@
 package com.ispw.bootstrap;
 
-
 import java.util.Scanner;
+import java.util.logging.Logger;
 
 public final class ConsoleMenu {
+
+    // Scanner su System.in: non chiuderlo (evita di chiudere lo stream globale della JVM).
     private final Scanner sc = new Scanner(System.in);
 
+    @SuppressWarnings("java:S1312") // Logger con nome classe: convenzione del progetto
+    private static final Logger LOGGER = Logger.getLogger(ConsoleMenu.class.getName());
+
+    /**
+     * Mostra un semplice menu testuale e chiede una scelta numerica tra 1..options.length.
+     * I messaggi passano dal logger per conformità a Sonar (S106).
+     */
     public int askOption(String title, String... options) {
         while (true) {
-            System.out.println("\n=== " + title + " ===");
+            // Intestazione e opzioni
+            LOGGER.info(() -> "\n=== " + title + " ===");
             for (int i = 0; i < options.length; i++) {
-                System.out.printf("%d) %s%n", (i + 1), options[i]);
+                final int idx = i + 1;          // effectively final
+                final String opt = options[i];  // effectively final
+                LOGGER.info(() -> idx + ") " + opt);
             }
-            System.out.print("Scelta: ");
-            String line = sc.nextLine().trim();
+
+            // Prompt
+            LOGGER.info("Scelta: ");
+            final String line = sc.nextLine().trim();
 
             try {
-                int choice = Integer.parseInt(line);
-                if (choice >= 1 && choice <= options.length) return choice;
-            } catch (NumberFormatException ignored) {}
+                final int choice = Integer.parseInt(line);
+                if (choice >= 1 && choice <= options.length) {
+                    return choice;
+                }
+            } catch (NumberFormatException ignored) {
+                // no-op: gestito sotto con warning
+            }
 
-            System.out.println("Input non valido. Riprova.");
+            LOGGER.warning("Input non valido. Riprova.");
         }
     }
 }
-
