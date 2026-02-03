@@ -154,7 +154,7 @@ public class LogicControllerGestioneNotifica implements
     private String destinatario(UtenteBean utente) {
         // Se UtenteBean espone getEmail()/getNome(), puoi raffinare:
         // return utente.getNome() + " <" + utente.getEmail() + ">";
-        return (utente != null) ? utente.toString() : "utente=null";
+        return (utente != null) ? utente.toString() : UTENTE_NULL;
     }
 
     @SuppressWarnings("java:S1312")
