@@ -27,27 +27,28 @@ import com.ispw.model.enums.StatoAccount;
  */
 public final class DbmsGeneralUserDAO extends DbmsDAO<Integer, GeneralUser> implements GeneralUserDAO {
     private static final String ID_UTENTE= "id_utente";
+    private static final String where= " WHERE ";
     // ======= Costanti SQL (adatta al tuo schema reale) =======
     private static final String TBL  = "general_user";
     private static final String COLS = "id_utente, nome, email, password, stato_account, ruolo";
 
     private static final String SQL_SELECT_ONE =
-            "SELECT " + COLS + " FROM " + TBL + " WHERE " + ID_UTENTE + " = ?";
+            "SELECT " + COLS + " FROM " + TBL + where + ID_UTENTE + " = ?";
 
     private static final String SQL_SELECT_BY_EMAIL =
-            "SELECT " + COLS + " FROM " + TBL + " WHERE LOWER(email) = ?";
+            "SELECT " + COLS + " FROM " + TBL + where + "LOWER(email) = ?";
 
     private static final String SQL_EXISTS =
-            "SELECT 1 FROM " + TBL + " WHERE " + ID_UTENTE + " = ?";
+            "SELECT 1 FROM " + TBL + where + ID_UTENTE + " = ?";
 
     private static final String SQL_INSERT =
             "INSERT INTO " + TBL + " (nome, email, password, stato_account, ruolo) VALUES (?, ?, ?, ?, ?)";
 
     private static final String SQL_UPDATE =
-            "UPDATE " + TBL + " SET nome = ?, email = ?, password = ?, stato_account = ?, ruolo = ? WHERE " + ID_UTENTE + " = ?";
+            "UPDATE " + TBL + " SET nome = ?, email = ?, password = ?, stato_account = ?, ruolo = ? " + where + ID_UTENTE + " = ?";
 
     private static final String SQL_DELETE =
-            "DELETE FROM " + TBL + " WHERE " + ID_UTENTE + " = ?";
+            "DELETE FROM " + TBL + where + ID_UTENTE + " = ?";
     public DbmsGeneralUserDAO(ConnectionFactory cf) {
         super(cf);
     }
@@ -55,7 +56,7 @@ public final class DbmsGeneralUserDAO extends DbmsDAO<Integer, GeneralUser> impl
     // ======= RowMapper =======
     private static GeneralUser map(ResultSet rs) throws SQLException {
         final UtenteFinale u = new UtenteFinale(); // GeneralUser è abstract
-        u.setIdUtente(rs.getInt("id_utente"));
+        u.setIdUtente(rs.getInt(ID_UTENTE));
         u.setNome(rs.getString("nome"));
         u.setEmail(rs.getString("email"));
         u.setPassword(rs.getString("password"));

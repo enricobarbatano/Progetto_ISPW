@@ -35,10 +35,10 @@ public class LogicControllerGestionePagamento
         try { return MetodoPagamento.valueOf(nome.trim().toUpperCase()); }
         catch (IllegalArgumentException ex) { return null; }
     }
-    private static final String fallito= "FALLITO";
-    private static final String rifusiato= "RIFIUTATO";
-    private static final String negato= "NEGATO";
-    private static final String ko= "KO";
+    private static final String FALLITO= "FALLITO";
+    private static final String RIFIUTATO= "RIFIUTATO";
+    private static final String NEGATO= "NEGATO";
+    private static final String KO= "KO";
     /**
      * Prova una lista di alias per ricavare uno StatoPagamento dell'enum reale;
      * se non trova corrispondenze, fa fallback al primo valore definito nell'enum
@@ -63,9 +63,9 @@ public class LogicControllerGestionePagamento
     @Override
     public StatoPagamento richiediPagamentoPrenotazione(DatiPagamentoBean dati, int idPrenotazione) {
         // Validazioni semplici d’input
-        if (dati == null) return pickStato(fallito, rifusiato, negato, ko);
+        if (dati == null) return pickStato(FALLITO, RIFIUTATO, NEGATO, KO);
         MetodoPagamento metodo = parseMetodo(dati.getMetodo());
-        if (metodo == null) return pickStato(fallito, rifusiato, negato, ko);
+        if (metodo == null) return pickStato(FALLITO, RIFIUTATO, NEGATO, KO);
         
         // Se esiste già un pagamento registrato, riuso l’entity; altrimenti ne creo una nuova
         Pagamento pay = pagamentoDAO().findByPrenotazione(idPrenotazione);
@@ -83,7 +83,7 @@ public class LogicControllerGestionePagamento
         boolean ok = dati.getImporto() > 0f;
         StatoPagamento stato = ok
                 ? pickStato( "ESEGUITO", "APPROVATO", "PAGATO", "SUCCESSO", "COMPLETATO")
-                : pickStato(rifusiato, fallito, negato, ko);
+                : pickStato(RIFIUTATO, FALLITO, NEGATO, KO);
 
         pay.setStato(stato);
         // Persisto tramite DAO (nessun SQL qui)
@@ -116,9 +116,9 @@ public class LogicControllerGestionePagamento
     @Override
     public StatoPagamentoBean richiediPagamentoPenalità(DatiPagamentoBean dati, int idPenalita) {
         // Validazioni semplici
-        if (dati == null) return esito(false, pickStato(fallito, rifusiato, negato, ko).name(), null, "Dati pagamento mancanti");
+        if (dati == null) return esito(false, pickStato(FALLITO, RIFIUTATO, NEGATO, KO).name(), null, "Dati pagamento mancanti");
         MetodoPagamento metodo = parseMetodo(dati.getMetodo());
-        if (metodo == null) return esito(false, pickStato(fallito, rifusiato, negato, ko).name(), null, "Metodo pagamento non valido");
+        if (metodo == null) return esito(false, pickStato(FALLITO, RIFIUTATO, NEGATO, KO).name(), null, "Metodo pagamento non valido");
 
         // Soluzione “scolastica”: traccio un Pagamento legato alla penalità usando idPrenotazione negativo
         Pagamento pay = new Pagamento();
@@ -130,7 +130,7 @@ public class LogicControllerGestionePagamento
         boolean ok = dati.getImporto() > 0f;
         String stato = (ok
                 ? pickStato("ESEGUITO", "APPROVATO", "PAGATO", "SUCCESSO", "COMPLETATO")
-                : pickStato(rifusiato, fallito, negato, ko)
+                : pickStato(RIFIUTATO, FALLITO, NEGATO, KO)
         ).name();
 
         pay.setStato(StatoPagamento.valueOf(stato)); // coerente con l'enum reale

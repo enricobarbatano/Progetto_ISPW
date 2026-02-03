@@ -25,27 +25,27 @@ import com.ispw.model.enums.TipoOperazione;
  */
 public final class DbmsLogDAO extends DbmsDAO<Integer, SystemLog> implements LogDAO {
     
-    private static final String da=" FROM ";
-    private static final String select="SELECT ";
-    // ======= Costanti SQL (adatta i nomi a schema reale) =======
+    private static final String DA=" FROM ";
+    private static final String SELECT="SELECT ";
+    // ======= Costanti SQL (aDAtta i nomi a schema reale) =======
     private static final String TBL = "system_log";
     private static final String COLS = "id_log, timestamp, tipo_operazione, id_utente_coinvolto, descrizione";
 
     private static final String SQL_SELECT_ONE =
-            select + COLS + da + TBL + " WHERE id_log = ?";
+            SELECT + COLS + DA + TBL + " WHERE id_log = ?";
 
     private static final String SQL_INSERT =
             "INSERT INTO " + TBL + " (timestamp, tipo_operazione, id_utente_coinvolto, descrizione) VALUES (?, ?, ?, ?)";
 
     private static final String SQL_EXISTS =
-            select + "1" + da + TBL + " WHERE id_log = ?";
+            SELECT + "1" + DA + TBL + " WHERE id_log = ?";
 
     private static final String SQL_FIND_BY_UTENTE =
-            select + COLS + da + TBL + " WHERE id_utente_coinvolto = ? " +
+            SELECT + COLS + DA + TBL + " WHERE id_utente_coinvolto = ? " +
             "ORDER BY timestamp DESC, id_log DESC";
 
     private static final String SQL_FIND_LAST =
-            select + COLS + da + TBL + " ORDER BY timestamp DESC, id_log DESC LIMIT ?";
+            SELECT + COLS + DA + TBL + " ORDER BY timestamp DESC, id_log DESC LIMIT ?";
     private static final int MIN_LIMIT = 1;
 
     public DbmsLogDAO(ConnectionFactory cf) {
@@ -90,7 +90,6 @@ public final class DbmsLogDAO extends DbmsDAO<Integer, SystemLog> implements Log
             ps.setInt(3, log.getIdUtenteCoinvolto());
             ps.setString(4, log.getDescrizione());
             ps.executeUpdate();
-
             try (ResultSet gk = ps.getGeneratedKeys()) {
                 if (gk.next()) {
                     log.setIdLog(gk.getInt(1));
@@ -120,7 +119,7 @@ public final class DbmsLogDAO extends DbmsDAO<Integer, SystemLog> implements Log
         return r.orElse(null);
     }
 
-    /** Append-only: store delega ad append (non fa update). */
+    /** Append-only: store delega ad append (non fa upDAte). */
     @Override
     public void store(SystemLog entity) {
         append(entity);

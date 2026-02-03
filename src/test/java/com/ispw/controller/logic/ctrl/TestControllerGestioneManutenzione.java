@@ -93,7 +93,16 @@ class TestControllerGestioneManutenzione extends BaseDAOTest {
     private static final class TestLogHandler extends Handler {
         private final List<LogRecord> records = new ArrayList<>();
         @Override public void publish(LogRecord record) { records.add(record); }
-        @Override public void flush() { }
+        @Override public void flush() { 
+            
+ /**
+     * Nota: metodo intenzionalmente vuoto.
+     * Questo handler memorizza i LogRecord in memoria (lista) e non scrive su stream/sink esterni;
+     * non c'è quindi alcun buffer sottostante da svuotare. Lasciarlo no-op evita effetti collaterali
+     * nei test e rende il comportamento prevedibile.
+     */
+
+        }
         @Override public void close() throws SecurityException { records.clear(); }
         LogRecord last() { return records.isEmpty() ? null : records.get(records.size() - 1); }
         int size() { return records.size(); }
