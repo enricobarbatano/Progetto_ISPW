@@ -2,24 +2,21 @@ package com.ispw.controller.graphic;
 
 import java.util.Map;
 
+/**
+ * Router/Navigator: cambia "schermata" (CLI menu o JavaFX scene).
+ * È l’unico che mantiene il contesto di navigazione (stack, route corrente, ecc.).
+ */
 public interface GraphicControllerNavigation {
 
-    /** Registra un controller, usando il suo routeName */
-    default GraphicControllerNavigation register(NavigableController controller) {
-        return register(controller.getRouteName(), controller);
-    }
-
-    /** Versione originale, se vuoi mantenerla retrocompatibile */
-    GraphicControllerNavigation register(String route, NavigableController controller);
-
-    void start(String initialRoute);
-
-    /** Naviga verso una route senza parametri */
+    /** Vai a una route senza parametri */
     default void goTo(String route) { goTo(route, Map.of()); }
 
-    /** Naviga verso una route passando parametri */
+    /** Vai a una route con parametri (passaggio dati tra schermate) */
     void goTo(String route, Map<String, Object> params);
 
-    /** Opzionale: torna alla schermata precedente, se presente */
-    default boolean back() { return false; }
+    /** Torna indietro (se supportato). In CLI può tornare al menu precedente. */
+    void back();
+
+    /** Chiude l'applicazione in modo controllato */
+    void exit();
 }
