@@ -23,21 +23,26 @@ public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
 
     @Override
     public void onShow(Map<String, Object> params) {
+        // Metodo intenzionalmente vuoto: lifecycle non ancora implementato
     }
 
     @Override
     public void richiediPrenotazioniCancellabili() {
+        // Metodo intenzionalmente vuoto: implementazione GUI specifica da completare
     }
 
     @Override
+        // Metodo intenzionalmente vuoto: implementazione GUI specifica da completare
     public void selezionaPrenotazione(int idPrenotazione) {
     }
 
     @Override
+        // Metodo intenzionalmente vuoto: implementazione GUI specifica da completare
     public void richiediAnteprimaDisdetta(int idPrenotazione) {
     }
 
     @Override
+        // Metodo intenzionalmente vuoto: implementazione GUI specifica da completare
     public void confermaDisdetta(int idPrenotazione) {
     }
 

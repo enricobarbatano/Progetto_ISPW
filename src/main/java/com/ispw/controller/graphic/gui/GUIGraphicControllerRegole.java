@@ -28,13 +28,16 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
 
     @Override
     public void onShow(Map<String, Object> params) {
+        // Metodo intenzionalmente vuoto: lifecycle non ancora implementato
     }
 
     @Override
     public void richiediListaCampi() {
+        // Metodo intenzionalmente vuoto: implementazione GUI specifica da completare
     }
 
     @Override
+        // Metodo intenzionalmente vuoto: implementazione GUI specifica da completare
     public void selezionaCampo(int idCampo) {
     }
 

@@ -28,6 +28,7 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
 
     @Override
     public void onShow(Map<String, Object> params) {
+        // Metodo intenzionalmente vuoto: lifecycle non ancora implementato
     }
 
     @Override

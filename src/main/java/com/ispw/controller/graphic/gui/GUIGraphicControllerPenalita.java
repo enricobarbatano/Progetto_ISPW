@@ -23,10 +23,12 @@ public class GUIGraphicControllerPenalita implements GraphicControllerPenalita {
 
     @Override
     public void onShow(Map<String, Object> params) {
+        // Metodo intenzionalmente vuoto: lifecycle non ancora implementato
     }
 
     @Override
     public void selezionaUtente(String email) {
+        // Metodo intenzionalmente vuoto: implementazione GUI specifica da completare
     }
 
     @Override

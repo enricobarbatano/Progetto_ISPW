@@ -26,10 +26,12 @@ public class GUIGraphicControllerAccount implements GraphicControllerAccount {
 
     @Override
     public void onShow(Map<String, Object> params) {
+        // Metodo intenzionalmente vuoto: lifecycle non ancora implementato
     }
 
     @Override
     public void loadAccount() {
+        // Metodo intenzionalmente vuoto: implementazione GUI specifica da completare
     }
 
     @Override
