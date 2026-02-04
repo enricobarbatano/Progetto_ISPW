@@ -2,32 +2,18 @@ package com.ispw.controller.graphic.gui;
 
 import java.util.Map;
 
-import com.ispw.bean.DatiRegistrazioneBean;
-import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.graphic.GraphicControllerRegistrazione;
 import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerRegistrazione;
 import com.ispw.controller.logic.ctrl.LogicControllerRegistrazione;
 
 /**
  * Adapter GUI per la registrazione.
  */
-public class GUIGraphicControllerRegistrazione implements GraphicControllerRegistrazione {
-    
-    private final GraphicControllerNavigation navigator;
+public class GUIGraphicControllerRegistrazione extends AbstractGraphicControllerRegistrazione {
     
     public GUIGraphicControllerRegistrazione(GraphicControllerNavigation navigator) {
-        this.navigator = navigator;
-    }
-    
-    @Override
-    public String getRouteName() {
-        return GraphicControllerUtils.ROUTE_REGISTRAZIONE;
-    }
-
-    @Override
-    public void onShow(Map<String, Object> params) {
-        // Metodo intenzionalmente vuoto: lifecycle non ancora implementato
+        super(navigator);
     }
 
     @Override
@@ -35,15 +21,15 @@ public class GUIGraphicControllerRegistrazione implements GraphicControllerRegis
         if (datiRegistrazione == null) {
             return;
         }
-        
-        DatiRegistrazioneBean bean = new DatiRegistrazioneBean();
-        bean.setNome((String) datiRegistrazione.get("nome"));
-        bean.setCognome((String) datiRegistrazione.get("cognome"));
-        bean.setEmail((String) datiRegistrazione.get("email"));
-        bean.setPassword((String) datiRegistrazione.get("password"));
+
+        var bean = buildRegistrazioneBean(
+            (String) datiRegistrazione.get(GraphicControllerUtils.KEY_NOME),
+            (String) datiRegistrazione.get(GraphicControllerUtils.KEY_COGNOME),
+            (String) datiRegistrazione.get(GraphicControllerUtils.KEY_EMAIL),
+            (String) datiRegistrazione.get(GraphicControllerUtils.KEY_PASSWORD));
         
         LogicControllerRegistrazione logicController = new LogicControllerRegistrazione();
-        EsitoOperazioneBean esito = logicController.registraNuovoUtente(bean);
+        var esito = logicController.registraNuovoUtente(bean);
         
         if (esito != null && esito.isSuccesso()) {
             vaiAlLogin();
@@ -51,7 +37,7 @@ public class GUIGraphicControllerRegistrazione implements GraphicControllerRegis
     }
 
     @Override
-    public void vaiAlLogin() {
+    protected void goToLogin() {
         if (navigator != null) {
             navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN, null);
         }

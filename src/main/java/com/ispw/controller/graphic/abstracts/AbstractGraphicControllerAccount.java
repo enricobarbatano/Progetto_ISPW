@@ -13,6 +13,12 @@ import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccount;
 
+/**
+ * Classe astratta che centralizza la logica comune dei controller grafici Account
+ * (CLI/GUI) per ridurre duplicazione. Non introduce nuove responsabilità né
+ * modifica il disaccoppiamento: delega invariata ai LogicController e mantiene
+ * la stessa navigazione verso la View tramite `GraphicControllerNavigation`.
+ */
 public abstract class AbstractGraphicControllerAccount implements GraphicControllerAccount {
 
     protected final GraphicControllerNavigation navigator;

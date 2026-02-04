@@ -3,28 +3,19 @@ package com.ispw.controller.graphic.cli;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.ispw.bean.DatiRegistrazioneBean;
-import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.graphic.GraphicControllerRegistrazione;
 import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerRegistrazione;
 import com.ispw.controller.logic.ctrl.LogicControllerRegistrazione;
 
 /**
  * Adapter CLI per la registrazione.
  */
-public class CLIGraphicControllerRegistrazione implements GraphicControllerRegistrazione {
+public class CLIGraphicControllerRegistrazione extends AbstractGraphicControllerRegistrazione {
     
     private static final Logger LOGGER = Logger.getLogger(CLIGraphicControllerRegistrazione.class.getName());
-    private final GraphicControllerNavigation navigator;
-    
     public CLIGraphicControllerRegistrazione(GraphicControllerNavigation navigator) {
-        this.navigator = navigator;
-    }
-    
-    @Override
-    public String getRouteName() {
-        return GraphicControllerUtils.ROUTE_REGISTRAZIONE;
+        super(navigator);
     }
 
     @Override
@@ -39,44 +30,40 @@ public class CLIGraphicControllerRegistrazione implements GraphicControllerRegis
     @Override
     public void inviaDatiRegistrazione(Map<String, Object> datiRegistrazione) {
         if (datiRegistrazione == null) {
-                    GraphicControllerUtils.notifyError(LOGGER, navigator, GraphicControllerUtils.ROUTE_REGISTRAZIONE,
-                        GraphicControllerUtils.PREFIX_REGISTRAZIONE,
-                    "Dati registrazione mancanti");
+            GraphicControllerUtils.notifyError(LOGGER, navigator, GraphicControllerUtils.ROUTE_REGISTRAZIONE,
+                GraphicControllerUtils.PREFIX_REGISTRAZIONE,
+                GraphicControllerUtils.MSG_DATI_REGISTRAZIONE_MANCANTI);
             return;
         }
         
-        String nome = safeTrim(datiRegistrazione.get("nome"));
-        String cognome = safeTrim(datiRegistrazione.get("cognome"));
-        String email = safeTrim(datiRegistrazione.get("email"));
-        String password = safeTrim(datiRegistrazione.get("password"));
+        String nome = safeTrim(datiRegistrazione.get(GraphicControllerUtils.KEY_NOME));
+        String cognome = safeTrim(datiRegistrazione.get(GraphicControllerUtils.KEY_COGNOME));
+        String email = safeTrim(datiRegistrazione.get(GraphicControllerUtils.KEY_EMAIL));
+        String password = safeTrim(datiRegistrazione.get(GraphicControllerUtils.KEY_PASSWORD));
 
         if (!hasText(nome) || !hasText(cognome) || !hasText(email) || !hasText(password)) {
-                    GraphicControllerUtils.notifyError(LOGGER, navigator, GraphicControllerUtils.ROUTE_REGISTRAZIONE,
-                        GraphicControllerUtils.PREFIX_REGISTRAZIONE,
-                    "Compila tutti i campi obbligatori");
+            GraphicControllerUtils.notifyError(LOGGER, navigator, GraphicControllerUtils.ROUTE_REGISTRAZIONE,
+                GraphicControllerUtils.PREFIX_REGISTRAZIONE,
+                GraphicControllerUtils.MSG_CAMPI_OBBLIGATORI_MANCANTI);
             return;
         }
 
-        DatiRegistrazioneBean bean = new DatiRegistrazioneBean();
-        bean.setNome(nome);
-        bean.setCognome(cognome);
-        bean.setEmail(email);
-        bean.setPassword(password);
+        var bean = buildRegistrazioneBean(nome, cognome, email, password);
         
         LogicControllerRegistrazione logicController = new LogicControllerRegistrazione();
-        EsitoOperazioneBean esito = logicController.registraNuovoUtente(bean);
+        var esito = logicController.registraNuovoUtente(bean);
         
         if (esito != null && esito.isSuccesso()) {
             vaiAlLogin();
         } else {
-                GraphicControllerUtils.notifyError(LOGGER, navigator, GraphicControllerUtils.ROUTE_REGISTRAZIONE,
-                    GraphicControllerUtils.PREFIX_REGISTRAZIONE,
-                    esito != null ? esito.getMessaggio() : "Registrazione non riuscita");
+            GraphicControllerUtils.notifyError(LOGGER, navigator, GraphicControllerUtils.ROUTE_REGISTRAZIONE,
+                GraphicControllerUtils.PREFIX_REGISTRAZIONE,
+                esito != null ? esito.getMessaggio() : GraphicControllerUtils.MSG_REGISTRAZIONE_NON_RIUSCITA);
         }
     }
 
     @Override
-    public void vaiAlLogin() {
+    protected void goToLogin() {
         if (navigator != null) {
             navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN);
         }

@@ -1,77 +1,56 @@
 package com.ispw.controller.graphic.gui;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
-import com.ispw.bean.DatiLoginBean;
-import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
-import com.ispw.controller.graphic.GraphicLoginController;
-import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccesso;
+import com.ispw.controller.graphic.abstracts.AbstractGraphicLoginController;
 
 /**
  * Adapter GUI per il login (JavaFX/Swing).
  */
-public class GUIGraphicLoginController implements GraphicLoginController {
-    
-    private final GraphicControllerNavigation navigator;
+public class GUIGraphicLoginController extends AbstractGraphicLoginController {
     
     public GUIGraphicLoginController(GraphicControllerNavigation navigator) {
-        this.navigator = navigator;
-    }
-    
-    @Override
-    public String getRouteName() {
-        return GraphicControllerUtils.ROUTE_LOGIN;
+        super(navigator);
     }
 
+    @SuppressWarnings("java:S1312")
     @Override
-    public void onShow(Map<String, Object> params) {
-        // Metodo intenzionalmente vuoto: lifecycle non ancora implementato
-    }
+    protected Logger log() { return Logger.getLogger(getClass().getName()); }
 
     @Override
-    public void effettuaLogin(DatiLoginBean credenziali) {
-        if (credenziali == null) {
-            if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN,
-                        Map.of(GraphicControllerUtils.KEY_ERROR, "Credenziali mancanti"));
-            }
-            return;
-        }
-        
-        LogicControllerGestioneAccesso logicController = new LogicControllerGestioneAccesso();
-        SessioneUtenteBean sessione = logicController.verificaCredenziali(credenziali);
-        
-        if (sessione != null) {
-            logicController.saveLog(sessione);
-            if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_HOME, Map.of("sessione", sessione));
-            }
-        } else if (navigator != null) {
+    protected void goToLoginWithError(String message) {
+        if (navigator != null) {
             navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN,
-                    Map.of(GraphicControllerUtils.KEY_ERROR, "Credenziali non valide"));
+                Map.of(GraphicControllerUtils.KEY_ERROR, message));
         }
     }
 
     @Override
-    public void logout() {
+    protected void goToLogin() {
         if (navigator != null) {
             navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN, null);
         }
     }
 
     @Override
-    public void vaiARegistrazione() {
+    protected void goToRegistrazione() {
         if (navigator != null) {
             navigator.goTo(GraphicControllerUtils.ROUTE_REGISTRAZIONE, null);
         }
     }
 
     @Override
-    public void vaiAHome() {
+    protected void goToHome(com.ispw.bean.SessioneUtenteBean sessione) {
         if (navigator != null) {
-            navigator.goTo(GraphicControllerUtils.ROUTE_HOME, null);
+            if (sessione == null) {
+                navigator.goTo(GraphicControllerUtils.ROUTE_HOME, null);
+            } else {
+                navigator.goTo(GraphicControllerUtils.ROUTE_HOME,
+                    Map.of(GraphicControllerUtils.KEY_SESSIONE, sessione));
+            }
         }
     }
 }

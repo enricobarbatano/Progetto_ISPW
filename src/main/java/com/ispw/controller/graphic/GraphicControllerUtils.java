@@ -26,6 +26,7 @@ public final class GraphicControllerUtils {
     public static final String KEY_NOME = "nome";
     public static final String KEY_COGNOME = "cognome";
     public static final String KEY_EMAIL = "email";
+    public static final String KEY_PASSWORD = "password";
     public static final String KEY_ATTIVO = "attivo";
     public static final String KEY_FLAG_MANUTENZIONE = "flagManutenzione";
     public static final String KEY_PREAVVISO_MINIMO_MINUTI = "preavvisoMinimoMinuti";
@@ -34,6 +35,8 @@ public final class GraphicControllerUtils {
     public static final String KEY_MESSAGGIO = "messaggio";
     public static final String KEY_ID_TRANSAZIONE = "idTransazione";
     public static final String KEY_DATA_PAGAMENTO = "dataPagamento";
+    public static final String KEY_SLOT_DISPONIBILI = "slotDisponibili";
+    public static final String KEY_SESSIONE = "sessione";
 
     public static final String ROUTE_LOGIN = "login";
     public static final String ROUTE_HOME = "home";
@@ -68,6 +71,18 @@ public final class GraphicControllerUtils {
     public static final String MSG_PARAMETRI_TEMPISTICHE_MANCANTI = "Parametri tempistiche mancanti";
     public static final String MSG_PARAMETRI_PENALITA_MANCANTI = "Parametri penalità mancanti";
     public static final String MSG_ID_CAMPO_NON_VALIDO = "Id campo non valido";
+    public static final String MSG_CREDENZIALI_MANCANTI = "Credenziali mancanti";
+    public static final String MSG_CREDENZIALI_NON_VALIDE = "Credenziali non valide";
+    public static final String MSG_DATI_REGISTRAZIONE_MANCANTI = "Dati registrazione mancanti";
+    public static final String MSG_CAMPI_OBBLIGATORI_MANCANTI = "Compila tutti i campi obbligatori";
+    public static final String MSG_REGISTRAZIONE_NON_RIUSCITA = "Registrazione non riuscita";
+    public static final String MSG_PARAMETRI_RICERCA_DISPONIBILITA_NULLI = "Parametri ricerca disponibilità nulli";
+    public static final String MSG_DATI_PRENOTAZIONE_NULLI = "Dati prenotazione nulli";
+    public static final String MSG_SESSIONE_MANCANTE_PRENOTAZIONE = "Sessione utente mancante per prenotazione";
+    public static final String MSG_PRENOTAZIONE_NON_CREATA = "Prenotazione non creata";
+    public static final String MSG_DATI_PAGAMENTO_NULLI = "Dati pagamento nulli";
+    public static final String MSG_SESSIONE_MANCANTE_PAGAMENTO = "Sessione utente mancante per pagamento";
+    public static final String MSG_PAGAMENTO_NON_COMPLETATO = "Pagamento non completato";
 
     private GraphicControllerUtils() {
         // utility class
