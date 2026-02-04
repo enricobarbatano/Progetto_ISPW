@@ -79,19 +79,7 @@ public class LogicControllerDisdettaPrenotazione {
 
         final List<RiepilogoPrenotazioneBean> out = new ArrayList<>();
         for (Prenotazione p : tutte) {
-            boolean skip = false;
-            LocalDateTime inizio = null;
-            if (p == null) {
-                skip = true;
-            } else if (p.getStato() == StatoPrenotazione.ANNULLATA) {
-                skip = true;
-            } else if (p.getData() == null || p.getOraInizio() == null) {
-                skip = true;
-            } else {
-                inizio = LocalDateTime.of(p.getData(), p.getOraInizio());
-                if (!inizio.isAfter(now)) skip = true; // solo future
-            }
-            if (skip) continue;
+            if (!isCancellablePrenotazione(p, now)) continue;
 
             // Importo: se esiste pagamento, usa importoFinale; altrimenti 0 (pren. non pagata)
             float importo = 0f;
@@ -108,6 +96,18 @@ public class LogicControllerDisdettaPrenotazione {
             out.add(r);
         }
         return out;
+    }
+
+    /**
+     * Verifica se una prenotazione è cancellabile (futura e non annullata).
+     */
+    private boolean isCancellablePrenotazione(Prenotazione p, LocalDateTime now) {
+        if (p == null) return false;
+        if (p.getStato() == StatoPrenotazione.ANNULLATA) return false;
+        if (p.getData() == null || p.getOraInizio() == null) return false;
+
+        LocalDateTime inizio = LocalDateTime.of(p.getData(), p.getOraInizio());
+        return inizio.isAfter(now); // solo future
     }
 
     // =====================================================================================
