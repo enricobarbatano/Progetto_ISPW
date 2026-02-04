@@ -13,9 +13,6 @@ import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccount;
 
-/**
- * Adapter GUI per la gestione account.
- */
 public class GUIGraphicControllerAccount implements GraphicControllerAccount {
     
     @SuppressWarnings("java:S1312")
@@ -66,14 +63,13 @@ public class GUIGraphicControllerAccount implements GraphicControllerAccount {
         }
 
         Object idUtente = nuoviDati.get(GraphicControllerUtils.KEY_ID_UTENTE);
-        if (!(idUtente instanceof Integer) || ((Integer) idUtente) <= 0) {
+        if (!(idUtente instanceof Integer id) || id <= 0) {
             notifyAccountError(GraphicControllerUtils.MSG_ID_UTENTE_NON_VALIDO);
             return;
         }
         
-        DatiAccountBean bean = buildAccountBean(nuoviDati, (Integer) idUtente);
+        DatiAccountBean bean = buildAccountBean(nuoviDati, id);
         
-        // Delega a LogicController (creato on-demand)
         LogicControllerGestioneAccount logicController = new LogicControllerGestioneAccount();
         EsitoOperazioneBean esito = logicController.aggiornaDatiAccountConNotifica(bean);
         

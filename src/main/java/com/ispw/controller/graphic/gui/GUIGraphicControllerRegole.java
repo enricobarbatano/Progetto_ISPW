@@ -14,9 +14,6 @@ import com.ispw.controller.graphic.GraphicControllerRegole;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerConfiguraRegole;
 
-/**
- * Adapter GUI per configurazione regole campo.
- */
 public class GUIGraphicControllerRegole implements GraphicControllerRegole {
     
     @SuppressWarnings("java:S1312")
@@ -35,7 +32,6 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
 
     @Override
     public void onShow(Map<String, Object> params) {
-        // Metodo intenzionalmente vuoto: lifecycle non ancora implementato
     }
 
     @Override

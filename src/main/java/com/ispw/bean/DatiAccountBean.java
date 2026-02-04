@@ -12,7 +12,6 @@ public class DatiAccountBean  {
     private String indirizzo;
 
     public DatiAccountBean() {
-        //Nota: costruttore no-args intenzionalmente vuoto.
     }
 
     public int getIdUtente() { 

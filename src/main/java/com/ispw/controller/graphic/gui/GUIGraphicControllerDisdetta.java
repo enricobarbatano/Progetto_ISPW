@@ -15,9 +15,6 @@ import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerDisdettaPrenotazione;
 
-/**
- * Adapter GUI per la disdetta prenotazione.
- */
 public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
     
     @SuppressWarnings("java:S1312")
@@ -36,7 +33,6 @@ public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
 
     @Override
     public void onShow(Map<String, Object> params) {
-        // Metodo intenzionalmente vuoto: lifecycle non ancora implementato
     }
 
     @Override

@@ -13,23 +13,13 @@ import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccount;
 
-/**
- * Adapter CLI per la gestione account.
- * 
- * Responsabilità:
- * - Adatta form account → Bean → LogicController
- * - Riceve DatiAccountBean, EsitoOperazioneBean dal LogicController
- * - Gestisce navigazione
- */
 public class CLIGraphicControllerAccount implements GraphicControllerAccount {
     
     @SuppressWarnings("java:S1312")
     private Logger log() { return Logger.getLogger(getClass().getName()); }
 
-    // ==================== Dependencies ====================
     private final GraphicControllerNavigation navigator;
     
-    // ==================== Constructors ====================
     public CLIGraphicControllerAccount(GraphicControllerNavigation navigator) {
         this.navigator = navigator;
     }
@@ -45,10 +35,6 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
         GraphicControllerUtils.handleOnShow(log(), params, GraphicControllerUtils.PREFIX_ACCOUNT);
     }
 
-    /**
-     * Carica informazioni account dell'utente corrente.
-     * View deve fornire SessioneUtenteBean.
-     */
     @Override
     public void loadAccount(SessioneUtenteBean sessione) {
         if (isSessioneNonValida(sessione, GraphicControllerUtils.MSG_SESSIONE_NON_VALIDA)) {
@@ -70,10 +56,6 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
         }
     }
 
-    /**
-     * Aggiorna dati account.
-     * @param nuoviDati mappa con campi modificati (nome, email, etc.)
-     */
     @Override
     public void aggiornaDatiAccount(Map<String, Object> nuoviDati) {
         if (nuoviDati == null) {
@@ -82,12 +64,12 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
         }
 
         Object idUtente = nuoviDati.get(GraphicControllerUtils.KEY_ID_UTENTE);
-        if (!(idUtente instanceof Integer) || ((Integer) idUtente) <= 0) {
+        if (!(idUtente instanceof Integer id) || id <= 0) {
             notifyAccountError(GraphicControllerUtils.MSG_ID_UTENTE_NON_VALIDO);
             return;
         }
         
-        DatiAccountBean bean = buildAccountBean(nuoviDati, (Integer) idUtente);
+        DatiAccountBean bean = buildAccountBean(nuoviDati, id);
 
         LogicControllerGestioneAccount logicController = new LogicControllerGestioneAccount();
         EsitoOperazioneBean esito = logicController.aggiornaDatiAccountConNotifica(bean);
@@ -100,9 +82,6 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
         }
     }
 
-    /**
-     * Cambia password.
-     */
     @Override
     public void cambiaPassword(String vecchiaPassword, String nuovaPassword, SessioneUtenteBean sessione) {
         if (vecchiaPassword == null || nuovaPassword == null) {
@@ -124,9 +103,6 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
         }
     }
 
-    /**
-     * Logout - naviga a login.
-     */
     @Override
     public void logout() {
         if (navigator != null) {

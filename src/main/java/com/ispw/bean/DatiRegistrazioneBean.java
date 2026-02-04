@@ -11,7 +11,6 @@ public class DatiRegistrazioneBean  {
     private String password;
 
     public DatiRegistrazioneBean() {
-        //Nota: costruttore no-args intenzionalmente vuoto.
     }
 
     public String getNome() { 

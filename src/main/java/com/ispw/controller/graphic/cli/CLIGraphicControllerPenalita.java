@@ -12,9 +12,6 @@ import com.ispw.controller.graphic.GraphicControllerPenalita;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerApplicaPenalita;
 
-/**
- * Adapter CLI per gestione applicazione penalità.
- */
 public class CLIGraphicControllerPenalita implements GraphicControllerPenalita {
     
     @SuppressWarnings("java:S1312")
@@ -33,7 +30,6 @@ public class CLIGraphicControllerPenalita implements GraphicControllerPenalita {
 
     @Override
     public void onShow(Map<String, Object> params) {
-        // Metodo intenzionalmente vuoto: lifecycle non ancora implementato
     }
 
     @Override
@@ -47,9 +43,6 @@ public class CLIGraphicControllerPenalita implements GraphicControllerPenalita {
         }
     }
 
-    /**
-     * Applica penalità a un utente.
-     */
     @Override
     public void applicaPenalita(int idUtente, float importo, String motivazione) {
         if (isIdUtenteNonValido(idUtente) || isPenalitaNonValida(importo, motivazione)) {

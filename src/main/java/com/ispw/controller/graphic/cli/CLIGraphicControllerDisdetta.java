@@ -15,9 +15,6 @@ import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerDisdettaPrenotazione;
 
-/**
- * Adapter CLI per la disdetta prenotazione.
- */
 public class CLIGraphicControllerDisdetta implements GraphicControllerDisdetta {
     
     @SuppressWarnings("java:S1312")
@@ -36,13 +33,8 @@ public class CLIGraphicControllerDisdetta implements GraphicControllerDisdetta {
 
     @Override
     public void onShow(Map<String, Object> params) {
-        // Metodo intenzionalmente vuoto: lifecycle non ancora implementato
     }
 
-    /**
-     * Richiede prenotazioni cancellabili per l'utente.
-     * View deve fornire UtenteBean dalla sessioneCorrente.
-     */
     @Override
     public void richiediPrenotazioniCancellabili(SessioneUtenteBean sessione) {
         if (isSessioneNonValida(sessione, GraphicControllerUtils.MSG_SESSIONE_UTENTE_MANCANTE)) {
@@ -78,9 +70,6 @@ public class CLIGraphicControllerDisdetta implements GraphicControllerDisdetta {
         }
     }
 
-    /**
-     * Richiede anteprima disdetta con calcolo rimborso.
-     */
     @Override
     public void richiediAnteprimaDisdetta(int idPrenotazione, SessioneUtenteBean sessione) {
         if (isIdNonValido(idPrenotazione, GraphicControllerUtils.MSG_ID_PRENOTAZIONE_NON_VALIDO)
@@ -110,9 +99,6 @@ public class CLIGraphicControllerDisdetta implements GraphicControllerDisdetta {
         }
     }
 
-    /**
-     * Conferma disdetta prenotazione.
-     */
     @Override
     public void confermaDisdetta(int idPrenotazione, SessioneUtenteBean sessione) {
         if (isIdNonValido(idPrenotazione, GraphicControllerUtils.MSG_ID_PRENOTAZIONE_NON_VALIDO)

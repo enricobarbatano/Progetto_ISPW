@@ -14,9 +14,6 @@ import com.ispw.controller.graphic.GraphicControllerRegole;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerConfiguraRegole;
 
-/**
- * Adapter CLI per configurazione regole campo.
- */
 public class CLIGraphicControllerRegole implements GraphicControllerRegole {
     
     @SuppressWarnings("java:S1312")
@@ -35,7 +32,6 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
 
     @Override
     public void onShow(Map<String, Object> params) {
-        // Metodo intenzionalmente vuoto: lifecycle non ancora implementato
     }
 
     @Override
@@ -63,9 +59,6 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
         }
     }
 
-    /**
-     * Aggiorna stato/regole del campo.
-     */
     @Override
     public void aggiornaStatoCampo(Map<String, Object> regolaCampo) {
         if (isNullParams(regolaCampo, GraphicControllerUtils.MSG_PARAMETRI_REGOLA_CAMPO_MANCANTI)) {
@@ -111,8 +104,6 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
         }
         
         PenalitaBean bean = buildPenalitaBean(penalita);
-        // Nota: BigDecimal per valorePenalita
-        
         LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
         EsitoOperazioneBean esito = logicController.aggiornaRegolepenalita(bean);
         
