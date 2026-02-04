@@ -145,31 +145,17 @@ public class LogicControllerDisdettaPrenotazione {
         if (p == null)    return esito(false, MSG_PREN_INESISTENTE);
         if (p.getStato() == StatoPrenotazione.ANNULLATA) return esito(false, MSG_GIA_ANNULLATA);
 
-        // Rimborso solo se prenotazione confermata (cioè pagata)
         final float penale = Math.max(0f, preview.getPenale());
-        if (p.getStato() == StatoPrenotazione.CONFERMATA) {
-            final var pag = pagamentoDAO().findByPrenotazione(idPrenotazione);
-            final float importoPagato = (pag != null && pag.getImportoFinale() != null) ? pag.getImportoFinale().floatValue() : 0f;
-            final float rimborso = Math.max(0f, importoPagato - penale);
-            if (rimborso > 0f) {
-                payRimborso.eseguiRimborso(idPrenotazione, rimborso);
-                fattRimborso.emettiNotaDiCredito(idPrenotazione);
-            }
-        }
 
-        // Aggiorna stato
+        // 1) rimborso (se necessario)
+        processRefundIfConfirmed(p, idPrenotazione, penale, payRimborso, fattRimborso);
+
+        // 2) aggiorna stato e rilascia slot
         prenotazioneDAO().updateStato(idPrenotazione, StatoPrenotazione.ANNULLATA);
-
-        // Rilascia la risorsa (slot)
         liberaRisorsa(idPrenotazione, disp);
 
-        // Notifica all’utente
-        noti.inviaConfermaCancellazione(sessione.getUtente(),
-                "Prenotazione #" + idPrenotazione + " annullata (penale " + penale + "€)");
-
-        // Log append-only (best effort)
-        appendLogSafe(user.getIdUtente(),
-                "DISDETTA_PRENOTAZIONE #" + idPrenotazione + " - penale " + penale + "€");
+        // 3) notifica e log
+        notifyAndLog(sessione, noti, user.getIdUtente(), idPrenotazione, penale);
 
         return esito(true, MSG_DISDETTA_OK);
     }
@@ -240,6 +226,43 @@ public class LogicControllerDisdettaPrenotazione {
             // Best effort: il rilascio slot non deve bloccare la disdetta
             log().log(Level.FINE, "Rilascio slot fallito: {0}", ex.getMessage());
         }
+    }
+
+    private void processRefundIfConfirmed(Prenotazione p, int idPrenotazione, float penale,
+                                           GestionePagamentoRimborso payRimborso,
+                                           GestioneFatturaRimborso fattRimborro) {
+        if (p == null) return;
+        if (p.getStato() != StatoPrenotazione.CONFERMATA) return;
+
+        final var pag = pagamentoDAO().findByPrenotazione(idPrenotazione);
+        final float importoPagato = (pag != null && pag.getImportoFinale() != null)
+                ? pag.getImportoFinale().floatValue() : 0f;
+        final float rimborso = Math.max(0f, importoPagato - penale);
+        if (rimborso <= 0f) return;
+
+        try {
+            payRimborso.eseguiRimborso(idPrenotazione, rimborso);
+            fattRimborro.emettiNotaDiCredito(idPrenotazione);
+        } catch (RuntimeException ex) {
+            // Best-effort: errori refund non bloccano la disdetta
+            log().log(Level.FINE, "Rimborso fallito: {0}", ex.getMessage());
+        }
+    }
+
+    private void notifyAndLog(SessioneUtenteBean sessione,
+                              GestioneNotificaDisdetta noti,
+                              int idUtente,
+                              int idPrenotazione,
+                              float penale) {
+        try {
+            noti.inviaConfermaCancellazione(sessione.getUtente(),
+                    "Prenotazione #" + idPrenotazione + " annullata (penale " + penale + "€)");
+        } catch (RuntimeException ex) {
+            // best-effort
+            log().log(Level.FINE, "Notifica disdetta fallita: {0}", ex.getMessage());
+        }
+
+        appendLogSafe(idUtente, "DISDETTA_PRENOTAZIONE #" + idPrenotazione + " - penale " + penale + "€");
     }
 
     // ========================
