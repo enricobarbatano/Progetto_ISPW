@@ -1,15 +1,28 @@
 package com.ispw.controller.graphic.gui;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.ispw.bean.EsitoDisdettaBean;
+import com.ispw.bean.EsitoOperazioneBean;
+import com.ispw.bean.RiepilogoPrenotazioneBean;
+import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.controller.graphic.GraphicControllerDisdetta;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
+import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.logic.ctrl.LogicControllerDisdettaPrenotazione;
 
 /**
  * Adapter GUI per la disdetta prenotazione.
  */
 public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
     
+    @SuppressWarnings("java:S1312")
+    private Logger log() { return Logger.getLogger(getClass().getName()); }
+
     private final GraphicControllerNavigation navigator;
     
     public GUIGraphicControllerDisdetta(GraphicControllerNavigation navigator) {
@@ -27,23 +40,99 @@ public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
     }
 
     @Override
-    public void richiediPrenotazioniCancellabili() {
-        // Metodo intenzionalmente vuoto: implementazione GUI specifica da completare
+    public void richiediPrenotazioniCancellabili(SessioneUtenteBean sessione) {
+        if (sessione == null || sessione.getUtente() == null) {
+            GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]", "Sessione utente mancante");
+            return;
+        }
+
+        try {
+            LogicControllerDisdettaPrenotazione logicController = new LogicControllerDisdettaPrenotazione();
+            List<RiepilogoPrenotazioneBean> prenotazioni =
+                    logicController.ottieniPrenotazioniCancellabili(sessione.getUtente());
+
+            List<String> elenco = prenotazioni.stream()
+                    .map(RiepilogoPrenotazioneBean::toString)
+                    .toList();
+
+            if (navigator != null) {
+                navigator.goTo("disdetta", Map.of("prenotazioni", elenco));
+            }
+        } catch (Exception e) {
+            log().log(Level.SEVERE, "Errore richiesta prenotazioni cancellabili", e);
+        }
     }
 
     @Override
-        // Metodo intenzionalmente vuoto: implementazione GUI specifica da completare
     public void selezionaPrenotazione(int idPrenotazione) {
+        if (idPrenotazione <= 0) {
+            GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]", "Id prenotazione non valido");
+            return;
+        }
+        if (navigator != null) {
+            navigator.goTo("disdetta", Map.of("idPrenotazione", idPrenotazione));
+        }
     }
 
     @Override
-        // Metodo intenzionalmente vuoto: implementazione GUI specifica da completare
-    public void richiediAnteprimaDisdetta(int idPrenotazione) {
+    public void richiediAnteprimaDisdetta(int idPrenotazione, SessioneUtenteBean sessione) {
+        if (idPrenotazione <= 0) {
+            GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]", "Id prenotazione non valido");
+            return;
+        }
+        if (sessione == null || sessione.getUtente() == null) {
+            GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]", "Sessione utente mancante");
+            return;
+        }
+
+        try {
+            LogicControllerDisdettaPrenotazione logicController = new LogicControllerDisdettaPrenotazione();
+            EsitoDisdettaBean esito = logicController.anteprimaDisdetta(idPrenotazione, sessione);
+
+            if (esito == null || !esito.isPossibile()) {
+                GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]", "Disdetta non consentita");
+                return;
+            }
+
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("possibile", esito.isPossibile());
+            payload.put("penale", esito.getPenale());
+
+            if (navigator != null) {
+                navigator.goTo("disdetta", Map.of("anteprima", payload));
+            }
+        } catch (Exception e) {
+            log().log(Level.SEVERE, "Errore anteprima disdetta", e);
+        }
     }
 
     @Override
-        // Metodo intenzionalmente vuoto: implementazione GUI specifica da completare
-    public void confermaDisdetta(int idPrenotazione) {
+    public void confermaDisdetta(int idPrenotazione, SessioneUtenteBean sessione) {
+        if (idPrenotazione <= 0) {
+            GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]", "Id prenotazione non valido");
+            return;
+        }
+        if (sessione == null || sessione.getUtente() == null) {
+            GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]", "Sessione utente mancante");
+            return;
+        }
+
+        try {
+            LogicControllerDisdettaPrenotazione logicController = new LogicControllerDisdettaPrenotazione();
+            EsitoOperazioneBean esito = logicController.eseguiAnnullamento(idPrenotazione, sessione);
+
+            if (esito == null || !esito.isSuccesso()) {
+                GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]",
+                    esito != null ? esito.getMessaggio() : "Disdetta non riuscita");
+                return;
+            }
+
+            if (navigator != null) {
+                navigator.goTo("disdetta", Map.of("successo", esito.getMessaggio()));
+            }
+        } catch (Exception e) {
+            log().log(Level.SEVERE, "Errore conferma disdetta", e);
+        }
     }
 
     @Override
@@ -52,4 +141,5 @@ public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
             navigator.goTo("home", null);
         }
     }
+
 }

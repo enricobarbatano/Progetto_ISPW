@@ -1,10 +1,12 @@
 package com.ispw.controller.graphic.cli;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import com.ispw.bean.DatiLoginBean;
 import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
+import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.GraphicLoginController;
 import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccesso;
 
@@ -25,6 +27,9 @@ import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccesso;
  */
 public class CLIGraphicLoginController implements GraphicLoginController {
     
+    @SuppressWarnings("java:S1312")
+    private Logger log() { return Logger.getLogger(getClass().getName()); }
+
     // ==================== Dependencies ====================
     private final GraphicControllerNavigation navigator;
     
@@ -41,7 +46,7 @@ public class CLIGraphicLoginController implements GraphicLoginController {
 
     @Override
     public void onShow(Map<String, Object> params) {
-        // TODO: implementare lifecycle (pulire campi, mostrare messaggio)
+        GraphicControllerUtils.handleOnShow(log(), params, "[LOGIN]");
     }
 
     // ==================== Business Methods ====================
@@ -62,7 +67,9 @@ public class CLIGraphicLoginController implements GraphicLoginController {
     @Override
     public void effettuaLogin(DatiLoginBean credenziali) {
         if (credenziali == null) {
-            // TODO: notificare View credenziali mancanti
+            if (navigator != null) {
+                navigator.goTo("login", Map.of("error", "Credenziali mancanti"));
+            }
             return;
         }
         
@@ -71,9 +78,13 @@ public class CLIGraphicLoginController implements GraphicLoginController {
         
         if (sessione != null) {
             logicController.saveLog(sessione);
-            vaiAHome();
+            if (navigator != null) {
+                navigator.goTo("home", Map.of("sessione", sessione));
+            }
         } else {
-            // TODO: notificare View credenziali errate
+            if (navigator != null) {
+                navigator.goTo("login", Map.of("error", "Credenziali non valide"));
+            }
         }
     }
 
@@ -82,7 +93,6 @@ public class CLIGraphicLoginController implements GraphicLoginController {
      */
     @Override
     public void logout() {
-        // TODO: implementare logout
         if (navigator != null) {
             navigator.goTo("login");
         }

@@ -79,6 +79,11 @@ public class LogicControllerGestioneAccount {
     // =====================================================================================
     // 2) Aggiorna dati account
     // =====================================================================================
+    /** Versione con notifica interna (controller secondario creato internamente). */
+    public EsitoOperazioneBean aggiornaDatiAccountConNotifica(DatiAccountBean nuovidati) {
+        return aggiornaDatiAccount(nuovidati, new LogicControllerGestioneNotifica());
+    }
+
     /** Firma essenziale: aggiorna nome/email (telefono/indirizzo non gestiti perché assenti in GeneralUser). */
     public EsitoOperazioneBean aggiornaDatiAccount(DatiAccountBean nuovidati) {
         if (!isValid(nuovidati)) {
@@ -140,6 +145,11 @@ public class LogicControllerGestioneAccount {
     // =====================================================================================
     // 3) Cambia password
     // =====================================================================================
+    /** Versione con notifica interna (controller secondario creato internamente). */
+    public EsitoOperazioneBean cambiaPasswordConNotifica(String vecchiaPwd, String nuovaPwd, SessioneUtenteBean sessione) {
+        return cambiaPassword(vecchiaPwd, nuovaPwd, sessione, new LogicControllerGestioneNotifica());
+    }
+
     /** Firma essenziale: cambia password, verificando la vecchia. */
     public EsitoOperazioneBean cambiaPassword(String vecchiaPwd, String nuovaPwd, SessioneUtenteBean sessione) {
         if (sessione == null || sessione.getUtente() == null || isBlank(sessione.getUtente().getEmail())) {

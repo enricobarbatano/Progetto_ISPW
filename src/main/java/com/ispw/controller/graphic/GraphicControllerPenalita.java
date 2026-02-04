@@ -15,7 +15,7 @@ public interface GraphicControllerPenalita extends NavigableController {
      * Applica una penalità all'utente precedentemente selezionato.
      * I dati necessari arrivano dalla UI (CLI/GUI).
      */
-    void applicaPenalita(float importo, String motivazione);
+    void applicaPenalita(int idUtente, float importo, String motivazione);
 
     /**
      * Torna alla home/menu principale della sessione corrente.

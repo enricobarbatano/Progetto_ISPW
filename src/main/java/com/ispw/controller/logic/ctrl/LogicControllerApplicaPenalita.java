@@ -56,6 +56,16 @@ public final class LogicControllerApplicaPenalita {
     // ========================================================================
     //  Metodo pubblico (rifattorizzato: bassa complessità cognitiva)
     // ========================================================================
+    public EsitoOperazioneBean applicaSanzione(DatiPenalitaBean dati) {
+        return applicaSanzione(
+                dati,
+                null,
+                null,
+                new LogicControllerGestionePagamento(),
+                new LogicControllerGestioneFattura(),
+                new LogicControllerGestioneNotifica());
+    }
+
     public EsitoOperazioneBean applicaSanzione(DatiPenalitaBean dati,
                                                DatiPagamentoBean datiPagamento,
                                                DatiFatturaBean   datiFattura,

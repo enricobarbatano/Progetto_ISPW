@@ -1,6 +1,9 @@
 package com.ispw.controller.graphic.gui;
 
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.bean.PenalitaBean;
@@ -8,6 +11,7 @@ import com.ispw.bean.RegolaCampoBean;
 import com.ispw.bean.TempisticheBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerRegole;
+import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerConfiguraRegole;
 
 /**
@@ -15,6 +19,9 @@ import com.ispw.controller.logic.ctrl.LogicControllerConfiguraRegole;
  */
 public class GUIGraphicControllerRegole implements GraphicControllerRegole {
     
+    @SuppressWarnings("java:S1312")
+    private Logger log() { return Logger.getLogger(getClass().getName()); }
+
     private final GraphicControllerNavigation navigator;
     
     public GUIGraphicControllerRegole(GraphicControllerNavigation navigator) {
@@ -33,17 +40,32 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
 
     @Override
     public void richiediListaCampi() {
-        // Metodo intenzionalmente vuoto: implementazione GUI specifica da completare
+        try {
+            LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
+            List<String> campi = logicController.listaCampi();
+            if (navigator != null) {
+                navigator.goTo("regole", Map.of("campi", campi));
+            }
+        } catch (Exception e) {
+            log().log(Level.SEVERE, "Errore recupero lista campi", e);
+        }
     }
 
     @Override
-        // Metodo intenzionalmente vuoto: implementazione GUI specifica da completare
     public void selezionaCampo(int idCampo) {
+        if (idCampo <= 0) {
+            GraphicControllerUtils.notifyError(log(), navigator, "regole", "[REGOLE]", "Id campo non valido");
+            return;
+        }
+        if (navigator != null) {
+            navigator.goTo("regole", Map.of("idCampo", idCampo));
+        }
     }
 
     @Override
     public void aggiornaStatoCampo(Map<String, Object> regolaCampo) {
         if (regolaCampo == null) {
+            GraphicControllerUtils.notifyError(log(), navigator, "regole", "[REGOLE]", "Parametri regola campo mancanti");
             return;
         }
         
@@ -62,13 +84,19 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
         EsitoOperazioneBean esito = logicController.aggiornaRegoleCampo(bean);
         
         if (esito != null && esito.isSuccesso()) {
-            // TODO: mostrare dialog successo
+            if (navigator != null) {
+                navigator.goTo("regole", Map.of("successo", esito.getMessaggio()));
+            }
+        } else {
+            GraphicControllerUtils.notifyError(log(), navigator, "regole", "[REGOLE]",
+                    esito != null ? esito.getMessaggio() : "Operazione non riuscita");
         }
     }
 
     @Override
     public void aggiornaTempistiche(Map<String, Object> tempistiche) {
         if (tempistiche == null) {
+            GraphicControllerUtils.notifyError(log(), navigator, "regole", "[REGOLE]", "Parametri tempistiche mancanti");
             return;
         }
         
@@ -84,13 +112,19 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
         EsitoOperazioneBean esito = logicController.aggiornaRegolaTempistiche(bean);
         
         if (esito != null && esito.isSuccesso()) {
-            // Mostra conferma
+            if (navigator != null) {
+                navigator.goTo("regole", Map.of("successo", esito.getMessaggio()));
+            }
+        } else {
+            GraphicControllerUtils.notifyError(log(), navigator, "regole", "[REGOLE]",
+                    esito != null ? esito.getMessaggio() : "Operazione non riuscita");
         }
     }
 
     @Override
     public void aggiornaPenalita(Map<String, Object> penalita) {
         if (penalita == null) {
+            GraphicControllerUtils.notifyError(log(), navigator, "regole", "[REGOLE]", "Parametri penalità mancanti");
             return;
         }
         
@@ -103,7 +137,12 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
         EsitoOperazioneBean esito = logicController.aggiornaRegolepenalita(bean);
         
         if (esito != null && esito.isSuccesso()) {
-            // Mostra conferma
+            if (navigator != null) {
+                navigator.goTo("regole", Map.of("successo", esito.getMessaggio()));
+            }
+        } else {
+            GraphicControllerUtils.notifyError(log(), navigator, "regole", "[REGOLE]",
+                    esito != null ? esito.getMessaggio() : "Operazione non riuscita");
         }
     }
 
@@ -113,4 +152,5 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
             navigator.goTo("home", null);
         }
     }
+
 }

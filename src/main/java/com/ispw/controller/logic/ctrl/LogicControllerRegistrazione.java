@@ -26,8 +26,12 @@ public class LogicControllerRegistrazione {
      * Registra un nuovo utente in stato DA_CONFERMARE e invia la richiesta di conferma registrazione.
      * La dipendenza dal controller di notifica è passata via parametro (controller stateless).
      */
-    public EsitoOperazioneBean registraNuovoUtente(DatiRegistrazioneBean datiInput,
-                                                   GestioneNotificaRegistrazione notificaCtrl) {
+    public EsitoOperazioneBean registraNuovoUtente(DatiRegistrazioneBean datiInput) {
+        return registraNuovoUtente(datiInput, new LogicControllerGestioneNotifica());
+    }
+
+    private EsitoOperazioneBean registraNuovoUtente(DatiRegistrazioneBean datiInput,
+                                                    GestioneNotificaRegistrazione notificaCtrl) {
         final EsitoOperazioneBean esito = new EsitoOperazioneBean();
 
         // Validazione "scolastica"
@@ -65,6 +69,13 @@ public class LogicControllerRegistrazione {
 
         // 4) Notifica richiesta conferma registrazione (controller secondario passato per input)
         notificaCtrl.inviaConfermaRegistrazione(toBean(nuovo));
+
+        // 4b) Simula conferma immediata (gestore reale)
+        nuovo.setStatoAccount(StatoAccount.ATTIVO);
+        userDAO.store(nuovo);
+        appendLog(nuovo.getIdUtente(),
+            TipoOperazione.ACCOUNT_ATTIVATO,
+            "Conferma registrazione completata (simulata)");
 
         // 5) Esito
         esito.setSuccesso(true);

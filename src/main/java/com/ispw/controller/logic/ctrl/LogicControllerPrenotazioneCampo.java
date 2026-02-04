@@ -62,8 +62,12 @@ public class LogicControllerPrenotazioneCampo {
     // =============================================================================
     // 1) TROVA SLOT DISPONIBILI
     // =============================================================================
-    public List<DatiDisponibilitaBean> trovaSlotDisponibili(ParametriVerificaBean param,
-                                                            GestioneDisponibilitaPrenotazione dispCtrl) {
+    public List<DatiDisponibilitaBean> trovaSlotDisponibili(ParametriVerificaBean param) {
+        return trovaSlotDisponibili(param, new LogicControllerGestoreDisponibilita());
+    }
+
+    List<DatiDisponibilitaBean> trovaSlotDisponibili(ParametriVerificaBean param,
+                                                     GestioneDisponibilitaPrenotazione dispCtrl) {
         if (param == null || dispCtrl == null) return List.of();
         return dispCtrl.verificaDisponibilita(param);
     }
@@ -72,8 +76,13 @@ public class LogicControllerPrenotazioneCampo {
     // 2) NUOVA PRENOTAZIONE (crea DA_PAGARE + blocca slot) → Riepilogo
     // =============================================================================
     public RiepilogoPrenotazioneBean nuovaPrenotazione(DatiInputPrenotazioneBean input,
-                                                       SessioneUtenteBean sessione,
-                                                       GestioneDisponibilitaPrenotazione dispCtrl) {
+                                                       SessioneUtenteBean sessione) {
+        return nuovaPrenotazione(input, sessione, new LogicControllerGestoreDisponibilita());
+    }
+
+    RiepilogoPrenotazioneBean nuovaPrenotazione(DatiInputPrenotazioneBean input,
+                                                SessioneUtenteBean sessione,
+                                                GestioneDisponibilitaPrenotazione dispCtrl) {
         if (input == null || sessione == null || sessione.getUtente() == null || dispCtrl == null) return null;
 
         final int idCampo  = input.getIdCampo();
@@ -149,10 +158,20 @@ public class LogicControllerPrenotazioneCampo {
     //    Rifattorizzato per ridurre la complessità cognitiva, senza cambiare la logica.
     // =============================================================================
     public StatoPagamentoBean completaPrenotazione(DatiPagamentoBean dati,
-                                                   SessioneUtenteBean sessione,
-                                                   GestionePagamentoPrenotazione payCtrl,
-                                                   GestioneFatturaPrenotazione   fattCtrl,
-                                                   GestioneNotificaPrenotazione  notiCtrl) {
+                                                   SessioneUtenteBean sessione) {
+        return completaPrenotazione(
+                dati,
+                sessione,
+                new LogicControllerGestionePagamento(),
+                new LogicControllerGestioneFattura(),
+                new LogicControllerGestioneNotifica());
+    }
+
+    StatoPagamentoBean completaPrenotazione(DatiPagamentoBean dati,
+                                            SessioneUtenteBean sessione,
+                                            GestionePagamentoPrenotazione payCtrl,
+                                            GestioneFatturaPrenotazione   fattCtrl,
+                                            GestioneNotificaPrenotazione  notiCtrl) {
         // 1) Validazioni iniziali (early return)
         if (!isCheckoutInputValid(dati, sessione, payCtrl, fattCtrl, notiCtrl)) {
             return esitoPagamento(false, "KO", MSG_INPUT_NON_VALIDO);

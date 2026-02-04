@@ -32,6 +32,9 @@ public class GUIGraphicLoginController implements GraphicLoginController {
     @Override
     public void effettuaLogin(DatiLoginBean credenziali) {
         if (credenziali == null) {
+            if (navigator != null) {
+                navigator.goTo("login", Map.of("error", "Credenziali mancanti"));
+            }
             return;
         }
         
@@ -39,7 +42,12 @@ public class GUIGraphicLoginController implements GraphicLoginController {
         SessioneUtenteBean sessione = logicController.verificaCredenziali(credenziali);
         
         if (sessione != null) {
-            vaiAHome();
+            logicController.saveLog(sessione);
+            if (navigator != null) {
+                navigator.goTo("home", Map.of("sessione", sessione));
+            }
+        } else if (navigator != null) {
+            navigator.goTo("login", Map.of("error", "Credenziali non valide"));
         }
     }
 

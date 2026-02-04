@@ -42,7 +42,7 @@ public class GUIGraphicControllerRegistrazione implements GraphicControllerRegis
         bean.setPassword((String) datiRegistrazione.get("password"));
         
         LogicControllerRegistrazione logicController = new LogicControllerRegistrazione();
-        EsitoOperazioneBean esito = logicController.registraNuovoUtente(bean, null);
+        EsitoOperazioneBean esito = logicController.registraNuovoUtente(bean);
         
         if (esito != null && esito.isSuccesso()) {
             vaiAlLogin();

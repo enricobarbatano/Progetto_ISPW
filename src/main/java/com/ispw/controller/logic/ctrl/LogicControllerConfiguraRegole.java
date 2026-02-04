@@ -3,6 +3,7 @@ package com.ispw.controller.logic.ctrl;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -69,6 +70,19 @@ public class LogicControllerConfiguraRegole {
     }
     private LogDAO logDAO() {
         return DAOFactory.getInstance().getLogDAO();
+    }
+
+    // =====================================================================================
+    // 0) Lista campi (supporto UI)
+    // =====================================================================================
+
+    /**
+     * Restituisce una lista di campi in formato testuale per la selezione UI.
+     */
+    public List<String> listaCampi() {
+        return campoDAO().findAll().stream()
+            .map(c -> String.format("#%d - %s (%s)", c.getIdCampo(), c.getNome(), c.getTipoSport()))
+            .toList();
     }
 
     // =====================================================================================

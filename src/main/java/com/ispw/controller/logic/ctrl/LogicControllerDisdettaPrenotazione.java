@@ -160,6 +160,19 @@ public class LogicControllerDisdettaPrenotazione {
         return esito(true, MSG_DISDETTA_OK);
     }
 
+    /**
+     * Overload semplice: crea internamente i controller secondari e li passa al metodo interno.
+     */
+    public EsitoOperazioneBean eseguiAnnullamento(int idPrenotazione, SessioneUtenteBean sessione) {
+        return eseguiAnnullamento(
+                idPrenotazione,
+                sessione,
+                new LogicControllerGestionePagamento(),
+                new LogicControllerGestioneFattura(),
+                new LogicControllerGestioneNotifica(),
+                new LogicControllerGestoreDisponibilita());
+    }
+
     // =====================================================================================
     // - validaDisdetta(int, SessioneUtenteBean): EsitoDisdettaBean
     //   - Titolarità, stato e finestra temporale; calcolo penale da regole singleton.
