@@ -28,7 +28,7 @@ public class GUIGraphicControllerPenalita implements GraphicControllerPenalita {
     
     @Override
     public String getRouteName() {
-        return "penalita";
+        return GraphicControllerUtils.ROUTE_PENALITA;
     }
 
     @Override
@@ -39,22 +39,25 @@ public class GUIGraphicControllerPenalita implements GraphicControllerPenalita {
     @Override
     public void selezionaUtente(String email) {
         if (email == null || email.isBlank()) {
-            GraphicControllerUtils.notifyError(log(), navigator, "penalita", "[PENALITA]", "Email utente non valida");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PENALITA,
+                    GraphicControllerUtils.PREFIX_PENALITA, "Email utente non valida");
             return;
         }
         if (navigator != null) {
-            navigator.goTo("penalita", Map.of("email", email.trim()));
+            navigator.goTo(GraphicControllerUtils.ROUTE_PENALITA, Map.of("email", email.trim()));
         }
     }
 
     @Override
     public void applicaPenalita(int idUtente, float importo, String motivazione) {
         if (idUtente <= 0) {
-            GraphicControllerUtils.notifyError(log(), navigator, "penalita", "[PENALITA]", "Id utente non valido");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PENALITA,
+                    GraphicControllerUtils.PREFIX_PENALITA, "Id utente non valido");
             return;
         }
         if (motivazione == null || motivazione.isBlank() || importo <= 0) {
-            GraphicControllerUtils.notifyError(log(), navigator, "penalita", "[PENALITA]", "Dati penalità non validi");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PENALITA,
+                    GraphicControllerUtils.PREFIX_PENALITA, "Dati penalità non validi");
             return;
         }
 
@@ -68,13 +71,15 @@ public class GUIGraphicControllerPenalita implements GraphicControllerPenalita {
             EsitoOperazioneBean esito = logicController.applicaSanzione(dati);
 
             if (esito == null || !esito.isSuccesso()) {
-                GraphicControllerUtils.notifyError(log(), navigator, "penalita", "[PENALITA]",
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PENALITA,
+                    GraphicControllerUtils.PREFIX_PENALITA,
                     esito != null ? esito.getMessaggio() : "Operazione non riuscita");
                 return;
             }
 
             if (navigator != null) {
-                navigator.goTo("penalita", Map.of("successo", esito.getMessaggio()));
+                navigator.goTo(GraphicControllerUtils.ROUTE_PENALITA,
+                    Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore applicazione penalità", e);
@@ -84,7 +89,7 @@ public class GUIGraphicControllerPenalita implements GraphicControllerPenalita {
     @Override
     public void tornaAllaHome() {
         if (navigator != null) {
-            navigator.goTo("home", null);
+            navigator.goTo(GraphicControllerUtils.ROUTE_HOME, null);
         }
     }
 

@@ -5,6 +5,7 @@ import java.util.Map;
 import com.ispw.bean.DatiLoginBean;
 import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
+import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.GraphicLoginController;
 import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccesso;
 
@@ -21,7 +22,7 @@ public class GUIGraphicLoginController implements GraphicLoginController {
     
     @Override
     public String getRouteName() {
-        return "login";
+        return GraphicControllerUtils.ROUTE_LOGIN;
     }
 
     @Override
@@ -33,7 +34,8 @@ public class GUIGraphicLoginController implements GraphicLoginController {
     public void effettuaLogin(DatiLoginBean credenziali) {
         if (credenziali == null) {
             if (navigator != null) {
-                navigator.goTo("login", Map.of("error", "Credenziali mancanti"));
+                navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN,
+                        Map.of(GraphicControllerUtils.KEY_ERROR, "Credenziali mancanti"));
             }
             return;
         }
@@ -44,31 +46,32 @@ public class GUIGraphicLoginController implements GraphicLoginController {
         if (sessione != null) {
             logicController.saveLog(sessione);
             if (navigator != null) {
-                navigator.goTo("home", Map.of("sessione", sessione));
+                navigator.goTo(GraphicControllerUtils.ROUTE_HOME, Map.of("sessione", sessione));
             }
         } else if (navigator != null) {
-            navigator.goTo("login", Map.of("error", "Credenziali non valide"));
+            navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN,
+                    Map.of(GraphicControllerUtils.KEY_ERROR, "Credenziali non valide"));
         }
     }
 
     @Override
     public void logout() {
         if (navigator != null) {
-            navigator.goTo("login", null);
+            navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN, null);
         }
     }
 
     @Override
     public void vaiARegistrazione() {
         if (navigator != null) {
-            navigator.goTo("registrazione", null);
+            navigator.goTo(GraphicControllerUtils.ROUTE_REGISTRAZIONE, null);
         }
     }
 
     @Override
     public void vaiAHome() {
         if (navigator != null) {
-            navigator.goTo("home", null);
+            navigator.goTo(GraphicControllerUtils.ROUTE_HOME, null);
         }
     }
 }

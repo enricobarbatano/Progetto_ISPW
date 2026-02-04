@@ -37,12 +37,12 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
     
     @Override
     public String getRouteName() {
-        return "account";
+        return GraphicControllerUtils.ROUTE_ACCOUNT;
     }
 
     @Override
     public void onShow(Map<String, Object> params) {
-        GraphicControllerUtils.handleOnShow(log(), params, "[ACCOUNT]");
+        GraphicControllerUtils.handleOnShow(log(), params, GraphicControllerUtils.PREFIX_ACCOUNT);
     }
 
     /**
@@ -52,7 +52,8 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
     @Override
     public void loadAccount(SessioneUtenteBean sessione) {
         if (sessione == null || sessione.getUtente() == null) {
-            GraphicControllerUtils.notifyError(log(), navigator, "account", "[ACCOUNT]", "Sessione non valida");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
+                    GraphicControllerUtils.PREFIX_ACCOUNT, "Sessione non valida");
             return;
         }
 
@@ -61,7 +62,8 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
             DatiAccountBean dati = logicController.recuperaInformazioniAccount(sessione);
 
             if (dati == null) {
-                GraphicControllerUtils.notifyError(log(), navigator, "account", "[ACCOUNT]", "Impossibile recuperare dati account");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
+                    GraphicControllerUtils.PREFIX_ACCOUNT, "Impossibile recuperare dati account");
                 return;
             }
 
@@ -72,7 +74,7 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
             payload.put("email", dati.getEmail());
 
             if (navigator != null) {
-                navigator.goTo("account", Map.of("datiAccount", payload));
+                navigator.goTo(GraphicControllerUtils.ROUTE_ACCOUNT, Map.of("datiAccount", payload));
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore caricamento account", e);
@@ -86,13 +88,15 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
     @Override
     public void aggiornaDatiAccount(Map<String, Object> nuoviDati) {
         if (nuoviDati == null) {
-            GraphicControllerUtils.notifyError(log(), navigator, "account", "[ACCOUNT]", "Dati account mancanti");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
+                    GraphicControllerUtils.PREFIX_ACCOUNT, "Dati account mancanti");
             return;
         }
 
         Object idUtente = nuoviDati.get("idUtente");
         if (!(idUtente instanceof Integer) || ((Integer) idUtente) <= 0) {
-            GraphicControllerUtils.notifyError(log(), navigator, "account", "[ACCOUNT]", "Id utente non valido");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
+                    GraphicControllerUtils.PREFIX_ACCOUNT, "Id utente non valido");
             return;
         }
         
@@ -113,10 +117,12 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
         
         if (esito != null && esito.isSuccesso()) {
             if (navigator != null) {
-                navigator.goTo("account", Map.of("successo", esito.getMessaggio()));
+                navigator.goTo(GraphicControllerUtils.ROUTE_ACCOUNT,
+                        Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
             }
         } else {
-            GraphicControllerUtils.notifyError(log(), navigator, "account", "[ACCOUNT]",
+            GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
+                    GraphicControllerUtils.PREFIX_ACCOUNT,
                     esito != null ? esito.getMessaggio() : "Operazione non riuscita");
         }
     }
@@ -127,11 +133,13 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
     @Override
     public void cambiaPassword(String vecchiaPassword, String nuovaPassword, SessioneUtenteBean sessione) {
         if (vecchiaPassword == null || nuovaPassword == null) {
-            GraphicControllerUtils.notifyError(log(), navigator, "account", "[ACCOUNT]", "Password non valide");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
+                    GraphicControllerUtils.PREFIX_ACCOUNT, "Password non valide");
             return;
         }
         if (sessione == null || sessione.getUtente() == null) {
-            GraphicControllerUtils.notifyError(log(), navigator, "account", "[ACCOUNT]", "Sessione non valida");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
+                    GraphicControllerUtils.PREFIX_ACCOUNT, "Sessione non valida");
             return;
         }
 
@@ -140,10 +148,12 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
 
         if (esito != null && esito.isSuccesso()) {
             if (navigator != null) {
-                navigator.goTo("account", Map.of("successo", esito.getMessaggio()));
+                navigator.goTo(GraphicControllerUtils.ROUTE_ACCOUNT,
+                        Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
             }
         } else {
-            GraphicControllerUtils.notifyError(log(), navigator, "account", "[ACCOUNT]",
+            GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
+                    GraphicControllerUtils.PREFIX_ACCOUNT,
                     esito != null ? esito.getMessaggio() : "Operazione non riuscita");
         }
     }
@@ -154,7 +164,7 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
     @Override
     public void logout() {
         if (navigator != null) {
-            navigator.goTo("login");
+            navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN);
         }
     }
 

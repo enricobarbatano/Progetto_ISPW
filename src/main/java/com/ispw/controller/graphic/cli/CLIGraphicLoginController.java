@@ -41,12 +41,12 @@ public class CLIGraphicLoginController implements GraphicLoginController {
     // ==================== NavigableController ====================
     @Override
     public String getRouteName() {
-        return "login";
+        return GraphicControllerUtils.ROUTE_LOGIN;
     }
 
     @Override
     public void onShow(Map<String, Object> params) {
-        GraphicControllerUtils.handleOnShow(log(), params, "[LOGIN]");
+        GraphicControllerUtils.handleOnShow(log(), params, GraphicControllerUtils.PREFIX_LOGIN);
     }
 
     // ==================== Business Methods ====================
@@ -68,7 +68,8 @@ public class CLIGraphicLoginController implements GraphicLoginController {
     public void effettuaLogin(DatiLoginBean credenziali) {
         if (credenziali == null) {
             if (navigator != null) {
-                navigator.goTo("login", Map.of("error", "Credenziali mancanti"));
+                navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN,
+                        Map.of(GraphicControllerUtils.KEY_ERROR, "Credenziali mancanti"));
             }
             return;
         }
@@ -79,11 +80,12 @@ public class CLIGraphicLoginController implements GraphicLoginController {
         if (sessione != null) {
             logicController.saveLog(sessione);
             if (navigator != null) {
-                navigator.goTo("home", Map.of("sessione", sessione));
+                navigator.goTo(GraphicControllerUtils.ROUTE_HOME, Map.of("sessione", sessione));
             }
         } else {
             if (navigator != null) {
-                navigator.goTo("login", Map.of("error", "Credenziali non valide"));
+                navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN,
+                        Map.of(GraphicControllerUtils.KEY_ERROR, "Credenziali non valide"));
             }
         }
     }
@@ -94,7 +96,7 @@ public class CLIGraphicLoginController implements GraphicLoginController {
     @Override
     public void logout() {
         if (navigator != null) {
-            navigator.goTo("login");
+            navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN);
         }
     }
 
@@ -104,7 +106,7 @@ public class CLIGraphicLoginController implements GraphicLoginController {
     @Override
     public void vaiARegistrazione() {
         if (navigator != null) {
-            navigator.goTo("registrazione");
+            navigator.goTo(GraphicControllerUtils.ROUTE_REGISTRAZIONE);
         }
     }
 
@@ -114,7 +116,7 @@ public class CLIGraphicLoginController implements GraphicLoginController {
     @Override
     public void vaiAHome() {
         if (navigator != null) {
-            navigator.goTo("home");
+            navigator.goTo(GraphicControllerUtils.ROUTE_HOME);
         }
     }
 }

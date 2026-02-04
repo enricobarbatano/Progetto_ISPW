@@ -30,7 +30,7 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
     
     @Override
     public String getRouteName() {
-        return "regole";
+        return GraphicControllerUtils.ROUTE_REGOLE;
     }
 
     @Override
@@ -44,7 +44,7 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
             LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
             List<String> campi = logicController.listaCampi();
             if (navigator != null) {
-                navigator.goTo("regole", Map.of("campi", campi));
+                navigator.goTo(GraphicControllerUtils.ROUTE_REGOLE, Map.of("campi", campi));
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore recupero lista campi", e);
@@ -54,18 +54,20 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
     @Override
     public void selezionaCampo(int idCampo) {
         if (idCampo <= 0) {
-            GraphicControllerUtils.notifyError(log(), navigator, "regole", "[REGOLE]", "Id campo non valido");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
+                    GraphicControllerUtils.PREFIX_REGOLE, "Id campo non valido");
             return;
         }
         if (navigator != null) {
-            navigator.goTo("regole", Map.of("idCampo", idCampo));
+            navigator.goTo(GraphicControllerUtils.ROUTE_REGOLE, Map.of("idCampo", idCampo));
         }
     }
 
     @Override
     public void aggiornaStatoCampo(Map<String, Object> regolaCampo) {
         if (regolaCampo == null) {
-            GraphicControllerUtils.notifyError(log(), navigator, "regole", "[REGOLE]", "Parametri regola campo mancanti");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
+                    GraphicControllerUtils.PREFIX_REGOLE, "Parametri regola campo mancanti");
             return;
         }
         
@@ -85,10 +87,12 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
         
         if (esito != null && esito.isSuccesso()) {
             if (navigator != null) {
-                navigator.goTo("regole", Map.of("successo", esito.getMessaggio()));
+                navigator.goTo(GraphicControllerUtils.ROUTE_REGOLE,
+                        Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
             }
         } else {
-            GraphicControllerUtils.notifyError(log(), navigator, "regole", "[REGOLE]",
+            GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
+                    GraphicControllerUtils.PREFIX_REGOLE,
                     esito != null ? esito.getMessaggio() : "Operazione non riuscita");
         }
     }
@@ -96,7 +100,8 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
     @Override
     public void aggiornaTempistiche(Map<String, Object> tempistiche) {
         if (tempistiche == null) {
-            GraphicControllerUtils.notifyError(log(), navigator, "regole", "[REGOLE]", "Parametri tempistiche mancanti");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
+                    GraphicControllerUtils.PREFIX_REGOLE, "Parametri tempistiche mancanti");
             return;
         }
         
@@ -113,10 +118,12 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
         
         if (esito != null && esito.isSuccesso()) {
             if (navigator != null) {
-                navigator.goTo("regole", Map.of("successo", esito.getMessaggio()));
+                navigator.goTo(GraphicControllerUtils.ROUTE_REGOLE,
+                        Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
             }
         } else {
-            GraphicControllerUtils.notifyError(log(), navigator, "regole", "[REGOLE]",
+            GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
+                    GraphicControllerUtils.PREFIX_REGOLE,
                     esito != null ? esito.getMessaggio() : "Operazione non riuscita");
         }
     }
@@ -124,7 +131,8 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
     @Override
     public void aggiornaPenalita(Map<String, Object> penalita) {
         if (penalita == null) {
-            GraphicControllerUtils.notifyError(log(), navigator, "regole", "[REGOLE]", "Parametri penalità mancanti");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
+                    GraphicControllerUtils.PREFIX_REGOLE, "Parametri penalità mancanti");
             return;
         }
         
@@ -138,10 +146,12 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
         
         if (esito != null && esito.isSuccesso()) {
             if (navigator != null) {
-                navigator.goTo("regole", Map.of("successo", esito.getMessaggio()));
+                navigator.goTo(GraphicControllerUtils.ROUTE_REGOLE,
+                        Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
             }
         } else {
-            GraphicControllerUtils.notifyError(log(), navigator, "regole", "[REGOLE]",
+            GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
+                    GraphicControllerUtils.PREFIX_REGOLE,
                     esito != null ? esito.getMessaggio() : "Operazione non riuscita");
         }
     }
@@ -149,7 +159,7 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
     @Override
     public void tornaAllaHome() {
         if (navigator != null) {
-            navigator.goTo("home", null);
+            navigator.goTo(GraphicControllerUtils.ROUTE_HOME, null);
         }
     }
 

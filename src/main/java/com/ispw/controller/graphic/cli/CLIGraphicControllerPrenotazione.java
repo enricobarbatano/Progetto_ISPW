@@ -33,7 +33,7 @@ public class CLIGraphicControllerPrenotazione implements GraphicControllerPrenot
     
     @Override
     public String getRouteName() {
-        return "prenotazione";
+        return GraphicControllerUtils.ROUTE_PRENOTAZIONE;
     }
 
     @Override
@@ -47,7 +47,8 @@ public class CLIGraphicControllerPrenotazione implements GraphicControllerPrenot
     @Override
     public void cercaDisponibilita(ParametriVerificaBean input) {
         if (input == null) {
-                GraphicControllerUtils.notifyError(log(), navigator, "prenotazione", "[PRENOT]",
+                    GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PRENOTAZIONE,
+                        GraphicControllerUtils.PREFIX_PRENOT,
                     "Parametri ricerca disponibilità nulli");
             return;
         }
@@ -59,7 +60,7 @@ public class CLIGraphicControllerPrenotazione implements GraphicControllerPrenot
                 .toList();
 
             if (navigator != null) {
-                navigator.goTo("prenotazione", Map.of("slotDisponibili", slot));
+                navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE, Map.of("slotDisponibili", slot));
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore ricerca disponibilità", e);
@@ -69,11 +70,13 @@ public class CLIGraphicControllerPrenotazione implements GraphicControllerPrenot
     @Override
     public void creaPrenotazione(DatiInputPrenotazioneBean input, SessioneUtenteBean sessione) {
         if (input == null) {
-            GraphicControllerUtils.notifyError(log(), navigator, "prenotazione", "[PRENOT]", "Dati prenotazione nulli");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PRENOTAZIONE,
+                    GraphicControllerUtils.PREFIX_PRENOT, "Dati prenotazione nulli");
             return;
         }
         if (sessione == null) {
-            GraphicControllerUtils.notifyError(log(), navigator, "prenotazione", "[PRENOT]",
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PRENOTAZIONE,
+                    GraphicControllerUtils.PREFIX_PRENOT,
                     "Sessione utente mancante per prenotazione");
             return;
         }
@@ -83,18 +86,20 @@ public class CLIGraphicControllerPrenotazione implements GraphicControllerPrenot
             RiepilogoPrenotazioneBean riepilogo = logicController.nuovaPrenotazione(input, sessione);
 
             if (riepilogo == null) {
-                GraphicControllerUtils.notifyError(log(), navigator, "prenotazione", "[PRENOT]",
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PRENOTAZIONE,
+                    GraphicControllerUtils.PREFIX_PRENOT,
                     "Prenotazione non creata");
                 return;
             }
 
             Map<String, Object> payload = new HashMap<>();
-            payload.put("idPrenotazione", riepilogo.getIdPrenotazione());
-            payload.put("importoTotale", riepilogo.getImportoTotale());
-            payload.put("riepilogo", riepilogo.toString());
+            payload.put(GraphicControllerUtils.KEY_ID_PRENOTAZIONE, riepilogo.getIdPrenotazione());
+            payload.put(GraphicControllerUtils.KEY_IMPORTO_TOTALE, riepilogo.getImportoTotale());
+            payload.put(GraphicControllerUtils.KEY_RIEPILOGO, riepilogo.toString());
 
             if (navigator != null) {
-                navigator.goTo("prenotazione", Map.of("riepilogo", payload));
+                navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE,
+                    Map.of(GraphicControllerUtils.KEY_RIEPILOGO, payload));
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore creazione prenotazione", e);
@@ -104,11 +109,13 @@ public class CLIGraphicControllerPrenotazione implements GraphicControllerPrenot
     @Override
     public void procediAlPagamento(DatiPagamentoBean pagamento, SessioneUtenteBean sessione) {
         if (pagamento == null) {
-            GraphicControllerUtils.notifyError(log(), navigator, "prenotazione", "[PRENOT]", "Dati pagamento nulli");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PRENOTAZIONE,
+                    GraphicControllerUtils.PREFIX_PRENOT, "Dati pagamento nulli");
             return;
         }
         if (sessione == null) {
-            GraphicControllerUtils.notifyError(log(), navigator, "prenotazione", "[PRENOT]",
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PRENOTAZIONE,
+                    GraphicControllerUtils.PREFIX_PRENOT,
                     "Sessione utente mancante per pagamento");
             return;
         }
@@ -118,20 +125,22 @@ public class CLIGraphicControllerPrenotazione implements GraphicControllerPrenot
             StatoPagamentoBean esito = logicController.completaPrenotazione(pagamento, sessione);
 
             if (esito == null) {
-                GraphicControllerUtils.notifyError(log(), navigator, "prenotazione", "[PRENOT]",
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PRENOTAZIONE,
+                    GraphicControllerUtils.PREFIX_PRENOT,
                     "Pagamento non completato");
                 return;
             }
 
             Map<String, Object> payload = new HashMap<>();
-            payload.put("successo", esito.isSuccesso());
-            payload.put("stato", esito.getStato());
-            payload.put("messaggio", esito.getMessaggio());
-            payload.put("idTransazione", esito.getIdTransazione());
-            payload.put("dataPagamento", esito.getDataPagamento());
+            payload.put(GraphicControllerUtils.KEY_SUCCESSO, esito.isSuccesso());
+            payload.put(GraphicControllerUtils.KEY_STATO, esito.getStato());
+            payload.put(GraphicControllerUtils.KEY_MESSAGGIO, esito.getMessaggio());
+            payload.put(GraphicControllerUtils.KEY_ID_TRANSAZIONE, esito.getIdTransazione());
+            payload.put(GraphicControllerUtils.KEY_DATA_PAGAMENTO, esito.getDataPagamento());
 
             if (navigator != null) {
-                navigator.goTo("prenotazione", Map.of("pagamento", payload));
+                navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE,
+                    Map.of(GraphicControllerUtils.KEY_PAGAMENTO, payload));
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore pagamento", e);
@@ -141,7 +150,7 @@ public class CLIGraphicControllerPrenotazione implements GraphicControllerPrenot
     @Override
     public void tornaAllaHome() {
         if (navigator != null) {
-            navigator.goTo("home");
+            navigator.goTo(GraphicControllerUtils.ROUTE_HOME);
         }
     }
 

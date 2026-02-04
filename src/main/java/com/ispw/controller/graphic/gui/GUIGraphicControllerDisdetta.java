@@ -31,7 +31,7 @@ public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
     
     @Override
     public String getRouteName() {
-        return "disdetta";
+        return GraphicControllerUtils.ROUTE_DISDETTA;
     }
 
     @Override
@@ -42,7 +42,8 @@ public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
     @Override
     public void richiediPrenotazioniCancellabili(SessioneUtenteBean sessione) {
         if (sessione == null || sessione.getUtente() == null) {
-            GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]", "Sessione utente mancante");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_DISDETTA,
+                    GraphicControllerUtils.PREFIX_DISDETTA, "Sessione utente mancante");
             return;
         }
 
@@ -56,7 +57,8 @@ public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
                     .toList();
 
             if (navigator != null) {
-                navigator.goTo("disdetta", Map.of("prenotazioni", elenco));
+                navigator.goTo(GraphicControllerUtils.ROUTE_DISDETTA,
+                    Map.of(GraphicControllerUtils.KEY_PRENOTAZIONI, elenco));
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore richiesta prenotazioni cancellabili", e);
@@ -66,22 +68,26 @@ public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
     @Override
     public void selezionaPrenotazione(int idPrenotazione) {
         if (idPrenotazione <= 0) {
-            GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]", "Id prenotazione non valido");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_DISDETTA,
+                    GraphicControllerUtils.PREFIX_DISDETTA, "Id prenotazione non valido");
             return;
         }
         if (navigator != null) {
-            navigator.goTo("disdetta", Map.of("idPrenotazione", idPrenotazione));
+            navigator.goTo(GraphicControllerUtils.ROUTE_DISDETTA,
+                Map.of(GraphicControllerUtils.KEY_ID_PRENOTAZIONE, idPrenotazione));
         }
     }
 
     @Override
     public void richiediAnteprimaDisdetta(int idPrenotazione, SessioneUtenteBean sessione) {
         if (idPrenotazione <= 0) {
-            GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]", "Id prenotazione non valido");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_DISDETTA,
+                    GraphicControllerUtils.PREFIX_DISDETTA, "Id prenotazione non valido");
             return;
         }
         if (sessione == null || sessione.getUtente() == null) {
-            GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]", "Sessione utente mancante");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_DISDETTA,
+                    GraphicControllerUtils.PREFIX_DISDETTA, "Sessione utente mancante");
             return;
         }
 
@@ -90,7 +96,8 @@ public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
             EsitoDisdettaBean esito = logicController.anteprimaDisdetta(idPrenotazione, sessione);
 
             if (esito == null || !esito.isPossibile()) {
-                GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]", "Disdetta non consentita");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_DISDETTA,
+                    GraphicControllerUtils.PREFIX_DISDETTA, "Disdetta non consentita");
                 return;
             }
 
@@ -99,7 +106,7 @@ public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
             payload.put("penale", esito.getPenale());
 
             if (navigator != null) {
-                navigator.goTo("disdetta", Map.of("anteprima", payload));
+                navigator.goTo(GraphicControllerUtils.ROUTE_DISDETTA, Map.of("anteprima", payload));
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore anteprima disdetta", e);
@@ -109,11 +116,13 @@ public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
     @Override
     public void confermaDisdetta(int idPrenotazione, SessioneUtenteBean sessione) {
         if (idPrenotazione <= 0) {
-            GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]", "Id prenotazione non valido");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_DISDETTA,
+                    GraphicControllerUtils.PREFIX_DISDETTA, "Id prenotazione non valido");
             return;
         }
         if (sessione == null || sessione.getUtente() == null) {
-            GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]", "Sessione utente mancante");
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_DISDETTA,
+                    GraphicControllerUtils.PREFIX_DISDETTA, "Sessione utente mancante");
             return;
         }
 
@@ -122,13 +131,15 @@ public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
             EsitoOperazioneBean esito = logicController.eseguiAnnullamento(idPrenotazione, sessione);
 
             if (esito == null || !esito.isSuccesso()) {
-                GraphicControllerUtils.notifyError(log(), navigator, "disdetta", "[DISDETTA]",
+                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_DISDETTA,
+                    GraphicControllerUtils.PREFIX_DISDETTA,
                     esito != null ? esito.getMessaggio() : "Disdetta non riuscita");
                 return;
             }
 
             if (navigator != null) {
-                navigator.goTo("disdetta", Map.of("successo", esito.getMessaggio()));
+                navigator.goTo(GraphicControllerUtils.ROUTE_DISDETTA,
+                    Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore conferma disdetta", e);
@@ -138,7 +149,7 @@ public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
     @Override
     public void tornaAllaHome() {
         if (navigator != null) {
-            navigator.goTo("home", null);
+            navigator.goTo(GraphicControllerUtils.ROUTE_HOME, null);
         }
     }
 

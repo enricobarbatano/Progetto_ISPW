@@ -14,6 +14,7 @@ import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.bean.StatoPagamentoBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerPrenotazione;
+import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerPrenotazioneCampo;
 
 /**
@@ -33,7 +34,7 @@ public class GUIGraphicControllerPrenotazione implements GraphicControllerPrenot
     
     @Override
     public String getRouteName() {
-        return "prenotazione";
+        return GraphicControllerUtils.ROUTE_PRENOTAZIONE;
     }
 
     @Override
@@ -54,7 +55,7 @@ public class GUIGraphicControllerPrenotazione implements GraphicControllerPrenot
                 .toList();
 
             if (navigator != null) {
-                navigator.goTo("prenotazione", Map.of("slotDisponibili", slot));
+                navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE, Map.of("slotDisponibili", slot));
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore ricerca disponibilità", e);
@@ -81,12 +82,13 @@ public class GUIGraphicControllerPrenotazione implements GraphicControllerPrenot
             }
 
             Map<String, Object> payload = new HashMap<>();
-            payload.put("idPrenotazione", riepilogo.getIdPrenotazione());
-            payload.put("importoTotale", riepilogo.getImportoTotale());
-            payload.put("riepilogo", riepilogo.toString());
+            payload.put(GraphicControllerUtils.KEY_ID_PRENOTAZIONE, riepilogo.getIdPrenotazione());
+            payload.put(GraphicControllerUtils.KEY_IMPORTO_TOTALE, riepilogo.getImportoTotale());
+            payload.put(GraphicControllerUtils.KEY_RIEPILOGO, riepilogo.toString());
 
             if (navigator != null) {
-                navigator.goTo("prenotazione", Map.of("riepilogo", payload));
+                navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE,
+                    Map.of(GraphicControllerUtils.KEY_RIEPILOGO, payload));
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore creazione prenotazione", e);
@@ -113,14 +115,15 @@ public class GUIGraphicControllerPrenotazione implements GraphicControllerPrenot
             }
 
             Map<String, Object> payload = new HashMap<>();
-            payload.put("successo", esito.isSuccesso());
-            payload.put("stato", esito.getStato());
-            payload.put("messaggio", esito.getMessaggio());
-            payload.put("idTransazione", esito.getIdTransazione());
-            payload.put("dataPagamento", esito.getDataPagamento());
+            payload.put(GraphicControllerUtils.KEY_SUCCESSO, esito.isSuccesso());
+            payload.put(GraphicControllerUtils.KEY_STATO, esito.getStato());
+            payload.put(GraphicControllerUtils.KEY_MESSAGGIO, esito.getMessaggio());
+            payload.put(GraphicControllerUtils.KEY_ID_TRANSAZIONE, esito.getIdTransazione());
+            payload.put(GraphicControllerUtils.KEY_DATA_PAGAMENTO, esito.getDataPagamento());
 
             if (navigator != null) {
-                navigator.goTo("prenotazione", Map.of("pagamento", payload));
+                navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE,
+                    Map.of(GraphicControllerUtils.KEY_PAGAMENTO, payload));
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore pagamento", e);
@@ -130,7 +133,7 @@ public class GUIGraphicControllerPrenotazione implements GraphicControllerPrenot
     @Override
     public void tornaAllaHome() {
         if (navigator != null) {
-            navigator.goTo("home", null);
+            navigator.goTo(GraphicControllerUtils.ROUTE_HOME, null);
         }
     }
     

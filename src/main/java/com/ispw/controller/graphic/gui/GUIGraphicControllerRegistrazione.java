@@ -6,6 +6,7 @@ import com.ispw.bean.DatiRegistrazioneBean;
 import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerRegistrazione;
+import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerRegistrazione;
 
 /**
@@ -21,7 +22,7 @@ public class GUIGraphicControllerRegistrazione implements GraphicControllerRegis
     
     @Override
     public String getRouteName() {
-        return "registrazione";
+        return GraphicControllerUtils.ROUTE_REGISTRAZIONE;
     }
 
     @Override
@@ -52,7 +53,7 @@ public class GUIGraphicControllerRegistrazione implements GraphicControllerRegis
     @Override
     public void vaiAlLogin() {
         if (navigator != null) {
-            navigator.goTo("login", null);
+            navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN, null);
         }
     }
 }

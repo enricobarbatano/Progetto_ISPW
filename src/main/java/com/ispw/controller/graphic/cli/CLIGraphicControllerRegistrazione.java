@@ -24,12 +24,12 @@ public class CLIGraphicControllerRegistrazione implements GraphicControllerRegis
     
     @Override
     public String getRouteName() {
-        return "registrazione";
+        return GraphicControllerUtils.ROUTE_REGISTRAZIONE;
     }
 
     @Override
     public void onShow(Map<String, Object> params) {
-        GraphicControllerUtils.handleOnShow(LOGGER, params, "[REGISTRAZIONE]");
+        GraphicControllerUtils.handleOnShow(LOGGER, params, GraphicControllerUtils.PREFIX_REGISTRAZIONE);
     }
 
     /**
@@ -39,7 +39,8 @@ public class CLIGraphicControllerRegistrazione implements GraphicControllerRegis
     @Override
     public void inviaDatiRegistrazione(Map<String, Object> datiRegistrazione) {
         if (datiRegistrazione == null) {
-                GraphicControllerUtils.notifyError(LOGGER, navigator, "registrazione", "[REGISTRAZIONE]",
+                    GraphicControllerUtils.notifyError(LOGGER, navigator, GraphicControllerUtils.ROUTE_REGISTRAZIONE,
+                        GraphicControllerUtils.PREFIX_REGISTRAZIONE,
                     "Dati registrazione mancanti");
             return;
         }
@@ -50,7 +51,8 @@ public class CLIGraphicControllerRegistrazione implements GraphicControllerRegis
         String password = safeTrim(datiRegistrazione.get("password"));
 
         if (!hasText(nome) || !hasText(cognome) || !hasText(email) || !hasText(password)) {
-                GraphicControllerUtils.notifyError(LOGGER, navigator, "registrazione", "[REGISTRAZIONE]",
+                    GraphicControllerUtils.notifyError(LOGGER, navigator, GraphicControllerUtils.ROUTE_REGISTRAZIONE,
+                        GraphicControllerUtils.PREFIX_REGISTRAZIONE,
                     "Compila tutti i campi obbligatori");
             return;
         }
@@ -67,7 +69,8 @@ public class CLIGraphicControllerRegistrazione implements GraphicControllerRegis
         if (esito != null && esito.isSuccesso()) {
             vaiAlLogin();
         } else {
-            GraphicControllerUtils.notifyError(LOGGER, navigator, "registrazione", "[REGISTRAZIONE]",
+                GraphicControllerUtils.notifyError(LOGGER, navigator, GraphicControllerUtils.ROUTE_REGISTRAZIONE,
+                    GraphicControllerUtils.PREFIX_REGISTRAZIONE,
                     esito != null ? esito.getMessaggio() : "Registrazione non riuscita");
         }
     }
@@ -75,7 +78,7 @@ public class CLIGraphicControllerRegistrazione implements GraphicControllerRegis
     @Override
     public void vaiAlLogin() {
         if (navigator != null) {
-            navigator.goTo("login");
+            navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN);
         }
     }
 
