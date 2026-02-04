@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import com.ispw.dao.impl.memory.InMemoryDAO;
 import com.ispw.dao.interfaces.LogDAO;
@@ -53,7 +52,7 @@ public final class InMemoryLogDAO extends InMemoryDAO<Integer, SystemLog> implem
         return snapshotValues().stream()
                 .filter(l -> l.getIdUtenteCoinvolto() == idUtente)
                 .sorted(ORDER_BY_TS_DESC_ID_DESC)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -62,7 +61,7 @@ public final class InMemoryLogDAO extends InMemoryDAO<Integer, SystemLog> implem
         return snapshotValues().stream()
                 .sorted(ORDER_BY_TS_DESC_ID_DESC)
                 .limit(safeLimit)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /** Append-only: vietato cancellare log. */

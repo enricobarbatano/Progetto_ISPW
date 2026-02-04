@@ -44,7 +44,9 @@ class DAOFactoryInitTest {
     @Test
     void initialize_dbms_shouldCreateDbmsFactory() {
         // initialize a lightweight in-memory DB connection factory for tests
-        com.ispw.dao.impl.dbms.connection.DbmsConnectionFactory.init("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", "");
+        try {
+            com.ispw.dao.impl.dbms.connection.DbmsConnectionFactory.init("jdbc:h2:mem:test;DB_CLOSE_DELAY=-1", "sa", "");
+        } catch (IllegalStateException ignored) { /* already initialized by another test */ }
         DAOFactory.initialize(PersistencyProvider.DBMS, null);
         DAOFactory instance = DAOFactory.getInstance();
         assertTrue(instance instanceof DbmsDAOFactory);

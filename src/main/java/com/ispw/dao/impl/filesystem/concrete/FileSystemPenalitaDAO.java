@@ -2,7 +2,6 @@ package com.ispw.dao.impl.filesystem.concrete;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.ispw.dao.impl.filesystem.FileSystemDAO;
 import com.ispw.dao.interfaces.PenalitaDAO;
@@ -25,6 +24,6 @@ public class FileSystemPenalitaDAO extends FileSystemDAO<Integer, Penalita> impl
     public List<Penalita> recuperaPenalitaUtente(int idUtente) {
         return this.cache.values().stream()
                 .filter(p -> p != null && p.getIdUtente() == idUtente)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

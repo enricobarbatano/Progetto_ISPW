@@ -1,16 +1,15 @@
 package com.ispw.dao.impl.filesystem.concrete;
 
 
-import com.ispw.dao.impl.filesystem.FileSystemDAO;
-import com.ispw.dao.interfaces.LogDAO;
-import com.ispw.model.entity.SystemLog;
-
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
+import com.ispw.dao.impl.filesystem.FileSystemDAO;
+import com.ispw.dao.interfaces.LogDAO;
+import com.ispw.model.entity.SystemLog;
 
 /**
  * DAO FileSystem per SystemLog (append-only).
@@ -59,7 +58,7 @@ public final class FileSystemLogDAO extends FileSystemDAO<Integer, SystemLog> im
         return this.cache.values().stream()
                 .filter(l -> l.getIdUtenteCoinvolto() == idUtente)
                 .sorted(ORDER_BY_TS_DESC_ID_DESC)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
@@ -68,7 +67,7 @@ public final class FileSystemLogDAO extends FileSystemDAO<Integer, SystemLog> im
         return this.cache.values().stream()
                 .sorted(ORDER_BY_TS_DESC_ID_DESC)
                 .limit(safeLimit)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /** Append-only: vietato cancellare log. */

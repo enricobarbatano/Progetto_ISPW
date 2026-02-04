@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -349,25 +350,38 @@ public class LogicControllerConfiguraRegole {
             m.setAccessible(true);
             m.invoke(target, value);
             return true;
-        } catch (ReflectiveOperationException ignored) {
+        } catch (ReflectiveOperationException ex) {
+            // Reflection may fail for many reasons (method not present or invocation error) — log at FINE for diagnostics
+            log().log(Level.FINE, "invokeSetter failed: method={0} target={1} cause={2}", new Object[]{method, target.getClass().getName(), ex.getMessage()});
             return false;
         }
     }
 
     private void setFieldIfExists(Object target, String field, Object value) {
+        if (target == null) return;
         try {
-            Field f = null;
-            Class<?> c = target.getClass();
-            while (c != null) {
-                try { f = c.getDeclaredField(field); break; }
-                catch (NoSuchFieldException ex) { c = c.getSuperclass(); }
-            }
-            if (f != null) {
+            Optional<Field> maybe = findField(target.getClass(), field);
+            if (maybe.isPresent()) {
+                Field f = maybe.get();
                 f.setAccessible(true);
                 f.set(target, value);
             }
-        } catch (ReflectiveOperationException ignored) {
-            // no-op
+        } catch (ReflectiveOperationException ex) {
+            log().log(Level.FINE, "setFieldIfExists failed: field={0} target={1} cause={2}", new Object[]{field, target.getClass().getName(), ex.getMessage()});
         }
+    }
+
+    /** Cerca il field dichiarato nella gerarchia di classi; restituisce Optional.empty() se non trovato. */
+    private Optional<Field> findField(Class<?> clazz, String fieldName) {
+        Class<?> c = clazz;
+        while (c != null) {
+            try {
+                Field f = c.getDeclaredField(fieldName);
+                return Optional.of(f);
+            } catch (NoSuchFieldException ex) {
+                c = c.getSuperclass();
+            }
+        }
+        return Optional.empty();
     }
 }
