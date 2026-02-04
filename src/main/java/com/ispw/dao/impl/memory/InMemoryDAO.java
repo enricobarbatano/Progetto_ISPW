@@ -51,6 +51,8 @@ public abstract class InMemoryDAO<I, E> implements DAO<I, E> {
     /**
      * (Opzionale) Factory method per create(id).
      * Default: non crea nulla. Override nei concreti se ti serve.
+     * @param id l'identificatore dell'entità da creare - può essere utilizzato nelle sottoclassi per l'inizializzazione
+     * @return una nuova entità inizializzata con l'ID fornito, oppure null se non richiesto
      */
     protected E newEntity(I id) {
         return null;

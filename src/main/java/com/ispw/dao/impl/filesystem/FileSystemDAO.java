@@ -145,7 +145,13 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
 
     @FunctionalInterface
     protected interface FileCodec<K, V> {
-        Optional<Map<K, V>> read(Path file) throws RuntimeException;
+        /**
+         * Legge una mappa da file. Può lanciare DaoException in caso di errore di lettura critico.
+         * @param file percorso del file
+         * @return Optional contenente i dati letti, oppure Optional.empty() se il file non esiste
+         * @throws com.ispw.dao.exception.DaoException se si verifica un errore di deserializzazione
+         */
+        Optional<Map<K, V>> read(Path file) throws com.ispw.dao.exception.DaoException;
         default void write(Path file, Map<K, V> data) throws IOException {
             throw new UnsupportedOperationException("write non implementato");
         }

@@ -129,7 +129,7 @@ public final class LogicControllerApplicaPenalita {
                     return r.getValorePenalita();
                 }
             } catch (RuntimeException ex) {
-                log().log(Level.FINE, "Lettura RegolePenalita fallita: {0}", ex.getMessage());
+                log().log(Level.FINE, "Lettura RegolePenalita fallita: {0}", new Object[]{ex.getMessage()});
             }
         }
         return imp;
@@ -199,7 +199,7 @@ public final class LogicControllerApplicaPenalita {
             penalitaDAO.store(p); // si assume assegni l'ID all'istanza
             if (p.getIdPenalita() > 0) return p.getIdPenalita();
         } catch (RuntimeException ex) {
-            log().log(Level.FINE, "Persistenza Penalita fallita: {0}", ex.getMessage());
+            log().log(Level.FINE, "Persistenza Penalita fallita: {0}", new Object[]{ex.getMessage()});
         }
 
         // Fallback deterministico (evita 0/negativi)
@@ -236,7 +236,7 @@ public final class LogicControllerApplicaPenalita {
             ldao.append(sl);
         } catch (RuntimeException ex) {
             // best-effort: non deve far fallire l'operazione principale
-            log().log(Level.FINE, "Scrittura LogDAO fallita: {0}", ex.getMessage());
+            log().log(Level.FINE, "Scrittura LogDAO fallita: {0}", new Object[]{ex.getMessage()});
         }
     }
 
