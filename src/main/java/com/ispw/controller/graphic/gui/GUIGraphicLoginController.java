@@ -3,18 +3,41 @@ package com.ispw.controller.graphic.gui;
 import java.util.Map;
 
 import com.ispw.bean.DatiLoginBean;
+import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicLoginController;
+import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccesso;
 
+/**
+ * Adapter GUI per il login (JavaFX/Swing).
+ */
 public class GUIGraphicLoginController implements GraphicLoginController {
+    
+    private LogicControllerGestioneAccesso logicController;
+    private GraphicControllerNavigation navigator;
+    
+    public GUIGraphicLoginController() {
+    }
+    
+    public GUIGraphicLoginController(
+        LogicControllerGestioneAccesso logicController,
+        GraphicControllerNavigation navigator) {
+        this.logicController = logicController;
+        this.navigator = navigator;
+    }
+    
+    public void setLogicController(LogicControllerGestioneAccesso controller) {
+        this.logicController = controller;
+    }
     
     @Override
     public String getRouteName() {
-        return null;
+        return "login";
     }
 
     @Override
     public void setNavigator(GraphicControllerNavigation navigator) {
+        this.navigator = navigator;
     }
 
     @Override
@@ -23,17 +46,35 @@ public class GUIGraphicLoginController implements GraphicLoginController {
 
     @Override
     public void effettuaLogin(DatiLoginBean credenziali) {
+        if (credenziali == null) {
+            return;
+        }
+        
+        SessioneUtenteBean sessione = logicController.verificaCredenziali(credenziali);
+        
+        if (sessione != null) {
+            vaiAHome();
+        }
     }
 
     @Override
     public void logout() {
+        if (navigator != null) {
+            navigator.goTo("login", null);
+        }
     }
 
     @Override
     public void vaiARegistrazione() {
+        if (navigator != null) {
+            navigator.goTo("registrazione", null);
+        }
     }
 
     @Override
     public void vaiAHome() {
+        if (navigator != null) {
+            navigator.goTo("home", null);
+        }
     }
 }

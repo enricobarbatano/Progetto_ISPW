@@ -1,20 +1,46 @@
 package com.ispw.controller.graphic.gui;
 
-import com.ispw.controller.graphic.GraphicControllerDisdetta;
+import java.util.Map;
 
+import com.ispw.controller.graphic.GraphicControllerDisdetta;
+import com.ispw.controller.graphic.GraphicControllerNavigation;
+import com.ispw.controller.logic.ctrl.LogicControllerDisdettaPrenotazione;
+
+/**
+ * Adapter GUI per la disdetta prenotazione.
+ */
 public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
+    
+    @SuppressWarnings("unused")
+    private LogicControllerDisdettaPrenotazione logicController;
+    private GraphicControllerNavigation navigator;
+    
+    public GUIGraphicControllerDisdetta() {
+    }
+    
+    public GUIGraphicControllerDisdetta(
+        LogicControllerDisdettaPrenotazione logicController,
+        GraphicControllerNavigation navigator) {
+        this.logicController = logicController;
+        this.navigator = navigator;
+    }
+    
+    public void setLogicController(LogicControllerDisdettaPrenotazione controller) {
+        this.logicController = controller;
+    }
     
     @Override
     public String getRouteName() {
-        return null;
+        return "disdetta";
     }
 
     @Override
-    public void setNavigator(com.ispw.controller.graphic.GraphicControllerNavigation navigator) {
+    public void setNavigator(GraphicControllerNavigation navigator) {
+        this.navigator = navigator;
     }
 
     @Override
-    public void onShow(java.util.Map<String, Object> params) {
+    public void onShow(Map<String, Object> params) {
     }
 
     @Override
@@ -35,5 +61,8 @@ public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
 
     @Override
     public void tornaAllaHome() {
+        if (navigator != null) {
+            navigator.goTo("home", null);
+        }
     }
 }
