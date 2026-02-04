@@ -68,7 +68,7 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
      */
     @Override
     public void aggiornaStatoCampo(Map<String, Object> regolaCampo) {
-        if (isNullParams(regolaCampo, "Parametri regola campo mancanti")) {
+        if (isNullParams(regolaCampo, GraphicControllerUtils.MSG_PARAMETRI_REGOLA_CAMPO_MANCANTI)) {
             return;
         }
         
@@ -80,13 +80,14 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
         if (esito != null && esito.isSuccesso()) {
             navigateSuccess(esito.getMessaggio());
         } else {
-            notifyRegoleError(esito != null ? esito.getMessaggio() : "Operazione non riuscita");
+            notifyRegoleError(esito != null ? esito.getMessaggio()
+                : GraphicControllerUtils.MSG_OPERAZIONE_NON_RIUSCITA);
         }
     }
 
     @Override
     public void aggiornaTempistiche(Map<String, Object> tempistiche) {
-        if (isNullParams(tempistiche, "Parametri tempistiche mancanti")) {
+        if (isNullParams(tempistiche, GraphicControllerUtils.MSG_PARAMETRI_TEMPISTICHE_MANCANTI)) {
             return;
         }
         
@@ -98,13 +99,14 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
         if (esito != null && esito.isSuccesso()) {
             navigateSuccess(esito.getMessaggio());
         } else {
-            notifyRegoleError(esito != null ? esito.getMessaggio() : "Operazione non riuscita");
+            notifyRegoleError(esito != null ? esito.getMessaggio()
+                : GraphicControllerUtils.MSG_OPERAZIONE_NON_RIUSCITA);
         }
     }
 
     @Override
     public void aggiornaPenalita(Map<String, Object> penalita) {
-        if (isNullParams(penalita, "Parametri penalità mancanti")) {
+        if (isNullParams(penalita, GraphicControllerUtils.MSG_PARAMETRI_PENALITA_MANCANTI)) {
             return;
         }
         
@@ -117,7 +119,8 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
         if (esito != null && esito.isSuccesso()) {
             navigateSuccess(esito.getMessaggio());
         } else {
-            notifyRegoleError(esito != null ? esito.getMessaggio() : "Operazione non riuscita");
+            notifyRegoleError(esito != null ? esito.getMessaggio()
+                : GraphicControllerUtils.MSG_OPERAZIONE_NON_RIUSCITA);
         }
     }
 
@@ -135,7 +138,7 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
 
     private boolean isIdCampoNonValido(int idCampo) {
         if (idCampo <= 0) {
-            notifyRegoleError("Id campo non valido");
+            notifyRegoleError(GraphicControllerUtils.MSG_ID_CAMPO_NON_VALIDO);
             return true;
         }
         return false;

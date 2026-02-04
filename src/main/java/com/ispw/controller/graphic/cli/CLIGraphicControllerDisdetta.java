@@ -45,7 +45,7 @@ public class CLIGraphicControllerDisdetta implements GraphicControllerDisdetta {
      */
     @Override
     public void richiediPrenotazioniCancellabili(SessioneUtenteBean sessione) {
-        if (isSessioneNonValida(sessione, "Sessione utente mancante")) {
+        if (isSessioneNonValida(sessione, GraphicControllerUtils.MSG_SESSIONE_UTENTE_MANCANTE)) {
             return;
         }
 
@@ -69,7 +69,7 @@ public class CLIGraphicControllerDisdetta implements GraphicControllerDisdetta {
 
     @Override
     public void selezionaPrenotazione(int idPrenotazione) {
-        if (isIdNonValido(idPrenotazione, "Id prenotazione non valido")) {
+        if (isIdNonValido(idPrenotazione, GraphicControllerUtils.MSG_ID_PRENOTAZIONE_NON_VALIDO)) {
             return;
         }
         if (navigator != null) {
@@ -83,8 +83,8 @@ public class CLIGraphicControllerDisdetta implements GraphicControllerDisdetta {
      */
     @Override
     public void richiediAnteprimaDisdetta(int idPrenotazione, SessioneUtenteBean sessione) {
-        if (isIdNonValido(idPrenotazione, "Id prenotazione non valido")
-                || isSessioneNonValida(sessione, "Sessione utente mancante")) {
+        if (isIdNonValido(idPrenotazione, GraphicControllerUtils.MSG_ID_PRENOTAZIONE_NON_VALIDO)
+            || isSessioneNonValida(sessione, GraphicControllerUtils.MSG_SESSIONE_UTENTE_MANCANTE)) {
             return;
         }
 
@@ -93,7 +93,7 @@ public class CLIGraphicControllerDisdetta implements GraphicControllerDisdetta {
             EsitoDisdettaBean esito = logicController.anteprimaDisdetta(idPrenotazione, sessione);
 
             if (esito == null || !esito.isPossibile()) {
-                notifyDisdettaError("Disdetta non consentita");
+                notifyDisdettaError(GraphicControllerUtils.MSG_DISDETTA_NON_CONSENTITA);
                 return;
             }
 
@@ -115,8 +115,8 @@ public class CLIGraphicControllerDisdetta implements GraphicControllerDisdetta {
      */
     @Override
     public void confermaDisdetta(int idPrenotazione, SessioneUtenteBean sessione) {
-        if (isIdNonValido(idPrenotazione, "Id prenotazione non valido")
-                || isSessioneNonValida(sessione, "Sessione utente mancante")) {
+        if (isIdNonValido(idPrenotazione, GraphicControllerUtils.MSG_ID_PRENOTAZIONE_NON_VALIDO)
+            || isSessioneNonValida(sessione, GraphicControllerUtils.MSG_SESSIONE_UTENTE_MANCANTE)) {
             return;
         }
 
@@ -125,7 +125,8 @@ public class CLIGraphicControllerDisdetta implements GraphicControllerDisdetta {
             EsitoOperazioneBean esito = logicController.eseguiAnnullamento(idPrenotazione, sessione);
 
             if (esito == null || !esito.isSuccesso()) {
-                notifyDisdettaError(esito != null ? esito.getMessaggio() : "Disdetta non riuscita");
+                notifyDisdettaError(esito != null ? esito.getMessaggio()
+                    : GraphicControllerUtils.MSG_DISDETTA_NON_RIUSCITA);
                 return;
             }
 

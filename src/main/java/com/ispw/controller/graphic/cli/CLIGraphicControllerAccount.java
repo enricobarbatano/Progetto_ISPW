@@ -51,7 +51,7 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
      */
     @Override
     public void loadAccount(SessioneUtenteBean sessione) {
-        if (isSessioneNonValida(sessione, "Sessione non valida")) {
+        if (isSessioneNonValida(sessione, GraphicControllerUtils.MSG_SESSIONE_NON_VALIDA)) {
             return;
         }
 
@@ -60,7 +60,7 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
             DatiAccountBean dati = logicController.recuperaInformazioniAccount(sessione);
 
             if (dati == null) {
-                notifyAccountError("Impossibile recuperare dati account");
+                notifyAccountError(GraphicControllerUtils.MSG_IMPOSSIBILE_RECUPERARE_DATI_ACCOUNT);
                 return;
             }
 
@@ -77,13 +77,13 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
     @Override
     public void aggiornaDatiAccount(Map<String, Object> nuoviDati) {
         if (nuoviDati == null) {
-            notifyAccountError("Dati account mancanti");
+            notifyAccountError(GraphicControllerUtils.MSG_DATI_ACCOUNT_MANCANTI);
             return;
         }
 
         Object idUtente = nuoviDati.get(GraphicControllerUtils.KEY_ID_UTENTE);
         if (!(idUtente instanceof Integer) || ((Integer) idUtente) <= 0) {
-            notifyAccountError("Id utente non valido");
+            notifyAccountError(GraphicControllerUtils.MSG_ID_UTENTE_NON_VALIDO);
             return;
         }
         
@@ -95,7 +95,8 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
         if (esito != null && esito.isSuccesso()) {
             navigateSuccess(esito.getMessaggio());
         } else {
-            notifyAccountError(esito != null ? esito.getMessaggio() : "Operazione non riuscita");
+            notifyAccountError(esito != null ? esito.getMessaggio()
+                : GraphicControllerUtils.MSG_OPERAZIONE_NON_RIUSCITA);
         }
     }
 
@@ -105,10 +106,10 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
     @Override
     public void cambiaPassword(String vecchiaPassword, String nuovaPassword, SessioneUtenteBean sessione) {
         if (vecchiaPassword == null || nuovaPassword == null) {
-            notifyAccountError("Password non valide");
+            notifyAccountError(GraphicControllerUtils.MSG_PASSWORD_NON_VALIDE);
             return;
         }
-        if (isSessioneNonValida(sessione, "Sessione non valida")) {
+        if (isSessioneNonValida(sessione, GraphicControllerUtils.MSG_SESSIONE_NON_VALIDA)) {
             return;
         }
 
@@ -118,7 +119,8 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
         if (esito != null && esito.isSuccesso()) {
             navigateSuccess(esito.getMessaggio());
         } else {
-            notifyAccountError(esito != null ? esito.getMessaggio() : "Operazione non riuscita");
+            notifyAccountError(esito != null ? esito.getMessaggio()
+                : GraphicControllerUtils.MSG_OPERAZIONE_NON_RIUSCITA);
         }
     }
 

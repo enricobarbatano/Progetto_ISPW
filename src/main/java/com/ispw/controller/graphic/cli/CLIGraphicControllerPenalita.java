@@ -63,7 +63,8 @@ public class CLIGraphicControllerPenalita implements GraphicControllerPenalita {
             EsitoOperazioneBean esito = logicController.applicaSanzione(dati);
 
             if (esito == null || !esito.isSuccesso()) {
-                notifyPenalitaError(esito != null ? esito.getMessaggio() : "Operazione non riuscita");
+                notifyPenalitaError(esito != null ? esito.getMessaggio()
+                    : GraphicControllerUtils.MSG_OPERAZIONE_NON_RIUSCITA);
                 return;
             }
 
@@ -90,7 +91,7 @@ public class CLIGraphicControllerPenalita implements GraphicControllerPenalita {
 
     private boolean isEmailNonValida(String email) {
         if (email == null || email.isBlank()) {
-            notifyPenalitaError("Email utente non valida");
+            notifyPenalitaError(GraphicControllerUtils.MSG_EMAIL_UTENTE_NON_VALIDA);
             return true;
         }
         return false;
@@ -98,7 +99,7 @@ public class CLIGraphicControllerPenalita implements GraphicControllerPenalita {
 
     private boolean isIdUtenteNonValido(int idUtente) {
         if (idUtente <= 0) {
-            notifyPenalitaError("Id utente non valido");
+            notifyPenalitaError(GraphicControllerUtils.MSG_ID_UTENTE_NON_VALIDO);
             return true;
         }
         return false;
@@ -106,7 +107,7 @@ public class CLIGraphicControllerPenalita implements GraphicControllerPenalita {
 
     private boolean isPenalitaNonValida(float importo, String motivazione) {
         if (motivazione == null || motivazione.isBlank() || importo <= 0) {
-            notifyPenalitaError("Dati penalità non validi");
+            notifyPenalitaError(GraphicControllerUtils.MSG_DATI_PENALITA_NON_VALIDI);
             return true;
         }
         return false;

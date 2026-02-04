@@ -52,6 +52,23 @@ public final class GraphicControllerUtils {
     public static final String PREFIX_PENALITA = "[PENALITA]";
     public static final String PREFIX_REGOLE = "[REGOLE]";
 
+    public static final String MSG_SESSIONE_NON_VALIDA = "Sessione non valida";
+    public static final String MSG_SESSIONE_UTENTE_MANCANTE = "Sessione utente mancante";
+    public static final String MSG_ID_UTENTE_NON_VALIDO = "Id utente non valido";
+    public static final String MSG_EMAIL_UTENTE_NON_VALIDA = "Email utente non valida";
+    public static final String MSG_DATI_PENALITA_NON_VALIDI = "Dati penalità non validi";
+    public static final String MSG_OPERAZIONE_NON_RIUSCITA = "Operazione non riuscita";
+    public static final String MSG_IMPOSSIBILE_RECUPERARE_DATI_ACCOUNT = "Impossibile recuperare dati account";
+    public static final String MSG_DATI_ACCOUNT_MANCANTI = "Dati account mancanti";
+    public static final String MSG_PASSWORD_NON_VALIDE = "Password non valide";
+    public static final String MSG_ID_PRENOTAZIONE_NON_VALIDO = "Id prenotazione non valido";
+    public static final String MSG_DISDETTA_NON_CONSENTITA = "Disdetta non consentita";
+    public static final String MSG_DISDETTA_NON_RIUSCITA = "Disdetta non riuscita";
+    public static final String MSG_PARAMETRI_REGOLA_CAMPO_MANCANTI = "Parametri regola campo mancanti";
+    public static final String MSG_PARAMETRI_TEMPISTICHE_MANCANTI = "Parametri tempistiche mancanti";
+    public static final String MSG_PARAMETRI_PENALITA_MANCANTI = "Parametri penalità mancanti";
+    public static final String MSG_ID_CAMPO_NON_VALIDO = "Id campo non valido";
+
     private GraphicControllerUtils() {
         // utility class
     }
