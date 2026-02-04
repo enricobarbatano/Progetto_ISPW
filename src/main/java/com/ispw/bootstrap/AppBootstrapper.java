@@ -49,6 +49,7 @@ public final class AppBootstrapper {
         }
 
         // 2b) Config FILE_SYSTEM (solo se FILE_SYSTEM)
+        Path fsRoot = null;
         if (config.persistency() == PersistencyProvider.FILE_SYSTEM) {
             Path root = Paths.get("C:\\Users\\User\\OneDrive\\Desktop\\Progetti_Uni\\Progetto_ISPW\\FileSystem");
             try {
@@ -57,13 +58,13 @@ public final class AppBootstrapper {
                 LOGGER.log(Level.SEVERE, "Impossibile creare directory root per FILE_SYSTEM: {0}", root);
                 return;
             }
-            DAOFactory.setFileSystemRoot(root);
+            fsRoot = root;
 
             LOGGER.log(Level.INFO, "FILE_SYSTEM root impostata su: {0}", root.toAbsolutePath());
         }
 
         // 3) Configura persistenza (DAOFactory guidata dal provider)
-        DAOFactory.setPersistencyProvider(config.persistency());
+        DAOFactory.initialize(config.persistency(), fsRoot);
         // Messaggio parametrico: MessageFormat
         LOGGER.log(Level.INFO, "Persistency provider: {0}", config.persistency());
 
