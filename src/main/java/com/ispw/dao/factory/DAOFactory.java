@@ -26,7 +26,7 @@ public abstract class DAOFactory {
     /**
      * @deprecated use {@link #initialize(PersistencyProvider, java.nio.file.Path)} to configure factory atomically
      */
-    @Deprecated
+    @Deprecated(since = "4.2", forRemoval = true)
     public static void setPersistencyProvider(PersistencyProvider p) {
         if (provider != null) {
             throw new IllegalStateException("PersistencyProvider già impostato. Non puoi cambiarlo a runtime.");
@@ -37,7 +37,7 @@ public abstract class DAOFactory {
     /**
      * @deprecated use {@link #initialize(PersistencyProvider, java.nio.file.Path)} to configure factory atomically
      */
-    @Deprecated
+    @Deprecated(since = "4.2", forRemoval = true)
     public static void setFileSystemRoot(Path root) {
         if (fileSystemRoot != null) {
             throw new IllegalStateException("FileSystem root già impostata.");
@@ -89,7 +89,7 @@ public abstract class DAOFactory {
     // GUI-safe: synchronized
     public static synchronized DAOFactory getInstance() {
         if (provider == null) {
-            throw new IllegalStateException("DAOFactory non configurata. Chiama setPersistencyProvider() prima.");
+            throw new IllegalStateException("DAOFactory non configurata. Chiama initialize(PersistencyProvider, Path) prima.");
         }
         if (instance == null) {
             instance = switch (provider) {
