@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.ispw.dao.interfaces.DAO;
 
@@ -26,6 +28,8 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
 
     private final Path filePath;
     private final FileCodec<I, E> codec;
+
+    private static final Logger LOGGER = Logger.getLogger(FileSystemDAO.class.getName());
 
     /**
      * @param storageDir directory base (es: "storage/")
@@ -66,7 +70,7 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
     }
 
     protected void flushToDisk() {
-        lock.readLock().lock();
+        lock.writeLock().lock();
         try {
             // scrittura atomica: file.tmp -> replace file reale
             Path tmp = filePath.resolveSibling(filePath.getFileName() + ".tmp");
@@ -79,7 +83,7 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
         } catch (IOException e) {
             throw new com.ispw.dao.exception.DaoException("Errore scrittura su file: " + filePath, e);
         } finally {
-            lock.readLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
@@ -163,8 +167,10 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
                 return Optional.ofNullable(data);
 
             } catch (NoSuchFileException e) {
+                LOGGER.log(Level.FINE, "File non trovato, trattando come vuoto: " + file, e);
                 return Optional.empty();
             } catch (EOFException e) {
+                LOGGER.log(Level.FINE, "EOF o file corrotto, trattando come vuoto: " + file, e);
                 return Optional.empty(); // file vuoto/corrotto -> lo tratti come empty
             } catch (IOException | ClassNotFoundException e) {
                 throw new com.ispw.dao.exception.DaoException("Errore lettura file binario: " + file, e);

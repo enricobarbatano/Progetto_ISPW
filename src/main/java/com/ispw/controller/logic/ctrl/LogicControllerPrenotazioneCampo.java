@@ -236,16 +236,24 @@ public class LogicControllerPrenotazioneCampo {
         if (pag != null) {
             StatoPagamentoBean bean = new StatoPagamentoBean();
             bean.setSuccesso(success);
-            bean.setStato(pag.getStato() != null ? pag.getStato().name() : (success ? PAGATO : "KO"));
+            if (pag.getStato() != null) {
+                bean.setStato(pag.getStato().name());
+            } else {
+                bean.setStato(success ? PAGATO : "KO");
+            }
             bean.setIdTransazione(newTxId("PX")); // invariato
             bean.setDataPagamento(pag.getDataPagamento());
             bean.setMessaggio(success ? "Pagamento eseguito" : "Pagamento rifiutato");
             return bean;
         }
         // Fallback minimale (invariato)
-        return esitoPagamento(success,
-                (statoEnum != null ? statoEnum.name() : (success ? PAGATO: "KO")),
-                success ? "Pagamento eseguito" : "Pagamento rifiutato");
+        final String stato;
+        if (statoEnum != null) {
+            stato = statoEnum.name();
+        } else {
+            stato = success ? PAGATO : "KO";
+        }
+        return esitoPagamento(success, stato, success ? "Pagamento eseguito" : "Pagamento rifiutato");
     }
 
     // =========================
@@ -290,7 +298,11 @@ public class LogicControllerPrenotazioneCampo {
     private StatoPagamentoBean esitoPagamento(boolean ok, String stato, String msg) {
         StatoPagamentoBean bean = new StatoPagamentoBean();
         bean.setSuccesso(ok);
-        bean.setStato(stato != null ? stato : (ok ? PAGATO : "KO"));
+        if (stato != null) {
+            bean.setStato(stato);
+        } else {
+            bean.setStato(ok ? PAGATO : "KO");
+        }
         bean.setIdTransazione(newTxId("TX"));
         bean.setDataPagamento(java.time.LocalDateTime.now());
         bean.setMessaggio(msg);
