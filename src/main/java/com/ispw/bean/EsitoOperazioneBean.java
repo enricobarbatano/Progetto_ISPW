@@ -5,10 +5,10 @@ public class EsitoOperazioneBean {
     private boolean success;
     private String messaggio;
     
-    public boolean isSuccess() { 
+    public boolean isSuccesso() { 
         return success; 
-    } public void setSuccess(boolean success)
-     {
+    } 
+    public void setSuccesso(boolean success){
          this.success = success; 
         }
     public String getMessaggio() {

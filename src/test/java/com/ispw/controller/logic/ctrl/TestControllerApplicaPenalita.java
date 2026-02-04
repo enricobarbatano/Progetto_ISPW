@@ -87,7 +87,7 @@ class TestControllerApplicaPenalita extends BaseDAOTest {
         EsitoOperazioneBean esito = controller.applicaSanzione(dati, null, null, null, null, null);
 
         assertNotNull(esito);
-        assertTrue(esito.isSuccess(), "L'applicazione della penalità deve andare a buon fine");
+        assertTrue(esito.isSuccesso(), "L'applicazione della penalità deve andare a buon fine");
         assertNotNull(esito.getMessaggio());
 
         List<SystemLog> logs = logDAO.findByUtente(u.getIdUtente());
@@ -111,7 +111,7 @@ class TestControllerApplicaPenalita extends BaseDAOTest {
         EsitoOperazioneBean esito = controller.applicaSanzione(dati, null, null, null, null, null);
 
         assertNotNull(esito);
-        assertFalse(esito.isSuccess(), "Deve fallire per utente non esistente");
+        assertFalse(esito.isSuccesso(), "Deve fallire per utente non esistente");
 
         List<SystemLog> logs = logDAO.findLast(1);
         assertTrue(logs.isEmpty(), "Non devono essere presenti log");
@@ -125,13 +125,13 @@ class TestControllerApplicaPenalita extends BaseDAOTest {
         dati1.setIdUtente(0);
         dati1.setMotivazione("x");
         EsitoOperazioneBean esito1 = controller.applicaSanzione(dati1, null, null, null, null, null);
-        assertFalse(esito1.isSuccess());
+        assertFalse(esito1.isSuccesso());
 
         DatiPenalitaBean dati2 = new DatiPenalitaBean();
         dati2.setIdUtente(1);
         dati2.setMotivazione("   ");
         EsitoOperazioneBean esito2 = controller.applicaSanzione(dati2, null, null, null, null, null);
-        assertFalse(esito2.isSuccess());
+        assertFalse(esito2.isSuccesso());
     }
 
     // -------------------------------------------------------------------
@@ -160,7 +160,7 @@ class TestControllerApplicaPenalita extends BaseDAOTest {
         EsitoOperazioneBean esito = controller.applicaSanzione(dati, null, null, null, null, null);
 
         assertNotNull(esito);
-        assertTrue(esito.isSuccess(), "La penalità deve andare a buon fine usando l'importo da regole");
+        assertTrue(esito.isSuccesso(), "La penalità deve andare a buon fine usando l'importo da regole");
 
         List<SystemLog> logs = logDAO.findByUtente(u.getIdUtente());
         assertFalse(logs.isEmpty());
@@ -201,7 +201,7 @@ class TestControllerApplicaPenalita extends BaseDAOTest {
                 dati, pay, fatt, fakePay, fakeFatt, fakeNoti);
 
         assertNotNull(esito);
-        assertTrue(esito.isSuccess());
+        assertTrue(esito.isSuccesso());
 
         assertEquals(1, fakeNoti.invocations, "Notifica penalità deve essere inviata una volta");
         assertEquals(String.valueOf(u.getIdUtente()), fakeNoti.lastIdUtente);
@@ -246,7 +246,7 @@ class TestControllerApplicaPenalita extends BaseDAOTest {
         EsitoOperazioneBean esito = controller.applicaSanzione(dati, null, null, null, null, null);
 
         assertNotNull(esito);
-        assertFalse(esito.isSuccess(), "Deve fallire per importo non valido (bean<=0 e regole<=0)");
+        assertFalse(esito.isSuccesso(), "Deve fallire per importo non valido (bean<=0 e regole<=0)");
     }
 
     // =========================================================

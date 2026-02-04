@@ -32,7 +32,7 @@ public class LogicControllerRegistrazione {
 
         // Validazione "scolastica"
         if (!isValid(datiInput) || notificaCtrl == null) {
-            esito.setSuccess(false);
+            esito.setSuccesso(false);
             esito.setMessaggio("Dati registrazione o servizio notifica non validi");
             log().warning("[REG] Input non valido per registrazione");
             return esito;
@@ -42,7 +42,7 @@ public class LogicControllerRegistrazione {
         final GeneralUserDAO userDAO = generalUserDAO();
         final GeneralUser existing = userDAO.findByEmail(datiInput.getEmail());
         if (existing != null) {
-            esito.setSuccess(false);
+            esito.setSuccesso(false);
             esito.setMessaggio("Email già registrata");
             log().log(Level.WARNING, "[REG] Email già presente: {0}", datiInput.getEmail());
             return esito;
@@ -66,7 +66,7 @@ public class LogicControllerRegistrazione {
         notificaCtrl.inviaConfermaRegistrazione(toBean(nuovo));
 
         // 5) Esito
-        esito.setSuccess(true);
+        esito.setSuccesso(true);
         esito.setMessaggio("Registrazione avviata. Controlla la tua email per la conferma.");
         log().log(Level.INFO, "[REG] Registrazione creata per utente #{0} ({1})",
                 new Object[]{nuovo.getIdUtente(), nuovo.getEmail()});

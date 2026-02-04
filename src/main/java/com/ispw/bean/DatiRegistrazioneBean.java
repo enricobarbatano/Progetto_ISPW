@@ -6,6 +6,7 @@ public class DatiRegistrazioneBean  {
    
 
     private String nome;
+    private String cognome;
     private String email;
     private String password;
 
@@ -18,6 +19,13 @@ public class DatiRegistrazioneBean  {
     }
     public void setNome(String nome) { 
         this.nome = nome; 
+    }
+
+    public String getCognome() { 
+        return cognome; 
+    }
+    public void setCognome(String cognome) { 
+        this.cognome = cognome; 
     }
 
     public String getEmail() { 

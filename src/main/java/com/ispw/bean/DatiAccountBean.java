@@ -6,6 +6,7 @@ public class DatiAccountBean  {
 
     private int idUtente;
     private String nome;
+    private String cognome;
     private String email;
     private String telefono;
     private String indirizzo;
@@ -26,6 +27,12 @@ public class DatiAccountBean  {
     }
     public void setNome(String nome) { 
         this.nome = nome; 
+    }
+    public String getCognome() { 
+        return cognome; 
+    }
+    public void setCognome(String cognome) { 
+        this.cognome = cognome; 
     }
 
     public String getEmail() { 

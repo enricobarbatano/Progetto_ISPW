@@ -116,7 +116,7 @@ public class LogicControllerGestioneAccount {
     public EsitoOperazioneBean aggiornaDatiAccount(DatiAccountBean nuovidati,
                                                    GestioneNotificaGestioneAccount notiCtrl) {
         EsitoOperazioneBean esito = aggiornaDatiAccount(nuovidati);
-        if (esito.isSuccess() && notiCtrl != null) {
+        if (esito.isSuccesso() && notiCtrl != null) {
             try {
                 final GeneralUser u = userDAO().findById(nuovidati.getIdUtente());
                 if (u != null) {
@@ -167,7 +167,7 @@ public class LogicControllerGestioneAccount {
                                               SessioneUtenteBean sessione,
                                               GestioneNotificaGestioneAccount notiCtrl) {
         EsitoOperazioneBean esito = cambiaPassword(vecchiaPwd, nuovaPwd, sessione);
-        if (esito.isSuccess() && notiCtrl != null) {
+        if (esito.isSuccesso() && notiCtrl != null) {
             try {
                 final UtenteBean ub = sessione != null ? sessione.getUtente() : null;
                 if (ub != null) {
@@ -220,7 +220,7 @@ public class LogicControllerGestioneAccount {
 
     private EsitoOperazioneBean esito(boolean ok, String msg) {
         EsitoOperazioneBean e = new EsitoOperazioneBean();
-        e.setSuccess(ok);
+        e.setSuccesso(ok);
         e.setMessaggio(msg);
         return e;
     }

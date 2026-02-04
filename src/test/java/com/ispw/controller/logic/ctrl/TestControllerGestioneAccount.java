@@ -139,7 +139,7 @@ class TestControllerGestioneAccount extends BaseDAOTest {
 
         // Assert esito
         assertNotNull(esito);
-        assertTrue(esito.isSuccess(), "L'aggiornamento deve andare a buon fine");
+        assertTrue(esito.isSuccesso(), "L'aggiornamento deve andare a buon fine");
         assertEquals(1, fake.getInvocations(), "Notifica deve essere inviata");
         assertNotNull(fake.getLastUtente());
         assertEquals(dati.getEmail(), fake.getLastUtente().getEmail());
@@ -187,7 +187,7 @@ class TestControllerGestioneAccount extends BaseDAOTest {
 
         // Assert KO
         assertNotNull(esito);
-        assertFalse(esito.isSuccess(), "Deve fallire per email duplicata");
+        assertFalse(esito.isSuccesso(), "Deve fallire per email duplicata");
 
         // Nessun nuovo log per l'utente A
         List<SystemLog> logs = logDAO.findByUtente(a.getIdUtente());
@@ -201,7 +201,7 @@ class TestControllerGestioneAccount extends BaseDAOTest {
         dati.setIdUtente(0);
         EsitoOperazioneBean esito = controller.aggiornaDatiAccount(dati);
         assertNotNull(esito);
-        assertFalse(esito.isSuccess());
+        assertFalse(esito.isSuccesso());
     }
 
     // =====================================================================================
@@ -232,7 +232,7 @@ class TestControllerGestioneAccount extends BaseDAOTest {
 
         // Assert
         assertNotNull(esito);
-        assertTrue(esito.isSuccess(), "Il cambio password deve andare a buon fine");
+        assertTrue(esito.isSuccesso(), "Il cambio password deve andare a buon fine");
         assertEquals(1, fake.getInvocations(), "Notifica deve essere inviata");
 
         GeneralUser after = userDAO.findByEmail(email);
@@ -262,7 +262,7 @@ class TestControllerGestioneAccount extends BaseDAOTest {
         EsitoOperazioneBean esito = controller.cambiaPassword("wrong", "newPass1", sessione);
 
         assertNotNull(esito);
-        assertFalse(esito.isSuccess(), "Deve fallire per vecchia password errata");
+        assertFalse(esito.isSuccesso(), "Deve fallire per vecchia password errata");
     }
 
     @Test
@@ -270,19 +270,19 @@ class TestControllerGestioneAccount extends BaseDAOTest {
     void testCambiaPassword_SessioneOPwdKO() {
         // Sessione null
         EsitoOperazioneBean e1 = controller.cambiaPassword("x", "newPass1", null);
-        assertNotNull(e1); assertFalse(e1.isSuccess());
+        assertNotNull(e1); assertFalse(e1.isSuccesso());
 
         // Email in sessione blank
         SessioneUtenteBean s2 = new SessioneUtenteBean(
                 "SID", new UtenteBean("N","C","   ", Ruolo.UTENTE), new Date());
         EsitoOperazioneBean e2 = controller.cambiaPassword("x", "newPass1", s2);
-        assertNotNull(e2); assertFalse(e2.isSuccess());
+        assertNotNull(e2); assertFalse(e2.isSuccesso());
 
         // Nuova password troppo corta
         SessioneUtenteBean s3 = new SessioneUtenteBean(
                 "SID", new UtenteBean("N","C","z@example.org", Ruolo.UTENTE), new Date());
         EsitoOperazioneBean e3 = controller.cambiaPassword("old", "123", s3);
-        assertNotNull(e3); assertFalse(e3.isSuccess());
+        assertNotNull(e3); assertFalse(e3.isSuccesso());
     }
 
     // =====================================================================================

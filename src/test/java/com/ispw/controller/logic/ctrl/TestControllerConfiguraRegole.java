@@ -86,7 +86,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         EsitoOperazioneBean esito = controller.aggiornaRegoleCampo(bean, disp, man, noti);
 
         assertNotNull(esito);
-        assertTrue(esito.isSuccess());
+        assertTrue(esito.isSuccesso());
 
         assertEquals(1, disp.attivaCount);
         assertEquals(idCampo, disp.lastIdAttiva);
@@ -118,7 +118,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         EsitoOperazioneBean esito = controller.aggiornaRegoleCampo(bean, disp, null, noti);
 
         assertNotNull(esito);
-        assertTrue(esito.isSuccess());
+        assertTrue(esito.isSuccesso());
 
         assertEquals(0, disp.attivaCount);
         assertEquals(1, disp.rimuoviCount);
@@ -147,7 +147,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         EsitoOperazioneBean esito = controller.aggiornaRegoleCampo(bean, disp, man, noti);
 
         assertNotNull(esito);
-        assertTrue(esito.isSuccess());
+        assertTrue(esito.isSuccesso());
 
         assertEquals(0, disp.attivaCount);
         assertEquals(1, disp.rimuoviCount);
@@ -166,19 +166,19 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         b1.setIdCampo(0);
         b1.setAttivo(Boolean.TRUE);
         b1.setFlagManutenzione(Boolean.FALSE);
-        assertFalse(controller.aggiornaRegoleCampo(b1).isSuccess());
+        assertFalse(controller.aggiornaRegoleCampo(b1).isSuccesso());
 
         RegolaCampoBean b2 = new RegolaCampoBean();
         b2.setIdCampo(1);
         b2.setAttivo(null);
         b2.setFlagManutenzione(Boolean.FALSE);
-        assertFalse(controller.aggiornaRegoleCampo(b2).isSuccess());
+        assertFalse(controller.aggiornaRegoleCampo(b2).isSuccesso());
 
         RegolaCampoBean b3 = new RegolaCampoBean();
         b3.setIdCampo(1);
         b3.setAttivo(Boolean.TRUE);
         b3.setFlagManutenzione(null);
-        assertFalse(controller.aggiornaRegoleCampo(b3).isSuccess());
+        assertFalse(controller.aggiornaRegoleCampo(b3).isSuccesso());
     }
 
     // =====================================================================================
@@ -196,7 +196,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         EsitoOperazioneBean esito = controller.eseguiManutenzione(bean);
 
         assertNotNull(esito);
-        assertTrue(esito.isSuccess());
+        assertTrue(esito.isSuccesso());
 
         Campo r = campoDAO.findById(idCampo);
         assertFalse(readBoolCompat(r, "isAttivo", "attivo"));
@@ -220,7 +220,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         EsitoOperazioneBean esito = controller.eseguiManutenzione(bean, disp, man, noti);
 
         assertNotNull(esito);
-        assertTrue(esito.isSuccess());
+        assertTrue(esito.isSuccesso());
 
         assertEquals(1, disp.rimuoviCount);
         assertEquals(idCampo, disp.lastIdRimuovi);
@@ -245,7 +245,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         EsitoOperazioneBean esito = controller.aggiornaRegolaTempistiche(t);
 
         assertNotNull(esito);
-        assertTrue(esito.isSuccess());
+        assertTrue(esito.isSuccesso());
 
         RegoleTempistiche rt = tempDAO.get();
         assertNotNull(rt);
@@ -271,7 +271,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         EsitoOperazioneBean esito = controller.aggiornaRegolaTempistiche(t, noti);
 
         assertNotNull(esito);
-        assertTrue(esito.isSuccess());
+        assertTrue(esito.isSuccesso());
         assertEquals(1, noti.invocations);
     }
 
@@ -283,21 +283,21 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         t1.setOraApertura(LocalTime.of(8, 0));
         t1.setOraChiusura(LocalTime.of(22, 0));
         t1.setPreavvisoMinimoMinuti(10);
-        assertFalse(controller.aggiornaRegolaTempistiche(t1).isSuccess());
+        assertFalse(controller.aggiornaRegolaTempistiche(t1).isSuccesso());
 
         TempisticheBean t2 = new TempisticheBean();
         t2.setDurataSlotMinuti(60);
         t2.setOraApertura(LocalTime.of(10, 0));
         t2.setOraChiusura(LocalTime.of(9, 0)); // apertura non before chiusura
         t2.setPreavvisoMinimoMinuti(10);
-        assertFalse(controller.aggiornaRegolaTempistiche(t2).isSuccess());
+        assertFalse(controller.aggiornaRegolaTempistiche(t2).isSuccesso());
 
         TempisticheBean t3 = new TempisticheBean();
         t3.setDurataSlotMinuti(60);
         t3.setOraApertura(LocalTime.of(8, 0));
         t3.setOraChiusura(LocalTime.of(22, 0));
         t3.setPreavvisoMinimoMinuti(-1);
-        assertFalse(controller.aggiornaRegolaTempistiche(t3).isSuccess());
+        assertFalse(controller.aggiornaRegolaTempistiche(t3).isSuccesso());
     }
 
     // =====================================================================================
@@ -314,7 +314,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         EsitoOperazioneBean esito = controller.aggiornaRegolepenalita(p);
 
         assertNotNull(esito);
-        assertTrue(esito.isSuccess());
+        assertTrue(esito.isSuccesso());
 
         RegolePenalita rp = penDAO.get();
         assertNotNull(rp);
@@ -336,7 +336,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         EsitoOperazioneBean esito = controller.aggiornaRegolepenalita(p, noti);
 
         assertNotNull(esito);
-        assertTrue(esito.isSuccess());
+        assertTrue(esito.isSuccesso());
         assertEquals(1, noti.invocations);
     }
 
@@ -346,17 +346,17 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         PenalitaBean p1 = new PenalitaBean();
         p1.setValorePenalita(BigDecimal.ZERO);
         p1.setPreavvisoMinimoMinuti(30);
-        assertFalse(controller.aggiornaRegolepenalita(p1).isSuccess());
+        assertFalse(controller.aggiornaRegolepenalita(p1).isSuccesso());
 
         PenalitaBean p2 = new PenalitaBean();
         p2.setValorePenalita(new BigDecimal("-1"));
         p2.setPreavvisoMinimoMinuti(30);
-        assertFalse(controller.aggiornaRegolepenalita(p2).isSuccess());
+        assertFalse(controller.aggiornaRegolepenalita(p2).isSuccesso());
 
         PenalitaBean p3 = new PenalitaBean();
         p3.setValorePenalita(new BigDecimal("10"));
         p3.setPreavvisoMinimoMinuti(-5);
-        assertFalse(controller.aggiornaRegolepenalita(p3).isSuccess());
+        assertFalse(controller.aggiornaRegolepenalita(p3).isSuccesso());
     }
 
     // =====================================================================================
@@ -381,12 +381,12 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         GestioneNotificaConfiguraRegole notiKo = () -> { throw new RuntimeException("boom-noti"); };
 
         EsitoOperazioneBean e1 = controller.aggiornaRegoleCampo(beanCampo, dispKo, manKo, notiKo);
-        assertNotNull(e1); assertTrue(e1.isSuccess(), "AggiornaRegoleCampo deve restare OK (best-effort)");
+        assertNotNull(e1); assertTrue(e1.isSuccesso(), "AggiornaRegoleCampo deve restare OK (best-effort)");
 
         RegolaCampoBean beanMan = new RegolaCampoBean();
         beanMan.setIdCampo(idCampo);
         EsitoOperazioneBean e2 = controller.eseguiManutenzione(beanMan, dispKo, manKo, notiKo);
-        assertNotNull(e2); assertTrue(e2.isSuccess(), "EseguiManutenzione deve restare OK (best-effort)");
+        assertNotNull(e2); assertTrue(e2.isSuccesso(), "EseguiManutenzione deve restare OK (best-effort)");
 
         TempisticheBean t = new TempisticheBean();
         t.setDurataSlotMinuti(30);
@@ -394,13 +394,13 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         t.setOraChiusura(LocalTime.of(10, 0));
         t.setPreavvisoMinimoMinuti(0);
         EsitoOperazioneBean e3 = controller.aggiornaRegolaTempistiche(t, notiKo);
-        assertNotNull(e3); assertTrue(e3.isSuccess());
+        assertNotNull(e3); assertTrue(e3.isSuccesso());
 
         PenalitaBean p = new PenalitaBean();
         p.setValorePenalita(new BigDecimal("2.50"));
         p.setPreavvisoMinimoMinuti(0);
         EsitoOperazioneBean e4 = controller.aggiornaRegolepenalita(p, notiKo);
-        assertNotNull(e4); assertTrue(e4.isSuccess());
+        assertNotNull(e4); assertTrue(e4.isSuccesso());
     }
 
     // =====================================================================================

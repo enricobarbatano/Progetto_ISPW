@@ -121,7 +121,7 @@ class TestControllerDisdettaPrenotazione extends BaseDAOTest {
                 p.getIdPrenotazione(), sessionOf(u), pay, fatt, noti, disp);
 
         assertNotNull(esito);
-        assertTrue(esito.isSuccess(), "Operazione attesa OK");
+        assertTrue(esito.isSuccesso(), "Operazione attesa OK");
 
         Prenotazione after = prenotazioneDAO.load(p.getIdPrenotazione());
         assertEquals(StatoPrenotazione.ANNULLATA, after.getStato(), "Stato aggiornato ad ANNULLATA");
@@ -157,7 +157,7 @@ class TestControllerDisdettaPrenotazione extends BaseDAOTest {
                 p.getIdPrenotazione(), sessionOf(u), pay, fatt, noti, disp);
 
         assertNotNull(esito);
-        assertTrue(esito.isSuccess());
+        assertTrue(esito.isSuccesso());
 
         Prenotazione after = prenotazioneDAO.load(p.getIdPrenotazione());
         assertEquals(StatoPrenotazione.ANNULLATA, after.getStato());

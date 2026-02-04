@@ -107,7 +107,7 @@ public class LogicControllerConfiguraRegole {
                                                    GestioneManutenzioneConfiguraRegole manCtrl,
                                                    GestioneNotificaConfiguraRegole notiCtrl) {
         EsitoOperazioneBean base = aggiornaRegoleCampo(bean);
-        if (!base.isSuccess()) return base;
+        if (!base.isSuccesso()) return base;
 
         final int idCampo = bean.getIdCampo();
         final boolean attivo = Boolean.TRUE.equals(bean.getAttivo());
@@ -169,7 +169,7 @@ public class LogicControllerConfiguraRegole {
                                                   GestioneManutenzioneConfiguraRegole manCtrl,
                                                   GestioneNotificaConfiguraRegole notiCtrl) {
         EsitoOperazioneBean base = eseguiManutenzione(bean);
-        if (!base.isSuccess()) return base;
+        if (!base.isSuccesso()) return base;
 
         final int idCampo = bean.getIdCampo();
 
@@ -221,7 +221,7 @@ public class LogicControllerConfiguraRegole {
     /** Overload con notifica broadcast. */
     public EsitoOperazioneBean aggiornaRegolaTempistiche(TempisticheBean bean, GestioneNotificaConfiguraRegole notiCtrl) {
         EsitoOperazioneBean base = aggiornaRegolaTempistiche(bean);
-        if (base.isSuccess()) {
+        if (base.isSuccesso()) {
             generaNotificaAutomatica(notiCtrl);
         }
         return base;
@@ -255,7 +255,7 @@ public class LogicControllerConfiguraRegole {
     /** Overload con notifica broadcast. */
     public EsitoOperazioneBean aggiornaRegolepenalita(PenalitaBean bean, GestioneNotificaConfiguraRegole notiCtrl) {
         EsitoOperazioneBean base = aggiornaRegolepenalita(bean);
-        if (base.isSuccess()) {
+        if (base.isSuccesso()) {
             generaNotificaAutomatica(notiCtrl);
         }
         return base;
@@ -293,7 +293,7 @@ public class LogicControllerConfiguraRegole {
 
     private EsitoOperazioneBean esito(boolean ok, String msg) {
         EsitoOperazioneBean e = new EsitoOperazioneBean();
-        e.setSuccess(ok);
+        e.setSuccesso(ok);
         e.setMessaggio(msg);
         return e;
     }

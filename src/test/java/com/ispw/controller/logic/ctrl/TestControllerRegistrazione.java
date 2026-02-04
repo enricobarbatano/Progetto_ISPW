@@ -66,7 +66,7 @@ class TestControllerRegistrazione extends BaseDAOTest {
 
         // Assert esito
         assertNotNull(esito);
-        assertTrue(esito.isSuccess(), "La registrazione dovrebbe andare a buon fine");
+        assertTrue(esito.isSuccesso(), "La registrazione dovrebbe andare a buon fine");
         assertNotNull(esito.getMessaggio());
 
         // Assert utente creato in stato DA_CONFERMARE
@@ -111,7 +111,7 @@ class TestControllerRegistrazione extends BaseDAOTest {
 
         // Assert
         assertNotNull(esito);
-        assertFalse(esito.isSuccess(), "La registrazione deve fallire per email duplicata");
+        assertFalse(esito.isSuccesso(), "La registrazione deve fallire per email duplicata");
         assertEquals(0, fake.getInvocations(), "Non deve essere inviata alcuna notifica");
 
         // Nessun nuovo log per l'utente pre-esistente

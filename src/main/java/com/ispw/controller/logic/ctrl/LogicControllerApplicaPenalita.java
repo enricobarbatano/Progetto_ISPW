@@ -267,7 +267,7 @@ public final class LogicControllerApplicaPenalita {
     /** Costruisce l'esito (no reflection: usiamo direttamente i setter reali). */
     private EsitoOperazioneBean esito(boolean ok, String msg) {
         EsitoOperazioneBean e = new EsitoOperazioneBean();
-        e.setSuccess(ok);
+        e.setSuccesso(ok);
         e.setMessaggio(msg);
         return e;
     }
