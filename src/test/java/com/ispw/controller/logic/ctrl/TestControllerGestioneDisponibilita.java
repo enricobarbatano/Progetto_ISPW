@@ -116,7 +116,7 @@ class TestControllerGestoreDisponibilita extends BaseDAOTest {
     @DisplayName("4) Verifica disponibilità: ritorna slot solo per campi attivi e non in manutenzione")
     void testVerificaDisponibilita() {
          //Campo #4: ATTIVO, NON in manutenzione → disponibile
-        Campo c4 = seedCampo(4, 20f, true, false);
+        seedCampo(4, 20f, true, false);
         // Campo #5: attivo ma in manutenzione → NON deve comparire
         seedCampo(5, 50f, true, true);
 
