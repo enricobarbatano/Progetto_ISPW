@@ -37,43 +37,43 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     @Override
     public GraphicLoginController createLoginController() {
         GraphicControllerNavigation navigator = getNavigationController();
-        return new CLIGraphicLoginController((CLIGraphicControllerNavigation) navigator);
+        return new CLIGraphicLoginController(navigator);
     }
 
     @Override
     public GraphicControllerAccount createAccountController() {
         GraphicControllerNavigation navigator = getNavigationController();
-        return new CLIGraphicControllerAccount((CLIGraphicControllerNavigation) navigator);
+        return new CLIGraphicControllerAccount(navigator);
     }
 
     @Override
     public GraphicControllerRegistrazione createRegistrazioneController() {
         GraphicControllerNavigation navigator = getNavigationController();
-        return new CLIGraphicControllerRegistrazione((CLIGraphicControllerNavigation) navigator);
+        return new CLIGraphicControllerRegistrazione(navigator);
     }
 
     @Override
     public GraphicControllerPrenotazione createPrenotazioneController() {
         GraphicControllerNavigation navigator = getNavigationController();
-        return new CLIGraphicControllerPrenotazione((CLIGraphicControllerNavigation) navigator);
+        return new CLIGraphicControllerPrenotazione(navigator);
     }
 
     @Override
     public GraphicControllerDisdetta createDisdettaController() {
         GraphicControllerNavigation navigator = getNavigationController();
-        return new CLIGraphicControllerDisdetta((CLIGraphicControllerNavigation) navigator);
+        return new CLIGraphicControllerDisdetta(navigator);
     }
 
     @Override
     public GraphicControllerRegole createRegoleController() {
         GraphicControllerNavigation navigator = getNavigationController();
-        return new CLIGraphicControllerRegole((CLIGraphicControllerNavigation) navigator);
+        return new CLIGraphicControllerRegole(navigator);
     }
 
     @Override
     public GraphicControllerPenalita createPenalitaController() {
         GraphicControllerNavigation navigator = getNavigationController();
-        return new CLIGraphicControllerPenalita((CLIGraphicControllerNavigation) navigator);
+        return new CLIGraphicControllerPenalita(navigator);
     }
 
     @Override
@@ -85,9 +85,6 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     }
 
     private GraphicControllerNavigation getNavigationController() {
-        if (navigationController == null) {
-            navigationController = new CLIGraphicControllerNavigation();
-        }
-        return navigationController;
+        return createNavigationController();  // Delega al metodo pubblico
     }
 }  

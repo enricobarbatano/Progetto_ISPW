@@ -54,14 +54,14 @@ public class GUIGraphicControllerAccount implements GraphicControllerAccount {
         EsitoOperazioneBean esito = logicController.aggiornaDatiAccount(bean);
         
         if (esito != null && esito.isSuccesso()) {
-            // Mostra dialog successo
+            // TODO: mostrare dialog successo
         }
     }
 
     @Override
     public void cambiaPassword(String vecchiaPassword, String nuovaPassword) {
         if (vecchiaPassword == null || nuovaPassword == null) {
-            // Valida input GUI
+            // TODO: validare input GUI
         }
     }
 

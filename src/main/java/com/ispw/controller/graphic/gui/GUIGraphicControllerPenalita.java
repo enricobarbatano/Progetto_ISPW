@@ -32,7 +32,7 @@ public class GUIGraphicControllerPenalita implements GraphicControllerPenalita {
     @Override
     public void applicaPenalita(float importo, String motivazione) {
         if (motivazione == null || importo <= 0) {
-            // Valida input GUI
+            // TODO: validare input GUI
         }
     }
 

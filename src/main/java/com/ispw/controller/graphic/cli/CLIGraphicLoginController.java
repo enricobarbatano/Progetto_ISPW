@@ -41,8 +41,7 @@ public class CLIGraphicLoginController implements GraphicLoginController {
 
     @Override
     public void onShow(Map<String, Object> params) {
-        // Lifecycle: quando view login è mostrata
-        // Es. pulire campi, mostrare messaggio benvenuto
+        // TODO: implementare lifecycle (pulire campi, mostrare messaggio)
     }
 
     // ==================== Business Methods ====================
@@ -63,45 +62,27 @@ public class CLIGraphicLoginController implements GraphicLoginController {
     @Override
     public void effettuaLogin(DatiLoginBean credenziali) {
         if (credenziali == null) {
-            // Notifica View: credenziali mancanti
+            // TODO: notificare View credenziali mancanti
             return;
         }
         
-        // DELEGAZIONE: verifica credenziali tramite LogicController (creato on-demand)
         LogicControllerGestioneAccesso logicController = new LogicControllerGestioneAccesso();
         SessioneUtenteBean sessione = logicController.verificaCredenziali(credenziali);
         
         if (sessione != null) {
-            // Login riuscito
-            // Salva log di accesso
             logicController.saveLog(sessione);
-            
-            // Passa SessioneUtenteBean alla View per memorizzarla
-            // La View memorizzerà sessioneCorrente = sessione
-            
-            // Navigazione a home
             vaiAHome();
         } else {
-            // Login fallito
-            // Notifica View: credenziali errate
+            // TODO: notificare View credenziali errate
         }
     }
 
     /**
      * Logout.
-     * 
-     * Flusso:
-     * 1. View chiama logout
-     * 2. Invalida sessioneUtenteBean nella View
-     * 3. Naviga a login
      */
     @Override
     public void logout() {
-        // La View dovrà:
-        // - Invalidare sessioneCorrente (= null)
-        // - Pulire UI
-        
-        // Navigazione a login
+        // TODO: implementare logout
         if (navigator != null) {
             navigator.goTo("login");
         }

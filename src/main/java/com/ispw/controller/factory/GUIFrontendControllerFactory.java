@@ -36,43 +36,43 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
     @Override
     public GraphicLoginController createLoginController() {
         GraphicControllerNavigation navigator = getNavigationController();
-        return new GUIGraphicLoginController((GUIGraphicControllerNavigation) navigator);
+        return new GUIGraphicLoginController(navigator);
     }
 
     @Override
     public GraphicControllerAccount createAccountController() {
         GraphicControllerNavigation navigator = getNavigationController();
-        return new GUIGraphicControllerAccount((GUIGraphicControllerNavigation) navigator);
+        return new GUIGraphicControllerAccount(navigator);
     }
 
     @Override
     public GraphicControllerRegistrazione createRegistrazioneController() {
         GraphicControllerNavigation navigator = getNavigationController();
-        return new GUIGraphicControllerRegistrazione((GUIGraphicControllerNavigation) navigator);
+        return new GUIGraphicControllerRegistrazione(navigator);
     }
 
     @Override
     public GraphicControllerPrenotazione createPrenotazioneController() {
         GraphicControllerNavigation navigator = getNavigationController();
-        return new GUIGraphicControllerPrenotazione((GUIGraphicControllerNavigation) navigator);
+        return new GUIGraphicControllerPrenotazione(navigator);
     }
 
     @Override
     public GraphicControllerDisdetta createDisdettaController() {
         GraphicControllerNavigation navigator = getNavigationController();
-        return new GUIGraphicControllerDisdetta((GUIGraphicControllerNavigation) navigator);
+        return new GUIGraphicControllerDisdetta(navigator);
     }
 
     @Override
     public GraphicControllerRegole createRegoleController() {
         GraphicControllerNavigation navigator = getNavigationController();
-        return new GUIGraphicControllerRegole((GUIGraphicControllerNavigation) navigator);
+        return new GUIGraphicControllerRegole(navigator);
     }
 
     @Override
     public GraphicControllerPenalita createPenalitaController() {
         GraphicControllerNavigation navigator = getNavigationController();
-        return new GUIGraphicControllerPenalita((GUIGraphicControllerNavigation) navigator);
+        return new GUIGraphicControllerPenalita(navigator);
     }
 
     @Override
@@ -84,10 +84,7 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
     }
 
     private GraphicControllerNavigation getNavigationController() {
-        if (navigationController == null) {
-            navigationController = new GUIGraphicControllerNavigation();
-        }
-        return navigationController;
+        return createNavigationController();  // Delega al metodo pubblico
     }
 } 
 

@@ -36,15 +36,9 @@ public class CLIGraphicControllerPenalita implements GraphicControllerPenalita {
     @Override
     public void applicaPenalita(float importo, String motivazione) {
         if (motivazione == null || importo <= 0) {
-            // Valida input
+            return;  // Valida input
         }
-        
-        // EsitoOperazioneBean esito = 
-        //     logicController.applicaPenalita(emailUtente, importo, motivazione);
-        
-        // if (esito != null && esito.isSuccesso()) {
-        //     tornaAllaHome();
-        // }
+        // TODO: implementare applicazione penalita
     }
 
     @Override

@@ -33,10 +33,7 @@ public class GUIGraphicControllerPrenotazione implements GraphicControllerPrenot
         if (input == null) {
             return;
         }
-        
-        // List<DatiDisponibilitaBean> disponibilita = 
-        //     logicController.trovaSlotDisponibili(input, sessioneCorrente);
-        // Visualizza in TableView/JTable
+        // TODO: implementare richiesta disponibilita
     }
 
     @Override
@@ -44,10 +41,7 @@ public class GUIGraphicControllerPrenotazione implements GraphicControllerPrenot
         if (input == null) {
             return;
         }
-        
-        // RiepilogoPrenotazioneBean riepilogo = 
-        //     logicController.nuovaPrenotazione(input, sessioneCorrente, notificaCtrl);
-        // Mostra dialog riepilogo
+        // TODO: implementare creazione prenotazione
     }
 
     @Override
@@ -55,10 +49,7 @@ public class GUIGraphicControllerPrenotazione implements GraphicControllerPrenot
         if (pagamento == null) {
             return;
         }
-        
-        // StatoPagamentoBean stato = logicController.completaPrenotazione(
-        //     pagamento, sessioneCorrente, pagamentoCtrl, fatturaCtrl, notificaCtrl);
-        // if (stato != null) { tornaAllaHome(); }
+        // TODO: implementare completamento pagamento
     }
 
     @Override

@@ -31,15 +31,12 @@ public class CLIGraphicControllerDisdetta implements GraphicControllerDisdetta {
      */
     @Override
     public void richiediPrenotazioniCancellabili() {
-        // UtenteBean utente = view.getSessioneCorrente().getUtente();
-        // List<RiepilogoPrenotazioneBean> prenotazioni = 
-        //     logicController.ottieniPrenotazioniCancellabili(utente);
-        // view.mostraPrenotazioni(prenotazioni);
+        // TODO: implementare richiesta prenotazioni cancellabili
     }
 
     @Override
     public void selezionaPrenotazione(int idPrenotazione) {
-        // Memorizza selezione per operazioni successive
+        // TODO: implementare selezione prenotazione
     }
 
     /**
@@ -47,10 +44,7 @@ public class CLIGraphicControllerDisdetta implements GraphicControllerDisdetta {
      */
     @Override
     public void richiediAnteprimaDisdetta(int idPrenotazione) {
-        // SessioneUtenteBean sessione = view.getSessioneCorrente();
-        // EsitoDisdettaBean esito = 
-        //     logicController.anteprimaDisdetta(idPrenotazione, sessione);
-        // view.mostraAnteprima(esito);
+        // TODO: implementare anteprima disdetta
     }
 
     /**
@@ -58,9 +52,7 @@ public class CLIGraphicControllerDisdetta implements GraphicControllerDisdetta {
      */
     @Override
     public void confermaDisdetta(int idPrenotazione) {
-        // EsitoOperazioneBean esito = 
-        //     logicController.eseguiAnnullamento(idPrenotazione, ...);
-        // if (esito.isSuccesso()) { tornaAllaHome(); }
+        // TODO: implementare conferma disdetta
     }
 
     @Override

@@ -36,11 +36,7 @@ public class CLIGraphicControllerPrenotazione implements GraphicControllerPrenot
         if (input == null) {
             return;
         }
-        
-        // Delega a LogicController (SessioneUtenteBean viene dalla View)
-        // List<DatiDisponibilitaBean> disponibilita = 
-        //     logicController.trovaSlotDisponibili(input, sessioneCorrente);
-        // view.mostraDisponibilita(disponibilita);
+        // TODO: implementare richiesta disponibilita
     }
 
     @Override
@@ -48,11 +44,7 @@ public class CLIGraphicControllerPrenotazione implements GraphicControllerPrenot
         if (input == null) {
             return;
         }
-        
-        // Delega a LogicController (SessioneUtenteBean e notifica dalla View)
-        // RiepilogoPrenotazioneBean riepilogo = 
-        //     logicController.nuovaPrenotazione(input, sessioneCorrente, notificaCtrl);
-        // view.mostraRiepilogo(riepilogo);
+        // TODO: implementare creazione prenotazione
     }
 
     @Override
@@ -60,11 +52,7 @@ public class CLIGraphicControllerPrenotazione implements GraphicControllerPrenot
         if (pagamento == null) {
             return;
         }
-        
-        // Delega a LogicController (tutti i controller di notifica dalla View)
-        // StatoPagamentoBean stato = logicController.completaPrenotazione(
-        //     pagamento, sessioneCorrente, pagamentoCtrl, fatturaCtrl, notificaCtrl);
-        // if (stato != null) { tornaAllaHome(); }
+        // TODO: implementare completamento pagamento
     }
 
     @Override

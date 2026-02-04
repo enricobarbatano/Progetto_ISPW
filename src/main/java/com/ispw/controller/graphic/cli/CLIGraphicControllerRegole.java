@@ -32,13 +32,12 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
 
     @Override
     public void richiediListaCampi() {
-        // List<DatiCampoBean> campi = logicController.recuperaCampi();
-        // view.mostraCampi(campi);
+        // TODO: implementare richiesta lista campi
     }
 
     @Override
     public void selezionaCampo(int idCampo) {
-        // Memorizza selezione
+        // TODO: memorizzare selezione
     }
 
     /**
@@ -87,7 +86,7 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
         EsitoOperazioneBean esito = logicController.aggiornaRegolaTempistiche(bean);
         
         if (esito != null && esito.isSuccesso()) {
-            // Notifica View
+            // TODO: notificare View
         }
     }
 
@@ -107,7 +106,7 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
         EsitoOperazioneBean esito = logicController.aggiornaRegolepenalita(bean);
         
         if (esito != null && esito.isSuccesso()) {
-            // Notifica View
+            // TODO: notificare View
         }
     }
 

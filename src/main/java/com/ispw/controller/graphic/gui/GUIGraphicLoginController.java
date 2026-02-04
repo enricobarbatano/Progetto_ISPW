@@ -34,7 +34,6 @@ public class GUIGraphicLoginController implements GraphicLoginController {
             return;
         }
         
-        // Delega a LogicController (creato on-demand)
         LogicControllerGestioneAccesso logicController = new LogicControllerGestioneAccesso();
         SessioneUtenteBean sessione = logicController.verificaCredenziali(credenziali);
         

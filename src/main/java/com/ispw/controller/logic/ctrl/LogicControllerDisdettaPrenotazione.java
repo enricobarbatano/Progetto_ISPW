@@ -168,19 +168,29 @@ public class LogicControllerDisdettaPrenotazione {
         EsitoDisdettaBean out = new EsitoDisdettaBean();
 
         if (sessione == null || sessione.getUtente() == null || isBlank(sessione.getUtente().getEmail())) {
-            out.setPossibile(false); out.setPenale(0f); return out;
+            return invalidoEsito();
         }
         final var user = userDAO().findByEmail(normalizeEmail(sessione.getUtente().getEmail()));
-        if (user == null) { out.setPossibile(false); out.setPenale(0f); return out; }
+        if (user == null) {
+            return invalidoEsito();
+        }
 
         final Prenotazione p = prenotazioneDAO().load(idPrenotazione);
-        if (p == null) { out.setPossibile(false); out.setPenale(0f); return out; }
-        if (p.getIdUtente() != user.getIdUtente()) { out.setPossibile(false); out.setPenale(0f); return out; }
-        if (p.getStato() == StatoPrenotazione.ANNULLATA) { out.setPossibile(false); out.setPenale(0f); return out; }
+        if (p == null) {
+            return invalidoEsito();
+        }
+        if (p.getIdUtente() != user.getIdUtente()) {
+            return invalidoEsito();
+        }
+        if (p.getStato() == StatoPrenotazione.ANNULLATA) {
+            return invalidoEsito();
+        }
 
         final LocalDateTime now = LocalDateTime.now();
         final LocalDateTime start = LocalDateTime.of(p.getData(), p.getOraInizio());
-        if (!start.isAfter(now)) { out.setPossibile(false); out.setPenale(0f); return out; } // nel passato
+        if (!start.isAfter(now)) {
+            return invalidoEsito(); // nel passato
+        }
 
         final RegoleTempistiche rt = tempisticheDAO().get(); // preavvisoMinimo (minuti)
         final RegolePenalita   rp = penalitaDAO().get();     // valorePenalita (BigDecimal) + preavvisoMinimo (minuti)
@@ -188,6 +198,14 @@ public class LogicControllerDisdettaPrenotazione {
 
         out.setPossibile(true);
         out.setPenale(penale);
+        return out;
+    }
+
+    /** Helper per validazione fallita: ritorna EsitoDisdettaBean con possibile=false, penale=0f */
+    private EsitoDisdettaBean invalidoEsito() {
+        EsitoDisdettaBean out = new EsitoDisdettaBean();
+        out.setPossibile(false);
+        out.setPenale(0f);
         return out;
     }
 

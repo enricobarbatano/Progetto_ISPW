@@ -59,7 +59,7 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
         EsitoOperazioneBean esito = logicController.aggiornaRegoleCampo(bean);
         
         if (esito != null && esito.isSuccesso()) {
-            // Mostra dialog successo
+            // TODO: mostrare dialog successo
         }
     }
 

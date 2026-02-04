@@ -34,7 +34,7 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
 
     @Override
     public void onShow(Map<String, Object> params) {
-        // Lifecycle: carica dati account quando view è mostrata
+        // TODO: implementare lifecycle (caricare dati account)
     }
 
     /**
@@ -43,10 +43,7 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
      */
     @Override
     public void loadAccount() {
-        // La View deve fornire sessioneCorrente
-        // SessioneUtenteBean sessione = view.getSessioneCorrente();
-        // DatiAccountBean dati = logicController.recuperaInformazioniAccount(sessione);
-        // view.mostraDatiAccount(dati);
+        // TODO: implementare se necessario
     }
 
     /**
@@ -59,7 +56,6 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
             return;
         }
         
-        // Adatta Map → DatiAccountBean
         DatiAccountBean bean = new DatiAccountBean();
         if (nuoviDati.containsKey("nome")) {
             bean.setNome((String) nuoviDati.get("nome"));
@@ -71,14 +67,13 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
             bean.setEmail((String) nuoviDati.get("email"));
         }
         
-        // Delega a LogicController (creato on-demand)
         LogicControllerGestioneAccount logicController = new LogicControllerGestioneAccount();
         EsitoOperazioneBean esito = logicController.aggiornaDatiAccount(bean);
         
         if (esito != null && esito.isSuccesso()) {
-            // Notifica View: aggiornamento riuscito
+            // TODO: notificare View aggiornamento riuscito
         } else {
-            // Notifica View: errore
+            // TODO: notificare View errore
         }
     }
 
@@ -88,15 +83,9 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
     @Override
     public void cambiaPassword(String vecchiaPassword, String nuovaPassword) {
         if (vecchiaPassword == null || nuovaPassword == null) {
-            // Valida input
+            return;
         }
-        
-        // La View deve fornire sessioneCorrente
-        // SessioneUtenteBean sessione = view.getSessioneCorrente();
-        // EsitoOperazioneBean esito = 
-        //     logicController.cambiaPassword(vecchiaPassword, nuovaPassword, sessione);
-        
-        // if (esito.isSuccesso()) { logout(); }
+        // TODO: implementare cambio password
     }
 
     /**

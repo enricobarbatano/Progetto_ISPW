@@ -38,22 +38,19 @@ public class CLIGraphicControllerRegistrazione implements GraphicControllerRegis
             return;
         }
         
-        // Adatta Map → DatiRegistrazioneBean
         DatiRegistrazioneBean bean = new DatiRegistrazioneBean();
         bean.setNome((String) datiRegistrazione.get("nome"));
         bean.setCognome((String) datiRegistrazione.get("cognome"));
         bean.setEmail((String) datiRegistrazione.get("email"));
         bean.setPassword((String) datiRegistrazione.get("password"));
         
-        // Delega a LogicController (creato on-demand)
         LogicControllerRegistrazione logicController = new LogicControllerRegistrazione();
         EsitoOperazioneBean esito = logicController.registraNuovoUtente(bean, null);
         
         if (esito != null && esito.isSuccesso()) {
-            // Registrazione riuscita - naviga a login
             vaiAlLogin();
         } else {
-            // Notifica View: errore registrazione
+            // TODO: notificare View errore registrazione
         }
     }
 
