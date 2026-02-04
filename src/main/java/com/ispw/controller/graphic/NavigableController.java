@@ -2,12 +2,12 @@ package com.ispw.controller.graphic;
 
 import java.util.Map;
 
-/** Controller grafico “navigabile” (adapter UI ↔ use case) */
+/**
+ * Controller grafico "navigabile" (adapter UI ↔ use case).
+ * Il navigator viene iniettato via costruttore (dependency injection).
+ */
 public interface NavigableController {
     String getRouteName();
-
-    /** Inject del router */
-    void setNavigator(GraphicControllerNavigation navigator);
 
     /** Lifecycle: mostrata senza parametri */
     default void onShow() { onShow(Map.of()); }

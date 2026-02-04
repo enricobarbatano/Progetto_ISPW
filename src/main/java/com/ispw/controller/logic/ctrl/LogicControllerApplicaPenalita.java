@@ -42,16 +42,15 @@ public final class LogicControllerApplicaPenalita {
             Logger.getLogger(LogicControllerApplicaPenalita.class.getName());
 
     // === DIP: DAO iniettati via costruttore ===
-    private final GeneralUserDAO userDAO;
-    private final PenalitaDAO penalitaDAO;
-    private final RegolePenalitaDAO regolePenalitaDAO; // opzionale (può essere null)
-
-    public LogicControllerApplicaPenalita(GeneralUserDAO userDAO,
-                                          PenalitaDAO penalitaDAO,
-                                          RegolePenalitaDAO regolePenalitaDAO) {
-        this.userDAO = Objects.requireNonNull(userDAO, "userDAO");
-        this.penalitaDAO = Objects.requireNonNull(penalitaDAO, "penalitaDAO");
-        this.regolePenalitaDAO = regolePenalitaDAO; // può essere null
+    // DAO on-demand (no SQL nei controller)
+    private GeneralUserDAO userDAO() {
+        return DAOFactory.getInstance().getGeneralUserDAO();
+    }
+    private PenalitaDAO penalitaDAO() {
+        return DAOFactory.getInstance().getPenalitaDAO();
+    }
+    private RegolePenalitaDAO regolePenalitaDAO() {
+        return DAOFactory.getInstance().getRegolePenalitaDAO();
     }
 
     // ========================================================================
@@ -122,9 +121,9 @@ public final class LogicControllerApplicaPenalita {
         BigDecimal imp = d.getImporto();
         if (isImportoValido(imp)) return imp;
 
-        if (regolePenalitaDAO != null) {
+        if (regolePenalitaDAO() != null) {
             try {
-                RegolePenalita r = regolePenalitaDAO.get();
+                RegolePenalita r = regolePenalitaDAO().get();
                 if (r != null && isImportoValido(r.getValorePenalita())) {
                     return r.getValorePenalita();
                 }
@@ -196,7 +195,7 @@ public final class LogicControllerApplicaPenalita {
             p.setIdUtente(d.getIdUtente());
             p.setMotivazione(d.getMotivazione());
             p.setImporto(importo);
-            penalitaDAO.store(p); // si assume assegni l'ID all'istanza
+            penalitaDAO().store(p); // si assume assegni l'ID all'istanza
             if (p.getIdPenalita() > 0) return p.getIdPenalita();
         } catch (RuntimeException ex) {
             log().log(Level.FINE, "Persistenza Penalita fallita: {0}", new Object[]{ex.getMessage()});
@@ -258,10 +257,6 @@ public final class LogicControllerApplicaPenalita {
 
     private Logger log() {
         return LOGGER;
-    }
-
-    private GeneralUserDAO userDAO() {
-        return this.userDAO;
     }
 
     /** Costruisce l'esito (no reflection: usiamo direttamente i setter reali). */

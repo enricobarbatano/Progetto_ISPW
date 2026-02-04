@@ -19,16 +19,15 @@ import com.ispw.model.enums.TipoOperazione;
 
 public class LogicControllerGestioneAccesso {
 
-    private final GeneralUserDAO userDAO;
-
-    public LogicControllerGestioneAccesso(GeneralUserDAO userDAO) {
-        this.userDAO = Objects.requireNonNull(userDAO, "userDAO");
-    }
-
     // Logger on-demand (niente campo statico) — SonarCloud: soppressione locale S1312
     @SuppressWarnings("java:S1312")
     private Logger log() {
         return Logger.getLogger(getClass().getName());
+    }
+
+    // DAO on-demand (no SQL nei controller)
+    private GeneralUserDAO userDAO() {
+        return DAOFactory.getInstance().getGeneralUserDAO();
     }
 
     /**
@@ -49,7 +48,7 @@ public class LogicControllerGestioneAccesso {
         }
 
         // Convenzione: normalizziamo l'email a lowercase e trimmiamo
-        final GeneralUser user = userDAO.findByEmail(email.trim().toLowerCase());
+        final GeneralUser user = userDAO().findByEmail(email.trim().toLowerCase());
         if (user == null) return null;
 
         // Password (fase 1: plain compare; fase security: hashing e costante-time compare)
@@ -85,7 +84,7 @@ public class LogicControllerGestioneAccesso {
         if (email == null || email.isBlank()) return;
 
         // Recuperiamo l'id utente (UtenteBean non contiene l'id)
-        final GeneralUser user = userDAO.findByEmail(email.trim().toLowerCase());
+        final GeneralUser user = userDAO().findByEmail(email.trim().toLowerCase());
         if (user == null) return;
 
         final LogDAO logDAO = DAOFactory.getInstance().getLogDAO();

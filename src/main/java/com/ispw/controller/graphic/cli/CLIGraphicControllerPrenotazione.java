@@ -7,39 +7,21 @@ import com.ispw.bean.DatiPagamentoBean;
 import com.ispw.bean.ParametriVerificaBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerPrenotazione;
-import com.ispw.controller.logic.ctrl.LogicControllerPrenotazioneCampo;
 
 /**
  * Adapter CLI per la prenotazione campo.
  */
 public class CLIGraphicControllerPrenotazione implements GraphicControllerPrenotazione {
     
-    @SuppressWarnings("unused")
-    private LogicControllerPrenotazioneCampo logicController;
-    private GraphicControllerNavigation navigator;
+    private final GraphicControllerNavigation navigator;
     
-    public CLIGraphicControllerPrenotazione() {
-    }
-    
-    public CLIGraphicControllerPrenotazione(
-        LogicControllerPrenotazioneCampo logicController,
-        GraphicControllerNavigation navigator) {
-        this.logicController = logicController;
+    public CLIGraphicControllerPrenotazione(GraphicControllerNavigation navigator) {
         this.navigator = navigator;
-    }
-    
-    public void setLogicController(LogicControllerPrenotazioneCampo controller) {
-        this.logicController = controller;
     }
     
     @Override
     public String getRouteName() {
         return "prenotazione";
-    }
-
-    @Override
-    public void setNavigator(GraphicControllerNavigation navigator) {
-        this.navigator = navigator;
     }
 
     @Override

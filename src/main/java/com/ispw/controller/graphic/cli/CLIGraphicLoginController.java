@@ -26,35 +26,17 @@ import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccesso;
 public class CLIGraphicLoginController implements GraphicLoginController {
     
     // ==================== Dependencies ====================
-    private LogicControllerGestioneAccesso logicController;
-    private GraphicControllerNavigation navigator;
+    private final GraphicControllerNavigation navigator;
     
     // ==================== Constructors ====================
-    public CLIGraphicLoginController() {
-        // Default - per Factory
-    }
-    
-    public CLIGraphicLoginController(
-        LogicControllerGestioneAccesso logicController,
-        GraphicControllerNavigation navigator) {
-        this.logicController = logicController;
+    public CLIGraphicLoginController(GraphicControllerNavigation navigator) {
         this.navigator = navigator;
-    }
-    
-    // ==================== Setters (DI) ====================
-    public void setLogicController(LogicControllerGestioneAccesso controller) {
-        this.logicController = controller;
     }
     
     // ==================== NavigableController ====================
     @Override
     public String getRouteName() {
         return "login";
-    }
-
-    @Override
-    public void setNavigator(GraphicControllerNavigation navigator) {
-        this.navigator = navigator;
     }
 
     @Override
@@ -85,7 +67,8 @@ public class CLIGraphicLoginController implements GraphicLoginController {
             return;
         }
         
-        // DELEGAZIONE: verifica credenziali tramite LogicController
+        // DELEGAZIONE: verifica credenziali tramite LogicController (creato on-demand)
+        LogicControllerGestioneAccesso logicController = new LogicControllerGestioneAccesso();
         SessioneUtenteBean sessione = logicController.verificaCredenziali(credenziali);
         
         if (sessione != null) {

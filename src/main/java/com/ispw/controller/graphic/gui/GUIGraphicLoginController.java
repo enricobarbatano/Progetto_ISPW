@@ -13,31 +13,15 @@ import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccesso;
  */
 public class GUIGraphicLoginController implements GraphicLoginController {
     
-    private LogicControllerGestioneAccesso logicController;
-    private GraphicControllerNavigation navigator;
+    private final GraphicControllerNavigation navigator;
     
-    public GUIGraphicLoginController() {
-    }
-    
-    public GUIGraphicLoginController(
-        LogicControllerGestioneAccesso logicController,
-        GraphicControllerNavigation navigator) {
-        this.logicController = logicController;
+    public GUIGraphicLoginController(GraphicControllerNavigation navigator) {
         this.navigator = navigator;
-    }
-    
-    public void setLogicController(LogicControllerGestioneAccesso controller) {
-        this.logicController = controller;
     }
     
     @Override
     public String getRouteName() {
         return "login";
-    }
-
-    @Override
-    public void setNavigator(GraphicControllerNavigation navigator) {
-        this.navigator = navigator;
     }
 
     @Override
@@ -50,6 +34,8 @@ public class GUIGraphicLoginController implements GraphicLoginController {
             return;
         }
         
+        // Delega a LogicController (creato on-demand)
+        LogicControllerGestioneAccesso logicController = new LogicControllerGestioneAccesso();
         SessioneUtenteBean sessione = logicController.verificaCredenziali(credenziali);
         
         if (sessione != null) {

@@ -37,7 +37,8 @@ class TestLogicControllerGestioneAccesso extends BaseDAOTest {
     void setUp() {
         userDAO = DAOFactory.getInstance().getGeneralUserDAO();
         logDAO  = DAOFactory.getInstance().getLogDAO();
-        controller = new LogicControllerGestioneAccesso(userDAO);
+        // LogicController ora accede ai DAO on-demand via DAOFactory
+        controller = new LogicControllerGestioneAccesso();
 
         // pulizia in-memory se disponibile
         tryClear(userDAO);

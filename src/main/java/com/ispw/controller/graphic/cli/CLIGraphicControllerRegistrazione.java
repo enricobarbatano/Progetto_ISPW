@@ -13,31 +13,15 @@ import com.ispw.controller.logic.ctrl.LogicControllerRegistrazione;
  */
 public class CLIGraphicControllerRegistrazione implements GraphicControllerRegistrazione {
     
-    private LogicControllerRegistrazione logicController;
-    private GraphicControllerNavigation navigator;
+    private final GraphicControllerNavigation navigator;
     
-    public CLIGraphicControllerRegistrazione() {
-    }
-    
-    public CLIGraphicControllerRegistrazione(
-        LogicControllerRegistrazione logicController,
-        GraphicControllerNavigation navigator) {
-        this.logicController = logicController;
+    public CLIGraphicControllerRegistrazione(GraphicControllerNavigation navigator) {
         this.navigator = navigator;
-    }
-    
-    public void setLogicController(LogicControllerRegistrazione controller) {
-        this.logicController = controller;
     }
     
     @Override
     public String getRouteName() {
         return "registrazione";
-    }
-
-    @Override
-    public void setNavigator(GraphicControllerNavigation navigator) {
-        this.navigator = navigator;
     }
 
     @Override
@@ -61,7 +45,8 @@ public class CLIGraphicControllerRegistrazione implements GraphicControllerRegis
         bean.setEmail((String) datiRegistrazione.get("email"));
         bean.setPassword((String) datiRegistrazione.get("password"));
         
-        // Delega a LogicController
+        // Delega a LogicController (creato on-demand)
+        LogicControllerRegistrazione logicController = new LogicControllerRegistrazione();
         EsitoOperazioneBean esito = logicController.registraNuovoUtente(bean, null);
         
         if (esito != null && esito.isSuccesso()) {

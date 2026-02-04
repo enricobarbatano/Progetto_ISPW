@@ -13,31 +13,15 @@ import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccount;
  */
 public class GUIGraphicControllerAccount implements GraphicControllerAccount {
     
-    private LogicControllerGestioneAccount logicController;
-    private GraphicControllerNavigation navigator;
+    private final GraphicControllerNavigation navigator;
     
-    public GUIGraphicControllerAccount() {
-    }
-    
-    public GUIGraphicControllerAccount(
-        LogicControllerGestioneAccount logicController,
-        GraphicControllerNavigation navigator) {
-        this.logicController = logicController;
+    public GUIGraphicControllerAccount(GraphicControllerNavigation navigator) {
         this.navigator = navigator;
-    }
-    
-    public void setLogicController(LogicControllerGestioneAccount controller) {
-        this.logicController = controller;
     }
     
     @Override
     public String getRouteName() {
         return "account";
-    }
-
-    @Override
-    public void setNavigator(GraphicControllerNavigation navigator) {
-        this.navigator = navigator;
     }
 
     @Override
@@ -65,6 +49,8 @@ public class GUIGraphicControllerAccount implements GraphicControllerAccount {
             bean.setEmail((String) nuoviDati.get("email"));
         }
         
+        // Delega a LogicController (creato on-demand)
+        LogicControllerGestioneAccount logicController = new LogicControllerGestioneAccount();
         EsitoOperazioneBean esito = logicController.aggiornaDatiAccount(bean);
         
         if (esito != null && esito.isSuccesso()) {

@@ -4,39 +4,21 @@ import java.util.Map;
 
 import com.ispw.controller.graphic.GraphicControllerDisdetta;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.logic.ctrl.LogicControllerDisdettaPrenotazione;
 
 /**
  * Adapter CLI per la disdetta prenotazione.
  */
 public class CLIGraphicControllerDisdetta implements GraphicControllerDisdetta {
     
-    @SuppressWarnings("unused")
-    private LogicControllerDisdettaPrenotazione logicController;
-    private GraphicControllerNavigation navigator;
+    private final GraphicControllerNavigation navigator;
     
-    public CLIGraphicControllerDisdetta() {
-    }
-    
-    public CLIGraphicControllerDisdetta(
-        LogicControllerDisdettaPrenotazione logicController,
-        GraphicControllerNavigation navigator) {
-        this.logicController = logicController;
+    public CLIGraphicControllerDisdetta(GraphicControllerNavigation navigator) {
         this.navigator = navigator;
-    }
-    
-    public void setLogicController(LogicControllerDisdettaPrenotazione controller) {
-        this.logicController = controller;
     }
     
     @Override
     public String getRouteName() {
         return "disdetta";
-    }
-
-    @Override
-    public void setNavigator(GraphicControllerNavigation navigator) {
-        this.navigator = navigator;
     }
 
     @Override

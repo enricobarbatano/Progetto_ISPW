@@ -62,7 +62,8 @@ class TestControllerApplicaPenalita extends BaseDAOTest {
         tryClear(logDAO);
         tryClear(rulesDAO);
 
-        controller = new LogicControllerApplicaPenalita(userDAO, penalitaDAO, rulesDAO);
+        // LogicController ora accede ai DAO on-demand via DAOFactory
+        controller = new LogicControllerApplicaPenalita();
     }
 
     // ------------------------------------------------------------------------------------

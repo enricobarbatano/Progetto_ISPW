@@ -15,31 +15,15 @@ import com.ispw.controller.logic.ctrl.LogicControllerConfiguraRegole;
  */
 public class GUIGraphicControllerRegole implements GraphicControllerRegole {
     
-    private LogicControllerConfiguraRegole logicController;
-    private GraphicControllerNavigation navigator;
+    private final GraphicControllerNavigation navigator;
     
-    public GUIGraphicControllerRegole() {
-    }
-    
-    public GUIGraphicControllerRegole(
-        LogicControllerConfiguraRegole logicController,
-        GraphicControllerNavigation navigator) {
-        this.logicController = logicController;
+    public GUIGraphicControllerRegole(GraphicControllerNavigation navigator) {
         this.navigator = navigator;
-    }
-    
-    public void setLogicController(LogicControllerConfiguraRegole controller) {
-        this.logicController = controller;
     }
     
     @Override
     public String getRouteName() {
         return "regole";
-    }
-
-    @Override
-    public void setNavigator(GraphicControllerNavigation navigator) {
-        this.navigator = navigator;
     }
 
     @Override
@@ -71,6 +55,7 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
             bean.setFlagManutenzione((Boolean) regolaCampo.get("flagManutenzione"));
         }
         
+        LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
         EsitoOperazioneBean esito = logicController.aggiornaRegoleCampo(bean);
         
         if (esito != null && esito.isSuccesso()) {
@@ -92,6 +77,7 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
             bean.setDurataSlotMinuti((Integer) tempistiche.get("durataSlotMinuti"));
         }
         
+        LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
         EsitoOperazioneBean esito = logicController.aggiornaRegolaTempistiche(bean);
         
         if (esito != null && esito.isSuccesso()) {
@@ -110,6 +96,7 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
             bean.setPreavvisoMinimoMinuti((Integer) penalita.get("preavvisoMinimoMinuti"));
         }
         
+        LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
         EsitoOperazioneBean esito = logicController.aggiornaRegolepenalita(bean);
         
         if (esito != null && esito.isSuccesso()) {
