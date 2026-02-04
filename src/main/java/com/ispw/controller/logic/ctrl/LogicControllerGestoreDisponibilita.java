@@ -66,7 +66,8 @@ public class LogicControllerGestoreDisponibilita
             c.updateStatoOperativo(c.getIdCampo(), /*isAttivo*/ false, c.isFlagManutenzione());
             campoDAO().store(c);
             return true;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            // RuntimeException is the expected superset for validation/DAO problems; do not catch Errors
             return false;
         }
     }
@@ -84,7 +85,8 @@ public class LogicControllerGestoreDisponibilita
             c.updateStatoOperativo(c.getIdCampo(), /*isAttivo*/ true, c.isFlagManutenzione());
             campoDAO().store(c);
             return List.of();
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            // RuntimeException is the expected superset for validation/DAO problems; do not catch Errors
             return List.of();
         }
     }

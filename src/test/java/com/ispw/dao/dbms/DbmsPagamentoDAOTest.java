@@ -34,7 +34,7 @@ class DbmsPagamentoDAOTest {
     private PagamentoDAO dao;
 
     @BeforeAll
-    void initDb() throws Exception {
+    void initDb() throws java.sql.SQLException {
         // 1) Init H2 in-memory (una sola volta)
         try {
             DbmsConnectionFactory.getInstance();

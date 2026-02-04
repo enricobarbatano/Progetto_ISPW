@@ -22,7 +22,7 @@ public class FileSystemRegolePenalitaDAO implements RegolePenalitaDAO {
         try {
             Files.createDirectories(storageDir);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new com.ispw.dao.exception.DaoException(e);
         }
         this.file = storageDir.resolve("regole_penalita.ser");
     }
@@ -36,7 +36,7 @@ public class FileSystemRegolePenalitaDAO implements RegolePenalitaDAO {
         } catch (EOFException e) {
             return null;
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("Errore lettura regole_penalita", e);
+            throw new com.ispw.dao.exception.DaoException("Errore lettura regole_penalita", e);
         }
     }
 
@@ -48,7 +48,7 @@ public class FileSystemRegolePenalitaDAO implements RegolePenalitaDAO {
             oos.writeObject(regole);
             Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
-            throw new RuntimeException("Errore scrittura regole_penalita", e);
+            throw new com.ispw.dao.exception.DaoException("Errore scrittura regole_penalita", e);
         }
     }
 }

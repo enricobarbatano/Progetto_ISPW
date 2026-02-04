@@ -37,7 +37,7 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
         try {
             Files.createDirectories(storageDir);
         } catch (IOException e) {
-            throw new RuntimeException("Impossibile creare directory storage: " + storageDir, e);
+            throw new com.ispw.dao.exception.DaoException("Impossibile creare directory storage: " + storageDir, e);
         }
         this.filePath = storageDir.resolve(fileName);
         loadFromDisk();
@@ -77,7 +77,7 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
                     StandardCopyOption.ATOMIC_MOVE);
 
         } catch (IOException e) {
-            throw new RuntimeException("Errore scrittura su file: " + filePath, e);
+            throw new com.ispw.dao.exception.DaoException("Errore scrittura su file: " + filePath, e);
         } finally {
             lock.readLock().unlock();
         }
@@ -167,7 +167,7 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
             } catch (EOFException e) {
                 return Optional.empty(); // file vuoto/corrotto -> lo tratti come empty
             } catch (IOException | ClassNotFoundException e) {
-                throw new RuntimeException("Errore lettura file binario: " + file, e);
+                throw new com.ispw.dao.exception.DaoException("Errore lettura file binario: " + file, e);
             }
         }
 

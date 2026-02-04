@@ -41,7 +41,7 @@ class DbmsPagamentoDAORealIT {
     private PagamentoDAO dao;
 
     @BeforeAll
-    void initIfPropsPresent() throws Exception {
+    void initIfPropsPresent() throws java.sql.SQLException {
        
 
         // Skip se le property non sono valorizzate
