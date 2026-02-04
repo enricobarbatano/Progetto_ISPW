@@ -54,7 +54,7 @@ public final class AppBootstrapper {
             try {
                 Files.createDirectories(root);
             } catch (java.io.IOException | SecurityException e) {
-                LOGGER.log(Level.SEVERE, "Impossibile creare directory root per FILE_SYSTEM: " + root, e);
+                LOGGER.log(Level.SEVERE, "Impossibile creare directory root per FILE_SYSTEM: {0}", root);
                 return;
             }
             DAOFactory.setFileSystemRoot(root);
