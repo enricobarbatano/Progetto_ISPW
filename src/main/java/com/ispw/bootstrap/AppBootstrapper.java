@@ -26,6 +26,7 @@ public final class AppBootstrapper {
         // 2) Config DBMS (solo se DBMS)
         if (config.persistency() == PersistencyProvider.DBMS) {
             DbmsConnectionFactory.init(
+                // NOTA: niente HTML entities nell’URL
                 "jdbc:mysql://localhost:3306/centro_sportivo?useSSL=false&serverTimezone=Europe/Rome",
                 "ispw_user",
                 "ispw_user"
@@ -37,6 +38,7 @@ public final class AppBootstrapper {
                  var rs = ps.executeQuery()) {
 
                 if (rs.next()) {
+                    // Log “on-demand” (nessun placeholder, nessun rischio)
                     LOGGER.info(() -> "DB OK: " );
                 }
 
@@ -56,18 +58,21 @@ public final class AppBootstrapper {
                 return;
             }
             DAOFactory.setFileSystemRoot(root);
-            LOGGER.info(() -> "FILE_SYSTEM root impostata su: " + root.toAbsolutePath());
+
+            // *** Riga 55 sistemata: usare MessageFormat con {0} ***
+            LOGGER.log(Level.INFO, "FILE_SYSTEM root impostata su: {0}", root.toAbsolutePath());
         }
 
         // 3) Configura persistenza (DAOFactory guidata dal provider)
         DAOFactory.setPersistencyProvider(config.persistency());
-        LOGGER.info(() -> "Persistency provider: " + config.persistency());
+        // Messaggio parametrico: MessageFormat
+        LOGGER.log(Level.INFO, "Persistency provider: {0}", config.persistency());
 
         // 4) Configura frontend
         FrontendControllerFactory.setFrontendProvider(config.frontend());
-        LOGGER.info(() -> "Frontend provider: " + config.frontend());
+        LOGGER.log(Level.INFO, "Frontend provider: {0}", config.frontend());
 
-        // 5) Avvio UI
+        // 5) Avvio UI (nessun parametro -> ok Supplier o stringa diretta)
         LOGGER.info("Avvio applicazione...");
         FrontendControllerFactory.getInstance().startApplication();
     }
