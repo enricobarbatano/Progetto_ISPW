@@ -102,6 +102,11 @@ public abstract class InMemoryDAO<I, E> implements DAO<I, E> {
     }
 
     @Override
+    /**
+     * Crea una nuova entità con l'ID specificato, se non esiste già nello store.
+     * @param id l'identificatore dell'entità da creare
+     * @return l'entità creata, o null se newEntity ritorna null
+     */
     public E create(I id) {
         lock.writeLock().lock();
         try {
@@ -164,7 +169,7 @@ public abstract class InMemoryDAO<I, E> implements DAO<I, E> {
         @SuppressWarnings("unchecked")
         static <K, V> Map<K, V> getStoreFor(Class<?> daoClass) {
             // una Map per ogni DAO concreto
-            return (Map<K, V>) REGISTRY.computeIfAbsent(daoClass, k -> new ConcurrentHashMap<K, V>());
+            return (Map<K, V>) REGISTRY.computeIfAbsent(daoClass, k -> new ConcurrentHashMap<>());
         }
     }
 }

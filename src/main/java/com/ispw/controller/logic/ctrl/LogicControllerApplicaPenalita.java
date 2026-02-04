@@ -244,7 +244,7 @@ public final class LogicControllerApplicaPenalita {
         try {
             action.run();
         } catch (RuntimeException ex) {
-            log().log(Level.FINE, what + " fallita: {0}", ex.getMessage());
+            log().log(Level.FINE, what + " fallita: {0}", new Object[]{ex.getMessage()});
         }
     }
 

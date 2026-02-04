@@ -224,7 +224,7 @@ public class LogicControllerDisdettaPrenotazione {
             log().fine(() -> "[DISDETTA] Slot liberato per prenotazione #" + idPrenotazione);
         } catch (RuntimeException ex) {
             // Best effort: il rilascio slot non deve bloccare la disdetta
-            log().log(Level.FINE, "Rilascio slot fallito: {0}", ex.getMessage());
+            log().log(Level.FINE, "Rilascio slot fallito: {0}", new Object[]{ex.getMessage()});
         }
     }
 
@@ -245,7 +245,7 @@ public class LogicControllerDisdettaPrenotazione {
             fattRimborro.emettiNotaDiCredito(idPrenotazione);
         } catch (RuntimeException ex) {
             // Best-effort: errori refund non bloccano la disdetta
-            log().log(Level.FINE, "Rimborso fallito: {0}", ex.getMessage());
+            log().log(Level.FINE, "Rimborso fallito: {0}", new Object[]{ex.getMessage()});
         }
     }
 
@@ -259,7 +259,7 @@ public class LogicControllerDisdettaPrenotazione {
                     "Prenotazione #" + idPrenotazione + " annullata (penale " + penale + "€)");
         } catch (RuntimeException ex) {
             // best-effort
-            log().log(Level.FINE, "Notifica disdetta fallita: {0}", ex.getMessage());
+            log().log(Level.FINE, "Notifica disdetta fallita: {0}", new Object[]{ex.getMessage()});
         }
 
         appendLogSafe(idUtente, "DISDETTA_PRENOTAZIONE #" + idPrenotazione + " - penale " + penale + "€");
@@ -291,7 +291,7 @@ public class LogicControllerDisdettaPrenotazione {
             log.setDescrizione(descr);
             logDAO().append(log); // append-only
         } catch (RuntimeException ex) {
-            log().log(Level.FINE, "Append log disdetta fallito: {0}", ex.getMessage());
+            log().log(Level.FINE, "Append log disdetta fallito: {0}", new Object[]{ex.getMessage()});
         }
     }
 }

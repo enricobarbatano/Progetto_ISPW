@@ -118,7 +118,7 @@ class TestControllerGestoreDisponibilita extends BaseDAOTest {
          //Campo #4: ATTIVO, NON in manutenzione → disponibile
         Campo c4 = seedCampo(4, 20f, true, false);
         // Campo #5: attivo ma in manutenzione → NON deve comparire
-       Campo c5 = seedCampo(5, 50f, true, true);
+        seedCampo(5, 50f, true, true);
 
         LocalDate d = LocalDate.now().plusDays(1);
         LocalTime i = LocalTime.parse("10:00");
@@ -158,7 +158,7 @@ class TestControllerGestoreDisponibilita extends BaseDAOTest {
         Campo c = new Campo();
         c.setIdCampo(id);
         c.setCostoOrario(costoOrario);
-        c.updateStatoOperativo(id, attivo, manutenzione);
+        c.updateStatoOperativo(attivo, manutenzione);
         campoDAO.store(c);
         return c;
     }

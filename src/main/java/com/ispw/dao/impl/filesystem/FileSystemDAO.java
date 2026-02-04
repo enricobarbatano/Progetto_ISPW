@@ -167,13 +167,13 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
                 return Optional.ofNullable(data);
 
             } catch (NoSuchFileException e) {
-                LOGGER.log(Level.FINE, "File non trovato, trattando come vuoto:{0} {1}"+file, e);
+                LOGGER.log(Level.FINE, "File non trovato, trattando come vuoto: {0}", new Object[]{file});
                 return Optional.empty();
             } catch (EOFException e) {
-                LOGGER.log(Level.FINE, "EOF o file corrotto, trattando come vuoto: {0} {1}"+ file, e);
+                LOGGER.log(Level.FINE, "EOF o file corrotto, trattando come vuoto: {0}", new Object[]{file});
                 return Optional.empty(); // file vuoto/corrotto -> lo tratti come empty
             } catch (IOException | ClassNotFoundException e) {
-                throw new com.ispw.dao.exception.DaoException("Errore lettura file binario: {0} {1}" + file, e);
+                throw new com.ispw.dao.exception.DaoException("Errore lettura file binario: " + file, e);
             }
         }
 

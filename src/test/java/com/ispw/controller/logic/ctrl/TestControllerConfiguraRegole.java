@@ -550,26 +550,6 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         return id;
     }
 
-    /** Restituisce l'ID del campo provando getter noti o un eventuale field "idCampo". */
-    private static int getCampoId(Campo c) {
-        try {
-            for (String mName : new String[]{"getIdCampo", "getId", "id"}) {
-                try {
-                    Method m = c.getClass().getMethod(mName);
-                    Object v = m.invoke(c);
-                    if (v instanceof Integer) return (int) v;
-                } catch (ReflectiveOperationException ignored) { /* ignored: best-effort reflective access for test utils */ }
-            }
-            Field f = null; Class<?> k = c.getClass();
-            while (k != null) {
-                try { f = k.getDeclaredField("idCampo"); break; }
-                catch (NoSuchFieldException ex) { k = k.getSuperclass(); }
-            }
-            if (f != null) { f.setAccessible(true); return (int) f.get(c); }
-        } catch (ReflectiveOperationException ignored) { /* ignored: best-effort reflective access for test utils */ }
-        return 0;
-    }
-
     /** Legge un boolean compatibile provando lista di nomi di field e getter (isX/getX). */
     private static boolean readBoolCompat(Object target, String... candidateNames) {
         for (String n : candidateNames) {

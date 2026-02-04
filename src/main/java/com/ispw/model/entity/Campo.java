@@ -123,10 +123,8 @@ public final class Campo implements Serializable {
 
     /**
      * Aggiorna lo stato operativo (attivo/manutenzione).
-     * Il parametro idCampo è mantenuto per coerenza col diagramma (non strettamente necessario).
      */
-    public void updateStatoOperativo(int idCampo, boolean isAttivo, boolean flagManutenzione) {
-        // Se vuoi, qui potresti controllare che idCampo corrisponda a this.idCampo
+    public void updateStatoOperativo(boolean isAttivo, boolean flagManutenzione) {
         this.isAttivo = isAttivo;
         this.flagManutenzione = flagManutenzione;
     }

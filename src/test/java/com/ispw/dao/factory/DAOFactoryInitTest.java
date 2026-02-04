@@ -37,7 +37,9 @@ class DAOFactoryInitTest {
             // but remove temp dir
             try {
                 Files.deleteIfExists(tmp);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                // ignored: temp dir cleanup not critical for test
+            }
         }
     }
 

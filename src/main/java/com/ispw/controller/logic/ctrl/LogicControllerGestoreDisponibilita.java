@@ -63,7 +63,7 @@ public class LogicControllerGestoreDisponibilita
         if (c == null) return false;
 
         try {
-            c.updateStatoOperativo(c.getIdCampo(), /*isAttivo*/ false, c.isFlagManutenzione());
+            c.updateStatoOperativo(/*isAttivo*/ false, c.isFlagManutenzione());
             campoDAO().store(c);
             return true;
         } catch (RuntimeException e) {
@@ -82,7 +82,7 @@ public class LogicControllerGestoreDisponibilita
         if (c == null) return List.of();
 
         try {
-            c.updateStatoOperativo(c.getIdCampo(), /*isAttivo*/ true, c.isFlagManutenzione());
+            c.updateStatoOperativo(/*isAttivo*/ true, c.isFlagManutenzione());
             campoDAO().store(c);
             return List.of();
         } catch (RuntimeException e) {
@@ -133,7 +133,8 @@ public class LogicControllerGestoreDisponibilita
                 bean.setOraInizio(param.getOraInizio());
                 bean.setOraFine(oraFine.toString());
                 // costo pro-rata (costoOrario * durata/60). Gestiamo null-safety.
-                float costoOrario = (c.getCostoOrario() != null) ? c.getCostoOrario() : 0f;
+                Float costoOrarioObj = c.getCostoOrario();
+                float costoOrario = (costoOrarioObj != null) ? costoOrarioObj : 0f;
                 bean.setCosto(costoOrario * (durata / 60f));
 
                 out.add(bean);

@@ -81,7 +81,7 @@ class TestControllerGestionePagamento extends BaseDAOTest {
 
     @Test
 @DisplayName("3) Prenotazione: esiste già un pagamento → update del record")
-void testRichiediPagamentoPrenotazione_UpdateEsistente() throws InterruptedException {
+void testRichiediPagamentoPrenotazione_UpdateEsistente() {
     // seed pagamento esistente
     Pagamento p = new Pagamento();
     p.setIdPrenotazione(1003);
@@ -99,8 +99,6 @@ void testRichiediPagamentoPrenotazione_UpdateEsistente() throws InterruptedExcep
     dati.setMetodo(MetodoPagamento.PAYPAL.name());
     dati.setImporto(12f);
 
-    // attendo un attimo per distinguere chiaramente i timestamp
-    Thread.sleep(5);
 
     StatoPagamento esito = controller.richiediPagamentoPrenotazione(dati, 1003);
     assertNotNull(esito);
@@ -120,7 +118,7 @@ void testRichiediPagamentoPrenotazione_UpdateEsistente() throws InterruptedExcep
     // =====================================================================================
     @Test
 @DisplayName("4) Rimborso: pagamento presente → stato aggiornato e dataPagamento aggiornata")
-void testEseguiRimborso_Presente() throws InterruptedException {
+void testEseguiRimborso_Presente() {
     // seed pagamento
     Pagamento p = new Pagamento();
     p.setIdPrenotazione(2001);
@@ -133,7 +131,6 @@ void testEseguiRimborso_Presente() throws InterruptedException {
     // snapshot PRIMA
     LocalDateTime tsBefore = p.getDataPagamento();
 
-    Thread.sleep(5);
     controller.eseguiRimborso(2001, 30f);
 
     Pagamento after = pagamentoDAO.findByPrenotazione(2001);
