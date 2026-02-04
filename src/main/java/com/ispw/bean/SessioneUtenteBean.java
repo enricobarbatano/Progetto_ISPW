@@ -7,7 +7,7 @@ public class SessioneUtenteBean {
     private UtenteBean utente;
     private Date timeStamp;
 
-    public SessioneUtenteBean() {}
+    public SessioneUtenteBean() { /* default ctor for frameworks/serialization */ }
 
     public SessioneUtenteBean(String idSessione, UtenteBean utente, Date timeStamp) {
         this.idSessione = idSessione;

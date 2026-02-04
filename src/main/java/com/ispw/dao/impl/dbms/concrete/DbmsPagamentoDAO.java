@@ -66,12 +66,14 @@ public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements Pag
 
         String metodo = rs.getString("metodo");
         if (metodo != null) {
-            try { p.setMetodo(MetodoPagamento.valueOf(metodo)); } catch (IllegalArgumentException ignore) { }
+            try { p.setMetodo(MetodoPagamento.valueOf(metodo)); }
+            catch (IllegalArgumentException ignore) { /* ignored: invalid MetodoPagamento found in DB -> leave null */ }
         }
 
         String stato = rs.getString("stato");
         if (stato != null) {
-            try { p.setStato(StatoPagamento.valueOf(stato)); } catch (IllegalArgumentException ignore) { }
+            try { p.setStato(StatoPagamento.valueOf(stato)); }
+            catch (IllegalArgumentException ignore) { /* ignored: invalid StatoPagamento found in DB -> leave null */ }
         }
 
         Timestamp ts = rs.getTimestamp("data_pagamento");

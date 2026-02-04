@@ -9,7 +9,7 @@ public class UtenteBean {
     private String email;
     private Ruolo ruolo;
 
-    public UtenteBean() {}
+    public UtenteBean() { /* default ctor for frameworks/serialization */ }
 
     public UtenteBean(String nome, String cognome, String email, Ruolo ruolo) {
         this.nome = nome;

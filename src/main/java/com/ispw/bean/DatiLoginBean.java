@@ -4,7 +4,7 @@ public class DatiLoginBean {
     private String email;
     private String password;
 
-    public DatiLoginBean() {}
+    public DatiLoginBean() { /* default ctor for frameworks/serialization */ }
 
     public DatiLoginBean(String email, String password) {
         this.email = email;

@@ -458,7 +458,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
             Method m = dao.getClass().getMethod("clear");
             m.setAccessible(true);
             m.invoke(dao);
-        } catch (ReflectiveOperationException ignored) { }
+        } catch (ReflectiveOperationException ignored) { /* ignored: clear() may not be available for all DAO implementations */ }
     }
 
     /**
@@ -479,7 +479,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
                 Object created = m.invoke(campoDAO, Integer.valueOf(id));
                 if (created instanceof Campo) {
                     // persist esplicito se necessario (alcuni create già salvano; altri richiedono store)
-                    try { campoDAO.store((Campo) created); } catch (RuntimeException ignored) { }
+                    try { campoDAO.store((Campo) created); } catch (RuntimeException ignored) { /* ignored: best-effort store for in-memory DAO seeding */ }
                     Campo found = campoDAO.findById(id);
                     if (found != null) return id;
                 }
@@ -489,7 +489,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
                     Method m = campoDAO.getClass().getMethod("create", int.class);
                     Object created = m.invoke(campoDAO, id);
                     if (created instanceof Campo) {
-                        try { campoDAO.store((Campo) created); } catch (RuntimeException ignored) { }
+                        try { campoDAO.store((Campo) created); } catch (RuntimeException ignored) { /* ignored: best-effort store for in-memory DAO seeding */ }
                         Campo found = campoDAO.findById(id);
                         if (found != null) return id;
                     }
@@ -522,7 +522,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
                         setOk = true;
                         break;
                     }
-                } catch (ReflectiveOperationException ignored) { }
+                } catch (ReflectiveOperationException ignored) { /* ignored: best-effort reflective access for test setup */ }
             }
             // field diretto "idCampo" (int/Integer)
             if (!setOk) {
@@ -558,7 +558,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
                     Method m = c.getClass().getMethod(mName);
                     Object v = m.invoke(c);
                     if (v instanceof Integer) return (int) v;
-                } catch (ReflectiveOperationException ignored) { }
+                } catch (ReflectiveOperationException ignored) { /* ignored: best-effort reflective access for test utils */ }
             }
             Field f = null; Class<?> k = c.getClass();
             while (k != null) {
@@ -566,7 +566,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
                 catch (NoSuchFieldException ex) { k = k.getSuperclass(); }
             }
             if (f != null) { f.setAccessible(true); return (int) f.get(c); }
-        } catch (ReflectiveOperationException ignored) { }
+        } catch (ReflectiveOperationException ignored) { /* ignored: best-effort reflective access for test utils */ }
         return 0;
     }
 
@@ -579,7 +579,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
                     Method m = target.getClass().getMethod(g);
                     Object v = m.invoke(target);
                     if (v instanceof Boolean) return (Boolean) v;
-                } catch (ReflectiveOperationException ignored) { }
+                } catch (ReflectiveOperationException ignored) { /* ignored: method getter may be absent */ }
             }
         }
         for (String n : candidateNames) {
@@ -594,7 +594,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
                     Object v = f.get(target);
                     if (v instanceof Boolean) return (Boolean) v;
                 }
-            } catch (ReflectiveOperationException ignored) { }
+            } catch (ReflectiveOperationException ignored) { /* ignored: field getter may be absent */ }
         }
         return false;
     }

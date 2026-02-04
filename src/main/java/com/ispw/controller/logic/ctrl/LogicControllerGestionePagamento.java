@@ -46,7 +46,8 @@ public class LogicControllerGestionePagamento
      */
     private StatoPagamento pickStato(String... preferiti) {
         for (String s : preferiti) {
-            try { return StatoPagamento.valueOf(s); } catch (IllegalArgumentException ignore) { }
+            try { return StatoPagamento.valueOf(s); }
+            catch (IllegalArgumentException ignore) { /* ignored: alias not matching enum constant, try next */ }
         }
         StatoPagamento[] vals = StatoPagamento.values();
         return vals.length > 0 ? vals[0] : null;

@@ -10,7 +10,7 @@ public final class RegolePenalita implements Serializable {
     private BigDecimal valorePenalita; // importo base (o %), dipende dalle tue regole
     private int preavvisoMinimo;       // minuti
 
-    public RegolePenalita() {}
+    public RegolePenalita() { /* default ctor for mapping/serialization */ }
 
     public RegolePenalita(BigDecimal valorePenalita, int preavvisoMinimo) {
         this.valorePenalita = valorePenalita;

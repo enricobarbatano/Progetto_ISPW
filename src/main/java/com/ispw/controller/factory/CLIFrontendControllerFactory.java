@@ -7,12 +7,10 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
 
     private static final Logger logger = Logger.getLogger(CLIFrontendControllerFactory.class.getName());
 
-    public CLIFrontendControllerFactory() { }
-
     @Override
     public void startApplication() {
         logger.info("Avvio CLI...");
 
     
     }
-} 
+}  

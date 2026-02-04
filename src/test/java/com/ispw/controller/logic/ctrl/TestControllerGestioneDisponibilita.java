@@ -169,6 +169,6 @@ class TestControllerGestoreDisponibilita extends BaseDAOTest {
             Method m = dao.getClass().getMethod("clear");
             m.setAccessible(true);
             m.invoke(dao);
-        } catch (ReflectiveOperationException ignored) { }
+        } catch (ReflectiveOperationException ignored) { /* ignored: clear may not exist on all DAOs */ }
     }
 }

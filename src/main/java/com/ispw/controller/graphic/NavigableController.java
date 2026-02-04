@@ -16,5 +16,5 @@ public interface NavigableController {
     void onShow(Map<String, Object> params);
 
     /** Lifecycle: in uscita dalla schermata (opzionale) */
-    default void onHide() {}
+    default void onHide() { /* intentionally left blank: optional lifecycle hook */ }
 }

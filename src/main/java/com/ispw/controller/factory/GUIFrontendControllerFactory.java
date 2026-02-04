@@ -6,12 +6,10 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
 
     private static final Logger logger = Logger.getLogger(GUIFrontendControllerFactory.class.getName());
 
-    public GUIFrontendControllerFactory() { }
-
     @Override
     public void startApplication() {
         logger.info("Avvio GUI...");
-        // GuiLauncher.launchApp();
+        // Implementazione specifica per l'avvio dell'applicazione GUI
     }
-}
+} 
 
