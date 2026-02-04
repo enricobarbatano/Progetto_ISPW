@@ -52,8 +52,10 @@ class TestControllerGestioneFattura extends BaseDAOTest {
         assertNotNull(f, "Fattura attesa");
         assertEquals(idPren, f.getIdPrenotazione());
         assertNotNull(f.getLinkPdf());
-        assertEquals(f.getLinkPdf().equals("FATT-" + idPren + "-" + expectedSuffix + ".pdf"),
-                   "Link PDF atteso FATT-" + idPren + "-" + expectedSuffix + ".pdf");
+
+        String expectedLink = "FATT-" + idPren + "-" + expectedSuffix + ".pdf";
+        assertEquals(expectedLink, f.getLinkPdf(), "Link PDF atteso " + expectedLink);
+
         assertEquals(opDate, f.getDataEmissione());
     }
 
@@ -96,8 +98,10 @@ class TestControllerGestioneFattura extends BaseDAOTest {
         Fattura f = controller.generaFatturaPenalita(dati, idPen);
         assertNotNull(f);
         assertEquals(-idPen, f.getIdPrenotazione(), "Ref negativo atteso (-idPenalita)");
-        assertEquals(f.getLinkPdf(), "PEN-" + idPen + "-" + expectedSuffix + ".pdf",
-                   "Link PDF atteso PEN-" + idPen + "-" + expectedSuffix + ".pdf");
+
+        String expectedLink = "PEN-" + idPen + "-" + expectedSuffix + ".pdf";
+        assertEquals(expectedLink, f.getLinkPdf(), "Link PDF atteso " + expectedLink);
+
         assertEquals(opDate, f.getDataEmissione());
     }
 
