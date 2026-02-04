@@ -59,7 +59,6 @@ public final class AppBootstrapper {
             }
             DAOFactory.setFileSystemRoot(root);
 
-            // *** Riga 55 sistemata: usare MessageFormat con {0} ***
             LOGGER.log(Level.INFO, "FILE_SYSTEM root impostata su: {0}", root.toAbsolutePath());
         }
 
