@@ -56,13 +56,14 @@ public class GUIGraphicControllerAccount implements GraphicControllerAccount {
             }
 
             Map<String, Object> payload = new HashMap<>();
-            payload.put("idUtente", dati.getIdUtente());
-            payload.put("nome", dati.getNome());
-            payload.put("cognome", dati.getCognome());
-            payload.put("email", dati.getEmail());
+            payload.put(GraphicControllerUtils.KEY_ID_UTENTE, dati.getIdUtente());
+            payload.put(GraphicControllerUtils.KEY_NOME, dati.getNome());
+            payload.put(GraphicControllerUtils.KEY_COGNOME, dati.getCognome());
+            payload.put(GraphicControllerUtils.KEY_EMAIL, dati.getEmail());
 
             if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_ACCOUNT, Map.of("datiAccount", payload));
+                navigator.goTo(GraphicControllerUtils.ROUTE_ACCOUNT,
+                    Map.of(GraphicControllerUtils.KEY_DATI_ACCOUNT, payload));
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore caricamento account", e);
@@ -77,7 +78,7 @@ public class GUIGraphicControllerAccount implements GraphicControllerAccount {
             return;
         }
 
-        Object idUtente = nuoviDati.get("idUtente");
+        Object idUtente = nuoviDati.get(GraphicControllerUtils.KEY_ID_UTENTE);
         if (!(idUtente instanceof Integer) || ((Integer) idUtente) <= 0) {
                 GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
                     GraphicControllerUtils.PREFIX_ACCOUNT, "Id utente non valido");
@@ -86,14 +87,14 @@ public class GUIGraphicControllerAccount implements GraphicControllerAccount {
         
         DatiAccountBean bean = new DatiAccountBean();
         bean.setIdUtente((Integer) idUtente);
-        if (nuoviDati.containsKey("nome")) {
-            bean.setNome((String) nuoviDati.get("nome"));
+        if (nuoviDati.containsKey(GraphicControllerUtils.KEY_NOME)) {
+            bean.setNome((String) nuoviDati.get(GraphicControllerUtils.KEY_NOME));
         }
-        if (nuoviDati.containsKey("cognome")) {
-            bean.setCognome((String) nuoviDati.get("cognome"));
+        if (nuoviDati.containsKey(GraphicControllerUtils.KEY_COGNOME)) {
+            bean.setCognome((String) nuoviDati.get(GraphicControllerUtils.KEY_COGNOME));
         }
-        if (nuoviDati.containsKey("email")) {
-            bean.setEmail((String) nuoviDati.get("email"));
+        if (nuoviDati.containsKey(GraphicControllerUtils.KEY_EMAIL)) {
+            bean.setEmail((String) nuoviDati.get(GraphicControllerUtils.KEY_EMAIL));
         }
         
         // Delega a LogicController (creato on-demand)

@@ -44,7 +44,8 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
             LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
             List<String> campi = logicController.listaCampi();
             if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_REGOLE, Map.of("campi", campi));
+                navigator.goTo(GraphicControllerUtils.ROUTE_REGOLE,
+                    Map.of(GraphicControllerUtils.KEY_CAMPI, campi));
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore recupero lista campi", e);
@@ -59,7 +60,8 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
             return;
         }
         if (navigator != null) {
-            navigator.goTo(GraphicControllerUtils.ROUTE_REGOLE, Map.of("idCampo", idCampo));
+            navigator.goTo(GraphicControllerUtils.ROUTE_REGOLE,
+                Map.of(GraphicControllerUtils.KEY_ID_CAMPO, idCampo));
         }
     }
 
@@ -72,14 +74,14 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
         }
         
         RegolaCampoBean bean = new RegolaCampoBean();
-        if (regolaCampo.containsKey("idCampo")) {
-            bean.setIdCampo((Integer) regolaCampo.get("idCampo"));
+        if (regolaCampo.containsKey(GraphicControllerUtils.KEY_ID_CAMPO)) {
+            bean.setIdCampo((Integer) regolaCampo.get(GraphicControllerUtils.KEY_ID_CAMPO));
         }
-        if (regolaCampo.containsKey("attivo")) {
-            bean.setAttivo((Boolean) regolaCampo.get("attivo"));
+        if (regolaCampo.containsKey(GraphicControllerUtils.KEY_ATTIVO)) {
+            bean.setAttivo((Boolean) regolaCampo.get(GraphicControllerUtils.KEY_ATTIVO));
         }
-        if (regolaCampo.containsKey("flagManutenzione")) {
-            bean.setFlagManutenzione((Boolean) regolaCampo.get("flagManutenzione"));
+        if (regolaCampo.containsKey(GraphicControllerUtils.KEY_FLAG_MANUTENZIONE)) {
+            bean.setFlagManutenzione((Boolean) regolaCampo.get(GraphicControllerUtils.KEY_FLAG_MANUTENZIONE));
         }
         
         LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
@@ -106,11 +108,12 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
         }
         
         TempisticheBean bean = new TempisticheBean();
-        if (tempistiche.containsKey("preavvisoMinimoMinuti")) {
-            bean.setPreavvisoMinimoMinuti((Integer) tempistiche.get("preavvisoMinimoMinuti"));
+        if (tempistiche.containsKey(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI)) {
+            bean.setPreavvisoMinimoMinuti((Integer) tempistiche.get(
+                GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI));
         }
-        if (tempistiche.containsKey("durataSlotMinuti")) {
-            bean.setDurataSlotMinuti((Integer) tempistiche.get("durataSlotMinuti"));
+        if (tempistiche.containsKey(GraphicControllerUtils.KEY_DURATA_SLOT_MINUTI)) {
+            bean.setDurataSlotMinuti((Integer) tempistiche.get(GraphicControllerUtils.KEY_DURATA_SLOT_MINUTI));
         }
         
         LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
@@ -137,8 +140,9 @@ public class GUIGraphicControllerRegole implements GraphicControllerRegole {
         }
         
         PenalitaBean bean = new PenalitaBean();
-        if (penalita.containsKey("preavvisoMinimoMinuti")) {
-            bean.setPreavvisoMinimoMinuti((Integer) penalita.get("preavvisoMinimoMinuti"));
+        if (penalita.containsKey(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI)) {
+            bean.setPreavvisoMinimoMinuti((Integer) penalita.get(
+                GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI));
         }
         
         LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();

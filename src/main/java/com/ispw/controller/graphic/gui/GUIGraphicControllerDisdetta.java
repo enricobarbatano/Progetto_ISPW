@@ -102,11 +102,12 @@ public class GUIGraphicControllerDisdetta implements GraphicControllerDisdetta {
             }
 
             Map<String, Object> payload = new HashMap<>();
-            payload.put("possibile", esito.isPossibile());
-            payload.put("penale", esito.getPenale());
+            payload.put(GraphicControllerUtils.KEY_POSSIBILE, esito.isPossibile());
+            payload.put(GraphicControllerUtils.KEY_PENALE, esito.getPenale());
 
             if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_DISDETTA, Map.of("anteprima", payload));
+                navigator.goTo(GraphicControllerUtils.ROUTE_DISDETTA,
+                    Map.of(GraphicControllerUtils.KEY_ANTEPRIMA, payload));
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore anteprima disdetta", e);
