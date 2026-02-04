@@ -230,7 +230,7 @@ public class LogicControllerDisdettaPrenotazione {
             log().fine(() -> "[DISDETTA] Slot liberato per prenotazione #" + idPrenotazione);
         } catch (RuntimeException ex) {
             // Best effort: il rilascio slot non deve bloccare la disdetta
-            log().log(Level.FINE, "Rilascio slot fallito: " + ex.getMessage(), ex);
+            log().log(Level.FINE, "Rilascio slot fallito: {0}", ex.getMessage());
         }
     }
 
@@ -260,7 +260,7 @@ public class LogicControllerDisdettaPrenotazione {
             log.setDescrizione(descr);
             logDAO().append(log); // append-only
         } catch (RuntimeException ex) {
-            log().log(Level.FINE, "Append log disdetta fallito: " + ex.getMessage(), ex);
+            log().log(Level.FINE, "Append log disdetta fallito: {0}", ex.getMessage());
         }
     }
 }

@@ -125,7 +125,7 @@ public class LogicControllerGestioneAccount {
                     notiCtrl.inviaConfermaAggiornamentoAccount(ub);
                 }
             } catch (RuntimeException ex) {
-                log().log(Level.FINE, "Notifica aggiornamento account fallita: " + ex.getMessage(), ex);
+                log().log(Level.FINE, "Notifica aggiornamento account fallita: {0}", ex.getMessage());
             }
         }
         return esito;
@@ -174,7 +174,7 @@ public class LogicControllerGestioneAccount {
                     notiCtrl.inviaConfermaAggiornamentoAccount(ub);
                 }
             } catch (RuntimeException ex) {
-                log().log(Level.FINE, "Notifica cambio password fallita: " + ex.getMessage(), ex);
+                log().log(Level.FINE, "Notifica cambio password fallita: {0}", ex.getMessage());
             }
         }
         return esito;
@@ -195,7 +195,7 @@ public class LogicControllerGestioneAccount {
             u.setStatoAccount(StatoAccount.ATTIVO);
             userDAO().store(u);
         } catch (RuntimeException ex) {
-            log().log(Level.FINE, "Aggiornamento stato account fallito: " + ex.getMessage(), ex);
+            log().log(Level.FINE, "Aggiornamento stato account fallito: {0}", ex.getMessage());
         }
 
         appendLogSafe(u.getIdUtente(), "[ACCOUNT] Modifica account confermata");
@@ -233,7 +233,7 @@ public class LogicControllerGestioneAccount {
             l.setDescrizione(descr != null ? descr : "");
             logDAO().append(l);
         } catch (RuntimeException ex) {
-            log().log(Level.FINE, "Append log ACCOUNT fallito: " + ex.getMessage(), ex);
+            log().log(Level.FINE, "Append log ACCOUNT fallito: {0}", ex.getMessage());
         }
     }
 }

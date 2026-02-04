@@ -42,9 +42,7 @@ class DbmsPagamentoDAORealIT {
 
     @BeforeAll
     void initIfPropsPresent() throws Exception {
-       // url  = System.getProperty("db.url");
-        //user = System.getProperty("db.user");
-       // pass = System.getProperty("db.pass");
+       
 
         // Skip se le property non sono valorizzate
         assumeTrue(nonBlank(url) && nonBlank(user) && pass != null,

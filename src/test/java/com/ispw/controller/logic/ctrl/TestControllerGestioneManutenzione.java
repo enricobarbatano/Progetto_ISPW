@@ -92,7 +92,7 @@ class TestControllerGestioneManutenzione extends BaseDAOTest {
     // Handler per catturare i log del controller (JUL)
     private static final class TestLogHandler extends Handler {
         private final List<LogRecord> records = new ArrayList<>();
-        @Override public void publish(LogRecord record) { records.add(record); }
+        @Override public void publish(LogRecord Myrecord) { records.add(Myrecord); }
         @Override public void flush() { 
             
  /**

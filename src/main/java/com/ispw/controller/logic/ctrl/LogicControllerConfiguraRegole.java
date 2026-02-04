@@ -121,7 +121,7 @@ public class LogicControllerConfiguraRegole {
                     dispCtrl.rimuoviDisponibilita(idCampo);
                 }
             } catch (RuntimeException ex) {
-                log().log(Level.FINE, "Aggiorna disponibilità fallito: " + ex.getMessage(), ex);
+                log().log(Level.FINE, "Aggiorna disponibilità fallito: {0}", ex.getMessage());
             }
         }
 
@@ -130,7 +130,7 @@ public class LogicControllerConfiguraRegole {
             try {
                 manCtrl.inviaAlertManutentore(idCampo);
             } catch (RuntimeException ex) {
-                log().log(Level.FINE, "Alert manutenzione fallito: " + ex.getMessage(), ex);
+                log().log(Level.FINE, "Alert manutenzione fallito: {0}", ex.getMessage());
             }
         }
 
@@ -175,13 +175,13 @@ public class LogicControllerConfiguraRegole {
         // Disponibilità → rimuovi
         if (dispCtrl != null) {
             try { dispCtrl.rimuoviDisponibilita(idCampo); }
-            catch (RuntimeException ex) { log().log(Level.FINE, "Rimozione disponibilità fallita: " + ex.getMessage(), ex); }
+            catch (RuntimeException ex) { log().log(Level.FINE, "Rimozione disponibilità fallita: {0}", ex.getMessage()); }
         }
 
         // Manutenzione → alert
         if (manCtrl != null) {
             try { manCtrl.inviaAlertManutentore(idCampo); }
-            catch (RuntimeException ex) { log().log(Level.FINE, "Alert manutenzione fallito: " + ex.getMessage(), ex); }
+            catch (RuntimeException ex) { log().log(Level.FINE, "Alert manutenzione fallito: {0}", ex.getMessage()); }
         }
 
         // Notifica broadcast
@@ -208,7 +208,7 @@ public class LogicControllerConfiguraRegole {
         try {
             tempDAO().save(rt);
         } catch (RuntimeException ex) {
-            log().log(Level.FINE, "Salvataggio regole tempistiche fallito: " + ex.getMessage(), ex);
+            log().log(Level.FINE, "Salvataggio regole tempistiche fallito: {0}", ex.getMessage());
             return esito(false, MSG_INPUT_TEMP_KO);
         }
 
@@ -242,7 +242,7 @@ public class LogicControllerConfiguraRegole {
         try {
             penDAO().save(rp);
         } catch (RuntimeException ex) {
-            log().log(Level.FINE, "Salvataggio regole penalità fallito: " + ex.getMessage(), ex);
+            log().log(Level.FINE, "Salvataggio regole penalità fallito: {0}", ex.getMessage());
             return esito(false, MSG_INPUT_PEN_KO);
         }
 
@@ -306,7 +306,7 @@ public class LogicControllerConfiguraRegole {
             l.setDescrizione(Objects.toString(descr, ""));
             logDAO().append(l);
         } catch (RuntimeException ex) {
-            log().log(Level.FINE, "Append log REGOLE fallito: " + ex.getMessage(), ex);
+            log().log(Level.FINE, "Append log REGOLE fallito: {0}", ex.getMessage());
         }
     }
 
@@ -316,7 +316,7 @@ public class LogicControllerConfiguraRegole {
         try {
             notiCtrl.inviaNotificaAggiornamentoRegole();
         } catch (RuntimeException ex) {
-            log().log(Level.FINE, "Notifica aggiornamento regole fallita: " + ex.getMessage(), ex);
+            log().log(Level.FINE, "Notifica aggiornamento regole fallita: {0}", ex.getMessage());
         }
     }
 

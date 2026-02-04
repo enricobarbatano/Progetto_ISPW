@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -53,7 +52,7 @@ class TestControllerGestioneFattura extends BaseDAOTest {
         assertNotNull(f, "Fattura attesa");
         assertEquals(idPren, f.getIdPrenotazione());
         assertNotNull(f.getLinkPdf());
-        assertTrue(f.getLinkPdf().equals("FATT-" + idPren + "-" + expectedSuffix + ".pdf"),
+        assertEquals(f.getLinkPdf().equals("FATT-" + idPren + "-" + expectedSuffix + ".pdf"),
                    "Link PDF atteso FATT-" + idPren + "-" + expectedSuffix + ".pdf");
         assertEquals(opDate, f.getDataEmissione());
     }
@@ -97,7 +96,7 @@ class TestControllerGestioneFattura extends BaseDAOTest {
         Fattura f = controller.generaFatturaPenalita(dati, idPen);
         assertNotNull(f);
         assertEquals(-idPen, f.getIdPrenotazione(), "Ref negativo atteso (-idPenalita)");
-        assertTrue(f.getLinkPdf().equals("PEN-" + idPen + "-" + expectedSuffix + ".pdf"),
+        assertEquals(f.getLinkPdf(), "PEN-" + idPen + "-" + expectedSuffix + ".pdf",
                    "Link PDF atteso PEN-" + idPen + "-" + expectedSuffix + ".pdf");
         assertEquals(opDate, f.getDataEmissione());
     }
