@@ -1,9 +1,8 @@
 package com.ispw.bootstrap;
 
-import com.ispw.model.enums.PersistencyProvider;
-import com.ispw.model.enums.FrontendProvider;
 import com.ispw.model.enums.AppMode;
-
+import com.ispw.model.enums.FrontendProvider;
+import com.ispw.model.enums.PersistencyProvider;
 
 public final class AppConfigurator {
 
@@ -15,7 +14,8 @@ public final class AppConfigurator {
         FrontendProvider frontend = (uiChoice == 1) ? FrontendProvider.CLI : FrontendProvider.GUI;
 
         // 2) Mode
-        int modeChoice = menu.askOption("Seleziona Modalità", "DEMO (in-memory, no persistenza)", "STANDARD (con persistenza)");
+        int modeChoice = menu.askOption("Seleziona Modalità",
+                "DEMO (in-memory, no persistenza)", "STANDARD (con persistenza)");
         AppMode mode = (modeChoice == 1) ? AppMode.DEMO : AppMode.STANDARD;
 
         // 3) Persistenza
@@ -31,4 +31,3 @@ public final class AppConfigurator {
         return new AppConfig(frontend, mode, persistency);
     }
 }
-

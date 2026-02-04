@@ -3,12 +3,12 @@ package com.ispw.dao.impl.memory.concrete;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.ispw.dao.impl.memory.In_MemoryDAO;
+import com.ispw.dao.impl.memory.InMemoryDAO;
 import com.ispw.dao.interfaces.PrenotazioneDAO;
 import com.ispw.model.entity.Prenotazione;
 import com.ispw.model.enums.StatoPrenotazione;
 
-public class InMemoryPrenotazioneDAO extends In_MemoryDAO<Integer, Prenotazione> implements PrenotazioneDAO {
+public class InMemoryPrenotazioneDAO extends InMemoryDAO<Integer, Prenotazione> implements PrenotazioneDAO {
 
     // Sequenza condivisa (store condiviso: super(true))
     private static final AtomicInteger SEQ = new AtomicInteger(0);

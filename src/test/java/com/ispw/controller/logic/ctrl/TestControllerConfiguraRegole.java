@@ -374,8 +374,8 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         beanCampo.setFlagManutenzione(Boolean.FALSE);
 
         GestioneDisponibilitaGestioneRegole dispKo = new GestioneDisponibilitaGestioneRegole() {
-            @Override public Boolean rimuoviDisponibilità(int id) { throw new RuntimeException("boom-rimuovi"); }
-            @Override public List<DatiDisponibilitaBean> attivaDisponibilità(int id) { throw new RuntimeException("boom-attiva"); }
+            @Override public Boolean rimuoviDisponibilita(int id) { throw new RuntimeException("boom-rimuovi"); }
+            @Override public List<DatiDisponibilitaBean> attivaDisponibilita(int id) { throw new RuntimeException("boom-attiva"); }
         };
         GestioneManutenzioneConfiguraRegole manKo = id -> { throw new RuntimeException("boom-man"); };
         GestioneNotificaConfiguraRegole notiKo = () -> { throw new RuntimeException("boom-noti"); };
@@ -414,14 +414,14 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
         Integer lastIdRimuovi;
 
         @Override
-        public Boolean rimuoviDisponibilità(int idCampo) {
+        public Boolean rimuoviDisponibilita(int idCampo) {
             rimuoviCount++;
             lastIdRimuovi = idCampo;
             return Boolean.TRUE;
         }
 
         @Override
-        public List<DatiDisponibilitaBean> attivaDisponibilità(int idCampo) {
+        public List<DatiDisponibilitaBean> attivaDisponibilita(int idCampo) {
             attivaCount++;
             lastIdAttiva = idCampo;
             return Collections.emptyList();

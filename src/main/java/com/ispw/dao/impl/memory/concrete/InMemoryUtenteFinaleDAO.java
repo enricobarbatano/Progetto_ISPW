@@ -1,10 +1,10 @@
 package com.ispw.dao.impl.memory.concrete;
 
-import com.ispw.dao.impl.memory.In_MemoryDAO;
+import com.ispw.dao.impl.memory.InMemoryDAO;
 import com.ispw.dao.interfaces.UtenteFinaleDAO;
 import com.ispw.model.entity.UtenteFinale;
 
-public final class InMemoryUtenteFinaleDAO extends In_MemoryDAO<Integer, UtenteFinale> implements UtenteFinaleDAO {
+public final class InMemoryUtenteFinaleDAO extends InMemoryDAO<Integer, UtenteFinale> implements UtenteFinaleDAO {
     public InMemoryUtenteFinaleDAO() { super(true); }
     @Override protected Integer getId(UtenteFinale e) { return e != null ? e.getIdUtente() : 0; }
     @Override public UtenteFinale findById(int idUtente) { return load(idUtente); }

@@ -17,15 +17,31 @@ public class DatiPenalitaBean  {
         //Nota: costruttore no-args intenzionalmente vuoto.
     }
 
-    public int getIdUtente() { return idUtente; }
-    public void setIdUtente(int idUtente) { this.idUtente = idUtente; }
+    public int getIdUtente() { 
+        return idUtente; 
+    }
+    public void setIdUtente(int idUtente) { 
+        this.idUtente = idUtente; 
+    }
 
-    public BigDecimal getImporto() { return importo; }
-    public void setImporto(BigDecimal importo) { this.importo = importo; }
+    public BigDecimal getImporto() { 
+        return importo; 
+    }
+    public void setImporto(BigDecimal importo) { 
+        this.importo = importo;
+     }
 
-    public String getMotivazione() { return motivazione; }
-    public void setMotivazione(String motivazione) { this.motivazione = motivazione; }
+    public String getMotivazione() { 
+        return motivazione; 
+    }
+    public void setMotivazione(String motivazione) { 
+        this.motivazione = motivazione; 
+    }
 
-    public LocalDate getDataDecorrenza() { return dataDecorrenza; }
-    public void setDataDecorrenza(LocalDate dataDecorrenza) { this.dataDecorrenza = dataDecorrenza; }
+    public LocalDate getDataDecorrenza() { 
+        return dataDecorrenza; 
+    }
+    public void setDataDecorrenza(LocalDate dataDecorrenza) {
+         this.dataDecorrenza = dataDecorrenza;
+         }
 }

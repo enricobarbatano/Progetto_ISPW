@@ -53,7 +53,7 @@ public final class AppBootstrapper {
             Path root = Paths.get("C:\\Users\\User\\OneDrive\\Desktop\\Progetti_Uni\\Progetto_ISPW\\FileSystem");
             try {
                 Files.createDirectories(root);
-            } catch (Exception e) {
+            } catch (java.io.IOException | SecurityException e) {
                 LOGGER.log(Level.SEVERE, "Impossibile creare directory root per FILE_SYSTEM: " + root, e);
                 return;
             }

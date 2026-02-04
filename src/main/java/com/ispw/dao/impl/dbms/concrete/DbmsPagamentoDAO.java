@@ -56,7 +56,7 @@ public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements Pag
     // =====================
     // RowMapper (ResultSet -> Entity)
     // =====================
-    private final RowMapper<Pagamento> MAPPER = rs -> {
+    private final RowMapper<Pagamento> mapper = rs -> {
         Pagamento p = new Pagamento();
         p.setIdPagamento(rs.getInt("id_pagamento"));
         p.setIdPrenotazione(rs.getInt("id_prenotazione"));
@@ -86,7 +86,7 @@ public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements Pag
     @Override
     public Pagamento load(Integer id) {
         if (id == null) return null;
-        return queryOne(SQL_FIND_BY_ID, ps -> ps.setInt(1, id), MAPPER).orElse(null);
+        return queryOne(SQL_FIND_BY_ID, ps -> ps.setInt(1, id), mapper).orElse(null);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements Pag
     // =====================
     @Override
     public Pagamento findByPrenotazione(int idPrenotazione) {
-        return queryOne(SQL_FIND_BY_PRENOTAZIONE, ps -> ps.setInt(1, idPrenotazione), MAPPER)
+        return queryOne(SQL_FIND_BY_PRENOTAZIONE, ps -> ps.setInt(1, idPrenotazione), mapper)
                .orElse(null);
     }
 

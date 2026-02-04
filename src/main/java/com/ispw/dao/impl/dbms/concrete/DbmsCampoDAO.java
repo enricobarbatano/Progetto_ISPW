@@ -43,7 +43,7 @@ public class DbmsCampoDAO extends DbmsDAO<Integer, Campo> implements CampoDAO {
     }
 
    
-    private final RowMapper<Campo> MAPPER = rs -> {
+    private final RowMapper<Campo> mapper = rs -> {
         Campo c = new Campo();
         c.setIdCampo(rs.getInt("id_campo"));
         c.setNome(rs.getString("nome"));
@@ -60,7 +60,7 @@ public class DbmsCampoDAO extends DbmsDAO<Integer, Campo> implements CampoDAO {
     @Override
     public Campo load(Integer id) {
         if (id == null) return null;
-        return queryOne(SQL_FIND_BY_ID, ps -> ps.setInt(1, id), MAPPER).orElse(null);
+        return queryOne(SQL_FIND_BY_ID, ps -> ps.setInt(1, id), mapper).orElse(null);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class DbmsCampoDAO extends DbmsDAO<Integer, Campo> implements CampoDAO {
    
     @Override
     public List<Campo> findAll() {
-        return queryList(SQL_FIND_ALL, null, MAPPER);
+        return queryList(SQL_FIND_ALL, null, mapper);
     }
 
     @Override

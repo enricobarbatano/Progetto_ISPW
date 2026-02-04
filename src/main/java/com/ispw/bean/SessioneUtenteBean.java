@@ -15,12 +15,24 @@ public class SessioneUtenteBean {
         this.timeStamp = timeStamp;
     }
 
-    public String getIdSessione() { return idSessione; }
-    public void setIdSessione(String idSessione) { this.idSessione = idSessione; }
+    public String getIdSessione() { 
+        return idSessione; 
+    }
+    public void setIdSessione(String idSessione) { 
+        this.idSessione = idSessione; 
+    }
 
-    public UtenteBean getUtente() { return utente; }
-    public void setUtente(UtenteBean utente) { this.utente = utente; }
+    public UtenteBean getUtente() { 
+        return utente; 
+    }
+    public void setUtente(UtenteBean utente) { 
+        this.utente = utente;
+     }
 
-    public Date getTimeStamp() { return timeStamp; }
-    public void setTimeStamp(Date timeStamp) { this.timeStamp = timeStamp; }
+    public Date getTimeStamp() { 
+        return timeStamp; 
+    }
+    public void setTimeStamp(Date timeStamp) { 
+        this.timeStamp = timeStamp; 
+    }
 }

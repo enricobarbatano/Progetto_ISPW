@@ -60,7 +60,7 @@ public class DbmsPrenotazioneDAO extends DbmsDAO<Integer, Prenotazione> implemen
     // ================
     // RowMapper
     // ================
-    private final RowMapper<Prenotazione> MAPPER = rs -> {
+    private final RowMapper<Prenotazione> mapper= rs -> {
         Prenotazione p = new Prenotazione();
         p.setIdPrenotazione(rs.getInt("id_prenotazione"));
         p.setIdUtente(rs.getInt("id_utente"));
@@ -86,7 +86,7 @@ public class DbmsPrenotazioneDAO extends DbmsDAO<Integer, Prenotazione> implemen
     @Override
     public Prenotazione load(Integer id) {
         if (id == null) return null;
-        return queryOne(SQL_FIND_BY_ID, ps -> ps.setInt(1, id), MAPPER).orElse(null);
+        return queryOne(SQL_FIND_BY_ID, ps -> ps.setInt(1, id), mapper).orElse(null);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class DbmsPrenotazioneDAO extends DbmsDAO<Integer, Prenotazione> implemen
     // ================
     @Override
     public List<Prenotazione> findByUtente(int idUtente) {
-        return queryList(SQL_FIND_BY_UTENTE, ps -> ps.setInt(1, idUtente), MAPPER);
+        return queryList(SQL_FIND_BY_UTENTE, ps -> ps.setInt(1, idUtente), mapper);
     }
 
     @Override
@@ -131,7 +131,7 @@ public class DbmsPrenotazioneDAO extends DbmsDAO<Integer, Prenotazione> implemen
         return queryList(SQL_FIND_BY_UTENTE_STATO, ps -> {
             ps.setInt(1, idUtente);
             ps.setString(2, stato.name());
-        }, MAPPER);
+        }, mapper);
     }
 
     @Override

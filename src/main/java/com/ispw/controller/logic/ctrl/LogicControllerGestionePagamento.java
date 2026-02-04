@@ -114,7 +114,7 @@ public class LogicControllerGestionePagamento
     }
 
     @Override
-    public StatoPagamentoBean richiediPagamentoPenalità(DatiPagamentoBean dati, int idPenalita) {
+    public StatoPagamentoBean richiediPagamentoPenalita(DatiPagamentoBean dati, int idPenalita) {
         // Validazioni semplici
         if (dati == null) return esito(false, pickStato(FALLITO, RIFIUTATO, NEGATO, KO).name(), null, "Dati pagamento mancanti");
         MetodoPagamento metodo = parseMetodo(dati.getMetodo());

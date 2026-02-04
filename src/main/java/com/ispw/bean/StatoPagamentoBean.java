@@ -15,18 +15,39 @@ public class StatoPagamentoBean  {
         //Nota: costruttore no-args intenzionalmente vuoto.
     }
 
-    public boolean isSuccesso() { return successo; }
-    public void setSuccesso(boolean successo) { this.successo = successo; }
+    public boolean isSuccesso() { 
+        return successo; 
+    }
+    public void setSuccesso(boolean successo) { 
+        
+        this.successo = successo; 
+    }
 
-    public String getStato() { return stato; }
-    public void setStato(String stato) { this.stato = stato; }
+    public String getStato() {
+         return stato; 
+        }
+    public void setStato(String stato) { 
+        this.stato = stato; 
+    }
 
-    public String getIdTransazione() { return idTransazione; }
-    public void setIdTransazione(String idTransazione) { this.idTransazione = idTransazione; }
+    public String getIdTransazione() {
+         return idTransazione; 
+        }
+    public void setIdTransazione(String idTransazione) { 
+        this.idTransazione = idTransazione;
+     }
 
-    public LocalDateTime getDataPagamento() { return dataPagamento; }
-    public void setDataPagamento(LocalDateTime dataPagamento) { this.dataPagamento = dataPagamento; }
+    public LocalDateTime getDataPagamento() { 
+        return dataPagamento; 
+    }
+    public void setDataPagamento(LocalDateTime dataPagamento) {
+         this.dataPagamento = dataPagamento; 
+        }
 
-    public String getMessaggio() { return messaggio; }
-    public void setMessaggio(String messaggio) { this.messaggio = messaggio; }
+    public String getMessaggio() { 
+        return messaggio; 
+    }
+    public void setMessaggio(String messaggio) {
+         this.messaggio = messaggio; 
+        }
 }

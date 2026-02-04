@@ -15,7 +15,7 @@ import com.ispw.dao.interfaces.DAO;
  *  - store per istanza (default)
  *  - store condiviso per classe DAO (utile se non hai ancora la factory/caching)
  */
-public abstract class In_MemoryDAO<I, E> implements DAO<I, E> {
+public abstract class InMemoryDAO<I, E> implements DAO<I, E> {
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -29,7 +29,7 @@ public abstract class In_MemoryDAO<I, E> implements DAO<I, E> {
     /**
      * Costruttore default: store per istanza.
      */
-    protected In_MemoryDAO() {
+    protected InMemoryDAO() {
         this(false);
     }
 
@@ -37,7 +37,7 @@ public abstract class In_MemoryDAO<I, E> implements DAO<I, E> {
      * @param sharedStore se true, tutte le istanze della stessa classe DAO concreta
      *                    (es. InMemoryCampoDAO) condividono lo stesso store.
      */
-    protected In_MemoryDAO(boolean sharedStore) {
+    protected InMemoryDAO(boolean sharedStore) {
         if (sharedStore) {
             this.store = SharedStoreRegistry.getStoreFor(getClass());
         } else {

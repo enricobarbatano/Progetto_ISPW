@@ -153,7 +153,7 @@ public class LogicControllerGestioneNotifica implements
     /** Descrittore leggibile del destinatario a partire dal bean utente. */
     private String destinatario(UtenteBean utente) {
         // Se UtenteBean espone getEmail()/getNome(), puoi raffinare:
-        // return utente.getNome() + " <" + utente.getEmail() + ">";
+        
         return (utente != null) ? utente.toString() : UTENTE_NULL;
     }
 

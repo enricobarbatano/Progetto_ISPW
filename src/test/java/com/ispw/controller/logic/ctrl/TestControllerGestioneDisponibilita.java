@@ -1,7 +1,5 @@
 package com.ispw.controller.logic.ctrl;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.lang.reflect.Method;
 import java.sql.Date;
 import java.sql.Time;
@@ -9,6 +7,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -85,7 +88,7 @@ class TestControllerGestoreDisponibilita extends BaseDAOTest {
     @DisplayName("2) Rimuovi disponibilità: disattiva il campo")
     void testRimuoviDisponibilita() {
         Campo c = seedCampo(2, 25f, true, false);
-        assertTrue(controller.rimuoviDisponibilità(c.getIdCampo()), "Operazione deve tornare TRUE");
+        assertTrue(controller.rimuoviDisponibilita(c.getIdCampo()), "Operazione deve tornare TRUE");
         Campo after = campoDAO.findById(2);
         assertNotNull(after);
         assertFalse(after.isAttivo(), "Campo deve risultare disattivo");
@@ -98,7 +101,7 @@ class TestControllerGestoreDisponibilita extends BaseDAOTest {
     @DisplayName("3) Attiva disponibilità: attiva il campo e ritorna lista vuota")
     void testAttivaDisponibilita() {
         Campo c = seedCampo(3, 25f, false, false);
-        List<DatiDisponibilitaBean> out = controller.attivaDisponibilità(c.getIdCampo());
+        List<DatiDisponibilitaBean> out = controller.attivaDisponibilita(c.getIdCampo());
         assertNotNull(out);
         assertTrue(out.isEmpty(), "La firma prevede lista vuota come risultato");
         Campo after = campoDAO.findById(3);

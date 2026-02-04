@@ -18,15 +18,31 @@ public class UtenteBean {
         this.ruolo = ruolo;
     }
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public String getNome() { 
+        return nome; 
+    }
+    public void setNome(String nome) {
+         this.nome = nome; 
+        }
 
-    public String getCognome() { return cognome; }
-    public void setCognome(String cognome) { this.cognome = cognome; }
+    public String getCognome() { 
+        return cognome;
+     }
+    public void setCognome(String cognome) {
+         this.cognome = cognome; 
+        }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public String getEmail() {
+         return email; 
+        }
+    public void setEmail(String email) {
+         this.email = email;
+         }
 
-    public Ruolo getRuolo() { return ruolo; }
-    public void setRuolo(Ruolo ruolo) { this.ruolo = ruolo; }
+    public Ruolo getRuolo() { 
+        return ruolo; 
+    }
+    public void setRuolo(Ruolo ruolo) {
+         this.ruolo = ruolo;
+         }
 }

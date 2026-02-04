@@ -3,11 +3,11 @@ package com.ispw.dao.impl.memory.concrete;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ispw.dao.impl.memory.In_MemoryDAO;
+import com.ispw.dao.impl.memory.InMemoryDAO;
 import com.ispw.dao.interfaces.CampoDAO;
 import com.ispw.model.entity.Campo;
 
-public final class InMemoryCampoDAO extends In_MemoryDAO<Integer, Campo> implements CampoDAO {
+public final class InMemoryCampoDAO extends InMemoryDAO<Integer, Campo> implements CampoDAO {
 
     public InMemoryCampoDAO() {
         super(true); // store condiviso per eventuali istanze

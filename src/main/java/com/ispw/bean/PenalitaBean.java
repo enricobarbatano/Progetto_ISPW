@@ -12,9 +12,17 @@ public class PenalitaBean  {
         //Nota: costruttore no-args intenzionalmente vuoto.
     }
 
-    public BigDecimal getValorePenalita() { return valorePenalita; }
-    public void setValorePenalita(BigDecimal valorePenalita) { this.valorePenalita = valorePenalita; }
+    public BigDecimal getValorePenalita() { 
+        return valorePenalita;
+     }
+    public void setValorePenalita(BigDecimal valorePenalita) { 
+        this.valorePenalita = valorePenalita; 
+    }
 
-    public int getPreavvisoMinimoMinuti() { return preavvisoMinimoMinuti; }
-    public void setPreavvisoMinimoMinuti(int preavvisoMinimoMinuti) { this.preavvisoMinimoMinuti = preavvisoMinimoMinuti; }
+    public int getPreavvisoMinimoMinuti() { 
+        return preavvisoMinimoMinuti; 
+    }
+    public void setPreavvisoMinimoMinuti(int preavvisoMinimoMinuti) {
+         this.preavvisoMinimoMinuti = preavvisoMinimoMinuti; 
+        }
 }

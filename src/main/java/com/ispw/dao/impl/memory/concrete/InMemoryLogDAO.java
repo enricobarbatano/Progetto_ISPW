@@ -1,20 +1,20 @@
 package com.ispw.dao.impl.memory.concrete;
 
-import com.ispw.dao.impl.memory.In_MemoryDAO;
-import com.ispw.dao.interfaces.LogDAO;
-import com.ispw.model.entity.SystemLog;
-
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.ispw.dao.impl.memory.InMemoryDAO;
+import com.ispw.dao.interfaces.LogDAO;
+import com.ispw.model.entity.SystemLog;
+
 /**
  * DAO InMemory per SystemLog (append-only).
  * SonarCloud-friendly: comparator riutilizzabile, nessun System.out, controlli input.
  */
-public final class InMemoryLogDAO extends In_MemoryDAO<Integer, SystemLog> implements LogDAO {
+public final class InMemoryLogDAO extends InMemoryDAO<Integer, SystemLog> implements LogDAO {
 
     private static final int MIN_LIMIT = 1;
 

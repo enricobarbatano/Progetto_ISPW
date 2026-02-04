@@ -1,13 +1,13 @@
 package com.ispw.dao.impl.memory.concrete;
 
 
-import com.ispw.dao.impl.memory.In_MemoryDAO;
-import com.ispw.dao.interfaces.GeneralUserDAO;
-import com.ispw.model.entity.GeneralUser;    // abstract
-import com.ispw.model.entity.UtenteFinale;  // concreto da istanziare
-
 import java.util.Locale;
 import java.util.Objects;
+
+import com.ispw.dao.impl.memory.InMemoryDAO;    // abstract
+import com.ispw.dao.interfaces.GeneralUserDAO;  // concreto da istanziare
+import com.ispw.model.entity.GeneralUser;
+import com.ispw.model.entity.UtenteFinale;
 
 /**
  * DAO InMemory per GeneralUser.
@@ -15,7 +15,7 @@ import java.util.Objects;
  * - store condiviso per classe (super(true));
  * - id autoincrement se 0; validazioni / early return.
  */
-public final class InMemoryGeneralUserDAO extends In_MemoryDAO<Integer, GeneralUser> implements GeneralUserDAO {
+public final class InMemoryGeneralUserDAO extends InMemoryDAO<Integer, GeneralUser> implements GeneralUserDAO {
 
     public InMemoryGeneralUserDAO() {
         super(true); // store condiviso tra istanze della stessa classe concreta

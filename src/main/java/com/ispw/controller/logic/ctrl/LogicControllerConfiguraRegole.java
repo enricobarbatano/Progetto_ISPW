@@ -116,9 +116,9 @@ public class LogicControllerConfiguraRegole {
         if (dispCtrl != null) {
             try {
                 if (attivo && !manut) {
-                    dispCtrl.attivaDisponibilità(idCampo);
+                    dispCtrl.attivaDisponibilita(idCampo);
                 } else {
-                    dispCtrl.rimuoviDisponibilità(idCampo);
+                    dispCtrl.rimuoviDisponibilita(idCampo);
                 }
             } catch (RuntimeException ex) {
                 log().log(Level.FINE, "Aggiorna disponibilità fallito: " + ex.getMessage(), ex);
@@ -174,7 +174,7 @@ public class LogicControllerConfiguraRegole {
 
         // Disponibilità → rimuovi
         if (dispCtrl != null) {
-            try { dispCtrl.rimuoviDisponibilità(idCampo); }
+            try { dispCtrl.rimuoviDisponibilita(idCampo); }
             catch (RuntimeException ex) { log().log(Level.FINE, "Rimozione disponibilità fallita: " + ex.getMessage(), ex); }
         }
 

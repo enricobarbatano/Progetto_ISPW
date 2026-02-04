@@ -9,19 +9,35 @@ public class ParametriVerificaBean {
 
 
 
-   public int getIdCampo() { return idCampo; }
-    public void setIdCampo(int idCampo) { this.idCampo = idCampo; }
+   public int getIdCampo() { 
+    return idCampo; 
+}
+    public void setIdCampo(int idCampo) {
+         this.idCampo = idCampo;
+         }
 
-    public String getData() { 
-        return data; } 
-    public void setData(String data) {
-         this.data = data; }
-    public String getOraInizio() {
-         return oraInizio; } 
-    public void setOraInizio(String oraInizio) { 
-        this.oraInizio = oraInizio; }
-    public int getDurataMin() { 
-        return durataMin; } 
-    public void setDurataMin(int durataMin) { 
-        this.durataMin = durataMin; }
+    public String getData() 
+    { 
+        return data; 
+    } 
+    public void setData(String data)
+     {
+         this.data = data; 
+        }
+    public String getOraInizio() 
+    {
+         return oraInizio; 
+        } 
+    public void setOraInizio(String oraInizio)
+     { 
+        this.oraInizio = oraInizio; 
+    }
+    public int getDurataMin() 
+    { 
+        return durataMin; 
+    } 
+    public void setDurataMin(int durataMin)
+     { 
+        this.durataMin = durataMin; 
+    }
 }

@@ -258,7 +258,7 @@ class TestControllerApplicaPenalita extends BaseDAOTest {
         int lastIdPenalita;
 
         @Override
-        public StatoPagamentoBean richiediPagamentoPenalità(DatiPagamentoBean dati, int idPenalita) {
+        public StatoPagamentoBean richiediPagamentoPenalita(DatiPagamentoBean dati, int idPenalita) {
             this.invocations++;
             this.lastDati = dati;
             this.lastIdPenalita = idPenalita;

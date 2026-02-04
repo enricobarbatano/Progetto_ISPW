@@ -4,12 +4,12 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 
-import com.ispw.dao.impl.memory.In_MemoryDAO;
+import com.ispw.dao.impl.memory.InMemoryDAO;
 import com.ispw.dao.interfaces.GestoreDAO;
 import com.ispw.model.entity.Gestore;
 import com.ispw.model.enums.Permesso;
 
-public final class InMemoryGestoreDAO extends In_MemoryDAO<Integer, Gestore> implements GestoreDAO {
+public final class InMemoryGestoreDAO extends InMemoryDAO<Integer, Gestore> implements GestoreDAO {
 
     public InMemoryGestoreDAO() {
         super(true); // store condiviso tra eventuali istanze

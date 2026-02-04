@@ -58,7 +58,7 @@ public class LogicControllerGestoreDisponibilita
      * Ritorna TRUE se l’operazione va a buon fine.
      */
     @Override
-    public Boolean rimuoviDisponibilità(int idCampo) {
+    public Boolean rimuoviDisponibilita(int idCampo) {
         Campo c = campoDAO().findById(idCampo);
         if (c == null) return false;
 
@@ -76,7 +76,7 @@ public class LogicControllerGestoreDisponibilita
      * Non avendo parametri temporali, restituiamo lista vuota (snello).
      */
     @Override
-    public List<DatiDisponibilitaBean> attivaDisponibilità(int idCampo) {
+    public List<DatiDisponibilitaBean> attivaDisponibilita(int idCampo) {
         Campo c = campoDAO().findById(idCampo);
         if (c == null) return List.of();
 

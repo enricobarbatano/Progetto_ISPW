@@ -161,7 +161,7 @@ void testEseguiRimborso_Presente() throws InterruptedException {
         dati.setMetodo(MetodoPagamento.PAYPAL.name());
         dati.setImporto(12f);
 
-        StatoPagamentoBean out = controller.richiediPagamentoPenalità(dati, 77);
+        StatoPagamentoBean out = controller.richiediPagamentoPenalita(dati, 77);
         assertNotNull(out);
         assertTrue(out.isSuccesso());
         assertNotNull(out.getStato());
@@ -181,7 +181,7 @@ void testEseguiRimborso_Presente() throws InterruptedException {
         dati.setMetodo(MetodoPagamento.SATISPAY.name());
         dati.setImporto(0f);
 
-        StatoPagamentoBean out = controller.richiediPagamentoPenalità(dati, 88);
+        StatoPagamentoBean out = controller.richiediPagamentoPenalita(dati, 88);
         assertNotNull(out);
         assertFalse(out.isSuccesso());
 

@@ -5,6 +5,6 @@ import java.util.List;
 import com.ispw.bean.DatiDisponibilitaBean;
 
 public interface GestioneDisponibilitaGestioneRegole {
-    Boolean rimuoviDisponibilità(int idCampo);
-    List<DatiDisponibilitaBean> attivaDisponibilità(int idCampo);
+    Boolean rimuoviDisponibilita(int idCampo);
+    List<DatiDisponibilitaBean> attivaDisponibilita(int idCampo);
 }

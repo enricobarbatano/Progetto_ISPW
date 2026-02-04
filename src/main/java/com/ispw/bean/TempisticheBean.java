@@ -15,15 +15,31 @@ public class TempisticheBean {
         //Nota: costruttore no-args intenzionalmente vuoto.
     }
 
-    public int getDurataSlotMinuti() { return durataSlotMinuti; }
-    public void setDurataSlotMinuti(int durataSlotMinuti) { this.durataSlotMinuti = durataSlotMinuti; }
+    public int getDurataSlotMinuti() {
+         return durataSlotMinuti; 
+        }
+    public void setDurataSlotMinuti(int durataSlotMinuti) { 
+        this.durataSlotMinuti = durataSlotMinuti; 
+    }
 
-    public LocalTime getOraApertura() { return oraApertura; }
-    public void setOraApertura(LocalTime oraApertura) { this.oraApertura = oraApertura; }
+    public LocalTime getOraApertura() { 
+        return oraApertura; 
+    }
+    public void setOraApertura(LocalTime oraApertura) { 
+        this.oraApertura = oraApertura; 
+    }
 
-    public LocalTime getOraChiusura() { return oraChiusura; }
-    public void setOraChiusura(LocalTime oraChiusura) { this.oraChiusura = oraChiusura; }
+    public LocalTime getOraChiusura() { 
+        return oraChiusura;
+     }
+    public void setOraChiusura(LocalTime oraChiusura) {
+         this.oraChiusura = oraChiusura; 
+        }
 
-    public int getPreavvisoMinimoMinuti() { return preavvisoMinimoMinuti; }
-    public void setPreavvisoMinimoMinuti(int preavvisoMinimoMinuti) { this.preavvisoMinimoMinuti = preavvisoMinimoMinuti; }
+    public int getPreavvisoMinimoMinuti() {
+         return preavvisoMinimoMinuti; 
+        }
+    public void setPreavvisoMinimoMinuti(int preavvisoMinimoMinuti) { 
+        this.preavvisoMinimoMinuti = preavvisoMinimoMinuti;
+     }
 }

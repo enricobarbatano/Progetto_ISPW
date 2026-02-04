@@ -153,7 +153,7 @@ public final class LogicControllerApplicaPenalita {
         normalizePagamento(datiPagamento, importoPenalita);
         runBestEffort("Pagamento penalità",
             // NB: la tua interfaccia usa l’accento nel nome del metodo
-            () -> payCtrl.richiediPagamentoPenalità(datiPagamento, idPenalita));
+            () -> payCtrl.richiediPagamentoPenalita(datiPagamento, idPenalita));
     }
 
     private void handleFattura(GestioneFatturaPenalita fattCtrl,
