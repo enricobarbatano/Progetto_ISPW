@@ -8,16 +8,16 @@ public class CLIGraphicControllerNavigation implements GraphicControllerNavigati
     
     @Override
     public void goTo(String route, Map<String, Object> params) {
-        // Implementazione CLI: navigazione tra schermate (da implementare)
+        //Implementazione CLI: navigazione tra schermate (da implementare)
     }
 
     @Override
     public void back() {
-        // Implementazione CLI: navigazione indietro (da implementare)
+        //Implementazione CLI: navigazione indietro (da implementare)
     }
 
     @Override
     public void exit() {
-        // Implementazione CLI: uscita dall'applicazione (da implementare)
+        //Implementazione CLI: uscita dall'applicazione (da implementare)
     }
 }

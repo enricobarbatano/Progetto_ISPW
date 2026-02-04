@@ -24,24 +24,24 @@ import com.ispw.model.enums.Ruolo;
 class TestControllerGestioneNotifica extends BaseDAOTest {
 
     private LogicControllerGestioneNotifica controller;
-    private Logger logger;
+    private static final Logger LOGGER = Logger.getLogger(LogicControllerGestioneNotifica.class.getName());
     private TestLogHandler handler;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         controller = new LogicControllerGestioneNotifica();
 
         // catturo i log del controller
-        logger = Logger.getLogger(LogicControllerGestioneNotifica.class.getName());
-        logger.setUseParentHandlers(false);
+        LOGGER.setUseParentHandlers(false);
         // rimuovo eventuali handler residui
-        for (Handler h : logger.getHandlers()) {
-            logger.removeHandler(h);
+        for (Handler h : LOGGER.getHandlers()) {
+            LOGGER.removeHandler(h);
         }
         handler = new TestLogHandler();
         handler.setLevel(Level.ALL);
-        logger.addHandler(handler);
-        logger.setLevel(Level.ALL);
+        LOGGER.addHandler(handler);
+        LOGGER.setLevel(Level.ALL);
     }
 
     @Test
@@ -189,7 +189,9 @@ class TestControllerGestioneNotifica extends BaseDAOTest {
         }
         @Override public void close() throws SecurityException { records.clear(); }
         LogRecord last() { return records.isEmpty() ? null : records.get(records.size() - 1); }
+        @SuppressWarnings("unused")
         int size() { return records.size(); }
+        @SuppressWarnings("unused")
         LogRecord get(int idx) { return (idx >= 0 && idx < records.size()) ? records.get(idx) : null; }
     }
 }

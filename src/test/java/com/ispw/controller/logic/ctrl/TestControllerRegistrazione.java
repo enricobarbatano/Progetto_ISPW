@@ -40,6 +40,7 @@ class TestControllerRegistrazione extends BaseDAOTest {
     private LogDAO logDAO;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         controller = new LogicControllerRegistrazione();
         userDAO = DAOFactory.getInstance().getGeneralUserDAO();

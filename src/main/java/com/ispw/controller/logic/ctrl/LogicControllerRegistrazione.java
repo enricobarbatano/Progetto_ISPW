@@ -30,8 +30,8 @@ public class LogicControllerRegistrazione {
         return registraNuovoUtente(datiInput, new LogicControllerGestioneNotifica());
     }
 
-    private EsitoOperazioneBean registraNuovoUtente(DatiRegistrazioneBean datiInput,
-                                                    GestioneNotificaRegistrazione notificaCtrl) {
+    EsitoOperazioneBean registraNuovoUtente(DatiRegistrazioneBean datiInput,
+                                            GestioneNotificaRegistrazione notificaCtrl) {
         final EsitoOperazioneBean esito = new EsitoOperazioneBean();
 
         // Validazione "scolastica"

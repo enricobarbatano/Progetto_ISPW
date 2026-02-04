@@ -51,9 +51,7 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
      */
     @Override
     public void loadAccount(SessioneUtenteBean sessione) {
-        if (sessione == null || sessione.getUtente() == null) {
-                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
-                    GraphicControllerUtils.PREFIX_ACCOUNT, "Sessione non valida");
+        if (isSessioneNonValida(sessione, "Sessione non valida")) {
             return;
         }
 
@@ -62,21 +60,11 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
             DatiAccountBean dati = logicController.recuperaInformazioniAccount(sessione);
 
             if (dati == null) {
-                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
-                    GraphicControllerUtils.PREFIX_ACCOUNT, "Impossibile recuperare dati account");
+                notifyAccountError("Impossibile recuperare dati account");
                 return;
             }
 
-            Map<String, Object> payload = new HashMap<>();
-            payload.put(GraphicControllerUtils.KEY_ID_UTENTE, dati.getIdUtente());
-            payload.put(GraphicControllerUtils.KEY_NOME, dati.getNome());
-            payload.put(GraphicControllerUtils.KEY_COGNOME, dati.getCognome());
-            payload.put(GraphicControllerUtils.KEY_EMAIL, dati.getEmail());
-
-            if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_ACCOUNT,
-                    Map.of(GraphicControllerUtils.KEY_DATI_ACCOUNT, payload));
-            }
+            navigateAccountData(dati);
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore caricamento account", e);
         }
@@ -89,42 +77,25 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
     @Override
     public void aggiornaDatiAccount(Map<String, Object> nuoviDati) {
         if (nuoviDati == null) {
-                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
-                    GraphicControllerUtils.PREFIX_ACCOUNT, "Dati account mancanti");
+            notifyAccountError("Dati account mancanti");
             return;
         }
 
         Object idUtente = nuoviDati.get(GraphicControllerUtils.KEY_ID_UTENTE);
         if (!(idUtente instanceof Integer) || ((Integer) idUtente) <= 0) {
-                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
-                    GraphicControllerUtils.PREFIX_ACCOUNT, "Id utente non valido");
+            notifyAccountError("Id utente non valido");
             return;
         }
         
-        DatiAccountBean bean = new DatiAccountBean();
-        bean.setIdUtente((Integer) idUtente);
-        if (nuoviDati.containsKey(GraphicControllerUtils.KEY_NOME)) {
-            bean.setNome((String) nuoviDati.get(GraphicControllerUtils.KEY_NOME));
-        }
-        if (nuoviDati.containsKey(GraphicControllerUtils.KEY_COGNOME)) {
-            bean.setCognome((String) nuoviDati.get(GraphicControllerUtils.KEY_COGNOME));
-        }
-        if (nuoviDati.containsKey(GraphicControllerUtils.KEY_EMAIL)) {
-            bean.setEmail((String) nuoviDati.get(GraphicControllerUtils.KEY_EMAIL));
-        }
-        
+        DatiAccountBean bean = buildAccountBean(nuoviDati, (Integer) idUtente);
+
         LogicControllerGestioneAccount logicController = new LogicControllerGestioneAccount();
         EsitoOperazioneBean esito = logicController.aggiornaDatiAccountConNotifica(bean);
         
         if (esito != null && esito.isSuccesso()) {
-            if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_ACCOUNT,
-                        Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
-            }
+            navigateSuccess(esito.getMessaggio());
         } else {
-            GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
-                    GraphicControllerUtils.PREFIX_ACCOUNT,
-                    esito != null ? esito.getMessaggio() : "Operazione non riuscita");
+            notifyAccountError(esito != null ? esito.getMessaggio() : "Operazione non riuscita");
         }
     }
 
@@ -134,13 +105,10 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
     @Override
     public void cambiaPassword(String vecchiaPassword, String nuovaPassword, SessioneUtenteBean sessione) {
         if (vecchiaPassword == null || nuovaPassword == null) {
-                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
-                    GraphicControllerUtils.PREFIX_ACCOUNT, "Password non valide");
+            notifyAccountError("Password non valide");
             return;
         }
-        if (sessione == null || sessione.getUtente() == null) {
-                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
-                    GraphicControllerUtils.PREFIX_ACCOUNT, "Sessione non valida");
+        if (isSessioneNonValida(sessione, "Sessione non valida")) {
             return;
         }
 
@@ -148,14 +116,9 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
         EsitoOperazioneBean esito = logicController.cambiaPasswordConNotifica(vecchiaPassword, nuovaPassword, sessione);
 
         if (esito != null && esito.isSuccesso()) {
-            if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_ACCOUNT,
-                        Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
-            }
+            navigateSuccess(esito.getMessaggio());
         } else {
-            GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
-                    GraphicControllerUtils.PREFIX_ACCOUNT,
-                    esito != null ? esito.getMessaggio() : "Operazione non riuscita");
+            notifyAccountError(esito != null ? esito.getMessaggio() : "Operazione non riuscita");
         }
     }
 
@@ -167,6 +130,54 @@ public class CLIGraphicControllerAccount implements GraphicControllerAccount {
         if (navigator != null) {
             navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN);
         }
+    }
+
+    private void notifyAccountError(String message) {
+        GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
+            GraphicControllerUtils.PREFIX_ACCOUNT, message);
+    }
+
+    private boolean isSessioneNonValida(SessioneUtenteBean sessione, String message) {
+        if (sessione == null || sessione.getUtente() == null) {
+            notifyAccountError(message);
+            return true;
+        }
+        return false;
+    }
+
+    private void navigateSuccess(String message) {
+        if (navigator != null) {
+            navigator.goTo(GraphicControllerUtils.ROUTE_ACCOUNT,
+                Map.of(GraphicControllerUtils.KEY_SUCCESSO, message));
+        }
+    }
+
+    private void navigateAccountData(DatiAccountBean dati) {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put(GraphicControllerUtils.KEY_ID_UTENTE, dati.getIdUtente());
+        payload.put(GraphicControllerUtils.KEY_NOME, dati.getNome());
+        payload.put(GraphicControllerUtils.KEY_COGNOME, dati.getCognome());
+        payload.put(GraphicControllerUtils.KEY_EMAIL, dati.getEmail());
+
+        if (navigator != null) {
+            navigator.goTo(GraphicControllerUtils.ROUTE_ACCOUNT,
+                Map.of(GraphicControllerUtils.KEY_DATI_ACCOUNT, payload));
+        }
+    }
+
+    private DatiAccountBean buildAccountBean(Map<String, Object> nuoviDati, int idUtente) {
+        DatiAccountBean bean = new DatiAccountBean();
+        bean.setIdUtente(idUtente);
+        if (nuoviDati.containsKey(GraphicControllerUtils.KEY_NOME)) {
+            bean.setNome((String) nuoviDati.get(GraphicControllerUtils.KEY_NOME));
+        }
+        if (nuoviDati.containsKey(GraphicControllerUtils.KEY_COGNOME)) {
+            bean.setCognome((String) nuoviDati.get(GraphicControllerUtils.KEY_COGNOME));
+        }
+        if (nuoviDati.containsKey(GraphicControllerUtils.KEY_EMAIL)) {
+            bean.setEmail((String) nuoviDati.get(GraphicControllerUtils.KEY_EMAIL));
+        }
+        return bean;
     }
 
 }

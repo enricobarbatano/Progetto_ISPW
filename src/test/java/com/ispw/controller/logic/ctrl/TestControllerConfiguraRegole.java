@@ -46,6 +46,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
     private LogDAO logDAO;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         controller = new LogicControllerConfiguraRegole();
 
@@ -476,10 +477,10 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
             // Integer
             try {
                 Method m = campoDAO.getClass().getMethod("create", Integer.class);
-                Object created = m.invoke(campoDAO, Integer.valueOf(id));
-                if (created instanceof Campo) {
+                Object created = m.invoke(campoDAO, id);
+                if (created instanceof Campo c) {
                     // persist esplicito se necessario (alcuni create già salvano; altri richiedono store)
-                    try { campoDAO.store((Campo) created); } catch (RuntimeException ignored) { /* ignored: best-effort store for in-memory DAO seeding */ }
+                    try { campoDAO.store(c); } catch (RuntimeException ignored) { /* ignored: best-effort store for in-memory DAO seeding */ }
                     Campo found = campoDAO.findById(id);
                     if (found != null) return id;
                 }
@@ -488,8 +489,8 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
                 try {
                     Method m = campoDAO.getClass().getMethod("create", int.class);
                     Object created = m.invoke(campoDAO, id);
-                    if (created instanceof Campo) {
-                        try { campoDAO.store((Campo) created); } catch (RuntimeException ignored) { /* ignored: best-effort store for in-memory DAO seeding */ }
+                    if (created instanceof Campo c) {
+                        try { campoDAO.store(c); } catch (RuntimeException ignored) { /* ignored: best-effort store for in-memory DAO seeding */ }
                         Campo found = campoDAO.findById(id);
                         if (found != null) return id;
                     }
@@ -518,7 +519,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
                     if (m != null) {
                         m.setAccessible(true);
                         // se prende Integer o int, invoca comunque con Integer (auto-unboxing se serve)
-                        m.invoke(c, Integer.valueOf(id));
+                        m.invoke(c, id);
                         setOk = true;
                         break;
                     }
@@ -533,7 +534,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
                 }
                 if (f != null) {
                     f.setAccessible(true);
-                    f.set(c, Integer.valueOf(id));
+                    f.set(c, id);
                     setOk = true;
                 }
             }
@@ -558,7 +559,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
                 try {
                     Method m = target.getClass().getMethod(g);
                     Object v = m.invoke(target);
-                    if (v instanceof Boolean) return (Boolean) v;
+                    if (v instanceof Boolean b) return b;
                 } catch (ReflectiveOperationException ignored) { /* ignored: method getter may be absent */ }
             }
         }
@@ -572,7 +573,7 @@ class TestControllerConfiguraRegole extends BaseDAOTest {
                 if (f != null) {
                     f.setAccessible(true);
                     Object v = f.get(target);
-                    if (v instanceof Boolean) return (Boolean) v;
+                    if (v instanceof Boolean b) return b;
                 }
             } catch (ReflectiveOperationException ignored) { /* ignored: field getter may be absent */ }
         }

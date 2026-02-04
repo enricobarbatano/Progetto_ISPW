@@ -38,13 +38,12 @@ public class CLIGraphicControllerPenalita implements GraphicControllerPenalita {
 
     @Override
     public void selezionaUtente(String email) {
-        if (email == null || email.isBlank()) {
-                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PENALITA,
-                    GraphicControllerUtils.PREFIX_PENALITA, "Email utente non valida");
+        if (isEmailNonValida(email)) {
             return;
         }
         if (navigator != null) {
-            navigator.goTo(GraphicControllerUtils.ROUTE_PENALITA, Map.of("email", email.trim()));
+            navigator.goTo(GraphicControllerUtils.ROUTE_PENALITA,
+                Map.of(GraphicControllerUtils.KEY_EMAIL, email.trim()));
         }
     }
 
@@ -53,30 +52,18 @@ public class CLIGraphicControllerPenalita implements GraphicControllerPenalita {
      */
     @Override
     public void applicaPenalita(int idUtente, float importo, String motivazione) {
-        if (idUtente <= 0) {
-                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PENALITA,
-                    GraphicControllerUtils.PREFIX_PENALITA, "Id utente non valido");
-            return;
-        }
-        if (motivazione == null || motivazione.isBlank() || importo <= 0) {
-                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PENALITA,
-                    GraphicControllerUtils.PREFIX_PENALITA, "Dati penalità non validi");
+        if (isIdUtenteNonValido(idUtente) || isPenalitaNonValida(importo, motivazione)) {
             return;
         }
 
         try {
-            DatiPenalitaBean dati = new DatiPenalitaBean();
-            dati.setIdUtente(idUtente);
-            dati.setMotivazione(motivazione.trim());
-            dati.setImporto(BigDecimal.valueOf(importo));
+            DatiPenalitaBean dati = buildPenalitaBean(idUtente, importo, motivazione);
 
             LogicControllerApplicaPenalita logicController = new LogicControllerApplicaPenalita();
             EsitoOperazioneBean esito = logicController.applicaSanzione(dati);
 
             if (esito == null || !esito.isSuccesso()) {
-                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PENALITA,
-                    GraphicControllerUtils.PREFIX_PENALITA,
-                    esito != null ? esito.getMessaggio() : "Operazione non riuscita");
+                notifyPenalitaError(esito != null ? esito.getMessaggio() : "Operazione non riuscita");
                 return;
             }
 
@@ -94,6 +81,43 @@ public class CLIGraphicControllerPenalita implements GraphicControllerPenalita {
         if (navigator != null) {
             navigator.goTo(GraphicControllerUtils.ROUTE_HOME);
         }
+    }
+
+    private void notifyPenalitaError(String message) {
+        GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PENALITA,
+            GraphicControllerUtils.PREFIX_PENALITA, message);
+    }
+
+    private boolean isEmailNonValida(String email) {
+        if (email == null || email.isBlank()) {
+            notifyPenalitaError("Email utente non valida");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isIdUtenteNonValido(int idUtente) {
+        if (idUtente <= 0) {
+            notifyPenalitaError("Id utente non valido");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isPenalitaNonValida(float importo, String motivazione) {
+        if (motivazione == null || motivazione.isBlank() || importo <= 0) {
+            notifyPenalitaError("Dati penalità non validi");
+            return true;
+        }
+        return false;
+    }
+
+    private DatiPenalitaBean buildPenalitaBean(int idUtente, float importo, String motivazione) {
+        DatiPenalitaBean dati = new DatiPenalitaBean();
+        dati.setIdUtente(idUtente);
+        dati.setMotivazione(motivazione.trim());
+        dati.setImporto(BigDecimal.valueOf(importo));
+        return dati;
     }
 
 }

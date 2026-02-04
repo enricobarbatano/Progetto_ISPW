@@ -31,6 +31,7 @@ class TestControllerGestionePagamento extends BaseDAOTest {
     private PagamentoDAO pagamentoDAO;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         controller = new LogicControllerGestionePagamento();
 

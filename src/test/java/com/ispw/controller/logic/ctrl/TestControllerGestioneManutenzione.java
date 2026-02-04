@@ -22,24 +22,24 @@ import com.ispw.BaseDAOTest;
 class TestControllerGestioneManutenzione extends BaseDAOTest {
 
     private LogicControllerGestioneManutenzione controller;
-    private Logger logger;
+    private static final Logger LOGGER = Logger.getLogger(LogicControllerGestioneManutenzione.class.getName());
     private TestLogHandler handler;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         controller = new LogicControllerGestioneManutenzione();
 
         // Catturo i log del controller (JUL)
-        logger = Logger.getLogger(LogicControllerGestioneManutenzione.class.getName());
-        logger.setUseParentHandlers(false);
+        LOGGER.setUseParentHandlers(false);
         // pulizia handler esistenti
-        for (Handler h : logger.getHandlers()) {
-            logger.removeHandler(h);
+        for (Handler h : LOGGER.getHandlers()) {
+            LOGGER.removeHandler(h);
         }
         handler = new TestLogHandler();
         handler.setLevel(Level.ALL);
-        logger.addHandler(handler);
-        logger.setLevel(Level.ALL);
+        LOGGER.addHandler(handler);
+        LOGGER.setLevel(Level.ALL);
     }
 
     @Test

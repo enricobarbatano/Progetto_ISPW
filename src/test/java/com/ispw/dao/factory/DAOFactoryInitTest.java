@@ -13,6 +13,7 @@ import com.ispw.model.enums.PersistencyProvider;
 class DAOFactoryInitTest {
 
     @AfterEach
+    @SuppressWarnings("unused")
     void tearDown() {
         // clean up state between tests
         DAOFactory.resetForTests();
@@ -37,7 +38,7 @@ class DAOFactoryInitTest {
             // but remove temp dir
             try {
                 Files.deleteIfExists(tmp);
-            } catch (Exception ignored) {
+            } catch (java.io.IOException ignored) {
                 // ignored: temp dir cleanup not critical for test
             }
         }
@@ -56,12 +57,16 @@ class DAOFactoryInitTest {
 
     @Test
     void initialize_missingRootForFileSystem_shouldThrow() {
-        assertThrows(IllegalArgumentException.class, () -> DAOFactory.initialize(PersistencyProvider.FILE_SYSTEM, null));
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+            () -> DAOFactory.initialize(PersistencyProvider.FILE_SYSTEM, null));
+        assertTrue(ex.getMessage() == null || !ex.getMessage().isBlank());
     }
 
     @Test
     void initialize_twice_shouldThrowIllegalState() {
         DAOFactory.initialize(PersistencyProvider.IN_MEMORY, null);
-        assertThrows(IllegalStateException.class, () -> DAOFactory.initialize(PersistencyProvider.IN_MEMORY, null));
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+            () -> DAOFactory.initialize(PersistencyProvider.IN_MEMORY, null));
+        assertTrue(ex.getMessage() == null || !ex.getMessage().isBlank());
     }
 }

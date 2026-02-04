@@ -34,6 +34,7 @@ class TestLogicControllerGestioneAccesso extends BaseDAOTest {
 
    
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         userDAO = DAOFactory.getInstance().getGeneralUserDAO();
         logDAO  = DAOFactory.getInstance().getLogDAO();

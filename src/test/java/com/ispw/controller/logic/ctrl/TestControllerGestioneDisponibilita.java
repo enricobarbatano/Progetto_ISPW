@@ -35,6 +35,7 @@ class TestControllerGestoreDisponibilita extends BaseDAOTest {
     private PrenotazioneDAO prenotazioneDAO;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         controller = new LogicControllerGestoreDisponibilita();
         campoDAO = DAOFactory.getInstance().getCampoDAO();
@@ -148,7 +149,9 @@ class TestControllerGestoreDisponibilita extends BaseDAOTest {
     @Test
     @DisplayName("5) Verifica disponibilità: param=null → NullPointerException")
     void testVerificaDisponibilita_ParamNull() {
-        assertThrows(NullPointerException.class, () -> controller.verificaDisponibilita(null));
+        NullPointerException ex = assertThrows(NullPointerException.class,
+            () -> controller.verificaDisponibilita(null));
+        assertNotNull(ex);
     }
 
     // =====================================================================================

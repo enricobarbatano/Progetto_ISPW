@@ -51,6 +51,7 @@ class TestControllerApplicaPenalita extends BaseDAOTest {
     private RegolePenalitaDAO rulesDAO;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         userDAO     = DAOFactory.getInstance().getGeneralUserDAO();
         penalitaDAO = DAOFactory.getInstance().getPenalitaDAO();
@@ -208,11 +209,13 @@ class TestControllerApplicaPenalita extends BaseDAOTest {
         assertEquals(String.valueOf(u.getIdUtente()), fakeNoti.lastIdUtente);
 
         assertEquals(1, fakePay.invocations, "Pagamento penalità deve essere richiesto una volta");
+        assertNotNull(fakePay.lastDati);
         assertTrue(fakePay.lastIdPenalita > 0, "L'ID penalità passato al pagamento deve essere > 0");
         assertEquals(importoPen.floatValue(), pay.getImporto(), 0.0001f);
         assertEquals("PAYPAL", pay.getMetodo());
 
         assertEquals(1, fakeFatt.invocations, "Fattura penalità deve essere generata una volta");
+        assertNotNull(fakeFatt.lastDati);
         assertTrue(fakeFatt.lastIdPenalita > 0);
         assertEquals(fakePay.lastIdPenalita, fakeFatt.lastIdPenalita,
                 "ID penalità deve combaciare tra pagamento e fattura");

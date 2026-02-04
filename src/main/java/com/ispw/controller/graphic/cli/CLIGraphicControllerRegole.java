@@ -54,9 +54,7 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
 
     @Override
     public void selezionaCampo(int idCampo) {
-        if (idCampo <= 0) {
-                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
-                    GraphicControllerUtils.PREFIX_REGOLE, "Id campo non valido");
+        if (isIdCampoNonValido(idCampo)) {
             return;
         }
         if (navigator != null) {
@@ -70,12 +68,95 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
      */
     @Override
     public void aggiornaStatoCampo(Map<String, Object> regolaCampo) {
-        if (regolaCampo == null) {
-                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
-                    GraphicControllerUtils.PREFIX_REGOLE, "Parametri regola campo mancanti");
+        if (isNullParams(regolaCampo, "Parametri regola campo mancanti")) {
             return;
         }
         
+        RegolaCampoBean bean = buildRegolaCampoBean(regolaCampo);
+        
+        LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
+        EsitoOperazioneBean esito = logicController.aggiornaRegoleCampo(bean);
+        
+        if (esito != null && esito.isSuccesso()) {
+            navigateSuccess(esito.getMessaggio());
+        } else {
+            notifyRegoleError(esito != null ? esito.getMessaggio() : "Operazione non riuscita");
+        }
+    }
+
+    @Override
+    public void aggiornaTempistiche(Map<String, Object> tempistiche) {
+        if (isNullParams(tempistiche, "Parametri tempistiche mancanti")) {
+            return;
+        }
+        
+        TempisticheBean bean = buildTempisticheBean(tempistiche);
+        
+        LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
+        EsitoOperazioneBean esito = logicController.aggiornaRegolaTempistiche(bean);
+        
+        if (esito != null && esito.isSuccesso()) {
+            navigateSuccess(esito.getMessaggio());
+        } else {
+            notifyRegoleError(esito != null ? esito.getMessaggio() : "Operazione non riuscita");
+        }
+    }
+
+    @Override
+    public void aggiornaPenalita(Map<String, Object> penalita) {
+        if (isNullParams(penalita, "Parametri penalità mancanti")) {
+            return;
+        }
+        
+        PenalitaBean bean = buildPenalitaBean(penalita);
+        // Nota: BigDecimal per valorePenalita
+        
+        LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
+        EsitoOperazioneBean esito = logicController.aggiornaRegolepenalita(bean);
+        
+        if (esito != null && esito.isSuccesso()) {
+            navigateSuccess(esito.getMessaggio());
+        } else {
+            notifyRegoleError(esito != null ? esito.getMessaggio() : "Operazione non riuscita");
+        }
+    }
+
+    @Override
+    public void tornaAllaHome() {
+        if (navigator != null) {
+            navigator.goTo(GraphicControllerUtils.ROUTE_HOME);
+        }
+    }
+
+    private void notifyRegoleError(String message) {
+        GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
+            GraphicControllerUtils.PREFIX_REGOLE, message);
+    }
+
+    private boolean isIdCampoNonValido(int idCampo) {
+        if (idCampo <= 0) {
+            notifyRegoleError("Id campo non valido");
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isNullParams(Map<String, Object> params, String message) {
+        if (params == null) {
+            notifyRegoleError(message);
+            return true;
+        }
+        return false;
+    }
+
+    private void navigateSuccess(String message) {
+        if (navigator != null) {
+            navigator.goTo(GraphicControllerUtils.ROUTE_REGOLE,
+                Map.of(GraphicControllerUtils.KEY_SUCCESSO, message));
+        }
+    }
+
+    private RegolaCampoBean buildRegolaCampoBean(Map<String, Object> regolaCampo) {
         RegolaCampoBean bean = new RegolaCampoBean();
         if (regolaCampo.containsKey(GraphicControllerUtils.KEY_ID_CAMPO)) {
             bean.setIdCampo((Integer) regolaCampo.get(GraphicControllerUtils.KEY_ID_CAMPO));
@@ -86,30 +167,10 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
         if (regolaCampo.containsKey(GraphicControllerUtils.KEY_FLAG_MANUTENZIONE)) {
             bean.setFlagManutenzione((Boolean) regolaCampo.get(GraphicControllerUtils.KEY_FLAG_MANUTENZIONE));
         }
-        
-        LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
-        EsitoOperazioneBean esito = logicController.aggiornaRegoleCampo(bean);
-        
-        if (esito != null && esito.isSuccesso()) {
-            if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_REGOLE,
-                        Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
-            }
-        } else {
-            GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
-                    GraphicControllerUtils.PREFIX_REGOLE,
-                    esito != null ? esito.getMessaggio() : "Operazione non riuscita");
-        }
+        return bean;
     }
 
-    @Override
-    public void aggiornaTempistiche(Map<String, Object> tempistiche) {
-        if (tempistiche == null) {
-                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
-                    GraphicControllerUtils.PREFIX_REGOLE, "Parametri tempistiche mancanti");
-            return;
-        }
-        
+    private TempisticheBean buildTempisticheBean(Map<String, Object> tempistiche) {
         TempisticheBean bean = new TempisticheBean();
         if (tempistiche.containsKey(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI)) {
             bean.setPreavvisoMinimoMinuti((Integer) tempistiche.get(
@@ -118,57 +179,16 @@ public class CLIGraphicControllerRegole implements GraphicControllerRegole {
         if (tempistiche.containsKey(GraphicControllerUtils.KEY_DURATA_SLOT_MINUTI)) {
             bean.setDurataSlotMinuti((Integer) tempistiche.get(GraphicControllerUtils.KEY_DURATA_SLOT_MINUTI));
         }
-        
-        LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
-        EsitoOperazioneBean esito = logicController.aggiornaRegolaTempistiche(bean);
-        
-        if (esito != null && esito.isSuccesso()) {
-            if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_REGOLE,
-                        Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
-            }
-        } else {
-            GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
-                    GraphicControllerUtils.PREFIX_REGOLE,
-                    esito != null ? esito.getMessaggio() : "Operazione non riuscita");
-        }
+        return bean;
     }
 
-    @Override
-    public void aggiornaPenalita(Map<String, Object> penalita) {
-        if (penalita == null) {
-                GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
-                    GraphicControllerUtils.PREFIX_REGOLE, "Parametri penalità mancanti");
-            return;
-        }
-        
+    private PenalitaBean buildPenalitaBean(Map<String, Object> penalita) {
         PenalitaBean bean = new PenalitaBean();
         if (penalita.containsKey(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI)) {
             bean.setPreavvisoMinimoMinuti((Integer) penalita.get(
                 GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI));
         }
-        // Nota: BigDecimal per valorePenalita
-        
-        LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
-        EsitoOperazioneBean esito = logicController.aggiornaRegolepenalita(bean);
-        
-        if (esito != null && esito.isSuccesso()) {
-            if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_REGOLE,
-                        Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
-            }
-        } else {
-            GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
-                    GraphicControllerUtils.PREFIX_REGOLE,
-                    esito != null ? esito.getMessaggio() : "Operazione non riuscita");
-        }
-    }
-
-    @Override
-    public void tornaAllaHome() {
-        if (navigator != null) {
-            navigator.goTo(GraphicControllerUtils.ROUTE_HOME);
-        }
+        return bean;
     }
 
 }
