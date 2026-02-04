@@ -81,8 +81,7 @@ public final class Campo implements Serializable {
 
         // Controllo conflitti con prenotazioni dello stesso giorno
         for (Prenotazione p : listaPrenotazioni) {
-            if (p.getData() == null || p.getOraInizio() == null) continue;
-            if (!giorno.equals(p.getData())) continue;
+            if (p.getData() == null || p.getOraInizio() == null || !giorno.equals(p.getData())) continue;
 
             LocalTime pStart = p.getOraInizio();
             LocalTime pEnd   = (p.getOraFine() != null ? p.getOraFine() : pStart);

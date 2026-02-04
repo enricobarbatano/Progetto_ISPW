@@ -11,7 +11,7 @@ public abstract class BaseDAOTest {
     @BeforeAll
     public static void bootstrapDaoFactory() {
         try {
-            DAOFactory.setPersistencyProvider(PersistencyProvider.IN_MEMORY);
+            DAOFactory.initialize(PersistencyProvider.IN_MEMORY, null);
         } catch (IllegalStateException ignored) { /* già configurata */ }
     }
 }

@@ -79,11 +79,19 @@ public class LogicControllerDisdettaPrenotazione {
 
         final List<RiepilogoPrenotazioneBean> out = new ArrayList<>();
         for (Prenotazione p : tutte) {
-            if (p == null) continue;
-            if (p.getStato() == StatoPrenotazione.ANNULLATA) continue;
-
-            final LocalDateTime inizio = LocalDateTime.of(p.getData(), p.getOraInizio());
-            if (!inizio.isAfter(now)) continue; // solo future
+            boolean skip = false;
+            LocalDateTime inizio = null;
+            if (p == null) {
+                skip = true;
+            } else if (p.getStato() == StatoPrenotazione.ANNULLATA) {
+                skip = true;
+            } else if (p.getData() == null || p.getOraInizio() == null) {
+                skip = true;
+            } else {
+                inizio = LocalDateTime.of(p.getData(), p.getOraInizio());
+                if (!inizio.isAfter(now)) skip = true; // solo future
+            }
+            if (skip) continue;
 
             // Importo: se esiste pagamento, usa importoFinale; altrimenti 0 (pren. non pagata)
             float importo = 0f;
