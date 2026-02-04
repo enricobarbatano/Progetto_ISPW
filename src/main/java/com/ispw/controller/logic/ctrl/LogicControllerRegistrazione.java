@@ -51,6 +51,7 @@ public class LogicControllerRegistrazione {
         // 2) Creazione utente (GeneralUser è abstract → uso UtenteFinale)
         final UtenteFinale nuovo = new UtenteFinale();
         nuovo.setNome(datiInput.getNome());
+        nuovo.setCognome(datiInput.getCognome());
         nuovo.setEmail(datiInput.getEmail());
         nuovo.setPassword(datiInput.getPassword()); // accademico: nessun hashing qui
         nuovo.setStatoAccount(StatoAccount.DA_CONFERMARE);
@@ -127,7 +128,8 @@ public class LogicControllerRegistrazione {
     // =========================
 
     private boolean isValid(DatiRegistrazioneBean b) {
-        return b != null && hasText(b.getNome()) && hasText(b.getEmail()) && hasText(b.getPassword());
+        return b != null && hasText(b.getNome()) && hasText(b.getCognome()) 
+                && hasText(b.getEmail()) && hasText(b.getPassword());
     }
     private boolean hasText(String s) { return s != null && !s.trim().isEmpty(); }
 

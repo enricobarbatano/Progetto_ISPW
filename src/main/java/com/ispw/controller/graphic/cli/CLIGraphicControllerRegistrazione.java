@@ -57,9 +57,9 @@ public class CLIGraphicControllerRegistrazione implements GraphicControllerRegis
         // Adatta Map → DatiRegistrazioneBean
         DatiRegistrazioneBean bean = new DatiRegistrazioneBean();
         bean.setNome((String) datiRegistrazione.get("nome"));
+        bean.setCognome((String) datiRegistrazione.get("cognome"));
         bean.setEmail((String) datiRegistrazione.get("email"));
         bean.setPassword((String) datiRegistrazione.get("password"));
-        // Nota: DatiRegistrazioneBean non ha setCognome() o setRuolo()
         
         // Delega a LogicController
         EsitoOperazioneBean esito = logicController.registraNuovoUtente(bean, null);

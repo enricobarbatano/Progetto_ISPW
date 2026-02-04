@@ -83,6 +83,7 @@ class TestControllerGestioneAccount extends BaseDAOTest {
         assertNotNull(out, "DatiAccountBean non nullo");
         assertEquals(u.getIdUtente(), out.getIdUtente());
         assertEquals(u.getNome(), out.getNome());
+        assertEquals(u.getCognome(), out.getCognome());
         assertEquals(email, out.getEmail());
         assertNull(out.getTelefono(), "GeneralUser non espone telefono → null");
         assertNull(out.getIndirizzo(), "GeneralUser non espone indirizzo → null");

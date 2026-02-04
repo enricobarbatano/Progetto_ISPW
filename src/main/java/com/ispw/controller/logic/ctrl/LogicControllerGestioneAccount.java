@@ -70,6 +70,7 @@ public class LogicControllerGestioneAccount {
         DatiAccountBean out = new DatiAccountBean();
         out.setIdUtente(u.getIdUtente());
         out.setNome(u.getNome());
+        out.setCognome(u.getCognome());
         out.setEmail(u.getEmail());
         // Nota: GeneralUser non espone telefono/indirizzo → lasciamo null
         return out;
@@ -104,6 +105,11 @@ public class LogicControllerGestioneAccount {
         // Nome (opzionale)
         if (!isBlank(nuovidati.getNome())) {
             u.setNome(nuovidati.getNome().trim());
+        }
+
+        // Cognome (opzionale)
+        if (!isBlank(nuovidati.getCognome())) {
+            u.setCognome(nuovidati.getCognome().trim());
         }
 
         // Telefono/Indirizzo NON presenti su GeneralUser → ignorati (non fallire)

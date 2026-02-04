@@ -55,7 +55,8 @@ class TestControllerRegistrazione extends BaseDAOTest {
     void testRegistraNuovoUtente_HappyPath() {
         // Arrange
         DatiRegistrazioneBean dati = new DatiRegistrazioneBean();
-        dati.setNome("Mario Rossi");
+        dati.setNome("Mario");
+        dati.setCognome("Rossi");
         dati.setEmail("mario.rossi@example.org");
         dati.setPassword("Secret!23");
 
@@ -93,6 +94,7 @@ class TestControllerRegistrazione extends BaseDAOTest {
         // Arrange: utente pre-esistente
         UtenteFinale esistente = new UtenteFinale();
         esistente.setNome("Mario");
+        esistente.setCognome("Bianchi");
         esistente.setEmail("dup@example.org");
         esistente.setPassword("pwd");
         esistente.setStatoAccount(StatoAccount.DA_CONFERMARE);
@@ -100,7 +102,8 @@ class TestControllerRegistrazione extends BaseDAOTest {
         userDAO.store(esistente);
 
         DatiRegistrazioneBean dati = new DatiRegistrazioneBean();
-        dati.setNome("ANy");
+        dati.setNome("Any");
+        dati.setCognome("Person");
         dati.setEmail("dup@example.org");
         dati.setPassword("x");
 
@@ -125,13 +128,14 @@ class TestControllerRegistrazione extends BaseDAOTest {
         // Arrange: utente registrato
         UtenteFinale u = new UtenteFinale();
         u.setNome("Anna");
+        u.setCognome("Verdi");
         u.setEmail("anna@example.org");
         u.setPassword("pwd");
         u.setStatoAccount(StatoAccount.DA_CONFERMARE);
         u.setRuolo(Ruolo.UTENTE);
         userDAO.store(u);
 
-        UtenteBean ub = new UtenteBean(u.getNome(), null, u.getEmail(), u.getRuolo());
+        UtenteBean ub = new UtenteBean(u.getNome(), u.getCognome(), u.getEmail(), u.getRuolo());
 
         // Act
         controller.confermaNuovoAccount(ub);
@@ -153,6 +157,7 @@ class TestControllerRegistrazione extends BaseDAOTest {
         // Arrange
         UtenteFinale u = new UtenteFinale();
         u.setNome("Luca");
+        u.setCognome("Neri");
         u.setEmail("luca@example.org");
         u.setPassword("pwd");
         u.setStatoAccount(StatoAccount.DA_CONFERMARE);
