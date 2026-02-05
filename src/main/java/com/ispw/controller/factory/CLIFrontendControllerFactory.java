@@ -4,6 +4,7 @@ package com.ispw.controller.factory;
 
 import com.ispw.controller.graphic.GraphicControllerAccount;
 import com.ispw.controller.graphic.GraphicControllerDisdetta;
+import com.ispw.controller.graphic.GraphicControllerLog;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerPenalita;
 import com.ispw.controller.graphic.GraphicControllerPrenotazione;
@@ -13,6 +14,7 @@ import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.GraphicLoginController;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerAccount;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerDisdetta;
+import com.ispw.controller.graphic.cli.CLIGraphicControllerLog;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerNavigation;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerPenalita;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerPrenotazione;
@@ -22,6 +24,7 @@ import com.ispw.controller.graphic.cli.CLIGraphicLoginController;
 import com.ispw.view.cli.CLIAccountView;
 import com.ispw.view.cli.CLIDisdettaView;
 import com.ispw.view.cli.CLIHomeView;
+import com.ispw.view.cli.CLILogView;
 import com.ispw.view.cli.CLILoginView;
 import com.ispw.view.cli.CLIPenalitaView;
 import com.ispw.view.cli.CLIPrenotazioneView;
@@ -39,12 +42,14 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     private CLIDisdettaView disdettaView;
     private CLIRegoleView regoleView;
     private CLIPenalitaView penalitaView;
+    private CLILogView logView;
     private GraphicControllerAccount accountController;
     private GraphicControllerRegistrazione registrazioneController;
     private GraphicControllerPrenotazione prenotazioneController;
     private GraphicControllerDisdetta disdettaController;
     private GraphicControllerRegole regoleController;
     private GraphicControllerPenalita penalitaController;
+    private GraphicControllerLog logController;
 
     @Override
     public void startApplication() {
@@ -126,6 +131,14 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
         return penalitaView;
     }
 
+    public CLILogView createLogView() {
+        if (logView == null) {
+            logView = new CLILogView(
+                (CLIGraphicControllerLog) createLogController());
+        }
+        return logView;
+    }
+
     @Override
     public GraphicControllerAccount createAccountController() {
         if (accountController == null) {
@@ -181,6 +194,15 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     }
 
     @Override
+    public GraphicControllerLog createLogController() {
+        if (logController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            logController = new CLIGraphicControllerLog(navigator);
+        }
+        return logController;
+    }
+
+    @Override
     public GraphicControllerNavigation createNavigationController() {
         if (navigationController == null) {
             navigationController = new CLIGraphicControllerNavigation();
@@ -204,5 +226,6 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
         navigationController.registerRoute(createDisdettaView().getRouteName(), createDisdettaView());
         navigationController.registerRoute(createRegoleView().getRouteName(), createRegoleView());
         navigationController.registerRoute(createPenalitaView().getRouteName(), createPenalitaView());
+        navigationController.registerRoute(createLogView().getRouteName(), createLogView());
     }
 }  

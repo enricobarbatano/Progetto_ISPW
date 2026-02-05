@@ -1,6 +1,7 @@
 package com.ispw.controller.logic.ctrl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -54,6 +55,14 @@ public class LogicControllerGestioneAccount {
     }
     private LogDAO logDAO() {
         return DAOFactory.getInstance().getLogDAO();
+    }
+
+    // =====================================================================================
+    // 0) Log di sistema (gestore)
+    // =====================================================================================
+    public List<SystemLog> listaUltimiLog(int limit) {
+        int safeLimit = limit > 0 ? limit : 20;
+        return logDAO().findLast(safeLimit);
     }
 
     // =====================================================================================

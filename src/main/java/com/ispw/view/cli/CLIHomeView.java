@@ -55,6 +55,7 @@ public class CLIHomeView extends GenericViewCLI implements ViewHomeProfilo, Navi
         } else if (ruolo == Ruolo.GESTORE) {
             System.out.println("2) Regole");
             System.out.println("3) Penalità");
+            System.out.println("4) Log");
         }
         System.out.println("0) Logout");
         System.out.print("Scelta: ");
@@ -66,6 +67,13 @@ public class CLIHomeView extends GenericViewCLI implements ViewHomeProfilo, Navi
                                                     : GraphicControllerUtils.ROUTE_PRENOTAZIONE);
             case "3" -> goTo(ruolo == Ruolo.GESTORE ? GraphicControllerUtils.ROUTE_PENALITA
                                                     : GraphicControllerUtils.ROUTE_DISDETTA);
+            case "4" -> {
+                if (ruolo == Ruolo.GESTORE) {
+                    goTo(GraphicControllerUtils.ROUTE_LOGS);
+                } else {
+                    System.out.println("Scelta non valida");
+                }
+            }
             case "0" -> goTo(GraphicControllerUtils.ROUTE_LOGIN);
             default -> System.out.println("Scelta non valida");
         }

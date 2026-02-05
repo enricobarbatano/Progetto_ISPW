@@ -4,6 +4,7 @@ import java.util.logging.Logger;
 
 import com.ispw.controller.graphic.GraphicControllerAccount;
 import com.ispw.controller.graphic.GraphicControllerDisdetta;
+import com.ispw.controller.graphic.GraphicControllerLog;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerPenalita;
 import com.ispw.controller.graphic.GraphicControllerPrenotazione;
@@ -12,6 +13,7 @@ import com.ispw.controller.graphic.GraphicControllerRegole;
 import com.ispw.controller.graphic.GraphicLoginController;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerAccount;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerDisdetta;
+import com.ispw.controller.graphic.gui.GUIGraphicControllerLog;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerNavigation;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerPenalita;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerPrenotazione;
@@ -21,6 +23,7 @@ import com.ispw.controller.graphic.gui.GUIGraphicLoginController;
 import com.ispw.view.gui.GUIAccountView;
 import com.ispw.view.gui.GUIDisdettaView;
 import com.ispw.view.gui.GUIHomeView;
+import com.ispw.view.gui.GUILogView;
 import com.ispw.view.gui.GUILoginView;
 import com.ispw.view.gui.GUIPenalitaView;
 import com.ispw.view.gui.GUIPrenotazioneView;
@@ -41,12 +44,14 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
     private GUIDisdettaView disdettaView;
     private GUIRegoleView regoleView;
     private GUIPenalitaView penalitaView;
+    private GUILogView logView;
     private GraphicControllerAccount accountController;
     private GraphicControllerRegistrazione registrazioneController;
     private GraphicControllerPrenotazione prenotazioneController;
     private GraphicControllerDisdetta disdettaController;
     private GraphicControllerRegole regoleController;
     private GraphicControllerPenalita penalitaController;
+    private GraphicControllerLog logController;
 
     @Override
     public void startApplication() {
@@ -127,6 +132,14 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
         return penalitaView;
     }
 
+    public GUILogView createLogView() {
+        if (logView == null) {
+            logView = new GUILogView(
+                (GUIGraphicControllerLog) createLogController());
+        }
+        return logView;
+    }
+
     @Override
     public GraphicControllerAccount createAccountController() {
         if (accountController == null) {
@@ -182,6 +195,15 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
     }
 
     @Override
+    public GraphicControllerLog createLogController() {
+        if (logController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            logController = new GUIGraphicControllerLog(navigator);
+        }
+        return logController;
+    }
+
+    @Override
     public GraphicControllerNavigation createNavigationController() {
         if (navigationController == null) {
             navigationController = new GUIGraphicControllerNavigation();
@@ -205,6 +227,7 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
         navigationController.registerRoute(createDisdettaView().getRouteName(), createDisdettaView());
         navigationController.registerRoute(createRegoleView().getRouteName(), createRegoleView());
         navigationController.registerRoute(createPenalitaView().getRouteName(), createPenalitaView());
+        navigationController.registerRoute(createLogView().getRouteName(), createLogView());
     }
 } 
 

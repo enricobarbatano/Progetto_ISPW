@@ -8,7 +8,6 @@ import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerAccount;
 import com.ispw.view.interfaces.ViewGestioneAccount;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -41,10 +40,10 @@ public class GUIAccountView extends GenericViewGUI implements ViewGestioneAccoun
     @Override
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
-        VBox root = buildRoot();
+        VBox root = GuiViewUtils.createRoot();
         Label title = new Label("Account");
-        Label error = buildErrorLabel();
-        Label success = buildSuccessLabel();
+        Label error = GuiViewUtils.buildErrorLabel(getLastError());
+        Label success = GuiViewUtils.buildSuccessLabel(getLastSuccess());
 
         TextField nome = new TextField();
         TextField cognome = new TextField();
@@ -81,37 +80,11 @@ public class GUIAccountView extends GenericViewGUI implements ViewGestioneAccoun
         Button logout = new Button("Logout");
         logout.setOnAction(e -> controller.logout());
 
-        Button home = new Button("Home");
-        home.setOnAction(e -> controller.tornaAllaHome(sessione));
+        Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome(sessione));
 
         root.getChildren().addAll(title, error, success, nome, cognome, email, load, update, oldPwd, newPwd,
             changePwd, logout, home);
         GuiLauncher.setRoot(root);
-    }
-
-    private VBox buildRoot() {
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(16));
-        return root;
-    }
-
-    private Label buildErrorLabel() {
-        Label error = new Label();
-        error.setStyle("-fx-text-fill: red;");
-        String err = getLastError();
-        if (err != null && !err.isBlank()) {
-            error.setText(err);
-        }
-        return error;
-    }
-
-    private Label buildSuccessLabel() {
-        Label success = new Label();
-        String ok = getLastSuccess();
-        if (ok != null && !ok.isBlank()) {
-            success.setText(ok);
-        }
-        return success;
     }
 
     private void setupAccountFields(TextField nome, TextField cognome, TextField email) {

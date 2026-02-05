@@ -2,6 +2,7 @@ package com.ispw.controller.factory;
 
 import com.ispw.controller.graphic.GraphicControllerAccount;
 import com.ispw.controller.graphic.GraphicControllerDisdetta;
+import com.ispw.controller.graphic.GraphicControllerLog;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerPenalita;
 import com.ispw.controller.graphic.GraphicControllerPrenotazione;
@@ -48,6 +49,7 @@ public abstract class FrontendControllerFactory {
     public abstract GraphicControllerDisdetta createDisdettaController();
     public abstract GraphicControllerRegole createRegoleController();
     public abstract GraphicControllerPenalita createPenalitaController();
+    public abstract GraphicControllerLog createLogController();
     public abstract GraphicControllerNavigation createNavigationController();
 }
 

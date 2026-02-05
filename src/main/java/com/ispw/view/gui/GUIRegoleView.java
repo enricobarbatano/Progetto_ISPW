@@ -10,7 +10,6 @@ import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerRegole;
 import com.ispw.view.interfaces.ViewGestioneRegole;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -45,21 +44,11 @@ public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole,
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(16));
+        VBox root = GuiViewUtils.createRoot();
 
         Label title = new Label("Regole");
-        Label error = new Label();
-        error.setStyle("-fx-text-fill: red;");
-        String err = getLastError();
-        if (err != null && !err.isBlank()) {
-            error.setText(err);
-        }
-        Label ok = new Label();
-        String success = getLastSuccess();
-        if (success != null && !success.isBlank()) {
-            ok.setText(success);
-        }
+        Label error = GuiViewUtils.buildErrorLabel(getLastError());
+        Label ok = GuiViewUtils.buildSuccessLabel(getLastSuccess());
 
         ListView<String> campiList = new ListView<>();
         Object rawCampi = lastParams.get(GraphicControllerUtils.KEY_CAMPI);
@@ -126,8 +115,7 @@ public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole,
             }
         });
 
-        Button home = new Button("Home");
-        home.setOnAction(e -> controller.tornaAllaHome());
+        Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome());
 
         root.getChildren().addAll(title, error, ok, campiList, idCampo, lista, seleziona, attivo, manut,
             aggiornaStato, durata, apertura, chiusura, preavviso, aggiornaTemp, valorePen, aggiornaPen, home);

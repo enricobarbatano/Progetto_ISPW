@@ -8,7 +8,6 @@ import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerPenalita;
 import com.ispw.view.interfaces.ViewGestionePenalita;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -42,21 +41,11 @@ public class GUIPenalitaView extends GenericViewGUI implements ViewGestionePenal
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(16));
+        VBox root = GuiViewUtils.createRoot();
 
         Label title = new Label("Penalità");
-        Label error = new Label();
-        error.setStyle("-fx-text-fill: red;");
-        String err = getLastError();
-        if (err != null && !err.isBlank()) {
-            error.setText(err);
-        }
-        Label ok = new Label();
-        String success = getLastSuccess();
-        if (success != null && !success.isBlank()) {
-            ok.setText(success);
-        }
+        Label error = GuiViewUtils.buildErrorLabel(getLastError());
+        Label ok = GuiViewUtils.buildSuccessLabel(getLastSuccess());
 
         ListView<String> utentiList = new ListView<>();
         Object rawUtenti = lastParams.get(GraphicControllerUtils.KEY_UTENTI);
@@ -82,8 +71,7 @@ public class GUIPenalitaView extends GenericViewGUI implements ViewGestionePenal
             Float.parseFloat(importo.getText().trim()),
             motivazione.getText()));
 
-        Button home = new Button("Home");
-        home.setOnAction(e -> controller.tornaAllaHome());
+        Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome());
 
         root.getChildren().addAll(title, error, ok, utentiList, idUtente, importo, motivazione, lista, applica, home);
         GuiLauncher.setRoot(root);

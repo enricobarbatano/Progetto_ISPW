@@ -9,7 +9,6 @@ import com.ispw.controller.graphic.NavigableController;
 import com.ispw.model.enums.Ruolo;
 import com.ispw.view.interfaces.ViewHomeProfilo;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
@@ -41,8 +40,7 @@ public class GUIHomeView extends GenericViewGUI implements ViewHomeProfilo, Navi
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(16));
+        VBox root = GuiViewUtils.createRoot();
 
         Label title = new Label("Home");
         SessioneUtenteBean s = sessione;
@@ -60,10 +58,17 @@ public class GUIHomeView extends GenericViewGUI implements ViewHomeProfilo, Navi
         op2.setOnAction(e -> goTo(ruolo == Ruolo.GESTORE ? GraphicControllerUtils.ROUTE_PENALITA
                                                          : GraphicControllerUtils.ROUTE_DISDETTA));
 
+        Button logBtn = new Button("Log");
+        logBtn.setOnAction(e -> goTo(GraphicControllerUtils.ROUTE_LOGS));
+
         Button logout = new Button("Logout");
         logout.setOnAction(e -> goTo(GraphicControllerUtils.ROUTE_LOGIN));
 
-        root.getChildren().addAll(title, ruoloLabel, account, op1, op2, logout);
+        if (ruolo == Ruolo.GESTORE) {
+            root.getChildren().addAll(title, ruoloLabel, account, op1, op2, logBtn, logout);
+        } else {
+            root.getChildren().addAll(title, ruoloLabel, account, op1, op2, logout);
+        }
         GuiLauncher.setRoot(root);
     }
 

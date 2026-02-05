@@ -41,6 +41,7 @@ public final class GraphicControllerUtils {
     public static final String KEY_SLOT_DISPONIBILI = "slotDisponibili";
     public static final String KEY_SESSIONE = "sessione";
     public static final String KEY_UTENTI = "utenti";
+    public static final String KEY_LOGS = "logs";
 
     public static final String ROUTE_LOGIN = "login";
     public static final String ROUTE_HOME = "home";
@@ -50,6 +51,7 @@ public final class GraphicControllerUtils {
     public static final String ROUTE_DISDETTA = "disdetta";
     public static final String ROUTE_REGOLE = "regole";
     public static final String ROUTE_PENALITA = "penalita";
+    public static final String ROUTE_LOGS = "logs";
 
     public static final String PREFIX_LOGIN = "[LOGIN]";
     public static final String PREFIX_REGISTRAZIONE = "[REGISTRAZIONE]";

@@ -7,7 +7,6 @@ import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.gui.GUIGraphicLoginController;
 import com.ispw.view.interfaces.ViewLogin;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -45,12 +44,10 @@ public class GUILoginView extends GenericViewGUI implements ViewLogin, Navigable
         super.onShow(params);
         sessione = null;
 
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(16));
+        VBox root = GuiViewUtils.createRoot();
 
         Label title = new Label("Login");
-        errorLabel = new Label();
-        errorLabel.setStyle("-fx-text-fill: red;");
+        errorLabel = GuiViewUtils.buildErrorLabel(getLastError());
 
         emailField = new TextField();
         emailField.setPromptText("Email");
@@ -63,10 +60,7 @@ public class GUILoginView extends GenericViewGUI implements ViewLogin, Navigable
         Button regBtn = new Button("Registrazione");
         regBtn.setOnAction(e -> controller.vaiARegistrazione());
 
-        String err = getLastError();
-        if (err != null && !err.isBlank()) {
-            errorLabel.setText(err);
-        } else {
+        if (errorLabel.getText() == null) {
             errorLabel.setText("");
         }
 

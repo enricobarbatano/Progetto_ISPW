@@ -8,7 +8,6 @@ import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerDisdetta;
 import com.ispw.view.interfaces.ViewDisdettaPrenotazione;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -56,11 +55,9 @@ public class GUIDisdettaView extends GenericViewGUI implements ViewDisdettaPreno
     }
 
     private void renderMessage(String msg) {
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(16));
+        VBox root = GuiViewUtils.createRoot();
         root.getChildren().add(new Label(msg));
-        Button home = new Button("Home");
-        home.setOnAction(e -> controller.tornaAllaHome());
+        Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome());
         root.getChildren().add(home);
         GuiLauncher.setRoot(root);
     }
@@ -71,8 +68,7 @@ public class GUIDisdettaView extends GenericViewGUI implements ViewDisdettaPreno
         @SuppressWarnings("unchecked")
         List<String> list = (List<String>) elenco;
 
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(16));
+        VBox root = GuiViewUtils.createRoot();
         root.getChildren().add(new Label("Prenotazioni cancellabili"));
 
         ListView<String> listView = new ListView<>();
@@ -87,8 +83,7 @@ public class GUIDisdettaView extends GenericViewGUI implements ViewDisdettaPreno
             controller.richiediAnteprimaDisdetta(id, sessione);
         });
 
-        Button home = new Button("Home");
-        home.setOnAction(e -> controller.tornaAllaHome());
+        Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome());
 
         root.getChildren().addAll(listView, idField, anteprima, home);
         GuiLauncher.setRoot(root);
@@ -104,8 +99,7 @@ public class GUIDisdettaView extends GenericViewGUI implements ViewDisdettaPreno
         boolean poss = possibile instanceof Boolean b && b;
         float pen = penale instanceof Number n ? n.floatValue() : 0f;
 
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(16));
+        VBox root = GuiViewUtils.createRoot();
         root.getChildren().add(new Label("Anteprima disdetta"));
         root.getChildren().add(new Label("Possibile: " + poss + " - penale: " + pen + "€"));
 
@@ -118,8 +112,7 @@ public class GUIDisdettaView extends GenericViewGUI implements ViewDisdettaPreno
             controller.confermaDisdetta(id, sessione);
         });
 
-        Button home = new Button("Home");
-        home.setOnAction(e -> controller.tornaAllaHome());
+        Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome());
 
         root.getChildren().addAll(idField, conferma, home);
         GuiLauncher.setRoot(root);

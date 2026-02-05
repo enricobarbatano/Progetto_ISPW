@@ -8,7 +8,6 @@ import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerRegistrazione;
 import com.ispw.view.interfaces.ViewRegistrazione;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -43,16 +42,10 @@ public class GUIRegistrazioneView extends GenericViewGUI implements ViewRegistra
         super.onShow(params);
         sessione = null;
 
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(16));
+        VBox root = GuiViewUtils.createRoot();
 
         Label title = new Label("Registrazione");
-        Label error = new Label();
-        error.setStyle("-fx-text-fill: red;");
-        String err = getLastError();
-        if (err != null && !err.isBlank()) {
-            error.setText(err);
-        }
+        Label error = GuiViewUtils.buildErrorLabel(getLastError());
 
         TextField nome = new TextField();
         nome.setPromptText("Nome");

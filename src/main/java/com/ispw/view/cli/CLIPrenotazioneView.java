@@ -140,11 +140,7 @@ public class CLIPrenotazioneView extends GenericViewCLI implements ViewGestioneP
 
         String esito = PrenotazioneViewUtils.formatEsitoPagamento(success, stato, msg);
         pagamentoView.showPaymentOutcome(esito);
-        System.out.print("Torna alla home? [s/N]: ");
-        String ans = in.nextLine().trim();
-        if ("s".equalsIgnoreCase(ans)) {
-            controller.tornaAllaHome();
-        }
+        CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
         return true;
     }
     // The parseSlot method and SlotInfo record are now handled by PrenotazioneViewUtils

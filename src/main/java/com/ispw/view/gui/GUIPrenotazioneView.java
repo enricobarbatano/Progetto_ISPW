@@ -9,7 +9,6 @@ import com.ispw.controller.graphic.gui.GUIGraphicControllerPrenotazione;
 import com.ispw.view.interfaces.ViewGestionePrenotazione;
 import com.ispw.view.shared.PrenotazioneViewUtils;
 
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -65,8 +64,7 @@ public class GUIPrenotazioneView extends GenericViewGUI implements ViewGestioneP
     }
 
     private void renderMessage(String msg) {
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(16));
+        VBox root = GuiViewUtils.createRoot();
         root.getChildren().add(new Label(msg));
         GuiLauncher.setRoot(root);
     }
@@ -77,8 +75,7 @@ public class GUIPrenotazioneView extends GenericViewGUI implements ViewGestioneP
         @SuppressWarnings("unchecked")
         List<String> slots = (List<String>) slotsObj;
 
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(16));
+        VBox root = GuiViewUtils.createRoot();
         root.getChildren().add(new Label("Slot disponibili"));
 
         ListView<String> list = new ListView<>();
@@ -107,14 +104,13 @@ public class GUIPrenotazioneView extends GenericViewGUI implements ViewGestioneP
         Object importo = riepilogo.get(GraphicControllerUtils.KEY_IMPORTO_TOTALE);
         float importoVal = (importo instanceof Number n) ? n.floatValue() : 0f;
 
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(16));
+        VBox root = GuiViewUtils.createRoot();
         root.getChildren().addAll(new Label("Riepilogo prenotazione"), new Label(String.valueOf(riepilogoStr)));
 
         TextField metodo = new TextField("PAYPAL");
         metodo.setPromptText("Metodo");
         TextField cred = new TextField();
-        cred.setPromptText("Credenziale/Token/Email");
+        cred.setPromptText("Inserisci il codice fiscale per la fatturazione");
 
         Button paga = new Button("Paga");
         paga.setOnAction(e -> controller.procediAlPagamentoRaw(metodo.getText(), cred.getText(), importoVal, sessione));
@@ -132,13 +128,11 @@ public class GUIPrenotazioneView extends GenericViewGUI implements ViewGestioneP
         Object stato = pagamento.get(GraphicControllerUtils.KEY_STATO);
         Object msg = pagamento.get(GraphicControllerUtils.KEY_MESSAGGIO);
 
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(16));
+        VBox root = GuiViewUtils.createRoot();
         root.getChildren().add(new Label("Esito pagamento"));
         root.getChildren().add(new Label(PrenotazioneViewUtils.formatEsitoPagamento(success, stato, msg)));
 
-        Button home = new Button("Home");
-        home.setOnAction(e -> controller.tornaAllaHome());
+        Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome());
         root.getChildren().add(home);
 
         GuiLauncher.setRoot(root);
@@ -146,8 +140,7 @@ public class GUIPrenotazioneView extends GenericViewGUI implements ViewGestioneP
     }
 
     private void renderSearch(List<String> campi) {
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(16));
+        VBox root = GuiViewUtils.createRoot();
 
         Label title = new Label("Prenotazione");
         ListView<String> campiList = new ListView<>();
