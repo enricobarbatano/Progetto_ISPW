@@ -15,7 +15,6 @@ import com.ispw.bean.StatoPagamentoBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerPrenotazione;
 import com.ispw.controller.graphic.GraphicControllerUtils;
-import com.ispw.controller.logic.ctrl.LogicControllerPrenotazioneCampo;
 
 /**
  * Classe astratta che centralizza la logica comune dei controller grafici Prenotazione
@@ -37,6 +36,14 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
 
     protected abstract void goToHome();
 
+    protected abstract List<String> trovaSlotDisponibili(ParametriVerificaBean input);
+
+    protected abstract RiepilogoPrenotazioneBean nuovaPrenotazione(DatiInputPrenotazioneBean input,
+                                                                   SessioneUtenteBean sessione);
+
+    protected abstract StatoPagamentoBean completaPrenotazione(DatiPagamentoBean pagamento,
+                                                               SessioneUtenteBean sessione);
+
     @Override
     public String getRouteName() {
         return GraphicControllerUtils.ROUTE_PRENOTAZIONE;
@@ -55,10 +62,7 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
         }
 
         try {
-            LogicControllerPrenotazioneCampo logicController = new LogicControllerPrenotazioneCampo();
-            List<String> slot = logicController.trovaSlotDisponibili(input).stream()
-                .map(s -> s.getData() + " " + s.getOraInizio() + "-" + s.getOraFine() + " (€" + s.getCosto() + ")")
-                .toList();
+            List<String> slot = trovaSlotDisponibili(input);
 
             if (navigator != null) {
                 navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE,
@@ -81,8 +85,7 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
         }
 
         try {
-            LogicControllerPrenotazioneCampo logicController = new LogicControllerPrenotazioneCampo();
-            RiepilogoPrenotazioneBean riepilogo = logicController.nuovaPrenotazione(input, sessione);
+            RiepilogoPrenotazioneBean riepilogo = nuovaPrenotazione(input, sessione);
 
             if (riepilogo == null) {
                 notifyPrenotazioneError(GraphicControllerUtils.MSG_PRENOTAZIONE_NON_CREATA);
@@ -115,8 +118,7 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
         }
 
         try {
-            LogicControllerPrenotazioneCampo logicController = new LogicControllerPrenotazioneCampo();
-            StatoPagamentoBean esito = logicController.completaPrenotazione(pagamento, sessione);
+            StatoPagamentoBean esito = completaPrenotazione(pagamento, sessione);
 
             if (esito == null) {
                 notifyPrenotazioneError(GraphicControllerUtils.MSG_PAGAMENTO_NON_COMPLETATO);

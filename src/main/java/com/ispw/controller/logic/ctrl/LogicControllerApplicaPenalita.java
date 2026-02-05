@@ -3,6 +3,7 @@ package com.ispw.controller.logic.ctrl;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,6 +24,7 @@ import com.ispw.model.entity.GeneralUser;
 import com.ispw.model.entity.Penalita;
 import com.ispw.model.entity.RegolePenalita;
 import com.ispw.model.entity.SystemLog;
+import com.ispw.model.enums.Ruolo;
 import com.ispw.model.enums.StatoAccount;
 
 /**
@@ -65,6 +67,13 @@ public final class LogicControllerApplicaPenalita {
                 new LogicControllerGestionePagamento(),
                 new LogicControllerGestioneFattura(),
                 new LogicControllerGestioneNotifica());
+    }
+
+    public List<String> listaUtentiPerPenalita() {
+        return userDAO().findAll().stream()
+            .filter(u -> u != null && u.getRuolo() == Ruolo.UTENTE)
+            .map(this::formatUtente)
+            .toList();
     }
 
     public EsitoOperazioneBean applicaSanzione(DatiPenalitaBean dati,
@@ -281,6 +290,11 @@ public final class LogicControllerApplicaPenalita {
 
     private Logger log() {
         return LOGGER;
+    }
+
+    private String formatUtente(GeneralUser u) {
+        String email = u.getEmail() != null ? u.getEmail() : "";
+        return String.format("#%d - %s (%s)", u.getIdUtente(), email, u.getRuolo());
     }
 
     /** Costruisce l'esito (no reflection: usiamo direttamente i setter reali). */

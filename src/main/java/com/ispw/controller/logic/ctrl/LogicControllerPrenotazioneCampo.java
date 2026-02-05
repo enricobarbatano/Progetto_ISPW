@@ -60,6 +60,20 @@ public class LogicControllerPrenotazioneCampo {
     private PagamentoDAO    pagamentoDAO()    { return DAOFactory.getInstance().getPagamentoDAO(); }
 
     // =============================================================================
+    // 0) Lista campi (supporto UI prenotazione)
+    // =============================================================================
+    public List<String> listaCampi() {
+        return campoDAO().findAll().stream()
+            .map(c -> String.format("#%d - %s (%s) [attivo=%s, manutenzione=%s]",
+                c.getIdCampo(),
+                c.getNome(),
+                c.getTipoSport(),
+                c.isAttivo(),
+                c.isFlagManutenzione()))
+            .toList();
+    }
+
+    // =============================================================================
     // 1) TROVA SLOT DISPONIBILI
     // =============================================================================
     public List<DatiDisponibilitaBean> trovaSlotDisponibili(ParametriVerificaBean param) {

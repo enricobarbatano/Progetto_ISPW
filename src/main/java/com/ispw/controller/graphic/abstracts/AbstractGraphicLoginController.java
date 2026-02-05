@@ -8,7 +8,6 @@ import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.GraphicLoginController;
-import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccesso;
 
 /**
  * Classe astratta che centralizza la logica comune dei controller grafici Login
@@ -34,6 +33,10 @@ public abstract class AbstractGraphicLoginController implements GraphicLoginCont
 
     protected abstract void goToHome(SessioneUtenteBean sessione);
 
+    protected abstract SessioneUtenteBean verificaCredenziali(DatiLoginBean credenziali);
+
+    protected abstract void salvaLog(SessioneUtenteBean sessione);
+
     @Override
     public String getRouteName() {
         return GraphicControllerUtils.ROUTE_LOGIN;
@@ -51,11 +54,10 @@ public abstract class AbstractGraphicLoginController implements GraphicLoginCont
             return;
         }
 
-        LogicControllerGestioneAccesso logicController = new LogicControllerGestioneAccesso();
         try {
-            SessioneUtenteBean sessione = logicController.verificaCredenziali(credenziali);
+            SessioneUtenteBean sessione = verificaCredenziali(credenziali);
             if (sessione != null) {
-                logicController.saveLog(sessione);
+                salvaLog(sessione);
                 goToHome(sessione);
             } else {
                 goToLoginWithError(GraphicControllerUtils.MSG_CREDENZIALI_NON_VALIDE);

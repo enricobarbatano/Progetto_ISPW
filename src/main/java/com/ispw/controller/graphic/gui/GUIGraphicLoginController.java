@@ -3,9 +3,12 @@ package com.ispw.controller.graphic.gui;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import com.ispw.bean.DatiLoginBean;
+import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicLoginController;
+import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccesso;
 
 /**
  * Adapter GUI per il login (JavaFX/Swing).
@@ -43,7 +46,7 @@ public class GUIGraphicLoginController extends AbstractGraphicLoginController {
     }
 
     @Override
-    protected void goToHome(com.ispw.bean.SessioneUtenteBean sessione) {
+    protected void goToHome(SessioneUtenteBean sessione) {
         if (navigator != null) {
             if (sessione == null) {
                 navigator.goTo(GraphicControllerUtils.ROUTE_HOME, null);
@@ -52,5 +55,26 @@ public class GUIGraphicLoginController extends AbstractGraphicLoginController {
                     Map.of(GraphicControllerUtils.KEY_SESSIONE, sessione));
             }
         }
+    }
+
+    @Override
+    protected SessioneUtenteBean verificaCredenziali(DatiLoginBean credenziali) {
+        return new LogicControllerGestioneAccesso().verificaCredenziali(credenziali);
+    }
+
+    @Override
+    protected void salvaLog(SessioneUtenteBean sessione) {
+        new LogicControllerGestioneAccesso().saveLog(sessione);
+    }
+
+    /**
+     * Login con dati grezzi: l’adattamento in bean resta nel controller grafico.
+     */
+    public void effettuaLoginRaw(String email, String password) {
+        if (email == null && password == null) {
+            effettuaLogin(null);
+            return;
+        }
+        effettuaLogin(new DatiLoginBean(email, password));
     }
 }

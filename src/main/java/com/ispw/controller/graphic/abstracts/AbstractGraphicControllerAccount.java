@@ -11,7 +11,6 @@ import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.controller.graphic.GraphicControllerAccount;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
-import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccount;
 
 /**
  * Classe astratta che centralizza la logica comune dei controller grafici Account
@@ -31,6 +30,13 @@ public abstract class AbstractGraphicControllerAccount implements GraphicControl
 
     protected abstract void goToLogin();
 
+    protected abstract DatiAccountBean recuperaInformazioniAccount(SessioneUtenteBean sessione);
+
+    protected abstract EsitoOperazioneBean aggiornaDatiAccountConNotifica(DatiAccountBean bean);
+
+    protected abstract EsitoOperazioneBean cambiaPasswordConNotifica(String vecchiaPassword, String nuovaPassword,
+                                                                     SessioneUtenteBean sessione);
+
     @Override
     public String getRouteName() {
         return GraphicControllerUtils.ROUTE_ACCOUNT;
@@ -48,8 +54,7 @@ public abstract class AbstractGraphicControllerAccount implements GraphicControl
         }
 
         try {
-            LogicControllerGestioneAccount logicController = new LogicControllerGestioneAccount();
-            DatiAccountBean dati = logicController.recuperaInformazioniAccount(sessione);
+            DatiAccountBean dati = recuperaInformazioniAccount(sessione);
 
             if (dati == null) {
                 notifyAccountError(GraphicControllerUtils.MSG_IMPOSSIBILE_RECUPERARE_DATI_ACCOUNT);
@@ -77,8 +82,7 @@ public abstract class AbstractGraphicControllerAccount implements GraphicControl
 
         DatiAccountBean bean = buildAccountBean(nuoviDati, id);
 
-        LogicControllerGestioneAccount logicController = new LogicControllerGestioneAccount();
-        EsitoOperazioneBean esito = logicController.aggiornaDatiAccountConNotifica(bean);
+        EsitoOperazioneBean esito = aggiornaDatiAccountConNotifica(bean);
 
         if (esito != null && esito.isSuccesso()) {
             navigateSuccess(esito.getMessaggio());
@@ -98,8 +102,7 @@ public abstract class AbstractGraphicControllerAccount implements GraphicControl
             return;
         }
 
-        LogicControllerGestioneAccount logicController = new LogicControllerGestioneAccount();
-        EsitoOperazioneBean esito = logicController.cambiaPasswordConNotifica(vecchiaPassword, nuovaPassword, sessione);
+        EsitoOperazioneBean esito = cambiaPasswordConNotifica(vecchiaPassword, nuovaPassword, sessione);
 
         if (esito != null && esito.isSuccesso()) {
             navigateSuccess(esito.getMessaggio());

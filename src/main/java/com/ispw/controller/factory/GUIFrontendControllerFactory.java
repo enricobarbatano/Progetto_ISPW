@@ -18,12 +18,29 @@ import com.ispw.controller.graphic.gui.GUIGraphicControllerPrenotazione;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerRegistrazione;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerRegole;
 import com.ispw.controller.graphic.gui.GUIGraphicLoginController;
+import com.ispw.view.gui.GUIAccountView;
+import com.ispw.view.gui.GUIDisdettaView;
+import com.ispw.view.gui.GUIHomeView;
+import com.ispw.view.gui.GUILoginView;
+import com.ispw.view.gui.GUIPenalitaView;
+import com.ispw.view.gui.GUIPrenotazioneView;
+import com.ispw.view.gui.GUIRegistrazioneView;
+import com.ispw.view.gui.GUIRegoleView;
+import com.ispw.view.gui.GuiLauncher;
 
 public final class GUIFrontendControllerFactory extends FrontendControllerFactory {
 
     private static final Logger logger = Logger.getLogger(GUIFrontendControllerFactory.class.getName());
     private GUIGraphicControllerNavigation navigationController;
-    private GraphicLoginController loginController;
+    private GUIGraphicLoginController loginController;
+    private GUILoginView loginView;
+    private GUIHomeView homeView;
+    private GUIRegistrazioneView registrazioneView;
+    private GUIAccountView accountView;
+    private GUIPrenotazioneView prenotazioneView;
+    private GUIDisdettaView disdettaView;
+    private GUIRegoleView regoleView;
+    private GUIPenalitaView penalitaView;
     private GraphicControllerAccount accountController;
     private GraphicControllerRegistrazione registrazioneController;
     private GraphicControllerPrenotazione prenotazioneController;
@@ -34,10 +51,7 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
     @Override
     public void startApplication() {
         logger.info("Avvio GUI...");
-        // Avvia il flusso con la schermata di login
-        GraphicLoginController loginGraphicController = createLoginController();
-        loginGraphicController.onShow(null);
-        // La GUI leggerà input dalla finestra e chiamerà loginController.effettuaLogin(...)
+        GuiLauncher.launchApp(() -> getNavigationController().goTo(com.ispw.controller.graphic.GraphicControllerUtils.ROUTE_LOGIN));
     }
 
     @Override
@@ -47,6 +61,70 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
             loginController = new GUIGraphicLoginController(navigator);
         }
         return loginController;
+    }
+
+    public GUILoginView createLoginView() {
+        if (loginView == null) {
+            loginView = new GUILoginView(loginController == null
+                ? (GUIGraphicLoginController) createLoginController()
+                : loginController);
+        }
+        return loginView;
+    }
+
+    public GUIHomeView createHomeView() {
+        if (homeView == null) {
+            homeView = new GUIHomeView(getNavigationController());
+        }
+        return homeView;
+    }
+
+    public GUIRegistrazioneView createRegistrazioneView() {
+        if (registrazioneView == null) {
+            registrazioneView = new GUIRegistrazioneView(
+                (GUIGraphicControllerRegistrazione) createRegistrazioneController());
+        }
+        return registrazioneView;
+    }
+
+    public GUIAccountView createAccountView() {
+        if (accountView == null) {
+            accountView = new GUIAccountView(
+                (GUIGraphicControllerAccount) createAccountController());
+        }
+        return accountView;
+    }
+
+    public GUIPrenotazioneView createPrenotazioneView() {
+        if (prenotazioneView == null) {
+            prenotazioneView = new GUIPrenotazioneView(
+                (GUIGraphicControllerPrenotazione) createPrenotazioneController());
+        }
+        return prenotazioneView;
+    }
+
+    public GUIDisdettaView createDisdettaView() {
+        if (disdettaView == null) {
+            disdettaView = new GUIDisdettaView(
+                (GUIGraphicControllerDisdetta) createDisdettaController());
+        }
+        return disdettaView;
+    }
+
+    public GUIRegoleView createRegoleView() {
+        if (regoleView == null) {
+            regoleView = new GUIRegoleView(
+                (GUIGraphicControllerRegole) createRegoleController());
+        }
+        return regoleView;
+    }
+
+    public GUIPenalitaView createPenalitaView() {
+        if (penalitaView == null) {
+            penalitaView = new GUIPenalitaView(
+                (GUIGraphicControllerPenalita) createPenalitaController());
+        }
+        return penalitaView;
     }
 
     @Override
@@ -119,13 +197,14 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
     private void registerRoutes() {
         // Registrazione nelle factory concrete: conoscono i controller GUI reali e il navigator concreto.
         // Nell'astratta introdurrebbe dipendenze verso classi concrete, violando il disaccoppiamento.
-        navigationController.registerRoute(createLoginController().getRouteName(), createLoginController());
-        navigationController.registerRoute(createAccountController().getRouteName(), createAccountController());
-        navigationController.registerRoute(createRegistrazioneController().getRouteName(), createRegistrazioneController());
-        navigationController.registerRoute(createPrenotazioneController().getRouteName(), createPrenotazioneController());
-        navigationController.registerRoute(createDisdettaController().getRouteName(), createDisdettaController());
-        navigationController.registerRoute(createRegoleController().getRouteName(), createRegoleController());
-        navigationController.registerRoute(createPenalitaController().getRouteName(), createPenalitaController());
+        navigationController.registerRoute(createLoginView().getRouteName(), createLoginView());
+        navigationController.registerRoute(createHomeView().getRouteName(), createHomeView());
+        navigationController.registerRoute(createAccountView().getRouteName(), createAccountView());
+        navigationController.registerRoute(createRegistrazioneView().getRouteName(), createRegistrazioneView());
+        navigationController.registerRoute(createPrenotazioneView().getRouteName(), createPrenotazioneView());
+        navigationController.registerRoute(createDisdettaView().getRouteName(), createDisdettaView());
+        navigationController.registerRoute(createRegoleView().getRouteName(), createRegoleView());
+        navigationController.registerRoute(createPenalitaView().getRouteName(), createPenalitaView());
     }
 } 
 

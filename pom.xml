@@ -15,6 +15,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
+    <javafx.version>21.0.2</javafx.version>
   </properties>
 
   <!-- Mantieni pure il tuo dependencyManagement con junit-bom -->
@@ -59,6 +60,18 @@
       <groupId>com.mysql</groupId>
       <artifactId>mysql-connector-j</artifactId>
       <version>9.5.0</version>
+    </dependency>
+
+    <!-- JavaFX (GUI) -->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+      <version>${javafx.version}</version>
     </dependency>
   </dependencies>
 
@@ -141,6 +154,16 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- JavaFX plugin per esecuzione GUI -->
+      <plugin>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-maven-plugin</artifactId>
+        <version>0.0.8</version>
+        <configuration>
+          <mainClass>com.ispw.App</mainClass>
+        </configuration>
       </plugin>
     </plugins>
   </build>

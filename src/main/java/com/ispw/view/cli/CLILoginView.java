@@ -46,7 +46,12 @@ public class CLILoginView extends GenericViewCLI implements ViewLogin, Navigable
 
         sessione = null;
 
+        String err = getLastError();
         console.render();
+
+        if (err != null && !err.isBlank()) {
+            console.showError(err);
+        }
 
         String choice = console.readChoice();
         if ("2".equals(choice)) {
@@ -54,12 +59,12 @@ public class CLILoginView extends GenericViewCLI implements ViewLogin, Navigable
             return;
         }
 
-        String err = getLastError();
-        if (err != null && !err.isBlank()) {
-            console.showError(err);
+        String email;
+        if (choice != null && choice.contains("@")) {
+            email = choice;
+        } else {
+            email = console.readEmail();
         }
-
-        String email = console.readEmail();
         String password = console.readPassword();
         controller.effettuaLoginRaw(email, password);
     }

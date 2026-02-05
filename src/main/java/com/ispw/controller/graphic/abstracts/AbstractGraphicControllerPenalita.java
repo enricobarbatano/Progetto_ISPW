@@ -10,7 +10,6 @@ import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerPenalita;
 import com.ispw.controller.graphic.GraphicControllerUtils;
-import com.ispw.controller.logic.ctrl.LogicControllerApplicaPenalita;
 
 /**
  * Classe astratta che centralizza la logica comune dei controller grafici Penalità
@@ -29,6 +28,8 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
     protected abstract Logger log();
 
     protected abstract void goToHome();
+
+    protected abstract EsitoOperazioneBean applicaSanzione(DatiPenalitaBean dati);
 
     @Override
     public String getRouteName() {
@@ -60,8 +61,7 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
         try {
             DatiPenalitaBean dati = buildPenalitaBean(idUtente, importo, motivazione);
 
-            LogicControllerApplicaPenalita logicController = new LogicControllerApplicaPenalita();
-            EsitoOperazioneBean esito = logicController.applicaSanzione(dati);
+            EsitoOperazioneBean esito = applicaSanzione(dati);
 
             if (esito == null || !esito.isSuccesso()) {
                 notifyPenalitaError(esito != null ? esito.getMessaggio()

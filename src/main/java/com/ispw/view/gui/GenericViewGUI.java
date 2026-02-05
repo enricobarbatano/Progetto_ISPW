@@ -16,7 +16,9 @@ public abstract class GenericViewGUI implements GenericView {
 	@Override
 	public void onShow(Map<String, Object> params) {
 		lastParams = (params == null) ? Map.of() : params;
-		sessione = readSession(lastParams);
+		if (lastParams.containsKey(KEY_SESSIONE)) {
+			sessione = readSession(lastParams);
+		}
 	}
 
 	public SessioneUtenteBean getSessione() { return sessione; }

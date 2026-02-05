@@ -1,0 +1,76 @@
+package com.ispw.view.gui;
+
+import java.util.Map;
+
+import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.graphic.NavigableController;
+import com.ispw.controller.graphic.gui.GUIGraphicLoginController;
+import com.ispw.view.interfaces.ViewLogin;
+
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
+
+public class GUILoginView extends GenericViewGUI implements ViewLogin, NavigableController {
+
+    private final GUIGraphicLoginController controller;
+    private Label errorLabel;
+    private TextField emailField;
+    private PasswordField passwordField;
+
+    public GUILoginView(GUIGraphicLoginController controller) {
+        this.controller = controller;
+    }
+
+    @Override
+    public String getRouteName() {
+        return GraphicControllerUtils.ROUTE_LOGIN;
+    }
+
+    @Override
+    public void onShow() {
+        onShow(Map.of());
+    }
+
+    @Override
+    public void onHide() {
+        // no-op
+    }
+
+    @Override
+    public void onShow(Map<String, Object> params) {
+        super.onShow(params);
+        sessione = null;
+
+        VBox root = new VBox(10);
+        root.setPadding(new Insets(16));
+
+        Label title = new Label("Login");
+        errorLabel = new Label();
+        errorLabel.setStyle("-fx-text-fill: red;");
+
+        emailField = new TextField();
+        emailField.setPromptText("Email");
+        passwordField = new PasswordField();
+        passwordField.setPromptText("Password");
+
+        Button loginBtn = new Button("Login");
+        loginBtn.setOnAction(e -> controller.effettuaLoginRaw(emailField.getText(), passwordField.getText()));
+
+        Button regBtn = new Button("Registrazione");
+        regBtn.setOnAction(e -> controller.vaiARegistrazione());
+
+        String err = getLastError();
+        if (err != null && !err.isBlank()) {
+            errorLabel.setText(err);
+        } else {
+            errorLabel.setText("");
+        }
+
+        root.getChildren().addAll(title, errorLabel, emailField, passwordField, loginBtn, regBtn);
+        GuiLauncher.setRoot(root);
+    }
+}

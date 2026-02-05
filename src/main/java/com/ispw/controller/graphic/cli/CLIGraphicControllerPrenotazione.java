@@ -8,11 +8,13 @@ import java.util.logging.Logger;
 import com.ispw.bean.DatiInputPrenotazioneBean;
 import com.ispw.bean.DatiPagamentoBean;
 import com.ispw.bean.ParametriVerificaBean;
+import com.ispw.bean.RiepilogoPrenotazioneBean;
 import com.ispw.bean.SessioneUtenteBean;
+import com.ispw.bean.StatoPagamentoBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerPrenotazione;
-import com.ispw.controller.logic.ctrl.LogicControllerConfiguraRegole;
+import com.ispw.controller.logic.ctrl.LogicControllerPrenotazioneCampo;
 
 /**
  * Adapter CLI per la prenotazione campo.
@@ -39,13 +41,30 @@ public class CLIGraphicControllerPrenotazione extends AbstractGraphicControllerP
         }
     }
 
+    @Override
+    protected List<String> trovaSlotDisponibili(ParametriVerificaBean input) {
+        return new LogicControllerPrenotazioneCampo().trovaSlotDisponibili(input).stream()
+            .map(s -> s.getData() + " " + s.getOraInizio() + "-" + s.getOraFine() + " (€" + s.getCosto() + ")")
+            .toList();
+    }
+
+    @Override
+    protected RiepilogoPrenotazioneBean nuovaPrenotazione(DatiInputPrenotazioneBean input,
+                                                          SessioneUtenteBean sessione) {
+        return new LogicControllerPrenotazioneCampo().nuovaPrenotazione(input, sessione);
+    }
+
+    @Override
+    protected StatoPagamentoBean completaPrenotazione(DatiPagamentoBean pagamento, SessioneUtenteBean sessione) {
+        return new LogicControllerPrenotazioneCampo().completaPrenotazione(pagamento, sessione);
+    }
+
     /**
      * Recupera la lista campi per la selezione UI (formato testuale).
      */
     public void richiediListaCampi(SessioneUtenteBean sessione) {
         try {
-            LogicControllerConfiguraRegole logicController = new LogicControllerConfiguraRegole();
-            List<String> campi = logicController.listaCampi();
+            List<String> campi = new LogicControllerPrenotazioneCampo().listaCampi();
             if (navigator != null) {
                 Map<String, Object> payload = new java.util.HashMap<>();
                 payload.put(GraphicControllerUtils.KEY_CAMPI, campi);
