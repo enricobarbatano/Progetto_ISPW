@@ -119,7 +119,7 @@ public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole,
             try {
                 Map<String, Object> payload = new java.util.HashMap<>();
                 payload.put(GraphicControllerUtils.KEY_VALORE_PENALITA, new BigDecimal(valorePen.getText().trim()));
-                payload.put(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI, parseInt(preavviso.getText()));
+                payload.put(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI, parseIntOrDefault(preavviso.getText(), 0));
                 controller.aggiornaPenalita(payload);
             } catch (RuntimeException ex) {
                 error.setText("Dati penalità non validi");
@@ -145,5 +145,10 @@ public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole,
             result = result * 10 + digit;
         }
         return result;
+    }
+
+    private Integer parseIntOrDefault(String value, int defaultValue) {
+        Integer parsed = parseInt(value);
+        return parsed != null ? parsed : defaultValue;
     }
 }

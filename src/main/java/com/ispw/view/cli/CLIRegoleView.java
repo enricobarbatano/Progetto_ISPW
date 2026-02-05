@@ -170,7 +170,8 @@ public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole,
             System.out.print("Valore penalità: ");
             BigDecimal valore = new BigDecimal(in.nextLine().trim());
             System.out.print("Preavviso minimo (min): ");
-            int preavviso = Integer.parseInt(in.nextLine());
+            String rawPreavviso = in.nextLine().trim();
+            int preavviso = rawPreavviso.isBlank() ? 0 : Integer.parseInt(rawPreavviso);
 
             Map<String, Object> payload = new java.util.HashMap<>();
             payload.put(GraphicControllerUtils.KEY_VALORE_PENALITA, valore);
