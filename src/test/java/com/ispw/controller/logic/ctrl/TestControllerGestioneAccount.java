@@ -3,6 +3,7 @@ package com.ispw.controller.logic.ctrl;
 import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import com.ispw.BaseDAOTest;
+import com.ispw.DbmsTestHelper;
 import com.ispw.bean.DatiAccountBean;
 import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.bean.SessioneUtenteBean;
@@ -35,6 +37,10 @@ import com.ispw.model.enums.StatoAccount;
  * Assunzione: a runtime i DAO creati sono In-Memory.
  */
 @TestMethodOrder(MethodOrderer.DisplayName.class)
+/**
+ * Test del caso d’uso Gestione Account: recupero dati, aggiornamento profilo
+ * e cambio password (in-memory + DBMS).
+ */
 class TestControllerGestioneAccount extends BaseDAOTest {
 
     private LogicControllerGestioneAccount controller;
@@ -55,6 +61,97 @@ class TestControllerGestioneAccount extends BaseDAOTest {
         tryClear(userDAO);
         tryClear(logDAO);
     }
+
+        @Test
+        @DisplayName("DBMS) Gestione account: recupero, update e cambio password")
+        void testGestioneAccountDbms() throws Exception {
+            DbmsTestHelper.runWithDbms(
+                TestControllerGestioneAccount::createTablesIfMissing,
+                () -> {
+                GeneralUserDAO dbUserDAO = DAOFactory.getInstance().getGeneralUserDAO();
+                LogDAO dbLogDAO = DAOFactory.getInstance().getLogDAO();
+
+                String email = "account.logic.realit+" + UUID.randomUUID() + "@example.org";
+                UtenteFinale u = new UtenteFinale();
+                u.setNome("Mario");
+                u.setCognome("Rossi");
+                u.setEmail(email);
+                u.setPassword("oldPass123");
+                u.setStatoAccount(StatoAccount.ATTIVO);
+                u.setRuolo(Ruolo.UTENTE);
+                dbUserDAO.store(u);
+
+                SessioneUtenteBean sessione = new SessioneUtenteBean(
+                    UUID.randomUUID().toString(),
+                    new UtenteBean("Mario", "Rossi", email, Ruolo.UTENTE),
+                    new Date()
+                );
+
+                DatiAccountBean dati = controller.recuperaInformazioniAccount(sessione);
+                assertNotNull(dati);
+                assertEquals(u.getIdUtente(), dati.getIdUtente());
+                assertEquals(email, dati.getEmail());
+
+                DatiAccountBean update = new DatiAccountBean();
+                update.setIdUtente(u.getIdUtente());
+                update.setNome("Mario Aggiornato");
+                update.setCognome("Rossi");
+                update.setEmail("nuova." + email);
+
+                FakeNotificaGestioneAccount notifica = new FakeNotificaGestioneAccount();
+                EsitoOperazioneBean esitoUpdate = controller.aggiornaDatiAccount(update, notifica);
+                assertTrue(esitoUpdate.isSuccesso());
+                assertEquals(1, notifica.getInvocations());
+
+                GeneralUser updated = dbUserDAO.findById(u.getIdUtente());
+                assertNotNull(updated);
+                assertEquals("Mario Aggiornato", updated.getNome());
+
+                SessioneUtenteBean sessioneAggiornata = new SessioneUtenteBean(
+                    UUID.randomUUID().toString(),
+                    new UtenteBean("Mario Aggiornato", "Rossi", updated.getEmail(), Ruolo.UTENTE),
+                    new Date()
+                );
+
+                FakeNotificaGestioneAccount notificaPwd = new FakeNotificaGestioneAccount();
+                EsitoOperazioneBean esitoPwd = controller.cambiaPassword("oldPass123", "newPass123",
+                    sessioneAggiornata, notificaPwd);
+                assertTrue(esitoPwd.isSuccesso());
+                assertEquals(1, notificaPwd.getInvocations());
+
+                GeneralUser afterPwd = dbUserDAO.findById(u.getIdUtente());
+                assertEquals("newPass123", afterPwd.getPassword());
+
+                assertTrue(!dbLogDAO.findByUtente(u.getIdUtente()).isEmpty());
+                }
+            );
+        }
+
+        private static void createTablesIfMissing() throws Exception {
+            DbmsTestHelper.withStatement(st -> {
+                st.execute("""
+                    CREATE TABLE IF NOT EXISTS general_user (
+                      id_utente INT AUTO_INCREMENT PRIMARY KEY,
+                      nome VARCHAR(255),
+                      cognome VARCHAR(255),
+                      email VARCHAR(255),
+                      password VARCHAR(255),
+                      stato_account VARCHAR(40),
+                      ruolo VARCHAR(40)
+                    )
+                """);
+
+                st.execute("""
+                    CREATE TABLE IF NOT EXISTS system_log (
+                      id_log INT AUTO_INCREMENT PRIMARY KEY,
+                      timestamp TIMESTAMP NULL,
+                      tipo_operazione VARCHAR(40),
+                      id_utente_coinvolto INT,
+                      descrizione VARCHAR(255)
+                    )
+                """);
+            });
+        }
 
     // =====================================================================================
     // 1) RECUPERO INFORMAZIONI ACCOUNT

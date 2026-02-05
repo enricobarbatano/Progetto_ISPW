@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import com.ispw.BaseDAOTest;
+import com.ispw.DbmsTestHelper;
 import com.ispw.bean.DatiFatturaBean;
 import com.ispw.bean.DatiPagamentoBean;
 import com.ispw.bean.DatiPenalitaBean;
@@ -30,9 +32,11 @@ import com.ispw.dao.interfaces.LogDAO;
 import com.ispw.dao.interfaces.PenalitaDAO;
 import com.ispw.dao.interfaces.RegolePenalitaDAO;
 import com.ispw.model.entity.Fattura;
+import com.ispw.model.entity.GeneralUser;
 import com.ispw.model.entity.RegolePenalita;
 import com.ispw.model.entity.SystemLog;
 import com.ispw.model.entity.UtenteFinale;
+import com.ispw.model.enums.MetodoPagamento;
 import com.ispw.model.enums.Ruolo;
 import com.ispw.model.enums.StatoAccount;
 
@@ -41,6 +45,10 @@ import com.ispw.model.enums.StatoAccount;
  * Assunzione: In-Memory DAO attivi (vedi BaseDAOTest).
  */
 @TestMethodOrder(MethodOrderer.DisplayName.class)
+/**
+ * Test del caso d’uso Penalità: calcolo/applicazione penalità, pagamento
+ * e blocco account (in-memory + DBMS).
+ */
 class TestControllerApplicaPenalita extends BaseDAOTest {
 
     private LogicControllerApplicaPenalita controller;
@@ -253,6 +261,64 @@ class TestControllerApplicaPenalita extends BaseDAOTest {
         assertFalse(esito.isSuccesso(), "Deve fallire per importo non valido (bean<=0 e regole<=0)");
     }
 
+    @Test
+    @DisplayName("DBMS) Penalità: persiste penalità e sospende account")
+    void testApplicaSanzioneDbms() throws Exception {
+        DbmsTestHelper.runWithDbms(
+            TestControllerApplicaPenalita::createTablesIfMissingDbms,
+            () -> {
+                GeneralUserDAO dbUserDAO = DAOFactory.getInstance().getGeneralUserDAO();
+                PenalitaDAO dbPenalitaDAO = DAOFactory.getInstance().getPenalitaDAO();
+                RegolePenalitaDAO dbRulesDAO = DAOFactory.getInstance().getRegolePenalitaDAO();
+
+                UtenteFinale u = new UtenteFinale();
+                u.setNome("Mario");
+                u.setEmail("penalita.logic.realit+" + UUID.randomUUID() + "@example.org");
+                u.setPassword("pwd");
+                u.setStatoAccount(StatoAccount.ATTIVO);
+                u.setRuolo(Ruolo.UTENTE);
+                dbUserDAO.store(u);
+
+                RegolePenalita rp = new RegolePenalita();
+                rp.setValorePenalita(new BigDecimal("15.00"));
+                rp.setPreavvisoMinimo(60);
+                dbRulesDAO.save(rp);
+
+                DatiPenalitaBean dati = new DatiPenalitaBean();
+                dati.setIdUtente(u.getIdUtente());
+                dati.setMotivazione("No-show");
+                dati.setDataDecorrenza(LocalDate.now());
+                dati.setImporto(null);
+
+                DatiPagamentoBean pay = new DatiPagamentoBean();
+                pay.setImporto(0f);
+                pay.setMetodo(MetodoPagamento.PAYPAL.name());
+
+                DatiFatturaBean fatt = new DatiFatturaBean();
+                fatt.setDataOperazione(LocalDate.now());
+
+                LogicControllerApplicaPenalita dbController = new LogicControllerApplicaPenalita();
+                EsitoOperazioneBean esito = dbController.applicaSanzione(
+                    dati, pay, fatt,
+                    new LogicControllerGestionePagamento(),
+                    new LogicControllerGestioneFattura(),
+                    new LogicControllerGestioneNotifica()
+                );
+
+                assertNotNull(esito);
+                assertTrue(esito.isSuccesso());
+
+                GeneralUser updated = dbUserDAO.findById(u.getIdUtente());
+                assertNotNull(updated);
+                assertEquals(StatoAccount.SOSPESO, updated.getStatoAccount());
+
+                List<com.ispw.model.entity.Penalita> penalitaUtente =
+                    dbPenalitaDAO.recuperaPenalitaUtente(u.getIdUtente());
+                assertFalse(penalitaUtente.isEmpty());
+            }
+        );
+    }
+
     // =========================================================
     // Fake per i collaboratori secondari (DIP by-parameter)
     // =========================================================
@@ -312,6 +378,61 @@ class TestControllerApplicaPenalita extends BaseDAOTest {
             }
         }
     }
+
+        private static void createTablesIfMissingDbms() throws Exception {
+                DbmsTestHelper.withStatement(st -> {
+                        st.execute("""
+                                CREATE TABLE IF NOT EXISTS general_user (
+                                    id_utente INT AUTO_INCREMENT PRIMARY KEY,
+                                    nome VARCHAR(255),
+                                    email VARCHAR(255),
+                                    password VARCHAR(255),
+                                    stato_account VARCHAR(40),
+                                    ruolo VARCHAR(40)
+                                )
+                        """);
+
+                        st.execute("""
+                                CREATE TABLE IF NOT EXISTS regole_penalita (
+                                    id INT PRIMARY KEY,
+                                    valore_penalita DECIMAL(10,2),
+                                    preavviso_minimo INT
+                                )
+                        """);
+
+                        st.execute("""
+                                CREATE TABLE IF NOT EXISTS penalita (
+                                    id_penalita INT AUTO_INCREMENT PRIMARY KEY,
+                                    id_utente INT NOT NULL,
+                                    data_emissione DATE,
+                                    importo DECIMAL(10,2),
+                                    motivazione VARCHAR(255),
+                                    stato VARCHAR(40)
+                                )
+                        """);
+
+                        st.execute("""
+                                CREATE TABLE IF NOT EXISTS pagamenti (
+                                    id_pagamento INT AUTO_INCREMENT PRIMARY KEY,
+                                    id_prenotazione INT NOT NULL,
+                                    importo_finale DECIMAL(10,2),
+                                    metodo VARCHAR(40),
+                                    stato VARCHAR(40),
+                                    data_pagamento TIMESTAMP NULL
+                                )
+                        """);
+
+                        st.execute("""
+                                CREATE TABLE IF NOT EXISTS system_log (
+                                    id_log INT AUTO_INCREMENT PRIMARY KEY,
+                                    timestamp TIMESTAMP NULL,
+                                    tipo_operazione VARCHAR(40),
+                                    id_utente_coinvolto INT,
+                                    descrizione VARCHAR(255)
+                                )
+                        """);
+                });
+        }
 
     /** Prova a salvare la regola penalità su concreti diversi usando i nomi noti via reflection. */
     private static void trySetRegolaPenalita(RegolePenalitaDAO rulesDAO, RegolePenalita rp) {

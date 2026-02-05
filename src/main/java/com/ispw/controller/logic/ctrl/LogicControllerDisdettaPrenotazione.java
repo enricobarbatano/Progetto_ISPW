@@ -150,8 +150,8 @@ public class LogicControllerDisdettaPrenotazione {
         // 1) rimborso (se necessario)
         processRefundIfConfirmed(p, idPrenotazione, penale, payRimborso, fattRimborso);
 
-        // 2) aggiorna stato e rilascia slot
-        prenotazioneDAO().updateStato(idPrenotazione, StatoPrenotazione.ANNULLATA);
+        // 2) elimina prenotazione e rilascia slot
+        prenotazioneDAO().delete(idPrenotazione);
         liberaRisorsa(idPrenotazione, disp);
 
         // 3) notifica e log

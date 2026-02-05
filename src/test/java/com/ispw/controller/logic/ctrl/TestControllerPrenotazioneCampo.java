@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import com.ispw.BaseDAOTest;
+import com.ispw.DbmsTestHelper;
 import com.ispw.bean.DatiDisponibilitaBean;
 import com.ispw.bean.DatiFatturaBean;
 import com.ispw.bean.DatiInputPrenotazioneBean;
@@ -50,6 +53,10 @@ import com.ispw.model.enums.StatoPrenotazione;
  * Assunzione: a runtime i DAO creati sono In-Memory.
  */
 @TestMethodOrder(MethodOrderer.DisplayName.class)
+/**
+ * Test del caso d’uso Prenotazione: disponibilità, creazione prenotazione,
+ * completamento pagamento e flusso completo (in-memory + DBMS).
+ */
 class TestControllerPrenotazioneCampo extends BaseDAOTest {
 
     // ========= costanti (no magic strings) =========
@@ -70,6 +77,7 @@ class TestControllerPrenotazioneCampo extends BaseDAOTest {
     private PagamentoDAO pagamentoDAO;
 
     @BeforeEach
+    @SuppressWarnings("unused")
     void setUp() {
         controller = new LogicControllerPrenotazioneCampo();
 
@@ -262,9 +270,50 @@ class TestControllerPrenotazioneCampo extends BaseDAOTest {
         assertEquals(0, trackFat.invocations);
         assertEquals(0, trackNot.invConferma);
     }
+
+    @Test
+    @DisplayName("7) Completa prenotazione: pagamento random → stato coerente con esito")
+    void testCompletaPrenotazione_PagamentoRandom() {
+        UtenteFinale u = seedUser("rnd@example.org");
+        Campo c = seedCampo(5, 25f);
+
+        Prenotazione p = new Prenotazione();
+        p.setIdUtente(u.getIdUtente());
+        p.setIdCampo(c.getIdCampo());
+        p.setData(LocalDate.now().plusDays(2));
+        p.setOraInizio(java.time.LocalTime.parse("12:00"));
+        p.setOraFine(java.time.LocalTime.parse("13:00"));
+        p.setStato(StatoPrenotazione.DA_PAGARE);
+        prenotazioneDAO.store(p);
+
+        DatiPagamentoBean pay = new DatiPagamentoBean();
+        pay.setMetodo(MetodoPagamento.PAYPAL.name());
+        pay.setImporto(25f);
+
+        FakePagamentoRandom rndPay = new FakePagamentoRandom(new Random(42), pagamentoDAO);
+        FakeFattura trackFat  = new FakeFattura();
+        FakeNotifica trackNot = new FakeNotifica();
+
+        StatoPagamentoBean esito = controller.completaPrenotazione(pay, sessionOf(u), rndPay, trackFat, trackNot);
+
+        assertNotNull(esito);
+
+        Prenotazione after = prenotazioneDAO.load(p.getIdPrenotazione());
+        if (rndPay.lastSuccess) {
+            assertTrue(esito.isSuccesso(), MSG_PAY_OK);
+            assertEquals(StatoPrenotazione.CONFERMATA, after.getStato());
+            assertEquals(1, trackFat.invocations);
+            assertEquals(1, trackNot.invConferma);
+        } else {
+            assertFalse(esito.isSuccesso(), MSG_PAY_KO);
+            assertEquals(StatoPrenotazione.DA_PAGARE, after.getStato());
+            assertEquals(0, trackFat.invocations);
+            assertEquals(0, trackNot.invConferma);
+        }
+    }
     
 @Test
-@DisplayName("7) Flusso completo: slot disponibile → prenotazione, pagamento OK, conferma")
+@DisplayName("8) Flusso completo: slot disponibile → prenotazione, pagamento OK, conferma")
 void testFlussoCompleto_SlotDisponibile_PagamentoOK() {
     // Arrange: utente e campo
     UtenteFinale u = seedUser("flow@example.org");
@@ -338,6 +387,53 @@ void testFlussoCompleto_SlotDisponibile_PagamentoOK() {
     assertEquals(StatoPagamento.OK, saved.getStato(), "Stato pagamento OK");
 }
 
+    @Test
+    @DisplayName("DBMS) Completa prenotazione: pagamento persistito")
+    void testCompletaPrenotazioneDbms() throws Exception {
+        DbmsTestHelper.runWithDbms(
+            TestControllerPrenotazioneCampo::createTablesIfMissingDbms,
+            () -> {
+                GeneralUserDAO dbUserDAO = DAOFactory.getInstance().getGeneralUserDAO();
+                CampoDAO dbCampoDAO = DAOFactory.getInstance().getCampoDAO();
+                PrenotazioneDAO dbPrenotazioneDAO = DAOFactory.getInstance().getPrenotazioneDAO();
+                PagamentoDAO dbPagamentoDAO = DAOFactory.getInstance().getPagamentoDAO();
+
+                UtenteFinale u = seedDbUser(dbUserDAO);
+                Campo c = seedDbCampo(dbCampoDAO, 7001);
+
+                Prenotazione p = new Prenotazione();
+                p.setIdUtente(u.getIdUtente());
+                p.setIdCampo(c.getIdCampo());
+                p.setData(LocalDate.now().plusDays(2));
+                p.setOraInizio(java.time.LocalTime.parse("10:00"));
+                p.setOraFine(java.time.LocalTime.parse("11:00"));
+                p.setStato(StatoPrenotazione.DA_PAGARE);
+                dbPrenotazioneDAO.store(p);
+
+                Prenotazione persisted = dbPrenotazioneDAO.findByUtente(u.getIdUtente()).stream()
+                    .findFirst()
+                    .orElse(null);
+                assertNotNull(persisted, "Prenotazione deve essere persistita");
+
+                DatiPagamentoBean pay = new DatiPagamentoBean();
+                pay.setMetodo(MetodoPagamento.PAYPAL.name());
+                pay.setImporto(20f);
+
+                FakeFattura trackFat = new FakeFattura();
+                FakeNotifica trackNot = new FakeNotifica();
+
+                LogicControllerPrenotazioneCampo dbController = new LogicControllerPrenotazioneCampo();
+                StatoPagamentoBean esito = dbController.completaPrenotazione(
+                    pay, sessionOf(u), new LogicControllerGestionePagamento(), trackFat, trackNot);
+
+                assertNotNull(esito);
+
+                Pagamento saved = dbPagamentoDAO.findByPrenotazione(persisted.getIdPrenotazione());
+                assertNotNull(saved, "Pagamento deve essere persistito nel DB");
+            }
+        );
+    }
+
 
     // =====================================================================================
     // Helpers (seed, sessione, clear) + Fakes
@@ -367,6 +463,77 @@ void testFlussoCompleto_SlotDisponibile_PagamentoOK() {
         s.setUtente(new UtenteBean(u.getNome(), null, u.getEmail(), u.getRuolo()));
         s.setIdSessione(java.util.UUID.randomUUID().toString());
         return s;
+    }
+
+    private static UtenteFinale seedDbUser(GeneralUserDAO dao) {
+        UtenteFinale u = new UtenteFinale();
+        u.setNome("DB");
+        u.setEmail("prenotazione.db+" + UUID.randomUUID() + "@example.org");
+        u.setPassword("pwd");
+        u.setRuolo(Ruolo.UTENTE);
+        u.setStatoAccount(com.ispw.model.enums.StatoAccount.ATTIVO);
+        dao.store(u);
+        return u;
+    }
+
+    private static Campo seedDbCampo(CampoDAO dao, int idCampo) {
+        Campo c = new Campo();
+        c.setIdCampo(idCampo);
+        c.setCostoOrario(20f);
+        c.setAttivo(true);
+        c.setFlagManutenzione(false);
+        dao.store(c);
+        return c;
+    }
+
+    private static void createTablesIfMissingDbms() throws Exception {
+        DbmsTestHelper.withStatement(st -> {
+            st.execute("""
+                CREATE TABLE IF NOT EXISTS general_user (
+                  id_utente INT AUTO_INCREMENT PRIMARY KEY,
+                  nome VARCHAR(255),
+                  email VARCHAR(255),
+                  password VARCHAR(255),
+                  stato_account VARCHAR(40),
+                  ruolo VARCHAR(40)
+                )
+            """);
+
+            st.execute("""
+                CREATE TABLE IF NOT EXISTS campi (
+                  id_campo INT PRIMARY KEY,
+                  nome VARCHAR(255),
+                  tipo_sport VARCHAR(255),
+                  costo_orario FLOAT,
+                  is_attivo BOOLEAN,
+                  flag_manutenzione BOOLEAN
+                )
+            """);
+
+            st.execute("""
+                CREATE TABLE IF NOT EXISTS prenotazioni (
+                  id_prenotazione INT AUTO_INCREMENT PRIMARY KEY,
+                  id_utente INT NOT NULL,
+                  id_campo INT NOT NULL,
+                  data DATE,
+                  ora_inizio TIME,
+                  ora_fine TIME,
+                  stato VARCHAR(40),
+                  notifica_richiesta BOOLEAN
+                )
+            """);
+
+            st.execute("""
+                CREATE TABLE IF NOT EXISTS pagamenti (
+                  id_pagamento INT AUTO_INCREMENT PRIMARY KEY,
+                  id_prenotazione INT NOT NULL,
+                  importo_finale DECIMAL(10,2),
+                  metodo VARCHAR(40),
+                  stato VARCHAR(40),
+                  data_pagamento TIMESTAMP NULL
+                )
+            """);
+        });
     }
 
     /** Invoca clear() se esiste (evita dipendenze dai concreti In-Memory). */
@@ -422,6 +589,41 @@ void testFlussoCompleto_SlotDisponibile_PagamentoOK() {
         @Override
         public StatoPagamento richiediPagamentoPrenotazione(DatiPagamentoBean dati, int idPrenotazione) {
             StatoPagamento stato = success ? StatoPagamento.OK : StatoPagamento.FALLITO;
+
+            Pagamento p = pagamentoDAO.findByPrenotazione(idPrenotazione);
+            if (p == null) p = new Pagamento();
+            p.setIdPrenotazione(idPrenotazione);
+            p.setMetodo(dati.getMetodo() != null
+                    ? com.ispw.model.enums.MetodoPagamento.valueOf(dati.getMetodo())
+                    : MetodoPagamento.PAYPAL);
+            p.setImportoFinale(java.math.BigDecimal.valueOf(Math.max(0f, dati.getImporto())));
+            p.setDataPagamento(java.time.LocalDateTime.now());
+            p.setStato(stato);
+            pagamentoDAO.store(p);
+
+            return stato;
+        }
+    }
+
+    /**
+     * Fake Pagamento randomico:
+     * - esito random (seed fissato nel test per ripetibilità)
+     * - salva il pagamento sul DAO
+     */
+    private static final class FakePagamentoRandom implements GestionePagamentoPrenotazione {
+        private final Random random;
+        private final PagamentoDAO pagamentoDAO;
+        boolean lastSuccess;
+
+        private FakePagamentoRandom(Random random, PagamentoDAO pagamentoDAO) {
+            this.random = random;
+            this.pagamentoDAO = pagamentoDAO;
+        }
+
+        @Override
+        public StatoPagamento richiediPagamentoPrenotazione(DatiPagamentoBean dati, int idPrenotazione) {
+            lastSuccess = random.nextBoolean();
+            StatoPagamento stato = lastSuccess ? StatoPagamento.OK : StatoPagamento.FALLITO;
 
             Pagamento p = pagamentoDAO.findByPrenotazione(idPrenotazione);
             if (p == null) p = new Pagamento();

@@ -23,6 +23,7 @@ import com.ispw.model.entity.GeneralUser;
 import com.ispw.model.entity.Penalita;
 import com.ispw.model.entity.RegolePenalita;
 import com.ispw.model.entity.SystemLog;
+import com.ispw.model.enums.StatoAccount;
 
 /**
  * Controller applicativo per la gestione delle penalità/sanzioni.
@@ -96,6 +97,9 @@ public final class LogicControllerApplicaPenalita {
         handleNotifica(notiCtrl, idUtente);
         handlePagamento(payCtrl, datiPagamento, idPenalita, importo);
         handleFattura(fattCtrl, datiFattura, idPenalita);
+
+        // 3bis) Blocco account (best-effort)
+        blockAccountSafe(user);
 
         // 4) Log finale (audit)
         appendLogSafe(
@@ -254,6 +258,16 @@ public final class LogicControllerApplicaPenalita {
             action.run();
         } catch (RuntimeException ex) {
             log().log(Level.FINE, "{0} fallita: {1}", new Object[]{what, ex.getMessage()});
+        }
+    }
+
+    private void blockAccountSafe(GeneralUser user) {
+        if (user == null) return;
+        try {
+            user.setStatoAccount(StatoAccount.SOSPESO);
+            userDAO().store(user);
+        } catch (RuntimeException ex) {
+            log().log(Level.FINE, "Blocco account fallito: {0}", new Object[]{ex.getMessage()});
         }
     }
 

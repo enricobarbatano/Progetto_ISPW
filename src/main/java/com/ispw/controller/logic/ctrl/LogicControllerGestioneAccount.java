@@ -17,6 +17,7 @@ import com.ispw.dao.interfaces.LogDAO;
 import com.ispw.model.entity.GeneralUser;
 import com.ispw.model.entity.SystemLog;
 import com.ispw.model.enums.StatoAccount;
+import com.ispw.model.enums.TipoOperazione;
 
 /**
  * Controller applicativo principale per la "Gestione Account".
@@ -119,7 +120,8 @@ public class LogicControllerGestioneAccount {
 
         // Telefono/Indirizzo NON presenti su GeneralUser → ignorati (non fallire)
         userDAO().store(u);
-        appendLogSafe(u.getIdUtente(), "[ACCOUNT] Aggiornati dati account");
+        appendLogSafe(u.getIdUtente(), "[ACCOUNT] Aggiornati dati account",
+            TipoOperazione.AGGIORNAMENTO_DATI_PERSONALI);
         return esito(true, MSG_UPDATE_OK);
     }
 
@@ -173,7 +175,8 @@ public class LogicControllerGestioneAccount {
         // In produzione: hashing; qui coerente con In-Memory
         u.setPassword(nuovaPwd.trim());
         userDAO().store(u);
-        appendLogSafe(u.getIdUtente(), "[ACCOUNT] Password aggiornata");
+        appendLogSafe(u.getIdUtente(), "[ACCOUNT] Password aggiornata",
+            TipoOperazione.PASSWORD_AGGIORNAMENTO);
 
         return esito(true, MSG_PWD_OK);
     }
@@ -214,7 +217,8 @@ public class LogicControllerGestioneAccount {
             log().log(Level.FINE, "Aggiornamento stato account fallito: {0}", ex.getMessage());
         }
 
-        appendLogSafe(u.getIdUtente(), "[ACCOUNT] Modifica account confermata");
+        appendLogSafe(u.getIdUtente(), "[ACCOUNT] Modifica account confermata",
+            TipoOperazione.ACCOUNT_ATTIVATO);
     }
 
     // ========================
@@ -241,12 +245,13 @@ public class LogicControllerGestioneAccount {
         return e;
     }
 
-    private void appendLogSafe(int idUtente, String descr) {
+    private void appendLogSafe(int idUtente, String descr, TipoOperazione tipo) {
         try {
             SystemLog l = new SystemLog();
             l.setTimestamp(LocalDateTime.now());
             l.setIdUtenteCoinvolto(idUtente);
             l.setDescrizione(descr != null ? descr : "");
+            l.setTipoOperazione(tipo);
             logDAO().append(l);
         } catch (RuntimeException ex) {
             log().log(Level.FINE, "Append log ACCOUNT fallito: {0}", ex.getMessage());

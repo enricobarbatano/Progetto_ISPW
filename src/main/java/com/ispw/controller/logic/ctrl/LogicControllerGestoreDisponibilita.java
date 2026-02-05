@@ -105,12 +105,12 @@ public class LogicControllerGestoreDisponibilita
         // Parse dei parametri STRING in tipi temporali
         LocalDate data = LocalDate.parse(param.getData());          // yyyy-MM-dd
         LocalTime oraInizio = LocalTime.parse(param.getOraInizio()); // HH:mm
-        int durata = (param.getDurataMin() <=0 ) ? param.getDurataMin() : 60;
+        int durata = (param.getDurataMin() <= 0) ? 60 : param.getDurataMin();
         LocalTime oraFine = oraInizio.plusMinutes(durata);
 
         List<Campo> campi;
         CampoDAO cDAO = campoDAO();
-        if (param.getIdCampo() <0) {
+        if (param.getIdCampo() > 0) {
             Campo unico = cDAO.findById(param.getIdCampo());
             campi = (unico != null) ? List.of(unico) : List.of();
         } else {
@@ -143,7 +143,5 @@ public class LogicControllerGestoreDisponibilita
         return out;
     }
 
-    /* ==========================================
-       Altri metodi (Disdetta/Regole) in futuro.
-       ========================================== */
+    
 }

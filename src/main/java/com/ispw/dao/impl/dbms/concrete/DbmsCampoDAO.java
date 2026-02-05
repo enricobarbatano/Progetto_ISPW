@@ -1,5 +1,11 @@
 package com.ispw.dao.impl.dbms.concrete;
 
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Time;
 import java.sql.Types;
 import java.util.List;
 
@@ -7,6 +13,8 @@ import com.ispw.dao.impl.dbms.base.DbmsDAO;
 import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
 import com.ispw.dao.interfaces.CampoDAO;
 import com.ispw.model.entity.Campo;
+import com.ispw.model.entity.Prenotazione;
+import com.ispw.model.enums.StatoPrenotazione;
 
 /**
  * Implementazione DBMS di CampoDAO.
@@ -23,6 +31,10 @@ public class DbmsCampoDAO extends DbmsDAO<Integer, Campo> implements CampoDAO {
     private static final String SQL_FIND_BY_ID =
         "SELECT id_campo, nome, tipo_sport, costo_orario, is_attivo, flag_manutenzione " +
         "FROM campi WHERE id_campo = ?";
+
+    private static final String SQL_FIND_PRENOTAZIONI_BY_CAMPO =
+        "SELECT id_prenotazione, id_utente, id_campo, data, ora_inizio, ora_fine, stato, notifica_richiesta " +
+        "FROM prenotazioni WHERE id_campo = ?";
 
     private static final String SQL_EXISTS =
         "SELECT 1 FROM campi WHERE id_campo = ?";
@@ -52,7 +64,7 @@ public class DbmsCampoDAO extends DbmsDAO<Integer, Campo> implements CampoDAO {
         if (!rs.wasNull()) c.setCostoOrario(costo);
         c.setAttivo(rs.getBoolean("is_attivo"));
         c.setFlagManutenzione(rs.getBoolean("flag_manutenzione"));
-        // listaPrenotazioni NON popolata qui (scelta intenzionale per semplicità)
+        loadPrenotazioniForCampo(c);
         return c;
     };
 
@@ -126,5 +138,49 @@ public class DbmsCampoDAO extends DbmsDAO<Integer, Campo> implements CampoDAO {
             ps.setBoolean(5, c.isFlagManutenzione());
             ps.setInt(6, c.getIdCampo());
         });
+    }
+
+    private void loadPrenotazioniForCampo(Campo c) {
+        if (c == null) return;
+
+        try (Connection conn = openConnection();
+             PreparedStatement ps = conn.prepareStatement(SQL_FIND_PRENOTAZIONI_BY_CAMPO)) {
+
+            ps.setInt(1, c.getIdCampo());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Prenotazione p = new Prenotazione();
+                    p.setIdPrenotazione(rs.getInt("id_prenotazione"));
+                    p.setIdUtente(rs.getInt("id_utente"));
+                    p.setIdCampo(rs.getInt("id_campo"));
+
+                    Date d = rs.getDate("data");
+                    Time tStart = rs.getTime("ora_inizio");
+                    Time tEnd = rs.getTime("ora_fine");
+                    if (d != null) p.setData(d.toLocalDate());
+                    if (tStart != null) p.setOraInizio(tStart.toLocalTime());
+                    if (tEnd != null) p.setOraFine(tEnd.toLocalTime());
+
+                    String stato = rs.getString("stato");
+                    if (stato != null) {
+                        try {
+                            StatoPrenotazione statoEnum = StatoPrenotazione.valueOf(stato);
+                            if (statoEnum == StatoPrenotazione.ANNULLATA) {
+                                continue;
+                            }
+                            p.setStato(statoEnum);
+                        } catch (IllegalArgumentException ex) {
+                            // stato non valido: ignora filtro e carica comunque
+                        }
+                    }
+
+                    p.setNotificaRichiesta(rs.getBoolean("notifica_richiesta"));
+                    c.aggiungiPrenotazione(p);
+                }
+            }
+        } catch (SQLException e) {
+            throw wrap(e);
+        }
     }
 }
