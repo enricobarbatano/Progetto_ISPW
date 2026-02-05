@@ -13,6 +13,7 @@ import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.controller.graphic.GraphicControllerDisdetta;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.logic.ctrl.LogicControllerDisdettaPrenotazione;
 
 /**
  * Classe astratta che centralizza la logica comune dei controller grafici Disdetta
@@ -32,11 +33,9 @@ public abstract class AbstractGraphicControllerDisdetta implements GraphicContro
 
     protected abstract void goToHome();
 
-    protected abstract List<RiepilogoPrenotazioneBean> ottieniPrenotazioniCancellabili(SessioneUtenteBean sessione);
-
-    protected abstract EsitoDisdettaBean anteprimaDisdetta(int idPrenotazione, SessioneUtenteBean sessione);
-
-    protected abstract EsitoOperazioneBean eseguiAnnullamento(int idPrenotazione, SessioneUtenteBean sessione);
+    protected LogicControllerDisdettaPrenotazione logicController() {
+        return new LogicControllerDisdettaPrenotazione();
+    }
 
     @Override
     public String getRouteName() {
@@ -55,7 +54,8 @@ public abstract class AbstractGraphicControllerDisdetta implements GraphicContro
         }
 
         try {
-            List<RiepilogoPrenotazioneBean> prenotazioni = ottieniPrenotazioniCancellabili(sessione);
+            List<RiepilogoPrenotazioneBean> prenotazioni =
+                logicController().ottieniPrenotazioniCancellabili(sessione.getUtente());
 
             List<String> elenco = prenotazioni.stream()
                 .map(RiepilogoPrenotazioneBean::toString)
@@ -89,7 +89,7 @@ public abstract class AbstractGraphicControllerDisdetta implements GraphicContro
         }
 
         try {
-            EsitoDisdettaBean esito = anteprimaDisdetta(idPrenotazione, sessione);
+            EsitoDisdettaBean esito = logicController().anteprimaDisdetta(idPrenotazione, sessione);
 
             if (esito == null || !esito.isPossibile()) {
                 notifyDisdettaError(GraphicControllerUtils.MSG_DISDETTA_NON_CONSENTITA);
@@ -117,7 +117,7 @@ public abstract class AbstractGraphicControllerDisdetta implements GraphicContro
         }
 
         try {
-            EsitoOperazioneBean esito = eseguiAnnullamento(idPrenotazione, sessione);
+            EsitoOperazioneBean esito = logicController().eseguiAnnullamento(idPrenotazione, sessione);
 
             if (esito == null || !esito.isSuccesso()) {
                 notifyDisdettaError(esito != null ? esito.getMessaggio()

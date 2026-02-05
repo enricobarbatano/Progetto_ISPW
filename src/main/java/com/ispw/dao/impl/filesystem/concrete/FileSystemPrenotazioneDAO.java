@@ -2,6 +2,7 @@ package com.ispw.dao.impl.filesystem.concrete;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import com.ispw.dao.impl.filesystem.FileSystemDAO;
@@ -16,6 +17,11 @@ import com.ispw.model.enums.StatoPrenotazione;
  */
 public class FileSystemPrenotazioneDAO extends FileSystemDAO<Integer, Prenotazione> implements PrenotazioneDAO {
 
+    private static final Comparator<Prenotazione> ORDER_BY_DATA_ORA_ID =
+            Comparator.comparing(Prenotazione::getData, Comparator.nullsLast(Comparator.naturalOrder()))
+                      .thenComparing(Prenotazione::getOraInizio, Comparator.nullsLast(Comparator.naturalOrder()))
+                      .thenComparingInt(Prenotazione::getIdPrenotazione);
+
     public FileSystemPrenotazioneDAO(Path storageDir) {
         super(storageDir, "prenotazione.ser", new FileSystemDAO.JavaBinaryMapCodec<>());
     }
@@ -23,6 +29,15 @@ public class FileSystemPrenotazioneDAO extends FileSystemDAO<Integer, Prenotazio
     @Override
     protected Integer getId(Prenotazione entity) {
         return entity.getIdPrenotazione();
+    }
+
+    @Override
+    public void store(Prenotazione entity) {
+        if (entity != null && entity.getIdPrenotazione() == 0) {
+            int next = this.cache.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
+            entity.setIdPrenotazione(next);
+        }
+        super.store(entity);
     }
 
     @Override
@@ -35,6 +50,7 @@ public class FileSystemPrenotazioneDAO extends FileSystemDAO<Integer, Prenotazio
         // Filtra la cache (copiandola per sicurezza)
         List<Prenotazione> all = new ArrayList<>(cache.values());
         all.removeIf(p -> p.getIdUtente() != idUtente);
+        all.sort(ORDER_BY_DATA_ORA_ID);
         return all;
     }
 
@@ -42,6 +58,7 @@ public class FileSystemPrenotazioneDAO extends FileSystemDAO<Integer, Prenotazio
     public List<Prenotazione> findByUtenteAndStato(int idUtente, StatoPrenotazione stato) {
         List<Prenotazione> all = new ArrayList<>(cache.values());
         all.removeIf(p -> p.getIdUtente() != idUtente || p.getStato() != stato);
+        all.sort(ORDER_BY_DATA_ORA_ID);
         return all;
     }
 

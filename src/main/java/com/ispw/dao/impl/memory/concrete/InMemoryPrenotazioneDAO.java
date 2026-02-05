@@ -1,5 +1,6 @@
 package com.ispw.dao.impl.memory.concrete;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -36,12 +37,16 @@ public class InMemoryPrenotazioneDAO extends InMemoryDAO<Integer, Prenotazione> 
 
     @Override
     public List<Prenotazione> findByUtente(int idUtente) {
-        return filter(p -> p.getIdUtente() == idUtente);
+        List<Prenotazione> out = filter(p -> p.getIdUtente() == idUtente);
+        out.sort(ORDER_BY_DATA_ORA_ID);
+        return out;
     }
 
     @Override
     public List<Prenotazione> findByUtenteAndStato(int idUtente, StatoPrenotazione stato) {
-        return filter(p -> p.getIdUtente() == idUtente && p.getStato() == stato);
+        List<Prenotazione> out = filter(p -> p.getIdUtente() == idUtente && p.getStato() == stato);
+        out.sort(ORDER_BY_DATA_ORA_ID);
+        return out;
     }
 
     @Override
@@ -52,6 +57,11 @@ public class InMemoryPrenotazioneDAO extends InMemoryDAO<Integer, Prenotazione> 
             store(p);
         }
     }
+
+    private static final Comparator<Prenotazione> ORDER_BY_DATA_ORA_ID =
+            Comparator.comparing(Prenotazione::getData, Comparator.nullsLast(Comparator.naturalOrder()))
+                      .thenComparing(Prenotazione::getOraInizio, Comparator.nullsLast(Comparator.naturalOrder()))
+                      .thenComparingInt(Prenotazione::getIdPrenotazione);
 
         
 }

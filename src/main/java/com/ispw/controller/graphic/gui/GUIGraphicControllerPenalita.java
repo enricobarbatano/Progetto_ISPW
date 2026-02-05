@@ -1,14 +1,10 @@
 package com.ispw.controller.graphic.gui;
 
-import java.util.List;
 import java.util.logging.Logger;
 
-import com.ispw.bean.DatiPenalitaBean;
-import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerPenalita;
-import com.ispw.controller.logic.ctrl.LogicControllerApplicaPenalita;
 
 public class GUIGraphicControllerPenalita extends AbstractGraphicControllerPenalita {
     
@@ -25,20 +21,6 @@ public class GUIGraphicControllerPenalita extends AbstractGraphicControllerPenal
         if (navigator != null) {
             navigator.goTo(GraphicControllerUtils.ROUTE_HOME, null);
         }
-    }
-
-    @Override
-    protected EsitoOperazioneBean applicaSanzione(DatiPenalitaBean dati) {
-        return logicController().applicaSanzione(dati);
-    }
-
-    @Override
-    protected List<String> listaUtentiPerPenalita() {
-        return logicController().listaUtentiPerPenalita();
-    }
-
-    private LogicControllerApplicaPenalita logicController() {
-        return new LogicControllerApplicaPenalita();
     }
 
 }

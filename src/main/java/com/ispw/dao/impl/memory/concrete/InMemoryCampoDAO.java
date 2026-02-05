@@ -1,6 +1,7 @@
 package com.ispw.dao.impl.memory.concrete;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import com.ispw.dao.impl.memory.InMemoryDAO;
@@ -21,7 +22,9 @@ public final class InMemoryCampoDAO extends InMemoryDAO<Integer, Campo> implemen
     @Override
     public List<Campo> findAll() {
         // snapshotValues() è già thread-safe; restituiamo una copia difensiva
-        return new ArrayList<>(snapshotValues());
+        List<Campo> all = new ArrayList<>(snapshotValues());
+        all.sort(Comparator.comparingInt(Campo::getIdCampo));
+        return all;
     }
 
     @Override

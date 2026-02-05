@@ -2,14 +2,9 @@ package com.ispw.controller.graphic.gui;
 
 import java.util.logging.Logger;
 
-import com.ispw.bean.EsitoDisdettaBean;
-import com.ispw.bean.EsitoOperazioneBean;
-import com.ispw.bean.RiepilogoPrenotazioneBean;
-import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerDisdetta;
-import com.ispw.controller.logic.ctrl.LogicControllerDisdettaPrenotazione;
 
 public class GUIGraphicControllerDisdetta extends AbstractGraphicControllerDisdetta {
     
@@ -26,21 +21,6 @@ public class GUIGraphicControllerDisdetta extends AbstractGraphicControllerDisde
         if (navigator != null) {
             navigator.goTo(GraphicControllerUtils.ROUTE_HOME, null);
         }
-    }
-
-    @Override
-    protected java.util.List<RiepilogoPrenotazioneBean> ottieniPrenotazioniCancellabili(SessioneUtenteBean sessione) {
-        return new LogicControllerDisdettaPrenotazione().ottieniPrenotazioniCancellabili(sessione.getUtente());
-    }
-
-    @Override
-    protected EsitoDisdettaBean anteprimaDisdetta(int idPrenotazione, SessioneUtenteBean sessione) {
-        return new LogicControllerDisdettaPrenotazione().anteprimaDisdetta(idPrenotazione, sessione);
-    }
-
-    @Override
-    protected EsitoOperazioneBean eseguiAnnullamento(int idPrenotazione, SessioneUtenteBean sessione) {
-        return new LogicControllerDisdettaPrenotazione().eseguiAnnullamento(idPrenotazione, sessione);
     }
 
 }
