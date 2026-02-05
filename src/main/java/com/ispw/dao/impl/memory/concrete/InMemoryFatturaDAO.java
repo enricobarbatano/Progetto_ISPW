@@ -19,6 +19,15 @@ public final class InMemoryFatturaDAO extends InMemoryDAO<Integer, Fattura> impl
     }
 
     @Override
+    public void store(Fattura entity) {
+        if (entity.getIdFattura() == 0) {
+            int next = store.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
+            entity.setIdFattura(next);
+        }
+        super.store(entity);
+    }
+
+    @Override
     public Fattura findLastByUtente(int idUtente) {
         List<Fattura> all = snapshotValues();
         return all.stream()

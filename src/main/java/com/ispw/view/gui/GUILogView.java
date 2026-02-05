@@ -63,7 +63,7 @@ public class GUILogView extends GenericViewGUI implements ViewLog, NavigableCont
         root.getChildren().add(new Label("Log di sistema"));
 
         ListView<String> list = new ListView<>();
-        list.getItems().addAll(logs);
+        GuiViewUtils.fillList(list, logs);
 
         Button refresh = new Button("Aggiorna");
         refresh.setOnAction(e -> controller.richiediLog(20));

@@ -1,8 +1,11 @@
 package com.ispw.view.gui;
 
+import java.util.List;
+
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 
 public final class GuiViewUtils {
@@ -42,5 +45,14 @@ public final class GuiViewUtils {
             }
         });
         return home;
+    }
+
+    public static void fillList(ListView<String> listView, List<?> items) {
+        if (listView == null) return;
+        listView.getItems().clear();
+        if (items == null) return;
+        for (Object item : items) {
+            listView.getItems().add(String.valueOf(item));
+        }
     }
 }

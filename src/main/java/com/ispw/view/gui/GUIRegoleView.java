@@ -53,9 +53,7 @@ public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole,
         ListView<String> campiList = new ListView<>();
         Object rawCampi = lastParams.get(GraphicControllerUtils.KEY_CAMPI);
         if (rawCampi instanceof List<?> campi) {
-            for (Object c : campi) {
-                campiList.getItems().add(String.valueOf(c));
-            }
+            GuiViewUtils.fillList(campiList, campi);
         }
 
         TextField idCampo = new TextField();

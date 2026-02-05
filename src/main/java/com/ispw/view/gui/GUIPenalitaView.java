@@ -50,9 +50,7 @@ public class GUIPenalitaView extends GenericViewGUI implements ViewGestionePenal
         ListView<String> utentiList = new ListView<>();
         Object rawUtenti = lastParams.get(GraphicControllerUtils.KEY_UTENTI);
         if (rawUtenti instanceof List<?> utenti) {
-            for (Object u : utenti) {
-                utentiList.getItems().add(String.valueOf(u));
-            }
+            GuiViewUtils.fillList(utentiList, utenti);
         }
 
         TextField idUtente = new TextField();

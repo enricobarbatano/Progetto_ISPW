@@ -79,7 +79,7 @@ public class GUIPrenotazioneView extends GenericViewGUI implements ViewGestioneP
         root.getChildren().add(new Label("Slot disponibili"));
 
         ListView<String> list = new ListView<>();
-        list.getItems().addAll(slots);
+        GuiViewUtils.fillList(list, slots);
 
         Button select = new Button("Seleziona slot");
         select.setOnAction(e -> {
@@ -144,7 +144,7 @@ public class GUIPrenotazioneView extends GenericViewGUI implements ViewGestioneP
 
         Label title = new Label("Prenotazione");
         ListView<String> campiList = new ListView<>();
-        campiList.getItems().addAll(campi);
+        GuiViewUtils.fillList(campiList, campi);
 
         TextField idCampo = new TextField();
         idCampo.setPromptText("Id campo");
