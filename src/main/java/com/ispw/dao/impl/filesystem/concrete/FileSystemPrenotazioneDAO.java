@@ -26,6 +26,11 @@ public class FileSystemPrenotazioneDAO extends FileSystemDAO<Integer, Prenotazio
     }
 
     @Override
+    public Prenotazione findById(int idPrenotazione) {
+        return load(idPrenotazione);
+    }
+
+    @Override
     public List<Prenotazione> findByUtente(int idUtente) {
         // Filtra la cache (copiandola per sicurezza)
         List<Prenotazione> all = new ArrayList<>(cache.values());

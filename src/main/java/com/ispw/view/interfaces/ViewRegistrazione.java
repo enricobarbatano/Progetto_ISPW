@@ -1,5 +1,5 @@
 package com.ispw.view.interfaces;
 
-public class ViewRegistrazione {
-    
+public interface ViewRegistrazione extends GenericView {
+	// marker interface
 }

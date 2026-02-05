@@ -90,6 +90,11 @@ public class DbmsPrenotazioneDAO extends DbmsDAO<Integer, Prenotazione> implemen
     }
 
     @Override
+    public Prenotazione findById(int idPrenotazione) {
+        return load(idPrenotazione);
+    }
+
+    @Override
     public void store(Prenotazione entity) {
         if (entity == null) return;
         if (exists(entity.getIdPrenotazione())) {

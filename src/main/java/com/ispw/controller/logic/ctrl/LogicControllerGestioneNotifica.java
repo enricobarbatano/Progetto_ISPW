@@ -106,8 +106,8 @@ public class LogicControllerGestioneNotifica implements
             return;
         }
         log().log(Level.INFO,
-                "[PROMEMORIA] Prenotazione#{0} -> scheduling promemoria {1} minuti prima ... riuscito",
-                new Object[]{idPrenotazione, minutiAnticipo});
+            "[PROMEMORIA] Prenotazione#{0} -> scheduling promemoria {1} minuti prima ... riuscito",
+            new Object[]{idPrenotazione, minutiAnticipo});
     }
 
     // =======================

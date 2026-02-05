@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;     // abstract
 import java.sql.Statement;   // concreto da istanziare (sostituisci se diverso)
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
@@ -37,6 +38,9 @@ public final class DbmsGeneralUserDAO extends DbmsDAO<Integer, GeneralUser> impl
 
     private static final String SQL_SELECT_BY_EMAIL =
             "SELECT " + COLS + " FROM " + TBL + WHERE + "LOWER(email) = ?";
+
+        private static final String SQL_SELECT_ALL =
+            "SELECT " + COLS + " FROM " + TBL;
 
     private static final String SQL_EXISTS =
             "SELECT 1 FROM " + TBL + WHERE + ID_UTENTE + " = ?";
@@ -157,5 +161,10 @@ public final class DbmsGeneralUserDAO extends DbmsDAO<Integer, GeneralUser> impl
     @Override
     public GeneralUser findById(int idUtente) {
         return load(idUtente);
+    }
+
+    @Override
+    public List<GeneralUser> findAll() {
+        return queryList(SQL_SELECT_ALL, null, DbmsGeneralUserDAO::map);
     }
 }

@@ -2,19 +2,17 @@
 package com.ispw.view.cli.console;
 
 import java.util.Scanner;
-import java.util.logging.Logger;
 
 public class ConsolePrenotazioneConfirmView {
-    private static final Logger logger = Logger.getLogger(ConsolePrenotazioneConfirmView.class.getName());
     private final Scanner in = new Scanner(System.in);
     public void renderSummary(String riepilogo) {
-        logger.info("\n=== RIEPILOGO PRENOTAZIONE ===");
-        logger.info(riepilogo);
+        System.out.println("\n=== RIEPILOGO PRENOTAZIONE ===");
+        System.out.println(riepilogo);
     }
     public boolean askConfirmation() {
         System.out.print("Confermare? [s/N]: ");
         return "s".equalsIgnoreCase(in.nextLine().trim());
     }
-    public void showInfo(String msg)  { logger.info(msg); }
-    public void showError(String msg) { logger.severe("[ERRORE] " + msg); }
+    public void showInfo(String msg)  { System.out.println(msg); }
+    public void showError(String msg) { System.err.println("[ERRORE] " + msg); }
 } 

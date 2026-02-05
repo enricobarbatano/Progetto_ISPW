@@ -81,7 +81,12 @@ public class LogicControllerConfiguraRegole {
      */
     public List<String> listaCampi() {
         return campoDAO().findAll().stream()
-            .map(c -> String.format("#%d - %s (%s)", c.getIdCampo(), c.getNome(), c.getTipoSport()))
+            .map(c -> String.format("#%d - %s (%s) [attivo=%s, manutenzione=%s]",
+                c.getIdCampo(),
+                c.getNome(),
+                c.getTipoSport(),
+                c.isAttivo(),
+                c.isFlagManutenzione()))
             .toList();
     }
 

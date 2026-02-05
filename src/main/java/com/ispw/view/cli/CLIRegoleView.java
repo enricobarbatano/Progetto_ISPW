@@ -1,0 +1,153 @@
+package com.ispw.view.cli;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+
+import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.graphic.NavigableController;
+import com.ispw.controller.graphic.cli.CLIGraphicControllerRegole;
+import com.ispw.view.interfaces.ViewGestioneRegole;
+
+/**
+ * View CLI per gestione regole.
+ */
+public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole, NavigableController {
+    private final Scanner in = new Scanner(System.in);
+    private final CLIGraphicControllerRegole controller;
+
+    private Integer selectedCampoId;
+
+    public CLIRegoleView(CLIGraphicControllerRegole controller) {
+        this.controller = controller;
+    }
+
+    @Override
+    public String getRouteName() {
+        return GraphicControllerUtils.ROUTE_REGOLE;
+    }
+
+    @Override
+    public void onShow() {
+        onShow(Map.of());
+    }
+
+    @Override
+    public void onHide() {
+        // no-op
+    }
+
+    @Override
+    public void onShow(Map<String, Object> params) {
+        super.onShow(params);
+
+        String err = getLastError();
+        if (err != null && !err.isBlank()) {
+            System.err.println("[ERRORE] " + err);
+        }
+        String ok = getLastSuccess();
+        if (ok != null && !ok.isBlank()) {
+            System.out.println(ok);
+        }
+
+        Object rawCampi = lastParams.get(GraphicControllerUtils.KEY_CAMPI);
+        if (rawCampi instanceof List<?> campi) {
+            System.out.println("\n=== CAMPI ===");
+            int i = 1;
+            for (Object c : campi) {
+                final int idx = i++;
+                System.out.println(" [" + idx + "] " + c);
+            }
+        }
+        Object rawId = lastParams.get(GraphicControllerUtils.KEY_ID_CAMPO);
+        if (rawId instanceof Integer id) {
+            selectedCampoId = id;
+            System.out.println("Campo selezionato: " + id);
+        }
+
+        System.out.println("1) Lista campi");
+        System.out.println("2) Seleziona campo");
+        System.out.println("3) Aggiorna stato campo");
+        System.out.println("4) Aggiorna tempistiche");
+        System.out.println("5) Aggiorna penalità");
+        System.out.println("0) Home");
+        System.out.print("Scelta: ");
+        String scelta = in.nextLine().trim();
+
+        switch (scelta) {
+            case "1" -> controller.richiediListaCampi();
+            case "2" -> handleSelezionaCampo();
+            case "3" -> handleAggiornaCampo();
+            case "4" -> handleAggiornaTempistiche();
+            case "5" -> handleAggiornaPenalita();
+            case "0" -> controller.tornaAllaHome();
+            default -> System.out.println("Scelta non valida");
+        }
+    }
+
+    private void handleSelezionaCampo() {
+        System.out.print("Id campo: ");
+        int id = Integer.parseInt(in.nextLine());
+        controller.selezionaCampo(id);
+    }
+
+    private void handleAggiornaCampo() {
+        if (selectedCampoId == null && !lastParams.containsKey(GraphicControllerUtils.KEY_CAMPI)) {
+            controller.richiediListaCampi();
+            return;
+        }
+
+        Object rawCampi = lastParams.get(GraphicControllerUtils.KEY_CAMPI);
+        if (rawCampi instanceof List<?> campi) {
+            System.out.println("\n=== CAMPI ===");
+            int i = 1;
+            for (Object c : campi) {
+                final int idx = i++;
+                System.out.println(" [" + idx + "] " + c);
+            }
+        }
+
+        int id;
+        if (selectedCampoId != null) {
+            id = selectedCampoId;
+        } else {
+            id = readIdCampo();
+        }
+        System.out.print("Attivo? (true/false): ");
+        boolean attivo = Boolean.parseBoolean(in.nextLine());
+        System.out.print("Manutenzione? (true/false): ");
+        boolean manut = Boolean.parseBoolean(in.nextLine());
+
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put(GraphicControllerUtils.KEY_ID_CAMPO, id);
+        payload.put(GraphicControllerUtils.KEY_ATTIVO, attivo);
+        payload.put(GraphicControllerUtils.KEY_FLAG_MANUTENZIONE, manut);
+        controller.aggiornaStatoCampo(payload);
+    }
+
+    private void handleAggiornaTempistiche() {
+        System.out.print("Durata slot (min): ");
+        int durata = Integer.parseInt(in.nextLine());
+        System.out.print("Preavviso minimo (min): ");
+        int preavviso = Integer.parseInt(in.nextLine());
+
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put(GraphicControllerUtils.KEY_DURATA_SLOT_MINUTI, durata);
+        payload.put(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI, preavviso);
+        controller.aggiornaTempistiche(payload);
+    }
+
+    private void handleAggiornaPenalita() {
+        System.out.print("Preavviso minimo (min): ");
+        int preavviso = Integer.parseInt(in.nextLine());
+
+        Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI, preavviso);
+        controller.aggiornaPenalita(payload);
+    }
+
+    private int readIdCampo() {
+        System.out.print("Id campo: ");
+        return Integer.parseInt(in.nextLine());
+    }
+}

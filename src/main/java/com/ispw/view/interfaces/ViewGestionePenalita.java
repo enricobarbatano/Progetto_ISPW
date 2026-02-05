@@ -1,5 +1,5 @@
 package com.ispw.view.interfaces;
 
-public class ViewGestionePenalita {
-    
+public interface ViewGestionePenalita extends GenericView {
+	// marker interface
 }

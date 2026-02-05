@@ -4,8 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.ispw.controller.factory.FrontendControllerFactory;
 import com.ispw.dao.factory.DAOFactory;
@@ -13,10 +11,6 @@ import com.ispw.dao.impl.dbms.connection.DbmsConnectionFactory;
 import com.ispw.model.enums.PersistencyProvider;
 
 public final class AppBootstrapper {
-
-    @SuppressWarnings("java:S1312") // Logger con nome della classe: scelta progettuale condivisa
-    private static final Logger LOGGER = Logger.getLogger(AppBootstrapper.class.getName());
-
     public static void main(String[] args) {
 
         // 1) Leggi configurazione
@@ -38,12 +32,11 @@ public final class AppBootstrapper {
                  var rs = ps.executeQuery()) {
 
                 if (rs.next()) {
-                    // Log “on-demand” (nessun placeholder, nessun rischio)
-                    LOGGER.info(() -> "DB OK: " );
+                    System.out.println("DB OK");
                 }
 
             } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Errore connessione DB", e);
+                System.err.println("Errore connessione DB: " + e.getMessage());
                 return;
             }
         }
@@ -55,25 +48,24 @@ public final class AppBootstrapper {
             try {
                 Files.createDirectories(root);
             } catch (java.io.IOException | SecurityException e) {
-                LOGGER.log(Level.SEVERE, "Impossibile creare directory root per FILE_SYSTEM: {0}", root);
+                System.err.println("Impossibile creare directory root per FILE_SYSTEM: " + root);
                 return;
             }
             fsRoot = root;
-
-            LOGGER.log(Level.INFO, "FILE_SYSTEM root impostata su: {0}", root.toAbsolutePath());
+            System.out.println("FILE_SYSTEM root impostata su: " + root.toAbsolutePath());
         }
 
         // 3) Configura persistenza (DAOFactory guidata dal provider)
         DAOFactory.initialize(config.persistency(), fsRoot);
         // Messaggio parametrico: MessageFormat
-        LOGGER.log(Level.INFO, "Persistency provider: {0}", config.persistency());
+        System.out.println("Persistency provider: " + config.persistency());
 
         // 4) Configura frontend
         FrontendControllerFactory.setFrontendProvider(config.frontend());
-        LOGGER.log(Level.INFO, "Frontend provider: {0}", config.frontend());
+        System.out.println("Frontend provider: " + config.frontend());
 
         // 5) Avvio UI (nessun parametro -> ok Supplier o stringa diretta)
-        LOGGER.info("Avvio applicazione...");
+        System.out.println("Avvio applicazione...");
         FrontendControllerFactory.getInstance().startApplication();
     }
 }

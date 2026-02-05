@@ -52,13 +52,16 @@ public abstract class AbstractGraphicLoginController implements GraphicLoginCont
         }
 
         LogicControllerGestioneAccesso logicController = new LogicControllerGestioneAccesso();
-        SessioneUtenteBean sessione = logicController.verificaCredenziali(credenziali);
-
-        if (sessione != null) {
-            logicController.saveLog(sessione);
-            goToHome(sessione);
-        } else {
-            goToLoginWithError(GraphicControllerUtils.MSG_CREDENZIALI_NON_VALIDE);
+        try {
+            SessioneUtenteBean sessione = logicController.verificaCredenziali(credenziali);
+            if (sessione != null) {
+                logicController.saveLog(sessione);
+                goToHome(sessione);
+            } else {
+                goToLoginWithError(GraphicControllerUtils.MSG_CREDENZIALI_NON_VALIDE);
+            }
+        } catch (IllegalStateException ex) {
+            goToLoginWithError(ex.getMessage());
         }
     }
 

@@ -30,6 +30,11 @@ public class InMemoryPrenotazioneDAO extends InMemoryDAO<Integer, Prenotazione> 
     }
 
     @Override
+    public Prenotazione findById(int idPrenotazione) {
+        return load(idPrenotazione);
+    }
+
+    @Override
     public List<Prenotazione> findByUtente(int idUtente) {
         return filter(p -> p.getIdUtente() == idUtente);
     }

@@ -1,5 +1,5 @@
 package com.ispw.view.interfaces;
 
-public class ViewGestionePrenotazione {
-    
+public interface ViewGestionePrenotazione extends GenericView {
+	// marker interface
 }

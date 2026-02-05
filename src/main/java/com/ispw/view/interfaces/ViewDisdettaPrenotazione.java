@@ -1,5 +1,5 @@
 package com.ispw.view.interfaces;
 
-public class ViewDisdettaPrenotazione {
-    
+public interface ViewDisdettaPrenotazione extends GenericView {
+	// marker interface
 }

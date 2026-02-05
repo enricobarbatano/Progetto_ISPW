@@ -162,4 +162,5 @@ public class LogicControllerRegistrazione {
 
     @SuppressWarnings("java:S1312")
     private Logger log() { return Logger.getLogger(getClass().getName()); }
+
 }

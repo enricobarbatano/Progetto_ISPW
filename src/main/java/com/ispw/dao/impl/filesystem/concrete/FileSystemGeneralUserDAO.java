@@ -1,13 +1,15 @@
 package com.ispw.dao.impl.filesystem.concrete;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;    // abstract
+import java.util.Locale;  // concreto da istanziare
+import java.util.Objects;
+
 import com.ispw.dao.impl.filesystem.FileSystemDAO;
 import com.ispw.dao.interfaces.GeneralUserDAO;
-import com.ispw.model.entity.GeneralUser;    // abstract
-import com.ispw.model.entity.UtenteFinale;  // concreto da istanziare
-
-import java.nio.file.Path;
-import java.util.Locale;
-import java.util.Objects;
+import com.ispw.model.entity.GeneralUser;
+import com.ispw.model.entity.UtenteFinale;
 
 /**
  * DAO FileSystem per GeneralUser.
@@ -58,6 +60,11 @@ public final class FileSystemGeneralUserDAO extends FileSystemDAO<Integer, Gener
     @Override
     public GeneralUser findById(int idUtente) {
         return load(idUtente);
+    }
+
+    @Override
+    public List<GeneralUser> findAll() {
+        return new ArrayList<>(this.cache.values());
     }
 
     private static String normalizeEmail(String email) {

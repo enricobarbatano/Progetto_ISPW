@@ -1,6 +1,7 @@
 package com.ispw.dao.impl.memory.concrete;
 
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -56,6 +57,11 @@ public final class InMemoryGeneralUserDAO extends InMemoryDAO<Integer, GeneralUs
     @Override
     public GeneralUser findById(int idUtente) {
         return load(idUtente);
+    }
+
+    @Override
+    public List<GeneralUser> findAll() {
+        return snapshotValues();
     }
 
     private static String normalizeEmail(String email) {

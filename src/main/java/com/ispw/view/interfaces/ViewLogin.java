@@ -1,5 +1,5 @@
 package com.ispw.view.interfaces;
 
-public class ViewLogin {
-    
+public interface ViewLogin extends GenericView {
+	// marker interface
 }

@@ -1,7 +1,6 @@
 // src/main/java/com/ispw/controller/factory/CLIFrontendControllerFactory.java
 package com.ispw.controller.factory;
 
-import java.util.logging.Logger;
 
 import com.ispw.controller.graphic.GraphicControllerAccount;
 import com.ispw.controller.graphic.GraphicControllerDisdetta;
@@ -10,6 +9,7 @@ import com.ispw.controller.graphic.GraphicControllerPenalita;
 import com.ispw.controller.graphic.GraphicControllerPrenotazione;
 import com.ispw.controller.graphic.GraphicControllerRegistrazione;
 import com.ispw.controller.graphic.GraphicControllerRegole;
+import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.GraphicLoginController;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerAccount;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerDisdetta;
@@ -19,12 +19,26 @@ import com.ispw.controller.graphic.cli.CLIGraphicControllerPrenotazione;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerRegistrazione;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerRegole;
 import com.ispw.controller.graphic.cli.CLIGraphicLoginController;
+import com.ispw.view.cli.CLIAccountView;
+import com.ispw.view.cli.CLIDisdettaView;
+import com.ispw.view.cli.CLIHomeView;
+import com.ispw.view.cli.CLILoginView;
+import com.ispw.view.cli.CLIPenalitaView;
+import com.ispw.view.cli.CLIPrenotazioneView;
+import com.ispw.view.cli.CLIRegistrazioneView;
+import com.ispw.view.cli.CLIRegoleView;
 
 public final class CLIFrontendControllerFactory extends FrontendControllerFactory {
-
-    private static final Logger logger = Logger.getLogger(CLIFrontendControllerFactory.class.getName());
     private CLIGraphicControllerNavigation navigationController;
-    private GraphicLoginController loginController;
+    private CLIGraphicLoginController loginController;
+    private CLILoginView loginView;
+    private CLIHomeView homeView;
+    private CLIRegistrazioneView registrazioneView;
+    private CLIAccountView accountView;
+    private CLIPrenotazioneView prenotazioneView;
+    private CLIDisdettaView disdettaView;
+    private CLIRegoleView regoleView;
+    private CLIPenalitaView penalitaView;
     private GraphicControllerAccount accountController;
     private GraphicControllerRegistrazione registrazioneController;
     private GraphicControllerPrenotazione prenotazioneController;
@@ -34,11 +48,9 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
 
     @Override
     public void startApplication() {
-        logger.info("Avvio CLI...");
+        System.out.println("Avvio CLI...");
         // Avvia il flusso con la schermata di login
-        GraphicLoginController loginGraphicController = createLoginController();
-        loginGraphicController.onShow(null);
-        // La CLI leggerà input da console e chiamerà loginController.effettuaLogin(...)
+        getNavigationController().goTo(GraphicControllerUtils.ROUTE_LOGIN);
     }
 
     @Override
@@ -48,6 +60,70 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
             loginController = new CLIGraphicLoginController(navigator);
         }
         return loginController;
+    }
+
+    public CLILoginView createLoginView() {
+        if (loginView == null) {
+            loginView = new CLILoginView(loginController == null
+                ? (CLIGraphicLoginController) createLoginController()
+                : loginController);
+        }
+        return loginView;
+    }
+
+    public CLIHomeView createHomeView() {
+        if (homeView == null) {
+            homeView = new CLIHomeView(getNavigationController());
+        }
+        return homeView;
+    }
+
+    public CLIRegistrazioneView createRegistrazioneView() {
+        if (registrazioneView == null) {
+            registrazioneView = new CLIRegistrazioneView(
+                (CLIGraphicControllerRegistrazione) createRegistrazioneController());
+        }
+        return registrazioneView;
+    }
+
+    public CLIAccountView createAccountView() {
+        if (accountView == null) {
+            accountView = new CLIAccountView(
+                (CLIGraphicControllerAccount) createAccountController());
+        }
+        return accountView;
+    }
+
+    public CLIPrenotazioneView createPrenotazioneView() {
+        if (prenotazioneView == null) {
+            prenotazioneView = new CLIPrenotazioneView(
+                (CLIGraphicControllerPrenotazione) createPrenotazioneController());
+        }
+        return prenotazioneView;
+    }
+
+    public CLIDisdettaView createDisdettaView() {
+        if (disdettaView == null) {
+            disdettaView = new CLIDisdettaView(
+                (CLIGraphicControllerDisdetta) createDisdettaController());
+        }
+        return disdettaView;
+    }
+
+    public CLIRegoleView createRegoleView() {
+        if (regoleView == null) {
+            regoleView = new CLIRegoleView(
+                (CLIGraphicControllerRegole) createRegoleController());
+        }
+        return regoleView;
+    }
+
+    public CLIPenalitaView createPenalitaView() {
+        if (penalitaView == null) {
+            penalitaView = new CLIPenalitaView(
+                (CLIGraphicControllerPenalita) createPenalitaController());
+        }
+        return penalitaView;
     }
 
     @Override
@@ -120,12 +196,13 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     private void registerRoutes() {
         // Registrazione nelle factory concrete: conoscono i controller CLI reali e il navigator concreto.
         // Nell'astratta introdurrebbe dipendenze verso classi concrete, violando il disaccoppiamento.
-        navigationController.registerRoute(createLoginController().getRouteName(), createLoginController());
-        navigationController.registerRoute(createAccountController().getRouteName(), createAccountController());
-        navigationController.registerRoute(createRegistrazioneController().getRouteName(), createRegistrazioneController());
-        navigationController.registerRoute(createPrenotazioneController().getRouteName(), createPrenotazioneController());
-        navigationController.registerRoute(createDisdettaController().getRouteName(), createDisdettaController());
-        navigationController.registerRoute(createRegoleController().getRouteName(), createRegoleController());
-        navigationController.registerRoute(createPenalitaController().getRouteName(), createPenalitaController());
+        navigationController.registerRoute(createLoginView().getRouteName(), createLoginView());
+        navigationController.registerRoute(createHomeView().getRouteName(), createHomeView());
+        navigationController.registerRoute(createAccountView().getRouteName(), createAccountView());
+        navigationController.registerRoute(createRegistrazioneView().getRouteName(), createRegistrazioneView());
+        navigationController.registerRoute(createPrenotazioneView().getRouteName(), createPrenotazioneView());
+        navigationController.registerRoute(createDisdettaView().getRouteName(), createDisdettaView());
+        navigationController.registerRoute(createRegoleView().getRouteName(), createRegoleView());
+        navigationController.registerRoute(createPenalitaView().getRouteName(), createPenalitaView());
     }
 }  

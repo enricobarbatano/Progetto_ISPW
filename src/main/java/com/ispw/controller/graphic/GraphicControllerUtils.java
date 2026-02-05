@@ -37,6 +37,7 @@ public final class GraphicControllerUtils {
     public static final String KEY_DATA_PAGAMENTO = "dataPagamento";
     public static final String KEY_SLOT_DISPONIBILI = "slotDisponibili";
     public static final String KEY_SESSIONE = "sessione";
+    public static final String KEY_UTENTI = "utenti";
 
     public static final String ROUTE_LOGIN = "login";
     public static final String ROUTE_HOME = "home";

@@ -1,5 +1,5 @@
 package com.ispw.view.interfaces;
 
-public class ViewHomeProfilo {
-    
+public interface ViewHomeProfilo extends GenericView {
+	// marker interface
 }

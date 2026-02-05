@@ -83,8 +83,8 @@ public class LogicControllerGestionePagamento
         // Gateway fittizio: importo > 0 => esito positivo
         boolean ok = dati.getImporto() > 0f;
         StatoPagamento stato = ok
-                ? pickStato( "ESEGUITO", "APPROVATO", "PAGATO", "SUCCESSO", "COMPLETATO")
-                : pickStato(RIFIUTATO, FALLITO, NEGATO, KO);
+            ? pickStato("OK", "ESEGUITO", "APPROVATO", "PAGATO", "SUCCESSO", "COMPLETATO")
+            : pickStato(FALLITO, RIFIUTATO, NEGATO, KO);
 
         pay.setStato(stato);
         // Persisto tramite DAO (nessun SQL qui)
@@ -130,8 +130,8 @@ public class LogicControllerGestionePagamento
 
         boolean ok = dati.getImporto() > 0f;
         String stato = (ok
-                ? pickStato("ESEGUITO", "APPROVATO", "PAGATO", "SUCCESSO", "COMPLETATO")
-                : pickStato(RIFIUTATO, FALLITO, NEGATO, KO)
+            ? pickStato("OK", "ESEGUITO", "APPROVATO", "PAGATO", "SUCCESSO", "COMPLETATO")
+            : pickStato(FALLITO, RIFIUTATO, NEGATO, KO)
         ).name();
 
         pay.setStato(StatoPagamento.valueOf(stato)); // coerente con l'enum reale

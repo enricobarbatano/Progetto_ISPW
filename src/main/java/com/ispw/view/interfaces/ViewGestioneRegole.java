@@ -1,5 +1,5 @@
 package com.ispw.view.interfaces;
 
-public class ViewGestioneRegole {
-    
+public interface ViewGestioneRegole extends GenericView {
+	// marker interface
 }

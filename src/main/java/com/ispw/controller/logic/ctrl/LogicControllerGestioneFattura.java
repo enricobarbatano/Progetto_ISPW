@@ -11,7 +11,11 @@ import com.ispw.controller.logic.interfaces.fattura.GestioneFatturaPrenotazione;
 import com.ispw.controller.logic.interfaces.fattura.GestioneFatturaRimborso;
 import com.ispw.dao.factory.DAOFactory;
 import com.ispw.dao.interfaces.FatturaDAO;
+import com.ispw.dao.interfaces.GeneralUserDAO;
+import com.ispw.dao.interfaces.PrenotazioneDAO;
 import com.ispw.model.entity.Fattura;
+import com.ispw.model.entity.GeneralUser;
+import com.ispw.model.entity.Prenotazione;
 
 
 public class LogicControllerGestioneFattura
@@ -32,8 +36,15 @@ public class LogicControllerGestioneFattura
 
         final LocalDate emissione = (dati.getDataOperazione() != null) ? dati.getDataOperazione() : LocalDate.now();
 
+        final int idUtente = resolveIdUtente(dati);
+        if (idUtente <= 0) {
+            log().warning("[FATTURA][WARN] Utente non trovato per email/codice fiscale");
+            return null;
+        }
+
         Fattura f = new Fattura();
         f.setIdPrenotazione(idPrenotazione);
+        f.setIdUtente(idUtente);
         f.setCodiceFiscaleCliente(trimOrNull(dati.getCodiceFiscaleCliente()));
         f.setDataEmissione(emissione);
         f.setLinkPdf(buildPdfLink("FATT", idPrenotazione, emissione));
@@ -66,8 +77,15 @@ public class LogicControllerGestioneFattura
         final int idPrenotazioneFittizio = -Math.abs(idPenalita);
         final LocalDate emissione = (dati.getDataOperazione() != null) ? dati.getDataOperazione() : LocalDate.now();
 
+        final int idUtente = resolveIdUtente(dati);
+        if (idUtente <= 0) {
+            log().warning("[FATTURA][WARN] Utente non trovato per email/codice fiscale (penalita)");
+            return null;
+        }
+
         Fattura f = new Fattura();
         f.setIdPrenotazione(idPrenotazioneFittizio);
+        f.setIdUtente(idUtente);
         f.setCodiceFiscaleCliente(trimOrNull(dati.getCodiceFiscaleCliente()));
         f.setDataEmissione(emissione);
         f.setLinkPdf(buildPdfLink("PEN", idPrenotazioneFittizio, emissione));
@@ -91,8 +109,14 @@ public class LogicControllerGestioneFattura
         }
 
         final LocalDate oggi = LocalDate.now();
+        Prenotazione p = prenotazioneDAO().findById(idPrenotazione);
+        if (p == null) {
+            log().log(Level.WARNING, "[FATTURA][WARN] Prenotazione non trovata per NC: {0}", idPrenotazione);
+            return;
+        }
         Fattura nc = new Fattura();
         nc.setIdPrenotazione(idPrenotazione);
+        nc.setIdUtente(p.getIdUtente());
         // Il CF può essere popolato da un orchestratore principale, se necessario.
         nc.setDataEmissione(oggi);
         nc.setLinkPdf(buildPdfLink("NC", idPrenotazione, oggi));
@@ -127,9 +151,39 @@ public class LogicControllerGestioneFattura
         return prefix + "-" + Math.abs(ref) + "-" + d + ".pdf";
     }
 
+    private int resolveIdUtente(DatiFatturaBean dati) {
+        if (dati == null) {
+            return 0;
+        }
+        String email = firstNonBlank(dati.getEmail(), dati.getCodiceFiscaleCliente());
+        if (email == null) {
+            return 0;
+        }
+        GeneralUser user = userDAO().findByEmail(email.trim().toLowerCase());
+        return user != null ? user.getIdUtente() : 0;
+    }
+
+    private String firstNonBlank(String a, String b) {
+        if (hasText(a)) {
+            return a;
+        }
+        if (hasText(b)) {
+            return b;
+        }
+        return null;
+    }
+
     /** DAO on-demand (nessun campo, nessuna dipendenza da concreti). */
     private FatturaDAO fatturaDAO() {
         return DAOFactory.getInstance().getFatturaDAO();
+    }
+
+    private GeneralUserDAO userDAO() {
+        return DAOFactory.getInstance().getGeneralUserDAO();
+    }
+
+    private PrenotazioneDAO prenotazioneDAO() {
+        return DAOFactory.getInstance().getPrenotazioneDAO();
     }
 
     /** Logger on-demand per evitare campi (stateless). S1312 soppressa localmente. */

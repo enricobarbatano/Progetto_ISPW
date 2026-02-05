@@ -1,5 +1,5 @@
 package com.ispw.view.interfaces;
 
-public class ViewGestioneAccount {
-    
+public interface ViewGestioneAccount extends GenericView {
+	// marker interface
 }

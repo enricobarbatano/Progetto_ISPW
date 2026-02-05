@@ -2,14 +2,20 @@
 package com.ispw.view.cli.console;
 
 import java.util.Scanner;
-import java.util.logging.Logger;
-
 public class ConsoleLoginView {
-    private static final Logger logger = Logger.getLogger(ConsoleLoginView.class.getName());
     private final Scanner in = new Scanner(System.in);
-    public void render() { logger.info("\n=== LOGIN ==="); }
+    public void render() {
+        System.out.println("\n=== LOGIN ===");
+        System.out.println("1) Login");
+        System.out.println("2) Registrazione");
+    }
+
+    public String readChoice() {
+        System.out.print("Scelta: ");
+        return in.nextLine().trim();
+    }
     public String readEmail() { System.out.print("Email: "); return in.nextLine(); }
     public String readPassword() { System.out.print("Password: "); return in.nextLine(); }
-    public void showError(String msg) { logger.severe("[ERRORE] " + msg); }
-    public void showWelcome(String name) { logger.info("Benvenuto, " + name + "!"); }
+    public void showError(String msg) { System.out.println("[ERRORE] " + msg); }
+    public void showWelcome(String name) { System.out.println("Benvenuto, " + name + "!"); }
 }
