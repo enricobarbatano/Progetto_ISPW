@@ -1,8 +1,6 @@
 package com.ispw.controller.graphic.gui;
 
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ispw.bean.DatiPenalitaBean;
@@ -34,17 +32,9 @@ public class GUIGraphicControllerPenalita extends AbstractGraphicControllerPenal
         return logicController().applicaSanzione(dati);
     }
 
-    public void richiediListaUtenti() {
-        try {
-            List<String> utenti = logicController().listaUtentiPerPenalita();
-
-            if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_PENALITA,
-                    Map.of(GraphicControllerUtils.KEY_UTENTI, utenti));
-            }
-        } catch (Exception e) {
-            log().log(Level.SEVERE, "Errore recupero lista utenti", e);
-        }
+    @Override
+    protected List<String> listaUtentiPerPenalita() {
+        return logicController().listaUtentiPerPenalita();
     }
 
     private LogicControllerApplicaPenalita logicController() {

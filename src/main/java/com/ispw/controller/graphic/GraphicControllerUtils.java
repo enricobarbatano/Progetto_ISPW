@@ -98,7 +98,7 @@ public final class GraphicControllerUtils {
             return;
         }
         if (log != null) {
-            log.warning(() -> prefix + " " + message);
+            log.fine(() -> prefix + " " + message);
         }
         if (navigator != null) {
             navigator.goTo(route, Map.of(KEY_ERROR, message));
@@ -112,7 +112,7 @@ public final class GraphicControllerUtils {
         Object error = params.get(KEY_ERROR);
         if (error != null) {
             if (log != null) {
-                log.warning(() -> prefix + " " + error);
+                log.fine(() -> prefix + " " + error);
             }
             return;
         }
@@ -122,7 +122,7 @@ public final class GraphicControllerUtils {
         }
         if (rawMessage != null && log != null) {
             final String msg = String.valueOf(rawMessage);
-            log.info(() -> prefix + " " + msg);
+            log.fine(() -> prefix + " " + msg);
         }
     }
 }

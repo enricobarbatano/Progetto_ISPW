@@ -12,6 +12,7 @@ import com.ispw.bean.RiepilogoPrenotazioneBean;
 import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.bean.StatoPagamentoBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
+import com.ispw.controller.graphic.GraphicControllerPrenotazioneUtils;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerPrenotazione;
 import com.ispw.controller.logic.ctrl.LogicControllerPrenotazioneCampo;
@@ -43,9 +44,8 @@ public class CLIGraphicControllerPrenotazione extends AbstractGraphicControllerP
 
     @Override
     protected List<String> trovaSlotDisponibili(ParametriVerificaBean input) {
-        return new LogicControllerPrenotazioneCampo().trovaSlotDisponibili(input).stream()
-            .map(s -> s.getData() + " " + s.getOraInizio() + "-" + s.getOraFine() + " (€" + s.getCosto() + ")")
-            .toList();
+        return GraphicControllerPrenotazioneUtils.formatSlotDisponibili(
+            new LogicControllerPrenotazioneCampo().trovaSlotDisponibili(input));
     }
 
     @Override
@@ -76,43 +76,6 @@ public class CLIGraphicControllerPrenotazione extends AbstractGraphicControllerP
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore recupero lista campi", e);
         }
-    }
-
-    /**
-     * Cerca disponibilità con input grezzo.
-     */
-    public void cercaDisponibilitaRaw(int idCampo, String data, String oraInizio, int durataMin) {
-        ParametriVerificaBean input = new ParametriVerificaBean();
-        input.setIdCampo(idCampo);
-        input.setData(data);
-        input.setOraInizio(oraInizio);
-        input.setDurataMin(durataMin);
-        cercaDisponibilita(input);
-    }
-
-    /**
-     * Crea prenotazione con input grezzo.
-     */
-    public void creaPrenotazioneRaw(int idCampo, String data, String oraInizio, String oraFine,
-                                    SessioneUtenteBean sessione) {
-        DatiInputPrenotazioneBean input = new DatiInputPrenotazioneBean();
-        input.setIdCampo(idCampo);
-        input.setData(data);
-        input.setOraInizio(oraInizio);
-        input.setOraFine(oraFine);
-        creaPrenotazione(input, sessione);
-    }
-
-    /**
-     * Procedi al pagamento con input grezzo.
-     */
-    public void procediAlPagamentoRaw(String metodo, String credenziale, float importo,
-                                      SessioneUtenteBean sessione) {
-        DatiPagamentoBean pagamento = new DatiPagamentoBean();
-        pagamento.setMetodo(metodo);
-        pagamento.setCredenziale(credenziale);
-        pagamento.setImporto(importo);
-        procediAlPagamento(pagamento, sessione);
     }
 
 }

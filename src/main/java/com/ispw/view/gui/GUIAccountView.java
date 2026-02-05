@@ -108,7 +108,11 @@ public class GUIAccountView extends GenericViewGUI implements ViewGestioneAccoun
         Button logout = new Button("Logout");
         logout.setOnAction(e -> controller.logout());
 
-        root.getChildren().addAll(title, error, success, nome, cognome, email, load, update, oldPwd, newPwd, changePwd, logout);
+        Button home = new Button("Home");
+        home.setOnAction(e -> controller.tornaAllaHome(sessione));
+
+        root.getChildren().addAll(title, error, success, nome, cognome, email, load, update, oldPwd, newPwd,
+            changePwd, logout, home);
         GuiLauncher.setRoot(root);
     }
 }

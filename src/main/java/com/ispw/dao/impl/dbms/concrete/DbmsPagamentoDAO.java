@@ -135,17 +135,7 @@ public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements Pag
     private void insert(Pagamento p) {
         try (var c = openConnection();
              var ps = c.prepareStatement(SQL_INSERT, java.sql.Statement.RETURN_GENERATED_KEYS)) {
-
-            ps.setInt(1, p.getIdPrenotazione());
-            if (p.getImportoFinale() != null) ps.setBigDecimal(2, p.getImportoFinale());
-            else ps.setNull(2, Types.DECIMAL);
-
-            ps.setString(3, p.getMetodo() != null ? p.getMetodo().name() : null);
-            ps.setString(4, p.getStato()  != null ? p.getStato().name()  : null);
-
-            LocalDateTime dt = p.getDataPagamento();
-            if (dt != null) ps.setTimestamp(5, Timestamp.valueOf(dt));
-            else ps.setNull(5, Types.TIMESTAMP);
+            bindPagamento(ps, p, 1);
 
             ps.executeUpdate();
             try (var gk = ps.getGeneratedKeys()) {
@@ -160,18 +150,22 @@ public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements Pag
 
     private void update(Pagamento p) {
         executeUpdate(SQL_UPDATE, ps -> {
-            ps.setInt(1, p.getIdPrenotazione());
-            if (p.getImportoFinale() != null) ps.setBigDecimal(2, p.getImportoFinale());
-            else ps.setNull(2, Types.DECIMAL);
-
-            ps.setString(3, p.getMetodo() != null ? p.getMetodo().name() : null);
-            ps.setString(4, p.getStato()  != null ? p.getStato().name()  : null);
-
-            LocalDateTime dt = p.getDataPagamento();
-            if (dt != null) ps.setTimestamp(5, Timestamp.valueOf(dt));
-            else ps.setNull(5, Types.TIMESTAMP);
-
+            bindPagamento(ps, p, 1);
             ps.setInt(6, p.getIdPagamento());
         });
+    }
+
+    private void bindPagamento(java.sql.PreparedStatement ps, Pagamento p, int startIndex)
+            throws java.sql.SQLException {
+        ps.setInt(startIndex, p.getIdPrenotazione());
+        if (p.getImportoFinale() != null) ps.setBigDecimal(startIndex + 1, p.getImportoFinale());
+        else ps.setNull(startIndex + 1, Types.DECIMAL);
+
+        ps.setString(startIndex + 2, p.getMetodo() != null ? p.getMetodo().name() : null);
+        ps.setString(startIndex + 3, p.getStato()  != null ? p.getStato().name()  : null);
+
+        LocalDateTime dt = p.getDataPagamento();
+        if (dt != null) ps.setTimestamp(startIndex + 4, Timestamp.valueOf(dt));
+        else ps.setNull(startIndex + 4, Types.TIMESTAMP);
     }
 }

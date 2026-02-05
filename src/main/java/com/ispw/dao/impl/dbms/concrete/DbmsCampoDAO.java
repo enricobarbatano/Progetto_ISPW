@@ -147,40 +147,58 @@ public class DbmsCampoDAO extends DbmsDAO<Integer, Campo> implements CampoDAO {
              PreparedStatement ps = conn.prepareStatement(SQL_FIND_PRENOTAZIONI_BY_CAMPO)) {
 
             ps.setInt(1, c.getIdCampo());
+            loadPrenotazioniFromStatement(ps, c);
+        } catch (SQLException e) {
+            throw wrap(e);
+        }
+    }
 
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    Prenotazione p = new Prenotazione();
-                    p.setIdPrenotazione(rs.getInt("id_prenotazione"));
-                    p.setIdUtente(rs.getInt("id_utente"));
-                    p.setIdCampo(rs.getInt("id_campo"));
-
-                    Date d = rs.getDate("data");
-                    Time tStart = rs.getTime("ora_inizio");
-                    Time tEnd = rs.getTime("ora_fine");
-                    if (d != null) p.setData(d.toLocalDate());
-                    if (tStart != null) p.setOraInizio(tStart.toLocalTime());
-                    if (tEnd != null) p.setOraFine(tEnd.toLocalTime());
-
-                    String stato = rs.getString("stato");
-                    if (stato != null) {
-                        try {
-                            StatoPrenotazione statoEnum = StatoPrenotazione.valueOf(stato);
-                            if (statoEnum == StatoPrenotazione.ANNULLATA) {
-                                continue;
-                            }
-                            p.setStato(statoEnum);
-                        } catch (IllegalArgumentException ex) {
-                            // stato non valido: ignora filtro e carica comunque
-                        }
-                    }
-
-                    p.setNotificaRichiesta(rs.getBoolean("notifica_richiesta"));
+    private void loadPrenotazioniFromStatement(PreparedStatement ps, Campo c) throws SQLException {
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Prenotazione p = mapPrenotazione(rs);
+                if (p != null) {
                     c.aggiungiPrenotazione(p);
                 }
             }
-        } catch (SQLException e) {
-            throw wrap(e);
+        }
+    }
+
+    private Prenotazione mapPrenotazione(ResultSet rs) throws SQLException {
+        Prenotazione p = new Prenotazione();
+        p.setIdPrenotazione(rs.getInt("id_prenotazione"));
+        p.setIdUtente(rs.getInt("id_utente"));
+        p.setIdCampo(rs.getInt("id_campo"));
+
+        fillDateTime(p, rs);
+
+        StatoPrenotazione statoEnum = parseStatoPrenotazione(rs.getString("stato"));
+        if (statoEnum == StatoPrenotazione.ANNULLATA) {
+            return null;
+        }
+        if (statoEnum != null) {
+            p.setStato(statoEnum);
+        }
+
+        p.setNotificaRichiesta(rs.getBoolean("notifica_richiesta"));
+        return p;
+    }
+
+    private void fillDateTime(Prenotazione p, ResultSet rs) throws SQLException {
+        Date d = rs.getDate("data");
+        Time tStart = rs.getTime("ora_inizio");
+        Time tEnd = rs.getTime("ora_fine");
+        if (d != null) p.setData(d.toLocalDate());
+        if (tStart != null) p.setOraInizio(tStart.toLocalTime());
+        if (tEnd != null) p.setOraFine(tEnd.toLocalTime());
+    }
+
+    private StatoPrenotazione parseStatoPrenotazione(String stato) {
+        if (stato == null) return null;
+        try {
+            return StatoPrenotazione.valueOf(stato);
+        } catch (IllegalArgumentException ex) {
+            return null;
         }
     }
 }

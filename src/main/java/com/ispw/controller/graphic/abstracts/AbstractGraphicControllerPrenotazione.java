@@ -145,4 +145,32 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
     public void tornaAllaHome() {
         goToHome();
     }
+
+    public void cercaDisponibilitaRaw(int idCampo, String data, String oraInizio, int durataMin) {
+        ParametriVerificaBean input = new ParametriVerificaBean();
+        input.setIdCampo(idCampo);
+        input.setData(data);
+        input.setOraInizio(oraInizio);
+        input.setDurataMin(durataMin);
+        cercaDisponibilita(input);
+    }
+
+    public void creaPrenotazioneRaw(int idCampo, String data, String oraInizio, String oraFine,
+                                    SessioneUtenteBean sessione) {
+        DatiInputPrenotazioneBean input = new DatiInputPrenotazioneBean();
+        input.setIdCampo(idCampo);
+        input.setData(data);
+        input.setOraInizio(oraInizio);
+        input.setOraFine(oraFine);
+        creaPrenotazione(input, sessione);
+    }
+
+    public void procediAlPagamentoRaw(String metodo, String credenziale, float importo,
+                                      SessioneUtenteBean sessione) {
+        DatiPagamentoBean pagamento = new DatiPagamentoBean();
+        pagamento.setMetodo(metodo);
+        pagamento.setCredenziale(credenziale);
+        pagamento.setImporto(importo);
+        procediAlPagamento(pagamento, sessione);
+    }
 }

@@ -109,6 +109,11 @@ public class CLIDisdettaView extends GenericViewCLI implements ViewDisdettaPreno
             return false;
         }
         esitoView.showMessage(String.valueOf(raw));
+        System.out.print("Torna alla home? [s/N]: ");
+        String ans = in.nextLine().trim();
+        if ("s".equalsIgnoreCase(ans)) {
+            controller.tornaAllaHome();
+        }
         return true;
     }
 }

@@ -63,6 +63,7 @@ public class CLIAccountView extends GenericViewCLI implements ViewGestioneAccoun
         System.out.println("2) Aggiorna dati account");
         System.out.println("3) Cambia password");
         System.out.println("4) Logout");
+        System.out.println("0) Home");
         System.out.print("Scelta: ");
         String scelta = in.nextLine().trim();
 
@@ -71,6 +72,7 @@ public class CLIAccountView extends GenericViewCLI implements ViewGestioneAccoun
             case "2" -> handleAggiorna();
             case "3" -> handleCambiaPassword();
             case "4" -> controller.logout();
+            case "0" -> controller.tornaAllaHome(sessione);
             default -> System.out.println("Scelta non valida");
         }
     }

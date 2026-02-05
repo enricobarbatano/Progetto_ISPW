@@ -29,18 +29,20 @@ import com.ispw.model.enums.StatoAccount;
 public final class DbmsGeneralUserDAO extends DbmsDAO<Integer, GeneralUser> implements GeneralUserDAO {
     private static final String ID_UTENTE= "id_utente";
     private static final String WHERE= " WHERE ";
+    private static final String SELECT = "SELECT ";
+    private static final String DA = " FROM ";
     // ======= Costanti SQL (adatta al tuo schema reale) =======
     private static final String TBL  = "general_user";
     private static final String COLS = "id_utente, nome, email, password, stato_account, ruolo";
 
     private static final String SQL_SELECT_ONE =
-            "SELECT " + COLS + " FROM " + TBL + WHERE + ID_UTENTE + " = ?";
+            SELECT + COLS + DA + TBL + WHERE + ID_UTENTE + " = ?";
 
     private static final String SQL_SELECT_BY_EMAIL =
-            "SELECT " + COLS + " FROM " + TBL + WHERE + "LOWER(email) = ?";
+            SELECT + COLS + DA + TBL + WHERE + "LOWER(email) = ?";
 
         private static final String SQL_SELECT_ALL =
-            "SELECT " + COLS + " FROM " + TBL;
+            SELECT + COLS + DA + TBL;
 
     private static final String SQL_EXISTS =
             "SELECT 1 FROM " + TBL + WHERE + ID_UTENTE + " = ?";

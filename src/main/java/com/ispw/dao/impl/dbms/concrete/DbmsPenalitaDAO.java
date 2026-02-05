@@ -107,16 +107,7 @@ public class DbmsPenalitaDAO extends DbmsDAO<Integer, Penalita> implements Penal
     private void insert(Penalita p) {
         try (Connection c = openConnection();
              PreparedStatement ps = c.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
-
-            ps.setInt(1, p.getIdUtente());
-            if (p.getDataEmissione() != null) ps.setDate(2, Date.valueOf(p.getDataEmissione()));
-            else ps.setNull(2, Types.DATE);
-
-            if (p.getImporto() != null) ps.setBigDecimal(3, p.getImporto());
-            else ps.setNull(3, Types.DECIMAL);
-
-            ps.setString(4, p.getMotivazione());
-            ps.setString(5, p.getStato() != null ? p.getStato().name() : null);
+            bindPenalita(ps, p, 1);
 
             ps.executeUpdate();
             try (ResultSet gk = ps.getGeneratedKeys()) {
@@ -131,16 +122,20 @@ public class DbmsPenalitaDAO extends DbmsDAO<Integer, Penalita> implements Penal
 
     private void update(Penalita p) {
         executeUpdate(SQL_UPDATE, ps -> {
-            ps.setInt(1, p.getIdUtente());
-            if (p.getDataEmissione() != null) ps.setDate(2, Date.valueOf(p.getDataEmissione()));
-            else ps.setNull(2, Types.DATE);
-
-            if (p.getImporto() != null) ps.setBigDecimal(3, p.getImporto());
-            else ps.setNull(3, Types.DECIMAL);
-
-            ps.setString(4, p.getMotivazione());
-            ps.setString(5, p.getStato() != null ? p.getStato().name() : null);
+            bindPenalita(ps, p, 1);
             ps.setInt(6, p.getIdPenalita());
         });
+    }
+
+    private void bindPenalita(PreparedStatement ps, Penalita p, int startIndex) throws SQLException {
+        ps.setInt(startIndex, p.getIdUtente());
+        if (p.getDataEmissione() != null) ps.setDate(startIndex + 1, Date.valueOf(p.getDataEmissione()));
+        else ps.setNull(startIndex + 1, Types.DATE);
+
+        if (p.getImporto() != null) ps.setBigDecimal(startIndex + 2, p.getImporto());
+        else ps.setNull(startIndex + 2, Types.DECIMAL);
+
+        ps.setString(startIndex + 3, p.getMotivazione());
+        ps.setString(startIndex + 4, p.getStato() != null ? p.getStato().name() : null);
     }
 }

@@ -11,6 +11,7 @@ import com.ispw.view.cli.console.ConsolePagamentoView;
 import com.ispw.view.cli.console.ConsolePrenotazioneConfirmView;
 import com.ispw.view.cli.console.ConsolePrenotazioneSearchView;
 import com.ispw.view.interfaces.ViewGestionePrenotazione;
+import com.ispw.view.shared.PrenotazioneViewUtils;
 
 /**
  * View CLI per prenotazione campo.
@@ -95,12 +96,12 @@ public class CLIPrenotazioneView extends GenericViewCLI implements ViewGestioneP
             return true;
         }
         String slot = slots.get(sel);
-        SlotInfo info = parseSlot(slot);
+        PrenotazioneViewUtils.SlotInfo info = PrenotazioneViewUtils.parseSlot(slot);
         if (info == null) {
             searchView.showError("Formato slot non valido");
             return true;
         }
-        controller.creaPrenotazioneRaw(lastCampoId, info.data, info.oraInizio, info.oraFine, sessione);
+        controller.creaPrenotazioneRaw(lastCampoId, info.data(), info.oraInizio(), info.oraFine(), sessione);
         return true;
     }
 
@@ -137,7 +138,7 @@ public class CLIPrenotazioneView extends GenericViewCLI implements ViewGestioneP
         Object stato = pagamento.get(GraphicControllerUtils.KEY_STATO);
         Object msg = pagamento.get(GraphicControllerUtils.KEY_MESSAGGIO);
 
-        String esito = String.format("Esito: %s - stato: %s - %s", success, stato, msg);
+        String esito = PrenotazioneViewUtils.formatEsitoPagamento(success, stato, msg);
         pagamentoView.showPaymentOutcome(esito);
         System.out.print("Torna alla home? [s/N]: ");
         String ans = in.nextLine().trim();
@@ -146,19 +147,5 @@ public class CLIPrenotazioneView extends GenericViewCLI implements ViewGestioneP
         }
         return true;
     }
-
-    private SlotInfo parseSlot(String slot) {
-        if (slot == null) return null;
-        String[] parts = slot.split(" ");
-        if (parts.length < 2) return null;
-        String data = parts[0];
-        String times = parts[1];
-        int dash = times.indexOf('-');
-        if (dash <= 0) return null;
-        String oraInizio = times.substring(0, dash);
-        String oraFine = times.substring(dash + 1);
-        return new SlotInfo(data, oraInizio, oraFine);
-    }
-
-    private record SlotInfo(String data, String oraInizio, String oraFine) { }
+    // The parseSlot method and SlotInfo record are now handled by PrenotazioneViewUtils
 }

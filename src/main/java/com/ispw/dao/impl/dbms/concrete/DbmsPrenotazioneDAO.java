@@ -155,16 +155,8 @@ public class DbmsPrenotazioneDAO extends DbmsDAO<Integer, Prenotazione> implemen
             ps.setInt(1, p.getIdPrenotazione());
             ps.setInt(2, p.getIdUtente());
             ps.setInt(3, p.getIdCampo());
-
-            LocalDate d = p.getData();
-            LocalTime tStart = p.getOraInizio();
-            LocalTime tEnd   = p.getOraFine();
-
-            if (d != null) ps.setDate(4, Date.valueOf(d)); else ps.setNull(4, Types.DATE);
-            if (tStart != null) ps.setTime(5, Time.valueOf(tStart)); else ps.setNull(5, Types.TIME);
-            if (tEnd != null) ps.setTime(6, Time.valueOf(tEnd)); else ps.setNull(6, Types.TIME);
-
-            ps.setString(7, p.getStato() != null ? p.getStato().name() : null);
+            bindDateTime(ps, 4, 5, 6, p);
+            bindStato(ps, 7, p);
             ps.setBoolean(8, p.isNotificaRichiesta());
         });
     }
@@ -173,18 +165,25 @@ public class DbmsPrenotazioneDAO extends DbmsDAO<Integer, Prenotazione> implemen
         executeUpdate(SQL_UPDATE, ps -> {
             ps.setInt(1, p.getIdUtente());
             ps.setInt(2, p.getIdCampo());
-
-            LocalDate d = p.getData();
-            LocalTime tStart = p.getOraInizio();
-            LocalTime tEnd   = p.getOraFine();
-
-            if (d != null) ps.setDate(3, Date.valueOf(d)); else ps.setNull(3, Types.DATE);
-            if (tStart != null) ps.setTime(4, Time.valueOf(tStart)); else ps.setNull(4, Types.TIME);
-            if (tEnd != null) ps.setTime(5, Time.valueOf(tEnd)); else ps.setNull(5, Types.TIME);
-
-            ps.setString(6, p.getStato() != null ? p.getStato().name() : null);
+            bindDateTime(ps, 3, 4, 5, p);
+            bindStato(ps, 6, p);
             ps.setBoolean(7, p.isNotificaRichiesta());
             ps.setInt(8, p.getIdPrenotazione());
         });
+    }
+
+    private void bindDateTime(java.sql.PreparedStatement ps, int idxDate, int idxStart, int idxEnd,
+                              Prenotazione p) throws java.sql.SQLException {
+        LocalDate d = p.getData();
+        LocalTime tStart = p.getOraInizio();
+        LocalTime tEnd = p.getOraFine();
+
+        if (d != null) ps.setDate(idxDate, Date.valueOf(d)); else ps.setNull(idxDate, Types.DATE);
+        if (tStart != null) ps.setTime(idxStart, Time.valueOf(tStart)); else ps.setNull(idxStart, Types.TIME);
+        if (tEnd != null) ps.setTime(idxEnd, Time.valueOf(tEnd)); else ps.setNull(idxEnd, Types.TIME);
+    }
+
+    private void bindStato(java.sql.PreparedStatement ps, int idxStato, Prenotazione p) throws java.sql.SQLException {
+        ps.setString(idxStato, p.getStato() != null ? p.getStato().name() : null);
     }
 }

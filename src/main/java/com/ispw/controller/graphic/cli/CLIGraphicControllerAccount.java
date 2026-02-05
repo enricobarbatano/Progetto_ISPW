@@ -1,5 +1,6 @@
 package com.ispw.controller.graphic.cli;
 
+import java.util.Map;
 import java.util.logging.Logger;
 
 import com.ispw.bean.DatiAccountBean;
@@ -23,6 +24,18 @@ public class CLIGraphicControllerAccount extends AbstractGraphicControllerAccoun
     protected void goToLogin() {
         if (navigator != null) {
             navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN);
+        }
+    }
+
+    @Override
+    protected void goToHome(SessioneUtenteBean sessione) {
+        if (navigator != null) {
+            if (sessione != null) {
+                navigator.goTo(GraphicControllerUtils.ROUTE_HOME,
+                    Map.of(GraphicControllerUtils.KEY_SESSIONE, sessione));
+            } else {
+                navigator.goTo(GraphicControllerUtils.ROUTE_HOME);
+            }
         }
     }
 

@@ -85,14 +85,4 @@ public class CLIGraphicLoginController extends AbstractGraphicLoginController {
         new LogicControllerGestioneAccesso().saveLog(sessione);
     }
 
-    /**
-     * Login con dati grezzi: l’adattamento in bean resta nel controller grafico.
-     */
-    public void effettuaLoginRaw(String email, String password) {
-        if (email == null && password == null) {
-            effettuaLogin(null);
-            return;
-        }
-        effettuaLogin(new DatiLoginBean(email, password));
-    }
 }

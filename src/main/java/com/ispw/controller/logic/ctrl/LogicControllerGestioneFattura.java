@@ -50,7 +50,7 @@ public class LogicControllerGestioneFattura
         f.setLinkPdf(buildPdfLink("FATT", idPrenotazione, emissione));
 
         fatturaDAO().store(f); // upsert delegato al DAO concreto
-        log().log(Level.INFO, "[FATTURA] Emessa fattura prenotazione #{0} -> {1}",
+        log().log(Level.FINE, "[FATTURA] Emessa fattura prenotazione #{0} -> {1}",
                 new Object[]{idPrenotazione, f.getLinkPdf()});
         return f;
     }
@@ -91,7 +91,7 @@ public class LogicControllerGestioneFattura
         f.setLinkPdf(buildPdfLink("PEN", idPrenotazioneFittizio, emissione));
 
         fatturaDAO().store(f);
-        log().log(Level.INFO, "[FATTURA] Emessa fattura penalita #{0} (ref {1}) -> {2}",
+        log().log(Level.FINE, "[FATTURA] Emessa fattura penalita #{0} (ref {1}) -> {2}",
                 new Object[]{idPenalita, idPrenotazioneFittizio, f.getLinkPdf()});
         return f;
     }
@@ -122,7 +122,7 @@ public class LogicControllerGestioneFattura
         nc.setLinkPdf(buildPdfLink("NC", idPrenotazione, oggi));
 
         fatturaDAO().store(nc);
-        log().log(Level.INFO, "[FATTURA] Emetti NC prenotazione #{0} -> {1}",
+        log().log(Level.FINE, "[FATTURA] Emetti NC prenotazione #{0} -> {1}",
                 new Object[]{idPrenotazione, nc.getLinkPdf()});
     }
 

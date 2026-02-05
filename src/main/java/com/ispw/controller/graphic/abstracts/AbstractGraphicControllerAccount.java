@@ -30,6 +30,8 @@ public abstract class AbstractGraphicControllerAccount implements GraphicControl
 
     protected abstract void goToLogin();
 
+    protected abstract void goToHome(SessioneUtenteBean sessione);
+
     protected abstract DatiAccountBean recuperaInformazioniAccount(SessioneUtenteBean sessione);
 
     protected abstract EsitoOperazioneBean aggiornaDatiAccountConNotifica(DatiAccountBean bean);
@@ -115,6 +117,11 @@ public abstract class AbstractGraphicControllerAccount implements GraphicControl
     @Override
     public void logout() {
         goToLogin();
+    }
+
+    @Override
+    public void tornaAllaHome(SessioneUtenteBean sessione) {
+        goToHome(sessione);
     }
 
     private void notifyAccountError(String message) {

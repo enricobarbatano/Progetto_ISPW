@@ -81,4 +81,12 @@ public abstract class AbstractGraphicLoginController implements GraphicLoginCont
     public void vaiAHome() {
         goToHome(null);
     }
+
+    public void effettuaLoginRaw(String email, String password) {
+        if (email == null && password == null) {
+            effettuaLogin(null);
+            return;
+        }
+        effettuaLogin(new DatiLoginBean(email, password));
+    }
 }

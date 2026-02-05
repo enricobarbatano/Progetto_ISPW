@@ -105,7 +105,7 @@ public class LogicControllerGestioneNotifica implements
             warn("Imposta promemoria", "minutiAnticipo non valido: " + minutiAnticipo, null);
             return;
         }
-        log().log(Level.INFO,
+        log().log(Level.FINE,
             "[PROMEMORIA] Prenotazione#{0} -> scheduling promemoria {1} minuti prima ... riuscito",
             new Object[]{idPrenotazione, minutiAnticipo});
     }
@@ -127,7 +127,7 @@ public class LogicControllerGestioneNotifica implements
     /** Log INFO standardizzato. */
     private void info(String tipo, String destinatario, String dettaglio) {
         final String msg = compose("[NOTIFICA]", tipo, destinatario, dettaglio);
-        log().info(msg);
+        log().fine(msg);
     }
 
     /** Log WARNING standardizzato. */

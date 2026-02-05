@@ -31,4 +31,9 @@ public interface GraphicControllerAccount extends NavigableController {
      * Logout dell’utente corrente e navigazione conseguente (tipicamente verso login).
      */
     void logout();
+
+    /**
+     * Ritorno alla home senza logout.
+     */
+    void tornaAllaHome(SessioneUtenteBean sessione);
 }

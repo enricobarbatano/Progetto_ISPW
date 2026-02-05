@@ -1,6 +1,7 @@
 package com.ispw.controller.graphic.abstracts;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +32,8 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
 
     protected abstract EsitoOperazioneBean applicaSanzione(DatiPenalitaBean dati);
 
+    protected abstract List<String> listaUtentiPerPenalita();
+
     @Override
     public String getRouteName() {
         return GraphicControllerUtils.ROUTE_PENALITA;
@@ -39,6 +42,18 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
     @Override
     public void onShow(Map<String, Object> params) {
         // Override intenzionalmente vuoto: lifecycle non richiesto per Penalità.
+    }
+
+    public void richiediListaUtenti() {
+        try {
+            List<String> utenti = listaUtentiPerPenalita();
+            if (navigator != null) {
+                navigator.goTo(GraphicControllerUtils.ROUTE_PENALITA,
+                    Map.of(GraphicControllerUtils.KEY_UTENTI, utenti));
+            }
+        } catch (Exception e) {
+            log().log(Level.SEVERE, "Errore recupero lista utenti", e);
+        }
     }
 
     @Override

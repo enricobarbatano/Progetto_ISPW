@@ -17,6 +17,7 @@ public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole,
     private final CLIGraphicControllerRegole controller;
 
     private Integer selectedCampoId;
+    private List<String> lastCampi;
 
     public CLIRegoleView(CLIGraphicControllerRegole controller) {
         this.controller = controller;
@@ -52,9 +53,12 @@ public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole,
 
         Object rawCampi = lastParams.get(GraphicControllerUtils.KEY_CAMPI);
         if (rawCampi instanceof List<?> campi) {
+            @SuppressWarnings("unchecked")
+            List<String> list = (List<String>) campi;
+            lastCampi = list;
             System.out.println("\n=== CAMPI ===");
             int i = 1;
-            for (Object c : campi) {
+            for (Object c : list) {
                 final int idx = i++;
                 System.out.println(" [" + idx + "] " + c);
             }
@@ -81,8 +85,20 @@ public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole,
             case "4" -> handleAggiornaTempistiche();
             case "5" -> handleAggiornaPenalita();
             case "0" -> controller.tornaAllaHome();
-            default -> System.out.println("Scelta non valida");
+            default -> handleSceltaAlternativa(scelta);
         }
+    }
+
+    private void handleSceltaAlternativa(String scelta) {
+        if (isNumeric(scelta) && lastCampi != null && !lastCampi.isEmpty()) {
+            int n = Integer.parseInt(scelta);
+            Integer id = resolveCampoIdFromChoice(n, lastCampi);
+            if (id != null) {
+                controller.selezionaCampo(id);
+                return;
+            }
+        }
+        System.out.println("Scelta non valida");
     }
 
     private void handleSelezionaCampo() {
@@ -149,5 +165,39 @@ public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole,
     private int readIdCampo() {
         System.out.print("Id campo: ");
         return Integer.parseInt(in.nextLine());
+    }
+
+    private boolean isNumeric(String value) {
+        return value != null && value.matches("\\d+");
+    }
+
+    private Integer resolveCampoIdFromChoice(int choice, List<String> campi) {
+        if (choice <= 0) {
+            return null;
+        }
+        if (choice <= campi.size()) {
+            return parseIdFromCampo(campi.get(choice - 1));
+        }
+        return choice; // fallback: assume choice is an actual idCampo
+    }
+
+    private Integer parseIdFromCampo(String campo) {
+        if (campo == null) return null;
+        int hash = campo.indexOf('#');
+        if (hash < 0) return null;
+        int end = hash + 1;
+        while (end < campo.length() && Character.isDigit(campo.charAt(end))) {
+            end++;
+        }
+        if (end == hash + 1) return null;
+        int value = 0;
+        for (int i = hash + 1; i < end; i++) {
+            int digit = Character.digit(campo.charAt(i), 10);
+            if (digit < 0) {
+                return null;
+            }
+            value = value * 10 + digit;
+        }
+        return value;
     }
 }

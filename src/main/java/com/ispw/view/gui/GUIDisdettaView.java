@@ -59,6 +59,9 @@ public class GUIDisdettaView extends GenericViewGUI implements ViewDisdettaPreno
         VBox root = new VBox(10);
         root.setPadding(new Insets(16));
         root.getChildren().add(new Label(msg));
+        Button home = new Button("Home");
+        home.setOnAction(e -> controller.tornaAllaHome());
+        root.getChildren().add(home);
         GuiLauncher.setRoot(root);
     }
 
@@ -84,7 +87,10 @@ public class GUIDisdettaView extends GenericViewGUI implements ViewDisdettaPreno
             controller.richiediAnteprimaDisdetta(id, sessione);
         });
 
-        root.getChildren().addAll(listView, idField, anteprima);
+        Button home = new Button("Home");
+        home.setOnAction(e -> controller.tornaAllaHome());
+
+        root.getChildren().addAll(listView, idField, anteprima, home);
         GuiLauncher.setRoot(root);
         return true;
     }
@@ -112,7 +118,10 @@ public class GUIDisdettaView extends GenericViewGUI implements ViewDisdettaPreno
             controller.confermaDisdetta(id, sessione);
         });
 
-        root.getChildren().addAll(idField, conferma);
+        Button home = new Button("Home");
+        home.setOnAction(e -> controller.tornaAllaHome());
+
+        root.getChildren().addAll(idField, conferma, home);
         GuiLauncher.setRoot(root);
         return true;
     }
