@@ -1,5 +1,7 @@
 package com.ispw.controller.graphic.gui;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,8 +15,17 @@ public class GUIGraphicControllerNavigation implements GraphicControllerNavigati
     
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<String, NavigableController> routes = new HashMap<>();
+    private final Deque<String> history = new ArrayDeque<>();
+    private String currentRoute;
     
     public GUIGraphicControllerNavigation() {
+    }
+
+    public void registerRoute(String route, NavigableController controller) {
+        if (route == null || controller == null) {
+            return;
+        }
+        routes.put(route, controller);
     }
     
     @Override
@@ -22,17 +33,32 @@ public class GUIGraphicControllerNavigation implements GraphicControllerNavigati
         if (route == null) {
             return;
         }
-        
+
         NavigableController controller = routes.get(route);
-        if (controller != null) {
-            controller.onShow(params);
-            // GUI: cambia scene/panel attivo
+        if (controller == null) {
+            return;
         }
+
+        if (currentRoute != null && !currentRoute.equals(route)) {
+            history.push(currentRoute);
+        }
+        currentRoute = route;
+        controller.onShow(params);
+        // GUI: cambia scene/panel attivo
     }
 
     @Override
     public void back() {
-        // Metodo intenzionalmente vuoto: stack di navigazione non previsto.
+        if (history.isEmpty()) {
+            return;
+        }
+        String previous = history.pop();
+        NavigableController controller = routes.get(previous);
+        if (controller == null) {
+            return;
+        }
+        currentRoute = previous;
+        controller.onShow(Map.of());
     }
 
     @Override

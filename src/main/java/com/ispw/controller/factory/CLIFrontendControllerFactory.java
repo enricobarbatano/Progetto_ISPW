@@ -24,67 +24,108 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
 
     private static final Logger logger = Logger.getLogger(CLIFrontendControllerFactory.class.getName());
     private CLIGraphicControllerNavigation navigationController;
+    private GraphicLoginController loginController;
+    private GraphicControllerAccount accountController;
+    private GraphicControllerRegistrazione registrazioneController;
+    private GraphicControllerPrenotazione prenotazioneController;
+    private GraphicControllerDisdetta disdettaController;
+    private GraphicControllerRegole regoleController;
+    private GraphicControllerPenalita penalitaController;
 
     @Override
     public void startApplication() {
         logger.info("Avvio CLI...");
         // Avvia il flusso con la schermata di login
-        GraphicLoginController loginController = createLoginController();
-        loginController.onShow(null);
+        GraphicLoginController loginGraphicController = createLoginController();
+        loginGraphicController.onShow(null);
         // La CLI leggerà input da console e chiamerà loginController.effettuaLogin(...)
     }
 
     @Override
     public GraphicLoginController createLoginController() {
-        GraphicControllerNavigation navigator = getNavigationController();
-        return new CLIGraphicLoginController(navigator);
+        if (loginController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            loginController = new CLIGraphicLoginController(navigator);
+        }
+        return loginController;
     }
 
     @Override
     public GraphicControllerAccount createAccountController() {
-        GraphicControllerNavigation navigator = getNavigationController();
-        return new CLIGraphicControllerAccount(navigator);
+        if (accountController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            accountController = new CLIGraphicControllerAccount(navigator);
+        }
+        return accountController;
     }
 
     @Override
     public GraphicControllerRegistrazione createRegistrazioneController() {
-        GraphicControllerNavigation navigator = getNavigationController();
-        return new CLIGraphicControllerRegistrazione(navigator);
+        if (registrazioneController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            registrazioneController = new CLIGraphicControllerRegistrazione(navigator);
+        }
+        return registrazioneController;
     }
 
     @Override
     public GraphicControllerPrenotazione createPrenotazioneController() {
-        GraphicControllerNavigation navigator = getNavigationController();
-        return new CLIGraphicControllerPrenotazione(navigator);
+        if (prenotazioneController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            prenotazioneController = new CLIGraphicControllerPrenotazione(navigator);
+        }
+        return prenotazioneController;
     }
 
     @Override
     public GraphicControllerDisdetta createDisdettaController() {
-        GraphicControllerNavigation navigator = getNavigationController();
-        return new CLIGraphicControllerDisdetta(navigator);
+        if (disdettaController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            disdettaController = new CLIGraphicControllerDisdetta(navigator);
+        }
+        return disdettaController;
     }
 
     @Override
     public GraphicControllerRegole createRegoleController() {
-        GraphicControllerNavigation navigator = getNavigationController();
-        return new CLIGraphicControllerRegole(navigator);
+        if (regoleController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            regoleController = new CLIGraphicControllerRegole(navigator);
+        }
+        return regoleController;
     }
 
     @Override
     public GraphicControllerPenalita createPenalitaController() {
-        GraphicControllerNavigation navigator = getNavigationController();
-        return new CLIGraphicControllerPenalita(navigator);
+        if (penalitaController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            penalitaController = new CLIGraphicControllerPenalita(navigator);
+        }
+        return penalitaController;
     }
 
     @Override
     public GraphicControllerNavigation createNavigationController() {
         if (navigationController == null) {
             navigationController = new CLIGraphicControllerNavigation();
+            registerRoutes();
         }
         return navigationController;
     }
 
     private GraphicControllerNavigation getNavigationController() {
         return createNavigationController();  // Delega al metodo pubblico
+    }
+
+    private void registerRoutes() {
+        // Registrazione nelle factory concrete: conoscono i controller CLI reali e il navigator concreto.
+        // Nell'astratta introdurrebbe dipendenze verso classi concrete, violando il disaccoppiamento.
+        navigationController.registerRoute(createLoginController().getRouteName(), createLoginController());
+        navigationController.registerRoute(createAccountController().getRouteName(), createAccountController());
+        navigationController.registerRoute(createRegistrazioneController().getRouteName(), createRegistrazioneController());
+        navigationController.registerRoute(createPrenotazioneController().getRouteName(), createPrenotazioneController());
+        navigationController.registerRoute(createDisdettaController().getRouteName(), createDisdettaController());
+        navigationController.registerRoute(createRegoleController().getRouteName(), createRegoleController());
+        navigationController.registerRoute(createPenalitaController().getRouteName(), createPenalitaController());
     }
 }  
