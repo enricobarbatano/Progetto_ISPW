@@ -85,7 +85,7 @@ public class CLIAccountView extends GenericViewCLI implements ViewGestioneAccoun
 
         Object raw = lastParams.get(GraphicControllerUtils.KEY_DATI_ACCOUNT);
         if (!(raw instanceof Map<?, ?> dati) || dati.get(GraphicControllerUtils.KEY_ID_UTENTE) == null) {
-            System.err.println("[ERRORE] Dati account mancanti");
+            controller.loadAccount(sessione);
             return;
         }
 
@@ -116,6 +116,10 @@ public class CLIAccountView extends GenericViewCLI implements ViewGestioneAccoun
         String oldPwd = in.nextLine();
         System.out.print("Nuova password: ");
         String newPwd = in.nextLine();
+        if (newPwd == null || newPwd.trim().length() < 6) {
+            System.err.println("[ERRORE] Password non valida (min 6 caratteri)");
+            return;
+        }
         controller.cambiaPassword(oldPwd, newPwd, sessione);
     }
 }

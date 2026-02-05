@@ -41,69 +41,42 @@ public class GUIAccountView extends GenericViewGUI implements ViewGestioneAccoun
     @Override
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
-
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(16));
-
+        VBox root = buildRoot();
         Label title = new Label("Account");
-        Label error = new Label();
-        error.setStyle("-fx-text-fill: red;");
-        String err = getLastError();
-        if (err != null && !err.isBlank()) {
-            error.setText(err);
-        }
-        Label success = new Label();
-        String ok = getLastSuccess();
-        if (ok != null && !ok.isBlank()) {
-            success.setText(ok);
-        }
+        Label error = buildErrorLabel();
+        Label success = buildSuccessLabel();
 
         TextField nome = new TextField();
-        nome.setPromptText("Nome");
         TextField cognome = new TextField();
-        cognome.setPromptText("Cognome");
         TextField email = new TextField();
-        email.setPromptText("Email");
+        setupAccountFields(nome, cognome, email);
 
-        Object raw = lastParams.get(GraphicControllerUtils.KEY_DATI_ACCOUNT);
-        Integer idUtente = null;
-        if (raw instanceof Map<?, ?> dati) {
-            Object id = dati.get(GraphicControllerUtils.KEY_ID_UTENTE);
-            Object n = dati.get(GraphicControllerUtils.KEY_NOME);
-            Object c = dati.get(GraphicControllerUtils.KEY_COGNOME);
-            Object e = dati.get(GraphicControllerUtils.KEY_EMAIL);
-            if (id instanceof Integer i) {
-                idUtente = i;
-            }
-            if (n != null) nome.setText(String.valueOf(n));
-            if (c != null) cognome.setText(String.valueOf(c));
-            if (e != null) email.setText(String.valueOf(e));
-        }
+        Integer idUtente = loadAccountData(nome, cognome, email);
 
-        final Integer idFinal = idUtente;
+        PasswordField oldPwd = new PasswordField();
+        oldPwd.setPromptText("Vecchia password");
+        PasswordField newPwd = new PasswordField();
+        newPwd.setPromptText("Nuova password (min 6 caratteri)");
 
         Button load = new Button("Ricarica dati");
         load.setOnAction(e -> controller.loadAccount(sessione));
 
         Button update = new Button("Aggiorna");
         update.setOnAction(e -> {
-            if (idFinal == null) {
+            if (idUtente == null) {
+                controller.loadAccount(sessione);
                 return;
             }
-            Map<String, Object> updateMap = new HashMap<>();
-            updateMap.put(GraphicControllerUtils.KEY_ID_UTENTE, idFinal);
-            if (!nome.getText().isBlank()) updateMap.put(GraphicControllerUtils.KEY_NOME, nome.getText());
-            if (!cognome.getText().isBlank()) updateMap.put(GraphicControllerUtils.KEY_COGNOME, cognome.getText());
-            if (!email.getText().isBlank()) updateMap.put(GraphicControllerUtils.KEY_EMAIL, email.getText());
-            controller.aggiornaDatiAccount(updateMap);
+            controller.aggiornaDatiAccount(buildUpdateMap(idUtente, nome, cognome, email));
         });
 
-        PasswordField oldPwd = new PasswordField();
-        oldPwd.setPromptText("Vecchia password");
-        PasswordField newPwd = new PasswordField();
-        newPwd.setPromptText("Nuova password");
         Button changePwd = new Button("Cambia password");
-        changePwd.setOnAction(e -> controller.cambiaPassword(oldPwd.getText(), newPwd.getText(), sessione));
+        changePwd.setOnAction(e -> {
+            if (newPwd.getText() == null || newPwd.getText().trim().length() < 6) {
+                return;
+            }
+            controller.cambiaPassword(oldPwd.getText(), newPwd.getText(), sessione);
+        });
 
         Button logout = new Button("Logout");
         logout.setOnAction(e -> controller.logout());
@@ -114,5 +87,66 @@ public class GUIAccountView extends GenericViewGUI implements ViewGestioneAccoun
         root.getChildren().addAll(title, error, success, nome, cognome, email, load, update, oldPwd, newPwd,
             changePwd, logout, home);
         GuiLauncher.setRoot(root);
+    }
+
+    private VBox buildRoot() {
+        VBox root = new VBox(10);
+        root.setPadding(new Insets(16));
+        return root;
+    }
+
+    private Label buildErrorLabel() {
+        Label error = new Label();
+        error.setStyle("-fx-text-fill: red;");
+        String err = getLastError();
+        if (err != null && !err.isBlank()) {
+            error.setText(err);
+        }
+        return error;
+    }
+
+    private Label buildSuccessLabel() {
+        Label success = new Label();
+        String ok = getLastSuccess();
+        if (ok != null && !ok.isBlank()) {
+            success.setText(ok);
+        }
+        return success;
+    }
+
+    private void setupAccountFields(TextField nome, TextField cognome, TextField email) {
+        nome.setPromptText("Nome");
+        cognome.setPromptText("Cognome");
+        email.setPromptText("Email");
+    }
+
+    private Integer loadAccountData(TextField nome, TextField cognome, TextField email) {
+        Object raw = lastParams.get(GraphicControllerUtils.KEY_DATI_ACCOUNT);
+        if (!(raw instanceof Map<?, ?> dati)) {
+            return null;
+        }
+        Object id = dati.get(GraphicControllerUtils.KEY_ID_UTENTE);
+        Object n = dati.get(GraphicControllerUtils.KEY_NOME);
+        Object c = dati.get(GraphicControllerUtils.KEY_COGNOME);
+        Object e = dati.get(GraphicControllerUtils.KEY_EMAIL);
+        if (n != null) nome.setText(String.valueOf(n));
+        if (c != null) cognome.setText(String.valueOf(c));
+        if (e != null) email.setText(String.valueOf(e));
+        return (id instanceof Integer i) ? i : null;
+    }
+
+    private Map<String, Object> buildUpdateMap(Integer idUtente,
+                                               TextField nome,
+                                               TextField cognome,
+                                               TextField email) {
+        Map<String, Object> updateMap = new HashMap<>();
+        if (idUtente == null) {
+            return updateMap;
+        }
+        updateMap.put(GraphicControllerUtils.KEY_ID_UTENTE, idUtente);
+        if (!nome.getText().isBlank()) updateMap.put(GraphicControllerUtils.KEY_NOME, nome.getText());
+        if (!cognome.getText().isBlank()) updateMap.put(GraphicControllerUtils.KEY_COGNOME, cognome.getText());
+        if (!email.getText().isBlank()) updateMap.put(GraphicControllerUtils.KEY_EMAIL, email.getText());
+        return updateMap;
     }
 }

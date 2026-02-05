@@ -31,6 +31,9 @@ public final class GraphicControllerUtils {
     public static final String KEY_FLAG_MANUTENZIONE = "flagManutenzione";
     public static final String KEY_PREAVVISO_MINIMO_MINUTI = "preavvisoMinimoMinuti";
     public static final String KEY_DURATA_SLOT_MINUTI = "durataSlotMinuti";
+    public static final String KEY_ORA_APERTURA = "oraApertura";
+    public static final String KEY_ORA_CHIUSURA = "oraChiusura";
+    public static final String KEY_VALORE_PENALITA = "valorePenalita";
     public static final String KEY_STATO = "stato";
     public static final String KEY_MESSAGGIO = "messaggio";
     public static final String KEY_ID_TRANSAZIONE = "idTransazione";

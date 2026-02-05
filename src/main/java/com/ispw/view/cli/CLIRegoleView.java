@@ -1,5 +1,7 @@
 package com.ispw.view.cli;
 
+import java.math.BigDecimal;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -142,24 +144,41 @@ public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole,
     }
 
     private void handleAggiornaTempistiche() {
-        System.out.print("Durata slot (min): ");
-        int durata = Integer.parseInt(in.nextLine());
-        System.out.print("Preavviso minimo (min): ");
-        int preavviso = Integer.parseInt(in.nextLine());
+        try {
+            System.out.print("Durata slot (min): ");
+            int durata = Integer.parseInt(in.nextLine());
+            System.out.print("Ora apertura (HH:mm): ");
+            LocalTime apertura = LocalTime.parse(in.nextLine().trim());
+            System.out.print("Ora chiusura (HH:mm): ");
+            LocalTime chiusura = LocalTime.parse(in.nextLine().trim());
+            System.out.print("Preavviso minimo (min): ");
+            int preavviso = Integer.parseInt(in.nextLine());
 
-        Map<String, Object> payload = new java.util.HashMap<>();
-        payload.put(GraphicControllerUtils.KEY_DURATA_SLOT_MINUTI, durata);
-        payload.put(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI, preavviso);
-        controller.aggiornaTempistiche(payload);
+            Map<String, Object> payload = new java.util.HashMap<>();
+            payload.put(GraphicControllerUtils.KEY_DURATA_SLOT_MINUTI, durata);
+            payload.put(GraphicControllerUtils.KEY_ORA_APERTURA, apertura);
+            payload.put(GraphicControllerUtils.KEY_ORA_CHIUSURA, chiusura);
+            payload.put(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI, preavviso);
+            controller.aggiornaTempistiche(payload);
+        } catch (RuntimeException ex) {
+            System.err.println("[ERRORE] Dati tempistiche non validi");
+        }
     }
 
     private void handleAggiornaPenalita() {
-        System.out.print("Preavviso minimo (min): ");
-        int preavviso = Integer.parseInt(in.nextLine());
+        try {
+            System.out.print("Valore penalità: ");
+            BigDecimal valore = new BigDecimal(in.nextLine().trim());
+            System.out.print("Preavviso minimo (min): ");
+            int preavviso = Integer.parseInt(in.nextLine());
 
-        Map<String, Object> payload = new java.util.HashMap<>();
-        payload.put(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI, preavviso);
-        controller.aggiornaPenalita(payload);
+            Map<String, Object> payload = new java.util.HashMap<>();
+            payload.put(GraphicControllerUtils.KEY_VALORE_PENALITA, valore);
+            payload.put(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI, preavviso);
+            controller.aggiornaPenalita(payload);
+        } catch (RuntimeException ex) {
+            System.err.println("[ERRORE] Dati penalità non validi");
+        }
     }
 
     private int readIdCampo() {

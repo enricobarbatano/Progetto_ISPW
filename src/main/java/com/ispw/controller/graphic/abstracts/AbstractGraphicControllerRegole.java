@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.time.LocalTime;
+import java.math.BigDecimal;
 
 import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.bean.PenalitaBean;
@@ -183,6 +185,12 @@ public abstract class AbstractGraphicControllerRegole implements GraphicControll
         if (tempistiche.containsKey(GraphicControllerUtils.KEY_DURATA_SLOT_MINUTI)) {
             bean.setDurataSlotMinuti((Integer) tempistiche.get(GraphicControllerUtils.KEY_DURATA_SLOT_MINUTI));
         }
+        if (tempistiche.containsKey(GraphicControllerUtils.KEY_ORA_APERTURA)) {
+            bean.setOraApertura((LocalTime) tempistiche.get(GraphicControllerUtils.KEY_ORA_APERTURA));
+        }
+        if (tempistiche.containsKey(GraphicControllerUtils.KEY_ORA_CHIUSURA)) {
+            bean.setOraChiusura((LocalTime) tempistiche.get(GraphicControllerUtils.KEY_ORA_CHIUSURA));
+        }
         return bean;
     }
 
@@ -191,6 +199,9 @@ public abstract class AbstractGraphicControllerRegole implements GraphicControll
         if (penalita.containsKey(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI)) {
             bean.setPreavvisoMinimoMinuti((Integer) penalita.get(
                 GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI));
+        }
+        if (penalita.containsKey(GraphicControllerUtils.KEY_VALORE_PENALITA)) {
+            bean.setValorePenalita((BigDecimal) penalita.get(GraphicControllerUtils.KEY_VALORE_PENALITA));
         }
         return bean;
     }

@@ -29,9 +29,13 @@ public class GuiLauncher extends Application {
 		Platform.runLater(() -> stage.getScene().setRoot(root));
 	}
 
+	private static synchronized void setStage(Stage primaryStage) {
+		stage = primaryStage;
+	}
+
 	@Override
 	public void start(Stage primaryStage) {
-		stage = primaryStage;
+		setStage(primaryStage);
 		stage.setTitle("ISPW");
 		stage.setScene(new Scene(new VBox(), 800, 600));
 		stage.show();
