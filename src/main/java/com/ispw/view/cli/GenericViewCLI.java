@@ -1,31 +1,9 @@
 package com.ispw.view.cli;
 
-import java.util.Map;
-
-import com.ispw.bean.SessioneUtenteBean;
-import com.ispw.view.interfaces.GenericView;
+import com.ispw.view.common.GenericViewBase;
 
 /**
  * Base astratta per le view CLI.
  */
-public abstract class GenericViewCLI implements GenericView {
-
-	protected SessioneUtenteBean sessione;
-	protected Map<String, Object> lastParams = Map.of();
-
-	@Override
-	public void onShow(Map<String, Object> params) {
-		lastParams = (params == null) ? Map.of() : params;
-		if (lastParams.containsKey(KEY_SESSIONE)) {
-			sessione = readSession(lastParams);
-		}
-	}
-
-	public SessioneUtenteBean getSessione() { return sessione; }
-
-	public Map<String, Object> getLastParams() { return lastParams; }
-
-	public String getLastError() { return readError(lastParams); }
-
-	public String getLastSuccess() { return readSuccess(lastParams); }
+public abstract class GenericViewCLI extends GenericViewBase {
 }

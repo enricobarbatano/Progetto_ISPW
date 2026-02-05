@@ -6,8 +6,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ispw.controller.graphic.GraphicControllerLog;
+import com.ispw.controller.graphic.GraphicControllerLogUtils;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccount;
 
 public abstract class AbstractGraphicControllerLog implements GraphicControllerLog {
 
@@ -19,7 +21,10 @@ public abstract class AbstractGraphicControllerLog implements GraphicControllerL
 
     protected abstract Logger log();
 
-    protected abstract List<String> listaUltimiLog(int limit);
+    protected List<String> listaUltimiLog(int limit) {
+        return GraphicControllerLogUtils.formatLogs(
+            new LogicControllerGestioneAccount().listaUltimiLog(limit));
+    }
 
     protected abstract void goToHome();
 

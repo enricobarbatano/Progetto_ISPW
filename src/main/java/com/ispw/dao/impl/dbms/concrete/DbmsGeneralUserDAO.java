@@ -33,7 +33,7 @@ public final class DbmsGeneralUserDAO extends DbmsDAO<Integer, GeneralUser> impl
     private static final String DA = " FROM ";
     // ======= Costanti SQL (adatta al tuo schema reale) =======
     private static final String TBL  = "general_user";
-    private static final String COLS = "id_utente, nome, email, password, stato_account, ruolo";
+    private static final String COLS = "id_utente, nome, cognome, email, password, stato_account, ruolo";
 
     private static final String SQL_SELECT_ONE =
             SELECT + COLS + DA + TBL + WHERE + ID_UTENTE + " = ?";
@@ -47,11 +47,11 @@ public final class DbmsGeneralUserDAO extends DbmsDAO<Integer, GeneralUser> impl
     private static final String SQL_EXISTS =
             "SELECT 1 FROM " + TBL + WHERE + ID_UTENTE + " = ?";
 
-    private static final String SQL_INSERT =
-            "INSERT INTO " + TBL + " (nome, email, password, stato_account, ruolo) VALUES (?, ?, ?, ?, ?)";
+        private static final String SQL_INSERT =
+            "INSERT INTO " + TBL + " (nome, cognome, email, password, stato_account, ruolo) VALUES (?, ?, ?, ?, ?, ?)";
 
-    private static final String SQL_UPDATE =
-            "UPDATE " + TBL + " SET nome = ?, email = ?, password = ?, stato_account = ?, ruolo = ? " + WHERE + ID_UTENTE + " = ?";
+        private static final String SQL_UPDATE =
+            "UPDATE " + TBL + " SET nome = ?, cognome = ?, email = ?, password = ?, stato_account = ?, ruolo = ? " + WHERE + ID_UTENTE + " = ?";
 
     private static final String SQL_DELETE =
             "DELETE FROM " + TBL + WHERE + ID_UTENTE + " = ?";
@@ -64,6 +64,7 @@ public final class DbmsGeneralUserDAO extends DbmsDAO<Integer, GeneralUser> impl
         final UtenteFinale u = new UtenteFinale(); // GeneralUser è abstract
         u.setIdUtente(rs.getInt(ID_UTENTE));
         u.setNome(rs.getString("nome"));
+        u.setCognome(rs.getString("cognome"));
         u.setEmail(rs.getString("email"));
         u.setPassword(rs.getString("password"));
         u.setStatoAccount(parseEnum(rs.getString("stato_account"), StatoAccount.DA_CONFERMARE));
@@ -83,10 +84,11 @@ public final class DbmsGeneralUserDAO extends DbmsDAO<Integer, GeneralUser> impl
     // ======= Helper per bind dei campi comuni =======
     private static void bindCommonFields(PreparedStatement ps, GeneralUser e, int startIndex) throws SQLException {
         ps.setString(startIndex,     e.getNome());
-        ps.setString(startIndex + 1, e.getEmail());
-        ps.setString(startIndex + 2, e.getPassword());
-        ps.setString(startIndex + 3, e.getStatoAccount() != null ? e.getStatoAccount().name() : null);
-        ps.setString(startIndex + 4, e.getRuolo() != null ? e.getRuolo().name() : null);
+        ps.setString(startIndex + 1, e.getCognome());
+        ps.setString(startIndex + 2, e.getEmail());
+        ps.setString(startIndex + 3, e.getPassword());
+        ps.setString(startIndex + 4, e.getStatoAccount() != null ? e.getStatoAccount().name() : null);
+        ps.setString(startIndex + 5, e.getRuolo() != null ? e.getRuolo().name() : null);
     }
 
     private static String normalizeEmail(String email) {
@@ -111,7 +113,7 @@ public final class DbmsGeneralUserDAO extends DbmsDAO<Integer, GeneralUser> impl
             // UPDATE
             executeUpdate(SQL_UPDATE, ps -> {
                 bindCommonFields(ps, entity, 1);
-                ps.setInt(6, id);
+                ps.setInt(7, id);
             });
             return;
         }

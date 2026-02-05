@@ -14,6 +14,7 @@ import com.ispw.bean.TempisticheBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerRegole;
 import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.logic.ctrl.LogicControllerConfiguraRegole;
 
 /**
  * Classe astratta che centralizza la logica comune dei controller grafici Regole
@@ -33,13 +34,9 @@ public abstract class AbstractGraphicControllerRegole implements GraphicControll
 
     protected abstract void goToHome();
 
-    protected abstract List<String> listaCampi();
-
-    protected abstract EsitoOperazioneBean aggiornaRegoleCampo(RegolaCampoBean bean);
-
-    protected abstract EsitoOperazioneBean aggiornaRegolaTempistiche(TempisticheBean bean);
-
-    protected abstract EsitoOperazioneBean aggiornaRegolepenalita(PenalitaBean bean);
+    protected LogicControllerConfiguraRegole logicController() {
+        return new LogicControllerConfiguraRegole();
+    }
 
     @Override
     public String getRouteName() {
@@ -54,7 +51,7 @@ public abstract class AbstractGraphicControllerRegole implements GraphicControll
     @Override
     public void richiediListaCampi() {
         try {
-            List<String> campi = listaCampi();
+            List<String> campi = logicController().listaCampi();
             if (navigator != null) {
                 navigator.goTo(GraphicControllerUtils.ROUTE_REGOLE,
                     Map.of(GraphicControllerUtils.KEY_CAMPI, campi));
@@ -83,7 +80,7 @@ public abstract class AbstractGraphicControllerRegole implements GraphicControll
 
         RegolaCampoBean bean = buildRegolaCampoBean(regolaCampo);
 
-        EsitoOperazioneBean esito = aggiornaRegoleCampo(bean);
+        EsitoOperazioneBean esito = logicController().aggiornaRegoleCampo(bean);
 
         if (esito != null && esito.isSuccesso()) {
             navigateSuccess(esito.getMessaggio());
@@ -101,7 +98,7 @@ public abstract class AbstractGraphicControllerRegole implements GraphicControll
 
         TempisticheBean bean = buildTempisticheBean(tempistiche);
 
-        EsitoOperazioneBean esito = aggiornaRegolaTempistiche(bean);
+        EsitoOperazioneBean esito = logicController().aggiornaRegolaTempistiche(bean);
 
         if (esito != null && esito.isSuccesso()) {
             navigateSuccess(esito.getMessaggio());
@@ -119,7 +116,7 @@ public abstract class AbstractGraphicControllerRegole implements GraphicControll
 
         PenalitaBean bean = buildPenalitaBean(penalita);
 
-        EsitoOperazioneBean esito = aggiornaRegolepenalita(bean);
+        EsitoOperazioneBean esito = logicController().aggiornaRegolepenalita(bean);
 
         if (esito != null && esito.isSuccesso()) {
             navigateSuccess(esito.getMessaggio());

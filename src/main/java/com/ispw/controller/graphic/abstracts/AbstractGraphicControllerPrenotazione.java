@@ -14,7 +14,9 @@ import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.bean.StatoPagamentoBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerPrenotazione;
+import com.ispw.controller.graphic.GraphicControllerPrenotazioneUtils;
 import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.logic.ctrl.LogicControllerPrenotazioneCampo;
 
 /**
  * Classe astratta che centralizza la logica comune dei controller grafici Prenotazione
@@ -36,13 +38,9 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
 
     protected abstract void goToHome();
 
-    protected abstract List<String> trovaSlotDisponibili(ParametriVerificaBean input);
-
-    protected abstract RiepilogoPrenotazioneBean nuovaPrenotazione(DatiInputPrenotazioneBean input,
-                                                                   SessioneUtenteBean sessione);
-
-    protected abstract StatoPagamentoBean completaPrenotazione(DatiPagamentoBean pagamento,
-                                                               SessioneUtenteBean sessione);
+    protected LogicControllerPrenotazioneCampo logicController() {
+        return new LogicControllerPrenotazioneCampo();
+    }
 
     @Override
     public String getRouteName() {
@@ -62,7 +60,8 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
         }
 
         try {
-            List<String> slot = trovaSlotDisponibili(input);
+            List<String> slot = GraphicControllerPrenotazioneUtils.formatSlotDisponibili(
+                logicController().trovaSlotDisponibili(input));
 
             if (navigator != null) {
                 navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE,
@@ -85,7 +84,7 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
         }
 
         try {
-            RiepilogoPrenotazioneBean riepilogo = nuovaPrenotazione(input, sessione);
+            RiepilogoPrenotazioneBean riepilogo = logicController().nuovaPrenotazione(input, sessione);
 
             if (riepilogo == null) {
                 notifyPrenotazioneError(GraphicControllerUtils.MSG_PRENOTAZIONE_NON_CREATA);
@@ -118,7 +117,7 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
         }
 
         try {
-            StatoPagamentoBean esito = completaPrenotazione(pagamento, sessione);
+            StatoPagamentoBean esito = logicController().completaPrenotazione(pagamento, sessione);
 
             if (esito == null) {
                 notifyPrenotazioneError(GraphicControllerUtils.MSG_PAGAMENTO_NON_COMPLETATO);
@@ -144,6 +143,22 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
     @Override
     public void tornaAllaHome() {
         goToHome();
+    }
+
+    public void richiediListaCampi(SessioneUtenteBean sessione) {
+        try {
+            List<String> campi = logicController().listaCampi();
+            if (navigator != null) {
+                Map<String, Object> payload = new HashMap<>();
+                payload.put(GraphicControllerUtils.KEY_CAMPI, campi);
+                if (sessione != null) {
+                    payload.put(GraphicControllerUtils.KEY_SESSIONE, sessione);
+                }
+                navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE, payload);
+            }
+        } catch (Exception e) {
+            log().log(Level.SEVERE, "Errore recupero lista campi", e);
+        }
     }
 
     public void cercaDisponibilitaRaw(int idCampo, String data, String oraInizio, int durataMin) {
