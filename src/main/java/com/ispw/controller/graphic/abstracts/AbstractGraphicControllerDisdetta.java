@@ -40,6 +40,7 @@ public abstract class AbstractGraphicControllerDisdetta implements GraphicContro
 
     @Override
     public void onShow(Map<String, Object> params) {
+        // Override intenzionalmente vuoto: lifecycle non richiesto per Disdetta.
     }
 
     @Override

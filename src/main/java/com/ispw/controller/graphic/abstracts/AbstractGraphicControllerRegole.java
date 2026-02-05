@@ -39,6 +39,7 @@ public abstract class AbstractGraphicControllerRegole implements GraphicControll
 
     @Override
     public void onShow(Map<String, Object> params) {
+        // Override intenzionalmente vuoto: lifecycle non richiesto per Regole.
     }
 
     @Override

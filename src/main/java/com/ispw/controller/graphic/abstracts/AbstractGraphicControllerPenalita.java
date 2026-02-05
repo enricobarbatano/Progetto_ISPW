@@ -37,6 +37,7 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
 
     @Override
     public void onShow(Map<String, Object> params) {
+        // Override intenzionalmente vuoto: lifecycle non richiesto per Penalità.
     }
 
     @Override

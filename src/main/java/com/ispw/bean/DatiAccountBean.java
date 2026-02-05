@@ -12,6 +12,7 @@ public class DatiAccountBean  {
     private String indirizzo;
 
     public DatiAccountBean() {
+        // Costruttore vuoto richiesto per bean/framework (istanziazione riflessiva).
     }
 
     public int getIdUtente() { 

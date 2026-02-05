@@ -32,7 +32,7 @@ public class GUIGraphicControllerNavigation implements GraphicControllerNavigati
 
     @Override
     public void back() {
-        // Implementa stack di navigazione per GUI
+        // Metodo intenzionalmente vuoto: stack di navigazione non previsto.
     }
 
     @Override

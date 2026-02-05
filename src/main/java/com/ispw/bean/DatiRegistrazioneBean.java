@@ -11,6 +11,7 @@ public class DatiRegistrazioneBean  {
     private String password;
 
     public DatiRegistrazioneBean() {
+        // Costruttore vuoto richiesto per bean/framework (istanziazione riflessiva).
     }
 
     public String getNome() { 
