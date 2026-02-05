@@ -44,14 +44,7 @@ public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole,
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
-        String err = getLastError();
-        if (err != null && !err.isBlank()) {
-            System.err.println("[ERRORE] " + err);
-        }
-        String ok = getLastSuccess();
-        if (ok != null && !ok.isBlank()) {
-            System.out.println(ok);
-        }
+        CliViewUtils.printMessages(getLastError(), getLastSuccess());
 
         Object rawCampi = lastParams.get(GraphicControllerUtils.KEY_CAMPI);
         if (rawCampi instanceof List<?> campi) {

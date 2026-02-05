@@ -47,6 +47,12 @@ public final class InMemoryLogDAO extends InMemoryDAO<Integer, SystemLog> implem
         super.store(log); // append
     }
 
+    /** Append-only: store delega ad append (no update). */
+    @Override
+    public void store(SystemLog entity) {
+        append(entity);
+    }
+
     @Override
     public List<SystemLog> findByUtente(int idUtente) {
         return snapshotValues().stream()

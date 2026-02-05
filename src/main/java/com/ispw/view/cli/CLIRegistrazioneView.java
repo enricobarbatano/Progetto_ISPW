@@ -43,14 +43,7 @@ public class CLIRegistrazioneView extends GenericViewCLI implements ViewRegistra
 
         System.out.println("\n=== REGISTRAZIONE ===");
 
-        String err = getLastError();
-        if (err != null && !err.isBlank()) {
-            System.err.println("[ERRORE] " + err);
-        }
-        String ok = getLastSuccess();
-        if (ok != null && !ok.isBlank()) {
-            System.out.println(ok);
-        }
+        CliViewUtils.printMessages(getLastError(), getLastSuccess());
 
         Map<String, Object> form = new HashMap<>();
         System.out.print("Nome: ");

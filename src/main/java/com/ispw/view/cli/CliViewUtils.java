@@ -15,4 +15,13 @@ public final class CliViewUtils {
             goHome.run();
         }
     }
+
+    public static void printMessages(String error, String success) {
+        if (error != null && !error.isBlank()) {
+            System.err.println("[ERRORE] " + error);
+        }
+        if (success != null && !success.isBlank()) {
+            System.out.println(success);
+        }
+    }
 }

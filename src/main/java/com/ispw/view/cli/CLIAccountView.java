@@ -40,14 +40,7 @@ public class CLIAccountView extends GenericViewCLI implements ViewGestioneAccoun
 
         System.out.println("\n=== ACCOUNT ===");
 
-        String err = getLastError();
-        if (err != null && !err.isBlank()) {
-            System.err.println("[ERRORE] " + err);
-        }
-        String ok = getLastSuccess();
-        if (ok != null && !ok.isBlank()) {
-            System.out.println(ok);
-        }
+        CliViewUtils.printMessages(getLastError(), getLastSuccess());
 
         Object raw = lastParams.get(GraphicControllerUtils.KEY_DATI_ACCOUNT);
         if (raw instanceof Map<?, ?> dati) {

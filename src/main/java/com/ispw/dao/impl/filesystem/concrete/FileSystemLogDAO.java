@@ -53,6 +53,12 @@ public final class FileSystemLogDAO extends FileSystemDAO<Integer, SystemLog> im
         super.store(log); // persist su file (append-only)
     }
 
+    /** Append-only: store delega ad append (no update). */
+    @Override
+    public void store(SystemLog entity) {
+        append(entity);
+    }
+
     @Override
     public List<SystemLog> findByUtente(int idUtente) {
         return this.cache.values().stream()

@@ -41,14 +41,7 @@ public class CLIPenalitaView extends GenericViewCLI implements ViewGestionePenal
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
-        String err = getLastError();
-        if (err != null && !err.isBlank()) {
-            System.err.println("[ERRORE] " + err);
-        }
-        String ok = getLastSuccess();
-        if (ok != null && !ok.isBlank()) {
-            System.out.println(ok);
-        }
+        CliViewUtils.printMessages(getLastError(), getLastSuccess());
 
         Object rawUtenti = lastParams.get(GraphicControllerUtils.KEY_UTENTI);
         if (rawUtenti instanceof List<?> list) {

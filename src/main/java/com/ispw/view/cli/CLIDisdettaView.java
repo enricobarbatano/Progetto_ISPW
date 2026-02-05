@@ -48,10 +48,7 @@ public class CLIDisdettaView extends GenericViewCLI implements ViewDisdettaPreno
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
-        String err = getLastError();
-        if (err != null && !err.isBlank()) {
-            System.err.println("[ERRORE] " + err);
-        }
+        CliViewUtils.printMessages(getLastError(), getLastSuccess());
 
         if (handleSuccess()) {
             return;
