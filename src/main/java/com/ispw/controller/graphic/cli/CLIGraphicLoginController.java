@@ -10,29 +10,19 @@ import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicLoginController;
 import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccesso;
 
-
-/**
- * Adapter CLI per il Login.
- * 
- * Pattern: Adapter
- * - Adatta form login (View) → Bean → LogicController
- * - Riceve SessioneUtenteBean dal LogicController
- * - Gestisce navigazione post-login
- * 
- * Responsabilità:
- * - Riceve DatiLoginBean dalla View (form compilato)
- * - Delega verifica credenziali al LogicControllerGestioneAccesso
- * - Riceve SessioneUtenteBean dal LogicController
- * - Gestisce navigazione (home, registrazione)
- */
 public class CLIGraphicLoginController extends AbstractGraphicLoginController {
-    
-    // ==================== Constructors ====================
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: estende AbstractGraphicLoginController e usa GraphicControllerNavigation.
+    // A2) IO verso GUI/CLI: riceve DatiLoginBean, ritorna SessioneUtenteBean.
+    // A3) Logica delegata: usa LogicControllerGestioneAccesso.
+    // ========================
     public CLIGraphicLoginController(GraphicControllerNavigation navigator) {
         super(navigator);
     }
-    
-    // ==================== NavigableController ====================
+
     @Override
     public void onShow(Map<String, Object> params) {
         GraphicControllerUtils.handleOnShow(log(), params, GraphicControllerUtils.PREFIX_LOGIN);
@@ -84,5 +74,10 @@ public class CLIGraphicLoginController extends AbstractGraphicLoginController {
     protected void salvaLog(SessioneUtenteBean sessione) {
         new LogicControllerGestioneAccesso().saveLog(sessione);
     }
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi: nessun helper privato.
+    // ========================
 
 }

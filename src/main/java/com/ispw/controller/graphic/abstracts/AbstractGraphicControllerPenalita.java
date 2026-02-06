@@ -23,6 +23,14 @@ import com.ispw.controller.logic.ctrl.LogicControllerApplicaPenalita;
  */
 public abstract class AbstractGraphicControllerPenalita implements GraphicControllerPenalita {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: implementa GraphicControllerPenalita (interfaccia) e usa GraphicControllerNavigation.
+    // A2) IO verso GUI/CLI: riceve/ritorna bean (DatiPenalitaBean, UtentiBean) e Map.
+    // A3) Logica delegata: usa LogicControllerApplicaPenalita.
+    // ========================
+
     protected final GraphicControllerNavigation navigator;
 
     protected AbstractGraphicControllerPenalita(GraphicControllerNavigation navigator) {
@@ -44,7 +52,6 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
 
     @Override
     public void onShow(Map<String, Object> params) {
-        // Override intenzionalmente vuoto: lifecycle non richiesto per Penalità.
     }
 
     public void richiediListaUtenti() {
@@ -101,6 +108,17 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
         goToHome();
     }
 
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi:
+    // 1) notifyPenalitaError(...) - notifica errore e naviga.
+    // 2) isEmailNonValida(...) - valida email.
+    // 3) isIdUtenteNonValido(...) - valida id utente.
+    // 4) isPenalitaNonValida(...) - valida penalita.
+    // 5) buildPenalitaBean(...) - costruisce bean penalita.
+    // 6) formatUtenti(...) - formatta lista utenti.
+    // 7) formatUtente(...) - formatta singolo utente.
+    // ========================
     private void notifyPenalitaError(String message) {
         GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PENALITA,
             GraphicControllerUtils.PREFIX_PENALITA, message);

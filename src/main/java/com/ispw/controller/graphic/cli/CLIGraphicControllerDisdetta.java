@@ -7,6 +7,14 @@ import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerDisdetta;
 
 public class CLIGraphicControllerDisdetta extends AbstractGraphicControllerDisdetta {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: estende AbstractGraphicControllerDisdetta e usa GraphicControllerNavigation.
+    // A2) IO verso GUI/CLI: routing verso home.
+    // A3) Logica delegata: ereditata dalla classe astratta.
+    // ========================
     
     public CLIGraphicControllerDisdetta(GraphicControllerNavigation navigator) {
         super(navigator);
@@ -22,5 +30,10 @@ public class CLIGraphicControllerDisdetta extends AbstractGraphicControllerDisde
             navigator.goTo(GraphicControllerUtils.ROUTE_HOME);
         }
     }
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi: nessun helper privato.
+    // ========================
 
 }

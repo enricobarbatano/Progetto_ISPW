@@ -15,6 +15,14 @@ import com.ispw.controller.graphic.GraphicControllerUtils;
  */
 public abstract class AbstractGraphicControllerRegistrazione implements GraphicControllerRegistrazione {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: implementa GraphicControllerRegistrazione (interfaccia) e usa GraphicControllerNavigation.
+    // A2) IO verso GUI/CLI: riceve Map e costruisce DatiRegistrazioneBean.
+    // A3) Logica delegata: demandata ai controller concreti.
+    // ========================
+
     protected final GraphicControllerNavigation navigator;
 
     protected AbstractGraphicControllerRegistrazione(GraphicControllerNavigation navigator) {
@@ -30,7 +38,6 @@ public abstract class AbstractGraphicControllerRegistrazione implements GraphicC
 
     @Override
     public void onShow(Map<String, Object> params) {
-        // lifecycle hook (override if needed)
     }
 
     @Override
@@ -38,6 +45,11 @@ public abstract class AbstractGraphicControllerRegistrazione implements GraphicC
         goToLogin();
     }
 
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi:
+    // 1) buildRegistrazioneBean(...) - costruisce bean registrazione.
+    // ========================
     protected DatiRegistrazioneBean buildRegistrazioneBean(String nome, String cognome, String email, String password) {
         DatiRegistrazioneBean bean = new DatiRegistrazioneBean();
         bean.setNome(nome);

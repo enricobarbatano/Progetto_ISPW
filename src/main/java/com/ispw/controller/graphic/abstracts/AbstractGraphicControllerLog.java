@@ -13,6 +13,14 @@ import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccount;
 
 public abstract class AbstractGraphicControllerLog implements GraphicControllerLog {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: implementa GraphicControllerLog (interfaccia) e usa GraphicControllerNavigation.
+    // A2) IO verso GUI/CLI: ritorna lista stringhe formattate.
+    // A3) Logica delegata: usa LogicControllerGestioneAccount + GraphicControllerLogUtils.
+    // ========================
+
     protected final GraphicControllerNavigation navigator;
 
     protected AbstractGraphicControllerLog(GraphicControllerNavigation navigator) {
@@ -35,7 +43,6 @@ public abstract class AbstractGraphicControllerLog implements GraphicControllerL
 
     @Override
     public void onShow(Map<String, Object> params) {
-        // no-op
     }
 
     @Override
@@ -55,4 +62,9 @@ public abstract class AbstractGraphicControllerLog implements GraphicControllerL
     public void tornaAllaHome() {
         goToHome();
     }
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi: nessun helper privato.
+    // ========================
 }

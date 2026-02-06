@@ -20,6 +20,14 @@ import com.ispw.controller.graphic.GraphicControllerUtils;
  */
 public abstract class AbstractGraphicControllerAccount implements GraphicControllerAccount {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: implementa GraphicControllerAccount (interfaccia) e usa GraphicControllerNavigation.
+    // A2) IO verso GUI/CLI: riceve/ritorna bean (DatiAccountBean, SessioneUtenteBean) e Map.
+    // A3) Logica delegata: richiama LogicController via metodi astratti.
+    // ========================
+
     protected final GraphicControllerNavigation navigator;
 
     protected AbstractGraphicControllerAccount(GraphicControllerNavigation navigator) {
@@ -125,6 +133,17 @@ public abstract class AbstractGraphicControllerAccount implements GraphicControl
         goToHome(sessione);
     }
 
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi:
+    // 1) notifyAccountError(...) - notifica errore e naviga.
+    // 2) isSessioneNonValida(...) - valida sessione.
+    // 3) navigateSuccess(...) - naviga con messaggio di successo.
+    // 4) navigateAccountData(...) - prepara payload account.
+    // 5) buildAccountBean(...) - costruisce bean account.
+    // 6) updateSessionIfPresent(...) - aggiorna sessione se presente.
+    // 7) hasText(...) - verifica stringhe.
+    // ========================
     private void notifyAccountError(String message) {
         GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_ACCOUNT,
             GraphicControllerUtils.PREFIX_ACCOUNT, message);

@@ -6,12 +6,15 @@ import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerPrenotazione;
 
-/**
- * Adapter GUI per la prenotazione campo.
- * Trasforma dati grezzi (String, int) in bean per il LogicController.
- */
 public class GUIGraphicControllerPrenotazione extends AbstractGraphicControllerPrenotazione {
-    
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: estende AbstractGraphicControllerPrenotazione e usa GraphicControllerNavigation.
+    // A2) IO verso GUI/CLI: notifica errori e routing verso home.
+    // A3) Logica delegata: ereditata dalla classe astratta.
+    // ========================
     public GUIGraphicControllerPrenotazione(GraphicControllerNavigation navigator) {
         super(navigator);
     }
@@ -32,5 +35,10 @@ public class GUIGraphicControllerPrenotazione extends AbstractGraphicControllerP
             navigator.goTo(GraphicControllerUtils.ROUTE_HOME, null);
         }
     }
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi: nessun helper privato.
+    // ========================
 
 }

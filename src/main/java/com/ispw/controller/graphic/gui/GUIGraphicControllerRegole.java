@@ -7,6 +7,14 @@ import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerRegole;
 
 public class GUIGraphicControllerRegole extends AbstractGraphicControllerRegole {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: estende AbstractGraphicControllerRegole e usa GraphicControllerNavigation.
+    // A2) IO verso GUI/CLI: routing verso home.
+    // A3) Logica delegata: ereditata dalla classe astratta.
+    // ========================
     
     public GUIGraphicControllerRegole(GraphicControllerNavigation navigator) {
         super(navigator);
@@ -22,5 +30,10 @@ public class GUIGraphicControllerRegole extends AbstractGraphicControllerRegole 
             navigator.goTo(GraphicControllerUtils.ROUTE_HOME, null);
         }
     }
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi: nessun helper privato.
+    // ========================
 
 }

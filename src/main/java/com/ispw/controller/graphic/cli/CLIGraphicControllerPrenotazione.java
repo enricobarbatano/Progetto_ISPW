@@ -6,10 +6,15 @@ import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerPrenotazione;
 
-/**
- * Adapter CLI per la prenotazione campo.
- */
 public class CLIGraphicControllerPrenotazione extends AbstractGraphicControllerPrenotazione {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: estende AbstractGraphicControllerPrenotazione e usa GraphicControllerNavigation.
+    // A2) IO verso GUI/CLI: notifica errori e routing verso home.
+    // A3) Logica delegata: ereditata dalla classe astratta.
+    // ========================
     
     public CLIGraphicControllerPrenotazione(GraphicControllerNavigation navigator) {
         super(navigator);
@@ -30,5 +35,10 @@ public class CLIGraphicControllerPrenotazione extends AbstractGraphicControllerP
             navigator.goTo(GraphicControllerUtils.ROUTE_HOME);
         }
     }
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi: nessun helper privato.
+    // ========================
 
 }

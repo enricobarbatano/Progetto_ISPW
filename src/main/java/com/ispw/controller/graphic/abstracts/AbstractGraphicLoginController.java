@@ -17,6 +17,14 @@ import com.ispw.controller.graphic.GraphicLoginController;
  */
 public abstract class AbstractGraphicLoginController implements GraphicLoginController {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: implementa GraphicLoginController (interfaccia) e usa GraphicControllerNavigation.
+    // A2) IO verso GUI/CLI: riceve DatiLoginBean, ritorna SessioneUtenteBean.
+    // A3) Logica delegata: demandata ai controller concreti.
+    // ========================
+
     protected final GraphicControllerNavigation navigator;
 
     protected AbstractGraphicLoginController(GraphicControllerNavigation navigator) {
@@ -44,7 +52,6 @@ public abstract class AbstractGraphicLoginController implements GraphicLoginCont
 
     @Override
     public void onShow(Map<String, Object> params) {
-        // lifecycle hook (override if needed)
     }
 
     @Override
@@ -82,6 +89,11 @@ public abstract class AbstractGraphicLoginController implements GraphicLoginCont
         goToHome(null);
     }
 
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi:
+    // 1) effettuaLoginRaw(...) - adapter per input grezzi.
+    // ========================
     public void effettuaLoginRaw(String email, String password) {
         if (email == null && password == null) {
             effettuaLogin(null);

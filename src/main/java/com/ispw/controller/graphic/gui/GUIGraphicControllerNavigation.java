@@ -2,11 +2,20 @@ package com.ispw.controller.graphic.gui;
 
 import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerNavigation;
 
-/**
- * Navigation router per GUI (JavaFX/Swing).
- */
 public class GUIGraphicControllerNavigation extends AbstractGraphicControllerNavigation {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: estende AbstractGraphicControllerNavigation.
+    // A2) IO verso GUI/CLI: routing GUI.
+    // A3) Persistenza: nessuna.
+    // ========================
     public GUIGraphicControllerNavigation() {
-        // Costruttore vuoto: inizializzazione gestita dalla base.
     }
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi: nessun helper privato.
+    // ========================
 }

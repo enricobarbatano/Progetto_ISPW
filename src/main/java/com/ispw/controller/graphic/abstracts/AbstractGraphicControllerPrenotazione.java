@@ -27,6 +27,14 @@ import com.ispw.controller.logic.ctrl.LogicControllerPrenotazioneCampo;
  */
 public abstract class AbstractGraphicControllerPrenotazione implements GraphicControllerPrenotazione {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: implementa GraphicControllerPrenotazione (interfaccia) e usa GraphicControllerNavigation.
+    // A2) IO verso GUI/CLI: riceve/ritorna bean (ParametriVerificaBean, DatiInputPrenotazioneBean, DatiPagamentoBean).
+    // A3) Logica delegata: usa LogicControllerPrenotazioneCampo.
+    // ========================
+
     protected final GraphicControllerNavigation navigator;
 
     protected AbstractGraphicControllerPrenotazione(GraphicControllerNavigation navigator) {
@@ -50,7 +58,6 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
 
     @Override
     public void onShow(Map<String, Object> params) {
-        // lifecycle hook (override if needed)
     }
 
     @Override
@@ -162,6 +169,14 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
         }
     }
 
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi:
+    // 1) formatCampi(...) - formatta lista campi.
+    // 2) cercaDisponibilitaRaw(...) - adapter per input grezzi.
+    // 3) creaPrenotazioneRaw(...) - adapter per input grezzi.
+    // 4) procediAlPagamentoRaw(...) - adapter per input grezzi.
+    // ========================
     private List<String> formatCampi(CampiBean campi) {
         if (campi == null || campi.getCampi() == null) {
             return List.of();

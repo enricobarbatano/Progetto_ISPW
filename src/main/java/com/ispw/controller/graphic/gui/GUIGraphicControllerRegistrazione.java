@@ -7,11 +7,15 @@ import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerRegistrazione;
 import com.ispw.controller.logic.ctrl.LogicControllerRegistrazione;
 
-/**
- * Adapter GUI per la registrazione.
- */
 public class GUIGraphicControllerRegistrazione extends AbstractGraphicControllerRegistrazione {
-    
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: estende AbstractGraphicControllerRegistrazione e usa GraphicControllerNavigation.
+    // A2) IO verso GUI/CLI: riceve Map, costruisce bean, naviga su esito.
+    // A3) Logica delegata: usa LogicControllerRegistrazione.
+    // ========================
     public GUIGraphicControllerRegistrazione(GraphicControllerNavigation navigator) {
         super(navigator);
     }
@@ -42,4 +46,9 @@ public class GUIGraphicControllerRegistrazione extends AbstractGraphicController
             navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN, null);
         }
     }
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi: nessun helper privato.
+    // ========================
 }
