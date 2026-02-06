@@ -7,12 +7,6 @@ import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerRegistrazione;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 
-/**
- * Classe astratta che centralizza la logica comune dei controller grafici Registrazione
- * (CLI/GUI) per ridurre duplicazione. Non introduce nuove responsabilità né
- * modifica il disaccoppiamento: delega invariata ai LogicController e mantiene
- * la stessa navigazione verso la View tramite GraphicControllerNavigation.
- */
 public abstract class AbstractGraphicControllerRegistrazione implements GraphicControllerRegistrazione {
 
     // ========================

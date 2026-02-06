@@ -19,12 +19,6 @@ import com.ispw.controller.graphic.GraphicControllerPrenotazioneUtils;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerPrenotazioneCampo;
 
-/**
- * Classe astratta che centralizza la logica comune dei controller grafici Prenotazione
- * (CLI/GUI) per ridurre duplicazione. Non introduce nuove responsabilità né
- * modifica il disaccoppiamento: delega invariata ai LogicController e mantiene
- * la stessa navigazione verso la View tramite GraphicControllerNavigation.
- */
 public abstract class AbstractGraphicControllerPrenotazione implements GraphicControllerPrenotazione {
 
     // ========================
