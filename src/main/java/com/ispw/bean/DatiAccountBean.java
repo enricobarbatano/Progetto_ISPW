@@ -1,13 +1,8 @@
 package com.ispw.bean;
 
-
-public class DatiAccountBean  {
-    
+public class DatiAccountBean extends BaseAnagraficaBean {
 
     private int idUtente;
-    private String nome;
-    private String cognome;
-    private String email;
     private String telefono;
     private String indirizzo;
 
@@ -15,44 +10,27 @@ public class DatiAccountBean  {
         // Costruttore vuoto richiesto per bean/framework (istanziazione riflessiva).
     }
 
-    public int getIdUtente() { 
-        return idUtente; 
+    public int getIdUtente() {
+        return idUtente;
     }
+
     public void setIdUtente(int idUtente) {
-         this.idUtente = idUtente; 
-        }
-
-    public String getNome() { 
-        return nome; 
-    }
-    public void setNome(String nome) { 
-        this.nome = nome; 
-    }
-    public String getCognome() { 
-        return cognome; 
-    }
-    public void setCognome(String cognome) { 
-        this.cognome = cognome; 
+        this.idUtente = idUtente;
     }
 
-    public String getEmail() { 
-        return email;
-     }
-    public void setEmail(String email) {
-         this.email = email; 
-        }
-
-    public String getTelefono() { 
-        return telefono; 
+    public String getTelefono() {
+        return telefono;
     }
+
     public void setTelefono(String telefono) {
-         this.telefono = telefono;
-         }
-
-    public String getIndirizzo() { 
-        return indirizzo; 
+        this.telefono = telefono;
     }
-    public void setIndirizzo(String indirizzo) { 
-        this.indirizzo = indirizzo; 
+
+    public String getIndirizzo() {
+        return indirizzo;
+    }
+
+    public void setIndirizzo(String indirizzo) {
+        this.indirizzo = indirizzo;
     }
 }
