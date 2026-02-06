@@ -3,10 +3,14 @@ package com.ispw.controller.graphic;
 import java.util.Map;
 import java.util.logging.Logger;
 
-/**
- * Utility per i controller grafici: gestione messaggi standard e navigazione errori.
- */
 public final class GraphicControllerUtils {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: utility del layer graphic (stateless).
+    // A2) IO verso GUI/CLI: chiavi standard e routing error/successo.
+    // ========================
 
     public static final String KEY_ERROR = "error";
     public static final String KEY_MESSAGE = "message";
@@ -91,8 +95,14 @@ public final class GraphicControllerUtils {
     public static final String MSG_PAGAMENTO_NON_COMPLETATO = "Pagamento non completato";
 
     private GraphicControllerUtils() {
-        // utility class
     }
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) notifyError: logga e naviga alla route con errore.
+    // L2) handleOnShow: interpreta parametri e logga messaggi.
+    // ========================
 
     public static void notifyError(Logger log,
                                    GraphicControllerNavigation navigator,

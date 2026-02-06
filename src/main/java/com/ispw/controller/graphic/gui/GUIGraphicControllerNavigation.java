@@ -11,9 +11,6 @@ public class GUIGraphicControllerNavigation extends AbstractGraphicControllerNav
     // A2) IO verso GUI/CLI: routing GUI.
     // A3) Persistenza: nessuna.
     // ========================
-    public GUIGraphicControllerNavigation() {
-    }
-
     // ========================
     // SEZIONE LOGICA
     // Legenda metodi: nessun helper privato.

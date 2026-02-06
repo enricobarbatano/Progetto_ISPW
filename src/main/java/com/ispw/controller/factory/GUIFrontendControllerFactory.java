@@ -33,6 +33,13 @@ import com.ispw.view.gui.GuiLauncher;
 
 public final class GUIFrontendControllerFactory extends FrontendControllerFactory {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: crea controller/view GUI concreti.
+    // A2) Stato: mantiene istanze per riuso e routing.
+    // ========================
+
     private static final Logger logger = Logger.getLogger(GUIFrontendControllerFactory.class.getName());
     private GUIGraphicControllerNavigation navigationController;
     private GUIGraphicLoginController loginController;
@@ -213,12 +220,18 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
     }
 
     private GraphicControllerNavigation getNavigationController() {
-        return createNavigationController();  // Delega al metodo pubblico
+        return createNavigationController();
     }
 
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) create*View: crea e memoizza le view GUI.
+    // L2) create*Controller: crea e memoizza i controller GUI.
+    // L3) registerRoutes: registra route -> view.
+    // ========================
+
     private void registerRoutes() {
-        // Registrazione nelle factory concrete: conoscono i controller GUI reali e il navigator concreto.
-        // Nell'astratta introdurrebbe dipendenze verso classi concrete, violando il disaccoppiamento.
         navigationController.registerRoute(createLoginView().getRouteName(), createLoginView());
         navigationController.registerRoute(createHomeView().getRouteName(), createHomeView());
         navigationController.registerRoute(createAccountView().getRouteName(), createAccountView());

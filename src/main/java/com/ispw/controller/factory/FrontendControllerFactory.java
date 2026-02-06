@@ -13,10 +13,16 @@ import com.ispw.model.enums.FrontendProvider;
 
 public abstract class FrontendControllerFactory {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: factory astratta per controller grafici (CLI/GUI).
+    // A2) Stato: provider scelto a bootstrap e istanza singleton.
+    // ========================
+
     private static FrontendProvider provider;
     private static FrontendControllerFactory instance;
 
-    // Imposta il provider UNA SOLA VOLTA nel bootstrap
     public static void setFrontendProvider(FrontendProvider p) {
         if (provider != null) {
             throw new IllegalStateException("FrontendProvider già impostato. Non puoi cambiarlo a runtime.");
@@ -24,7 +30,6 @@ public abstract class FrontendControllerFactory {
         provider = p;
     }
 
-    // Restituisce sempre la stessa istanza (Singleton)
     public static FrontendControllerFactory getInstance() {
         if (provider == null) {
             throw new IllegalStateException("FrontendProvider non configurato. Chiama setFrontendProvider() prima.");
@@ -39,9 +44,15 @@ public abstract class FrontendControllerFactory {
         return instance;
     }
 
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) startApplication: avvio UI.
+    // L2) create*Controller: factory dei controller grafici.
+    // ========================
+
     public abstract void startApplication();
 
-    // Factory methods per creare i GraphicController
     public abstract GraphicLoginController createLoginController();
     public abstract GraphicControllerAccount createAccountController();
     public abstract GraphicControllerRegistrazione createRegistrazioneController();

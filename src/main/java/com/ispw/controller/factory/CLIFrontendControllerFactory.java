@@ -1,4 +1,3 @@
-// src/main/java/com/ispw/controller/factory/CLIFrontendControllerFactory.java
 package com.ispw.controller.factory;
 
 
@@ -32,6 +31,14 @@ import com.ispw.view.cli.CLIRegistrazioneView;
 import com.ispw.view.cli.CLIRegoleView;
 
 public final class CLIFrontendControllerFactory extends FrontendControllerFactory {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: crea controller/view CLI concreti.
+    // A2) Stato: mantiene istanze per riuso e routing.
+    // ========================
+
     private CLIGraphicControllerNavigation navigationController;
     private CLIGraphicLoginController loginController;
     private CLILoginView loginView;
@@ -54,7 +61,6 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     @Override
     public void startApplication() {
         System.out.println("Avvio CLI...");
-        // Avvia il flusso con la schermata di login
         getNavigationController().goTo(GraphicControllerUtils.ROUTE_LOGIN);
     }
 
@@ -212,12 +218,18 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     }
 
     private GraphicControllerNavigation getNavigationController() {
-        return createNavigationController();  // Delega al metodo pubblico
+        return createNavigationController();
     }
 
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) create*View: crea e memoizza le view CLI.
+    // L2) create*Controller: crea e memoizza i controller CLI.
+    // L3) registerRoutes: registra route -> view.
+    // ========================
+
     private void registerRoutes() {
-        // Registrazione nelle factory concrete: conoscono i controller CLI reali e il navigator concreto.
-        // Nell'astratta introdurrebbe dipendenze verso classi concrete, violando il disaccoppiamento.
         navigationController.registerRoute(createLoginView().getRouteName(), createLoginView());
         navigationController.registerRoute(createHomeView().getRouteName(), createHomeView());
         navigationController.registerRoute(createAccountView().getRouteName(), createAccountView());
