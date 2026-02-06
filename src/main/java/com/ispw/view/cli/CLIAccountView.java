@@ -93,6 +93,7 @@ public class CLIAccountView extends GenericViewCLI implements ViewGestioneAccoun
 
         Map<String, Object> update = new java.util.HashMap<>();
         update.put(GraphicControllerUtils.KEY_ID_UTENTE, idUtente);
+        update.put(GraphicControllerUtils.KEY_SESSIONE, sessione);
         if (!nome.isBlank()) update.put(GraphicControllerUtils.KEY_NOME, nome);
         if (!cognome.isBlank()) update.put(GraphicControllerUtils.KEY_COGNOME, cognome);
         if (!email.isBlank()) update.put(GraphicControllerUtils.KEY_EMAIL, email);

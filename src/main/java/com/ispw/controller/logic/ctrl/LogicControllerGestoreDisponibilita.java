@@ -24,7 +24,10 @@ public class LogicControllerGestoreDisponibilita
                    GestioneDisponibilitaGestioneRegole,
                    GestioneDisponibilitaPrenotazione {
 
-   
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Interazioni con DAO e componenti esterni.
+    // ========================
     private CampoDAO campoDAO() {
         return DAOFactory.getInstance().getCampoDAO();
     }
@@ -143,5 +146,8 @@ public class LogicControllerGestoreDisponibilita
         return out;
     }
 
-    
+    // ========================
+    // SEZIONE LOGICA
+    // Logica interna della classe (nessun helper aggiuntivo).
+    // ========================
 }

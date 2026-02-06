@@ -3,12 +3,13 @@ package com.ispw.controller.logic.ctrl;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ispw.bean.CampiBean;
+import com.ispw.bean.CampoBean;
 import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.bean.PenalitaBean;
 import com.ispw.bean.RegolaCampoBean;
@@ -79,15 +80,28 @@ public class LogicControllerConfiguraRegole {
     /**
      * Restituisce una lista di campi in formato testuale per la selezione UI.
      */
-    public List<String> listaCampi() {
-        return campoDAO().findAll().stream()
-            .map(c -> String.format("#%d - %s (%s) [attivo=%s, manutenzione=%s]",
-                c.getIdCampo(),
-                c.getNome(),
-                c.getTipoSport(),
-                c.isAttivo(),
-                c.isFlagManutenzione()))
-            .toList();
+    public CampiBean listaCampi() {
+        CampiBean out = new CampiBean();
+        out.setCampi(campoDAO().findAll().stream()
+            .map(this::toBean)
+            .toList());
+        return out;
+    }
+
+    private CampoBean toBean(Campo campo) {
+        CampoBean bean = new CampoBean();
+        if (campo == null) {
+            return bean;
+        }
+        bean.setIdCampo(campo.getIdCampo());
+        bean.setNome(campo.getNome());
+        bean.setTipoSport(campo.getTipoSport());
+        if (campo.getCostoOrario() != null) {
+            bean.setCostoOrario(java.math.BigDecimal.valueOf(campo.getCostoOrario()));
+        }
+        bean.setAttivo(campo.isAttivo());
+        bean.setFlagManutenzione(campo.isFlagManutenzione());
+        return bean;
     }
 
     // =====================================================================================

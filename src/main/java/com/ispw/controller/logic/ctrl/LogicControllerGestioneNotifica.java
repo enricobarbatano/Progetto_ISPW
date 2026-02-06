@@ -21,6 +21,11 @@ public class LogicControllerGestioneNotifica implements
         GestioneNotificaGestioneAccount,
         GestioneNotificaPenalita {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Interazioni con altri componenti (notifiche/logging).
+    // ========================
+
     // =======================
     //  NOTIFICHE DISDETTA
     // =======================
@@ -120,6 +125,10 @@ public class LogicControllerGestioneNotifica implements
         info("Aggiornamento regole", "BROADCAST: utenti interessati", null);
     }
 
+    // ========================
+    // SEZIONE LOGICA
+    // Logica interna della classe (composizione messaggi e utility).
+    // ========================
     // =======================
     //  Helper privati (stateless)
     // =======================

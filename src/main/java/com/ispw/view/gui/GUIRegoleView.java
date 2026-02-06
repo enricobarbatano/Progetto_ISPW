@@ -10,6 +10,7 @@ import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerRegole;
 import com.ispw.view.interfaces.ViewGestioneRegole;
 
+import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -20,6 +21,7 @@ import javafx.scene.layout.VBox;
 public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole, NavigableController {
 
     private final GUIGraphicControllerRegole controller;
+    private boolean campiRequested;
 
     public GUIRegoleView(GUIGraphicControllerRegole controller) {
         this.controller = controller;
@@ -52,7 +54,10 @@ public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole,
 
         ListView<String> campiList = new ListView<>();
         Object rawCampi = lastParams.get(GraphicControllerUtils.KEY_CAMPI);
-        if (rawCampi instanceof List<?> campi) {
+        if (rawCampi == null) {
+            GuiViewUtils.fillList(campiList, List.of("Caricamento lista campi..."));
+        } else if (rawCampi instanceof List<?> campi) {
+            campiRequested = false;
             GuiViewUtils.fillList(campiList, campi);
         }
 
@@ -118,6 +123,11 @@ public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole,
         root.getChildren().addAll(title, error, ok, campiList, idCampo, lista, seleziona, attivo, manut,
             aggiornaStato, durata, apertura, chiusura, preavviso, aggiornaTemp, valorePen, aggiornaPen, home);
         GuiLauncher.setRoot(root);
+
+        if (rawCampi == null && !campiRequested) {
+            campiRequested = true;
+            Platform.runLater(() -> controller.richiediListaCampi());
+        }
     }
 
     private Integer parseInt(String value) {

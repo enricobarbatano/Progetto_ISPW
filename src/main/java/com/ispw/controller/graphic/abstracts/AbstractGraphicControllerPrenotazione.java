@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ispw.bean.CampiBean;
 import com.ispw.bean.DatiInputPrenotazioneBean;
 import com.ispw.bean.DatiPagamentoBean;
 import com.ispw.bean.ParametriVerificaBean;
@@ -147,7 +148,7 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
 
     public void richiediListaCampi(SessioneUtenteBean sessione) {
         try {
-            List<String> campi = logicController().listaCampi();
+            List<String> campi = formatCampi(logicController().listaCampi());
             if (navigator != null) {
                 Map<String, Object> payload = new HashMap<>();
                 payload.put(GraphicControllerUtils.KEY_CAMPI, campi);
@@ -159,6 +160,20 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore recupero lista campi", e);
         }
+    }
+
+    private List<String> formatCampi(CampiBean campi) {
+        if (campi == null || campi.getCampi() == null) {
+            return List.of();
+        }
+        return campi.getCampi().stream()
+            .map(c -> String.format("#%d - %s (%s) [attivo=%s, manutenzione=%s]",
+                c.getIdCampo(),
+                c.getNome(),
+                c.getTipoSport(),
+                c.isAttivo(),
+                c.isFlagManutenzione()))
+            .toList();
     }
 
     public void cercaDisponibilitaRaw(int idCampo, String data, String oraInizio, int durataMin) {

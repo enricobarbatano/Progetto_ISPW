@@ -8,6 +8,8 @@ import java.util.logging.Logger;
 
 import com.ispw.bean.DatiPenalitaBean;
 import com.ispw.bean.EsitoOperazioneBean;
+import com.ispw.bean.UtenteSelezioneBean;
+import com.ispw.bean.UtentiBean;
 import com.ispw.controller.graphic.GraphicControllerNavigation;
 import com.ispw.controller.graphic.GraphicControllerPenalita;
 import com.ispw.controller.graphic.GraphicControllerUtils;
@@ -47,7 +49,7 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
 
     public void richiediListaUtenti() {
         try {
-            List<String> utenti = logicController().listaUtentiPerPenalita();
+            List<String> utenti = formatUtenti(logicController().listaUtentiPerPenalita());
             if (navigator != null) {
                 navigator.goTo(GraphicControllerUtils.ROUTE_PENALITA,
                     Map.of(GraphicControllerUtils.KEY_UTENTI, utenti));
@@ -134,5 +136,22 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
         dati.setMotivazione(motivazione.trim());
         dati.setImporto(BigDecimal.valueOf(importo));
         return dati;
+    }
+
+    private List<String> formatUtenti(UtentiBean utenti) {
+        if (utenti == null || utenti.getUtenti() == null || utenti.getUtenti().isEmpty()) {
+            return List.of("Nessun utente disponibile");
+        }
+        return utenti.getUtenti().stream()
+            .map(this::formatUtente)
+            .toList();
+    }
+
+    private String formatUtente(UtenteSelezioneBean u) {
+        if (u == null) {
+            return "";
+        }
+        String email = u.getEmail() != null ? u.getEmail() : "";
+        return String.format("#%d - %s (%s)", u.getIdUtente(), email, u.getRuolo());
     }
 }

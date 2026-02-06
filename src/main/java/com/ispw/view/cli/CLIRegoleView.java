@@ -47,7 +47,11 @@ public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole,
         CliViewUtils.printMessages(getLastError(), getLastSuccess());
 
         Object rawCampi = lastParams.get(GraphicControllerUtils.KEY_CAMPI);
-        if (rawCampi instanceof List<?> campi) {
+        if (rawCampi == null) {
+            controller.richiediListaCampi();
+            System.out.println("\n=== CAMPI ===");
+            System.out.println(" (lista non disponibile, richiesta in corso...)");
+        } else if (rawCampi instanceof List<?> campi) {
             @SuppressWarnings("unchecked")
             List<String> list = (List<String>) campi;
             lastCampi = list;

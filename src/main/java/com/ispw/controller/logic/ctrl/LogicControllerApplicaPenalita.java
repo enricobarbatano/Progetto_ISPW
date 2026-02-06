@@ -3,7 +3,6 @@ package com.ispw.controller.logic.ctrl;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,6 +11,8 @@ import com.ispw.bean.DatiFatturaBean;
 import com.ispw.bean.DatiPagamentoBean;
 import com.ispw.bean.DatiPenalitaBean;
 import com.ispw.bean.EsitoOperazioneBean;
+import com.ispw.bean.UtenteSelezioneBean;
+import com.ispw.bean.UtentiBean;
 import com.ispw.controller.logic.interfaces.fattura.GestioneFatturaPenalita;
 import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaPenalita;
 import com.ispw.controller.logic.interfaces.pagamento.GestionePagamentoPenalita;
@@ -69,11 +70,13 @@ public final class LogicControllerApplicaPenalita {
                 new LogicControllerGestioneNotifica());
     }
 
-    public List<String> listaUtentiPerPenalita() {
-        return userDAO().findAll().stream()
+    public UtentiBean listaUtentiPerPenalita() {
+        UtentiBean out = new UtentiBean();
+        out.setUtenti(userDAO().findAll().stream()
             .filter(u -> u != null && u.getRuolo() == Ruolo.UTENTE)
-            .map(this::formatUtente)
-            .toList();
+            .map(this::toBean)
+            .toList());
+        return out;
     }
 
     public EsitoOperazioneBean applicaSanzione(DatiPenalitaBean dati,
@@ -292,9 +295,15 @@ public final class LogicControllerApplicaPenalita {
         return LOGGER;
     }
 
-    private String formatUtente(GeneralUser u) {
-        String email = u.getEmail() != null ? u.getEmail() : "";
-        return String.format("#%d - %s (%s)", u.getIdUtente(), email, u.getRuolo());
+    private UtenteSelezioneBean toBean(GeneralUser u) {
+        UtenteSelezioneBean bean = new UtenteSelezioneBean();
+        if (u == null) {
+            return bean;
+        }
+        bean.setIdUtente(u.getIdUtente());
+        bean.setEmail(u.getEmail());
+        bean.setRuolo(u.getRuolo());
+        return bean;
     }
 
     /** Costruisce l'esito (no reflection: usiamo direttamente i setter reali). */

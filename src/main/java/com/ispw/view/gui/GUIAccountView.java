@@ -117,6 +117,7 @@ public class GUIAccountView extends GenericViewGUI implements ViewGestioneAccoun
             return updateMap;
         }
         updateMap.put(GraphicControllerUtils.KEY_ID_UTENTE, idUtente);
+        updateMap.put(GraphicControllerUtils.KEY_SESSIONE, sessione);
         if (!nome.getText().isBlank()) updateMap.put(GraphicControllerUtils.KEY_NOME, nome.getText());
         if (!cognome.getText().isBlank()) updateMap.put(GraphicControllerUtils.KEY_COGNOME, cognome.getText());
         if (!email.getText().isBlank()) updateMap.put(GraphicControllerUtils.KEY_EMAIL, email.getText());

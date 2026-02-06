@@ -11,6 +11,8 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ispw.bean.CampiBean;
+import com.ispw.bean.CampoBean;
 import com.ispw.bean.DatiDisponibilitaBean;
 import com.ispw.bean.DatiFatturaBean;
 import com.ispw.bean.DatiInputPrenotazioneBean;
@@ -62,15 +64,28 @@ public class LogicControllerPrenotazioneCampo {
     // =============================================================================
     // 0) Lista campi (supporto UI prenotazione)
     // =============================================================================
-    public List<String> listaCampi() {
-        return campoDAO().findAll().stream()
-            .map(c -> String.format("#%d - %s (%s) [attivo=%s, manutenzione=%s]",
-                c.getIdCampo(),
-                c.getNome(),
-                c.getTipoSport(),
-                c.isAttivo(),
-                c.isFlagManutenzione()))
-            .toList();
+    public CampiBean listaCampi() {
+        CampiBean out = new CampiBean();
+        out.setCampi(campoDAO().findAll().stream()
+            .map(this::toBean)
+            .toList());
+        return out;
+    }
+
+    private CampoBean toBean(Campo campo) {
+        CampoBean bean = new CampoBean();
+        if (campo == null) {
+            return bean;
+        }
+        bean.setIdCampo(campo.getIdCampo());
+        bean.setNome(campo.getNome());
+        bean.setTipoSport(campo.getTipoSport());
+        if (campo.getCostoOrario() != null) {
+            bean.setCostoOrario(java.math.BigDecimal.valueOf(campo.getCostoOrario()));
+        }
+        bean.setAttivo(campo.isAttivo());
+        bean.setFlagManutenzione(campo.isFlagManutenzione());
+        return bean;
     }
 
     // =============================================================================

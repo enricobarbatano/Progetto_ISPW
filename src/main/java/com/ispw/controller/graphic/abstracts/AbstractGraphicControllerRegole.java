@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ispw.bean.CampiBean;
 import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.bean.PenalitaBean;
 import com.ispw.bean.RegolaCampoBean;
@@ -51,7 +52,7 @@ public abstract class AbstractGraphicControllerRegole implements GraphicControll
     @Override
     public void richiediListaCampi() {
         try {
-            List<String> campi = logicController().listaCampi();
+            List<String> campi = formatCampi(logicController().listaCampi());
             if (navigator != null) {
                 navigator.goTo(GraphicControllerUtils.ROUTE_REGOLE,
                     Map.of(GraphicControllerUtils.KEY_CAMPI, campi));
@@ -171,6 +172,20 @@ public abstract class AbstractGraphicControllerRegole implements GraphicControll
             bean.setFlagManutenzione((Boolean) regolaCampo.get(GraphicControllerUtils.KEY_FLAG_MANUTENZIONE));
         }
         return bean;
+    }
+
+    private List<String> formatCampi(CampiBean campi) {
+        if (campi == null || campi.getCampi() == null || campi.getCampi().isEmpty()) {
+            return List.of("Nessun campo disponibile");
+        }
+        return campi.getCampi().stream()
+            .map(c -> String.format("#%d - %s (%s) [attivo=%s, manutenzione=%s]",
+                c.getIdCampo(),
+                c.getNome(),
+                c.getTipoSport(),
+                c.isAttivo(),
+                c.isFlagManutenzione()))
+            .toList();
     }
 
     private TempisticheBean buildTempisticheBean(Map<String, Object> tempistiche) {

@@ -1,7 +1,6 @@
 package com.ispw.controller.logic.ctrl;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -9,6 +8,8 @@ import java.util.logging.Logger;
 
 import com.ispw.bean.DatiAccountBean;
 import com.ispw.bean.EsitoOperazioneBean;
+import com.ispw.bean.LogEntryBean;
+import com.ispw.bean.LogsBean;
 import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.bean.UtenteBean;
 import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaGestioneAccount;
@@ -60,9 +61,25 @@ public class LogicControllerGestioneAccount {
     // =====================================================================================
     // 0) Log di sistema (gestore)
     // =====================================================================================
-    public List<SystemLog> listaUltimiLog(int limit) {
+    public LogsBean listaUltimiLog(int limit) {
         int safeLimit = limit > 0 ? limit : 20;
-        return logDAO().findLast(safeLimit);
+        LogsBean out = new LogsBean();
+        out.setLogs(logDAO().findLast(safeLimit).stream()
+            .map(this::toBean)
+            .toList());
+        return out;
+    }
+
+    private LogEntryBean toBean(SystemLog log) {
+        LogEntryBean bean = new LogEntryBean();
+        if (log == null) {
+            return bean;
+        }
+        bean.setTimestamp(log.getTimestamp());
+        bean.setDescrizione(log.getDescrizione());
+        bean.setIdUtenteCoinvolto(log.getIdUtenteCoinvolto());
+        bean.setTipoOperazione(log.getTipoOperazione() != null ? log.getTipoOperazione().name() : null);
+        return bean;
     }
 
     // =====================================================================================

@@ -22,40 +22,15 @@ import com.ispw.model.enums.StatoPagamento;
 public class LogicControllerGestionePagamento
         implements GestionePagamentoPrenotazione, GestionePagamentoRimborso, GestionePagamentoPenalita {
 
-    /* ======================
-       Helper (stateless)
-       ====================== */
-    private PagamentoDAO pagamentoDAO() {
-        return DAOFactory.getInstance().getPagamentoDAO();
-    }
-
-    // Converte la stringa del bean in MetodoPagamento (SATISPAY / PAYPAL / BONIFICO)
-    private MetodoPagamento parseMetodo(String nome) {
-        if (nome == null) return null;
-        try { return MetodoPagamento.valueOf(nome.trim().toUpperCase()); }
-        catch (IllegalArgumentException ex) { return null; }
-    }
     private static final String FALLITO= "FALLITO";
     private static final String RIFIUTATO= "RIFIUTATO";
     private static final String NEGATO= "NEGATO";
     private static final String KO= "KO";
-    /**
-     * Prova una lista di alias per ricavare uno StatoPagamento dell'enum reale;
-     * se non trova corrispondenze, fa fallback al primo valore definito nell'enum
-     * (scelta "scolastica" per evitare errori di compilazione in caso di nomi diversi).
-     */
-    private StatoPagamento pickStato(String... preferiti) {
-        for (String s : preferiti) {
-            try { return StatoPagamento.valueOf(s); }
-            catch (IllegalArgumentException ignore) { /* ignored: alias not matching enum constant, try next */ }
-        }
-        StatoPagamento[] vals = StatoPagamento.values();
-        return vals.length > 0 ? vals[0] : null;
-    }
 
-    private String newTxId(String prefix) {
-        return prefix + "-" + System.currentTimeMillis();
-    }
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Interazioni con altri componenti (DAO e servizi di pagamento).
+    // ========================
 
     /* =========================================================
        1) Pagamento PRENOTAZIONE
@@ -139,6 +114,40 @@ public class LogicControllerGestionePagamento
 
         // Ritorno il DTO richiesto dall’interfaccia
         return esito(ok, stato, newTxId("PX"), ok ? "Pagamento penalità eseguito" : "Pagamento penalità rifiutato");
+    }
+
+    // ========================
+    // SEZIONE LOGICA
+    // Logica interna della classe (helper e normalizzazioni).
+    // ========================
+
+    private PagamentoDAO pagamentoDAO() {
+        return DAOFactory.getInstance().getPagamentoDAO();
+    }
+
+    // Converte la stringa del bean in MetodoPagamento (SATISPAY / PAYPAL / BONIFICO)
+    private MetodoPagamento parseMetodo(String nome) {
+        if (nome == null) return null;
+        try { return MetodoPagamento.valueOf(nome.trim().toUpperCase()); }
+        catch (IllegalArgumentException ex) { return null; }
+    }
+
+    /**
+     * Prova una lista di alias per ricavare uno StatoPagamento dell'enum reale;
+     * se non trova corrispondenze, fa fallback al primo valore definito nell'enum
+     * (scelta "scolastica" per evitare errori di compilazione in caso di nomi diversi).
+     */
+    private StatoPagamento pickStato(String... preferiti) {
+        for (String s : preferiti) {
+            try { return StatoPagamento.valueOf(s); }
+            catch (IllegalArgumentException ignore) { /* ignored: alias not matching enum constant, try next */ }
+        }
+        StatoPagamento[] vals = StatoPagamento.values();
+        return vals.length > 0 ? vals[0] : null;
+    }
+
+    private String newTxId(String prefix) {
+        return prefix + "-" + System.currentTimeMillis();
     }
 
     private StatoPagamentoBean esito(boolean successo, String stato, String idTx, String msg) {

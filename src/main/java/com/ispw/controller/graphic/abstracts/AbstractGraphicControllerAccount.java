@@ -85,9 +85,10 @@ public abstract class AbstractGraphicControllerAccount implements GraphicControl
         DatiAccountBean bean = buildAccountBean(nuoviDati, id);
 
         EsitoOperazioneBean esito = aggiornaDatiAccountConNotifica(bean);
+        SessioneUtenteBean sessione = updateSessionIfPresent(nuoviDati, bean);
 
         if (esito != null && esito.isSuccesso()) {
-            navigateSuccess(esito.getMessaggio());
+            navigateSuccess(esito.getMessaggio(), sessione);
         } else {
             notifyAccountError(esito != null ? esito.getMessaggio()
                 : GraphicControllerUtils.MSG_OPERAZIONE_NON_RIUSCITA);
@@ -107,7 +108,7 @@ public abstract class AbstractGraphicControllerAccount implements GraphicControl
         EsitoOperazioneBean esito = cambiaPasswordConNotifica(vecchiaPassword, nuovaPassword, sessione);
 
         if (esito != null && esito.isSuccesso()) {
-            navigateSuccess(esito.getMessaggio());
+            navigateSuccess(esito.getMessaggio(), sessione);
         } else {
             notifyAccountError(esito != null ? esito.getMessaggio()
                 : GraphicControllerUtils.MSG_OPERAZIONE_NON_RIUSCITA);
@@ -137,10 +138,16 @@ public abstract class AbstractGraphicControllerAccount implements GraphicControl
         return false;
     }
 
-    private void navigateSuccess(String message) {
+    private void navigateSuccess(String message, SessioneUtenteBean sessione) {
         if (navigator != null) {
-            navigator.goTo(GraphicControllerUtils.ROUTE_ACCOUNT,
-                Map.of(GraphicControllerUtils.KEY_SUCCESSO, message));
+            if (sessione != null) {
+                navigator.goTo(GraphicControllerUtils.ROUTE_ACCOUNT,
+                    Map.of(GraphicControllerUtils.KEY_SUCCESSO, message,
+                           GraphicControllerUtils.KEY_SESSIONE, sessione));
+            } else {
+                navigator.goTo(GraphicControllerUtils.ROUTE_ACCOUNT,
+                    Map.of(GraphicControllerUtils.KEY_SUCCESSO, message));
+            }
         }
     }
 
@@ -170,5 +177,29 @@ public abstract class AbstractGraphicControllerAccount implements GraphicControl
             bean.setEmail((String) nuoviDati.get(GraphicControllerUtils.KEY_EMAIL));
         }
         return bean;
+    }
+
+    private SessioneUtenteBean updateSessionIfPresent(Map<String, Object> nuoviDati, DatiAccountBean bean) {
+        Object raw = nuoviDati.get(GraphicControllerUtils.KEY_SESSIONE);
+        if (!(raw instanceof SessioneUtenteBean sessione)) {
+            return null;
+        }
+        if (sessione.getUtente() == null || bean == null) {
+            return sessione;
+        }
+        if (hasText(bean.getNome())) {
+            sessione.getUtente().setNome(bean.getNome().trim());
+        }
+        if (hasText(bean.getCognome())) {
+            sessione.getUtente().setCognome(bean.getCognome().trim());
+        }
+        if (hasText(bean.getEmail())) {
+            sessione.getUtente().setEmail(bean.getEmail().trim());
+        }
+        return sessione;
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }

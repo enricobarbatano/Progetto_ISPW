@@ -59,6 +59,7 @@ public final class AppBootstrapper {
         DAOFactory.initialize(config.persistency(), fsRoot);
         // Messaggio parametrico: MessageFormat
         System.out.println("Persistency provider: " + config.persistency());
+        DataSeeder.seedIfNeeded(config.persistency());
 
         // 4) Configura frontend
         FrontendControllerFactory.setFrontendProvider(config.frontend());
