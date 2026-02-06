@@ -19,16 +19,13 @@ import com.ispw.model.enums.TipoOperazione;
 
 public class LogicControllerGestioneAccesso {
 
-    // Logger on-demand (niente campo statico) — SonarCloud: soppressione locale S1312
-    @SuppressWarnings("java:S1312")
-    private Logger log() {
-        return Logger.getLogger(getClass().getName());
-    }
-
-    // DAO on-demand (no SQL nei controller)
-    private GeneralUserDAO userDAO() {
-        return DAOFactory.getInstance().getGeneralUserDAO();
-    }
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: usa interfacce DAO via DAOFactory (DIP).
+    // A2) IO verso GUI/CLI: riceve DatiLoginBean, ritorna SessioneUtenteBean.
+    // A3) Persistenza: usa DAO per utenti e log.
+    // ========================
 
     /**
      * Verifica credenziali e, se valide, costruisce una SessioneUtenteBean (stateless).
@@ -101,5 +98,23 @@ public class LogicControllerGestioneAccesso {
 
         logDAO.append(sl);
         log().fine(() -> "[LOGIN-LOG] Log di accesso salvato per utenteId=" + user.getIdUtente());
+    }
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi:
+    // 1) log() - logger on-demand.
+    // 2) userDAO() - accesso DAO.
+    // ========================
+
+    // Logger on-demand (niente campo statico) — SonarCloud: soppressione locale S1312
+    @SuppressWarnings("java:S1312")
+    private Logger log() {
+        return Logger.getLogger(getClass().getName());
+    }
+
+    // DAO on-demand (no SQL nei controller)
+    private GeneralUserDAO userDAO() {
+        return DAOFactory.getInstance().getGeneralUserDAO();
     }
 }

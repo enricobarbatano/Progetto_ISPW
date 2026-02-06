@@ -15,9 +15,10 @@ import com.ispw.view.interfaces.ViewGestioneRegole;
  * View CLI per gestione regole.
  */
 public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole, NavigableController {
+    private static final String CAMPI_HEADER = "=== CAMPI ===";
     private final Scanner in = new Scanner(System.in);
     private final CLIGraphicControllerRegole controller;
-
+  
     private Integer selectedCampoId;
     private List<String> lastCampi;
 
@@ -49,13 +50,13 @@ public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole,
         Object rawCampi = lastParams.get(GraphicControllerUtils.KEY_CAMPI);
         if (rawCampi == null) {
             controller.richiediListaCampi();
-            System.out.println("\n=== CAMPI ===");
+            System.out.println("\n" + CAMPI_HEADER);
             System.out.println(" (lista non disponibile, richiesta in corso...)");
         } else if (rawCampi instanceof List<?> campi) {
             @SuppressWarnings("unchecked")
             List<String> list = (List<String>) campi;
             lastCampi = list;
-            System.out.println("\n=== CAMPI ===");
+            System.out.println("\n" + CAMPI_HEADER);
             int i = 1;
             for (Object c : list) {
                 final int idx = i++;
@@ -114,7 +115,7 @@ public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole,
 
         Object rawCampi = lastParams.get(GraphicControllerUtils.KEY_CAMPI);
         if (rawCampi instanceof List<?> campi) {
-            System.out.println("\n=== CAMPI ===");
+            System.out.println("\n" + CAMPI_HEADER);
             int i = 1;
             for (Object c : campi) {
                 final int idx = i++;

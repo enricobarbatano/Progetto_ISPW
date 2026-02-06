@@ -29,7 +29,10 @@ public class LogicControllerGestionePagamento
 
     // ========================
     // SEZIONE ARCHITETTURALE
-    // Interazioni con altri componenti (DAO e servizi di pagamento).
+    // Legenda architettura:
+    // A1) Collaboratori: implementa interfacce GestionePagamento* (DIP).
+    // A2) IO verso GUI/CLI: riceve DatiPagamentoBean, ritorna StatoPagamento/StatoPagamentoBean.
+    // A3) Persistenza: usa DAO via DAOFactory.
     // ========================
 
     /* =========================================================
@@ -118,7 +121,12 @@ public class LogicControllerGestionePagamento
 
     // ========================
     // SEZIONE LOGICA
-    // Logica interna della classe (helper e normalizzazioni).
+    // Legenda metodi:
+    // 1) pagamentoDAO() - accesso DAO.
+    // 2) parseMetodo(...) - converte stringa in MetodoPagamento.
+    // 3) pickStato(...) - risolve StatoPagamento da alias.
+    // 4) newTxId(...) - genera id transazione.
+    // 5) esito(...) - costruisce StatoPagamentoBean.
     // ========================
 
     private PagamentoDAO pagamentoDAO() {

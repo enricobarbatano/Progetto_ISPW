@@ -48,7 +48,11 @@ public class LogicControllerPrenotazioneCampo {
     private static final String MSG_INPUT_NON_VALIDO = "Input non valido";
 
     // ========================
-    // Logger on-demand (no static field) – S1312
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: usa interfacce Gestione* via parametro (DIP).
+    // A2) IO verso GUI/CLI: riceve/ritorna bean (CampiBean, DatiPagamentoBean, ecc.).
+    // A3) Persistenza: usa DAO via DAOFactory.
     // ========================
     @SuppressWarnings("java:S1312")
     private Logger log() { return Logger.getLogger(getClass().getName()); }
@@ -70,22 +74,6 @@ public class LogicControllerPrenotazioneCampo {
             .map(this::toBean)
             .toList());
         return out;
-    }
-
-    private CampoBean toBean(Campo campo) {
-        CampoBean bean = new CampoBean();
-        if (campo == null) {
-            return bean;
-        }
-        bean.setIdCampo(campo.getIdCampo());
-        bean.setNome(campo.getNome());
-        bean.setTipoSport(campo.getTipoSport());
-        if (campo.getCostoOrario() != null) {
-            bean.setCostoOrario(java.math.BigDecimal.valueOf(campo.getCostoOrario()));
-        }
-        bean.setAttivo(campo.isAttivo());
-        bean.setFlagManutenzione(campo.isFlagManutenzione());
-        return bean;
     }
 
     // =============================================================================
@@ -235,7 +223,21 @@ public class LogicControllerPrenotazioneCampo {
         return composeEsito(p, success, statoEnum);
     }
 
-    /* ========================= Helper estratti (nessuna logica cambiata) ========================= */
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi:
+    // 1) isCheckoutInputValid(...) - valida input pagamento.
+    // 2) getFirstDaPagare(...) - seleziona prenotazione da pagare.
+    // 3) postPagamentoActions(...) - conferma, fattura, notifica.
+    // 4) composeEsito(...) - ricompone esito pagamento.
+    // 5) toBean(...) - converte entity in bean.
+    // 6) isBlank(...) - verifica stringhe vuote.
+    // 7) buildRiepilogo(...) - costruisce riepilogo prenotazione.
+    // 8) normalizeEmail(...) - normalizza email.
+    // 9) isPagamentoOk(...) - interpreta StatoPagamento.
+    // 10) newTxId(...) - genera id transazione.
+    // 11) esitoPagamento(...) - costruisce esito pagamento.
+    // ========================
 
     private boolean isCheckoutInputValid(DatiPagamentoBean dati,
                                          SessioneUtenteBean sessione,
@@ -304,9 +306,22 @@ public class LogicControllerPrenotazioneCampo {
         return esitoPagamento(success, stato, success ? "Pagamento eseguito" : "Pagamento rifiutato");
     }
 
-    // =========================
-    // Helper generali
-    // =========================
+    private CampoBean toBean(Campo campo) {
+        CampoBean bean = new CampoBean();
+        if (campo == null) {
+            return bean;
+        }
+        bean.setIdCampo(campo.getIdCampo());
+        bean.setNome(campo.getNome());
+        bean.setTipoSport(campo.getTipoSport());
+        if (campo.getCostoOrario() != null) {
+            bean.setCostoOrario(java.math.BigDecimal.valueOf(campo.getCostoOrario()));
+        }
+        bean.setAttivo(campo.isAttivo());
+        bean.setFlagManutenzione(campo.isFlagManutenzione());
+        return bean;
+    }
+
     private boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
 
     private RiepilogoPrenotazioneBean buildRiepilogo(Prenotazione p, Campo c, UtenteBean utente, int durataMin) {

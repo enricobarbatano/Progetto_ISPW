@@ -21,6 +21,33 @@ import com.ispw.model.entity.Prenotazione;
 public class LogicControllerGestioneFattura
         implements GestioneFatturaPrenotazione, GestioneFatturaPenalita, GestioneFatturaRimborso {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: implementa le interfacce GestioneFattura* (DIP).
+    // A2) IO verso GUI/CLI: riceve DatiFatturaBean, ritorna Fattura.
+    // A3) Persistenza: usa DAO via DAOFactory.
+    // ========================
+
+    /** DAO on-demand (nessun campo, nessuna dipendenza da concreti). */
+    private FatturaDAO fatturaDAO() {
+        return DAOFactory.getInstance().getFatturaDAO();
+    }
+
+    private GeneralUserDAO userDAO() {
+        return DAOFactory.getInstance().getGeneralUserDAO();
+    }
+
+    private PrenotazioneDAO prenotazioneDAO() {
+        return DAOFactory.getInstance().getPrenotazioneDAO();
+    }
+
+    /** Logger on-demand per evitare campi (stateless). S1312 soppressa localmente. */
+    @SuppressWarnings("java:S1312")
+    private Logger log() {
+        return Logger.getLogger(getClass().getName());
+    }
+
   
     //Genera una fattura per una prenotazione (validazione essenziale + store via DAO). */
     @Override
@@ -126,9 +153,16 @@ public class LogicControllerGestioneFattura
                 new Object[]{idPrenotazione, nc.getLinkPdf()});
     }
 
-    // ===============================================================
-    //  Helper privati (stateless, SonarCloud friendly)
-    // ===============================================================
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi:
+    // 1) isValidDati(...) - valida dati fattura.
+    // 2) hasText(...) - verifica stringhe.
+    // 3) trimOrNull(...) - normalizza stringhe.
+    // 4) buildPdfLink(...) - crea link pdf fittizio.
+    // 5) resolveIdUtente(...) - risolve id utente da dati.
+    // 6) firstNonBlank(...) - primo valore non vuoto.
+    // ========================
 
     /** Validazione "scolastica": bean non nullo e CF presente. */
     private boolean isValidDati(DatiFatturaBean dati) {
@@ -171,24 +205,5 @@ public class LogicControllerGestioneFattura
             return b;
         }
         return null;
-    }
-
-    /** DAO on-demand (nessun campo, nessuna dipendenza da concreti). */
-    private FatturaDAO fatturaDAO() {
-        return DAOFactory.getInstance().getFatturaDAO();
-    }
-
-    private GeneralUserDAO userDAO() {
-        return DAOFactory.getInstance().getGeneralUserDAO();
-    }
-
-    private PrenotazioneDAO prenotazioneDAO() {
-        return DAOFactory.getInstance().getPrenotazioneDAO();
-    }
-
-    /** Logger on-demand per evitare campi (stateless). S1312 soppressa localmente. */
-    @SuppressWarnings("java:S1312")
-    private Logger log() {
-        return Logger.getLogger(getClass().getName());
     }
 }

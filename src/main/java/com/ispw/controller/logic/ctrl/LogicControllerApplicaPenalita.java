@@ -45,8 +45,13 @@ public final class LogicControllerApplicaPenalita {
     private static final Logger LOGGER =
             Logger.getLogger(LogicControllerApplicaPenalita.class.getName());
 
-    // === DIP: DAO iniettati via costruttore ===
-    // DAO on-demand (no SQL nei controller)
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: usa interfacce Gestione* via parametro (DIP).
+    // A2) IO verso GUI/CLI: riceve/ritorna bean (DatiPenalitaBean, DatiPagamentoBean, DatiFatturaBean, UtentiBean).
+    // A3) Persistenza: usa DAO via DAOFactory.
+    // ========================
     private GeneralUserDAO userDAO() {
         return DAOFactory.getInstance().getGeneralUserDAO();
     }
@@ -125,9 +130,27 @@ public final class LogicControllerApplicaPenalita {
         return esito(true, MSG_OK);
     }
 
-    // ========================================================================
-    //  Helper di validazione / normalizzazione
-    // ========================================================================
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi:
+    // 1) isDatiPenalitaValidi(...) - valida input.
+    // 2) isImportoValido(...) - valida importo.
+    // 3) resolveImportoOrDefault(...) - calcola importo.
+    // 4) handleNotifica(...) - invio notifica.
+    // 5) handlePagamento(...) - invio pagamento.
+    // 6) handleFattura(...) - invio fattura.
+    // 7) normalizePagamento(...) - default dati pagamento.
+    // 8) normalizeFattura(...) - default dati fattura.
+    // 9) persistOrComputeId(...) - persiste o calcola id.
+    // 10) appendLogSafe(...) - log best-effort su LogDAO.
+    // 11) runBestEffort(...) - wrapper best-effort.
+    // 12) blockAccountSafe(...) - sospensione account.
+    // 13) isBlank(...) - verifica stringhe vuote.
+    // 14) safe(...) - normalizza stringhe.
+    // 15) log() - logger on-demand.
+    // 16) toBean(...) - conversione entity->bean.
+    // 17) esito(...) - costruisce esito operazione.
+    // ========================
 
     private boolean isDatiPenalitaValidi(DatiPenalitaBean d) {
         return d != null

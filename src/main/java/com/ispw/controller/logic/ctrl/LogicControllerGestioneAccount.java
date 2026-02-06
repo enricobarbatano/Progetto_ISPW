@@ -43,6 +43,13 @@ public class LogicControllerGestioneAccount {
     private static final String MSG_PWD_OK            = "Password aggiornata";
 
     // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: usa interfaccia GestioneNotificaGestioneAccount via parametro (DIP).
+    // A2) IO verso GUI/CLI: riceve/ritorna bean (DatiAccountBean, SessioneUtenteBean, LogsBean).
+    // A3) Persistenza: usa DAO via DAOFactory.
+    // ========================
+    // ========================
     // Logger on-demand (S1312)
     // ========================
     @SuppressWarnings("java:S1312")
@@ -248,7 +255,13 @@ public class LogicControllerGestioneAccount {
     }
 
     // ========================
-    // Helper (validazioni, logging)
+    // SEZIONE LOGICA
+    // Legenda metodi:
+    // 1) isBlank(...) - verifica stringhe vuote.
+    // 2) normEmail(...) - normalizza email.
+    // 3) isValid(DatiAccountBean) - valida input account.
+    // 4) esito(...) - costruisce l'esito operazione.
+    // 5) appendLogSafe(...) - log best-effort su LogDAO.
     // ========================
     private static boolean isBlank(String s) {
         return s == null || s.trim().isEmpty();

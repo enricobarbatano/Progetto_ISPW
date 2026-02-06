@@ -64,6 +64,13 @@ public class LogicControllerDisdettaPrenotazione {
     private RegoleTempisticheDAO tempisticheDAO()      { return DAOFactory.getInstance().getRegoleTempisticheDAO(); }
     private RegolePenalitaDAO    penalitaDAO()         { return DAOFactory.getInstance().getRegolePenalitaDAO(); }
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: usa interfacce Gestione* via parametro (DIP).
+    // A2) IO verso GUI/CLI: riceve/ritorna bean (EsitoDisdettaBean, EsitoOperazioneBean, RiepilogoPrenotazioneBean).
+    // A3) Persistenza: usa DAO via DAOFactory.
+    // ========================
     // =====================================================================================
     // + ottieniPrenotazioniCancellabili(UtenteBean): List<RiepilogoPrenotazioneBean>
     //   - Restituisce prenotazioni future e non ANNULLATE dell’utente (riepilogo con importo pagato se disponibile).
@@ -96,18 +103,6 @@ public class LogicControllerDisdettaPrenotazione {
             out.add(r);
         }
         return out;
-    }
-
-    /**
-     * Verifica se una prenotazione è cancellabile (futura e non annullata).
-     */
-    private boolean isCancellablePrenotazione(Prenotazione p, LocalDateTime now) {
-        if (p == null) return false;
-        if (p.getStato() == StatoPrenotazione.ANNULLATA) return false;
-        if (p.getData() == null || p.getOraInizio() == null) return false;
-
-        LocalDateTime inizio = LocalDateTime.of(p.getData(), p.getOraInizio());
-        return inizio.isAfter(now); // solo future
     }
 
     // =====================================================================================
@@ -297,8 +292,26 @@ public class LogicControllerDisdettaPrenotazione {
     }
 
     // ========================
-    // Helper
+    // SEZIONE LOGICA
+    // Legenda metodi:
+    // 1) isCancellablePrenotazione(...) - verifica prenotazione cancellabile.
+    // 2) isBlank(...) - verifica stringhe vuote.
+    // 3) normalizeEmail(...) - normalizza email.
+    // 4) esito(...) - costruisce esito operazione.
+    // 5) appendLogSafe(...) - log best-effort su LogDAO.
     // ========================
+    /**
+     * Verifica se una prenotazione è cancellabile (futura e non annullata).
+     */
+    private boolean isCancellablePrenotazione(Prenotazione p, LocalDateTime now) {
+        if (p == null) return false;
+        if (p.getStato() == StatoPrenotazione.ANNULLATA) return false;
+        if (p.getData() == null || p.getOraInizio() == null) return false;
+
+        LocalDateTime inizio = LocalDateTime.of(p.getData(), p.getOraInizio());
+        return inizio.isAfter(now); // solo future
+    }
+
     private boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
 
     private String normalizeEmail(String email) {

@@ -23,7 +23,10 @@ public class LogicControllerGestioneNotifica implements
 
     // ========================
     // SEZIONE ARCHITETTURALE
-    // Interazioni con altri componenti (notifiche/logging).
+    // Legenda architettura:
+    // A1) Collaboratori: implementa interfacce GestioneNotifica* (DIP).
+    // A2) IO verso GUI/CLI: riceve UtenteBean e dati di contesto.
+    // A3) Persistenza: non usa DAO in questa classe.
     // ========================
 
     // =======================
@@ -127,11 +130,13 @@ public class LogicControllerGestioneNotifica implements
 
     // ========================
     // SEZIONE LOGICA
-    // Logica interna della classe (composizione messaggi e utility).
+    // Legenda metodi:
+    // 1) info(...) - log informativo.
+    // 2) warn(...) - log warning.
+    // 3) compose(...) - compone messaggio.
+    // 4) destinatario(...) - descrive destinatario.
+    // 5) log() - logger on-demand.
     // ========================
-    // =======================
-    //  Helper privati (stateless)
-    // =======================
 
     /** Log INFO standardizzato. */
     private void info(String tipo, String destinatario, String dettaglio) {

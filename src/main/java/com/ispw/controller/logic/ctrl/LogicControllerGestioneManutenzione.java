@@ -1,9 +1,9 @@
 package com.ispw.controller.logic.ctrl;
 
-import com.ispw.controller.logic.interfaces.manutenzione.GestioneManutenzioneConfiguraRegole;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.ispw.controller.logic.interfaces.manutenzione.GestioneManutenzioneConfiguraRegole;
 
 /**
  * Controller secondario STATeless per la gestione della manutenzione.
@@ -16,7 +16,10 @@ public final class LogicControllerGestioneManutenzione implements GestioneManute
 
     // ========================
     // SEZIONE ARCHITETTURALE
-    // Interazioni con altri componenti (notifica/manutenzione/logging).
+    // Legenda architettura:
+    // A1) Collaboratori: implementa l'interfaccia GestioneManutenzioneConfiguraRegole (DIP).
+    // A2) IO verso GUI/CLI: non usa bean, lavora su id campo.
+    // A3) Persistenza: non usa DAO in questa classe.
     // ========================
 
     /**
@@ -35,7 +38,8 @@ public final class LogicControllerGestioneManutenzione implements GestioneManute
 
     // ========================
     // SEZIONE LOGICA
-    // Logica interna della classe (supporto e utilità).
+    // Legenda metodi:
+    // 1) log() - logger on-demand.
     // ========================
     /** Logger on-demand per evitare campi (controller stateless). */
     @SuppressWarnings("java:S1312")

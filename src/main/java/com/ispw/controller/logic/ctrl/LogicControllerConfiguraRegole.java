@@ -52,6 +52,13 @@ public class LogicControllerConfiguraRegole {
     private static final String MSG_UPDATE_PEN_OK      = "Regole penalità aggiornate";
 
     // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: usa interfacce Gestione* via parametro (DIP).
+    // A2) IO verso GUI/CLI: riceve/ritorna bean (CampiBean, RegolaCampoBean, TempisticheBean, PenalitaBean).
+    // A3) Persistenza: usa DAO via DAOFactory.
+    // ========================
+    // ========================
     // Logger on-demand (S1312)
     // ========================
     @SuppressWarnings("java:S1312")
@@ -295,7 +302,18 @@ public class LogicControllerConfiguraRegole {
     }
 
     // ========================
-    // Helper (validazioni, log, reflection-safe updates)
+    // SEZIONE LOGICA
+    // Legenda metodi:
+    // 1) isValid(RegolaCampoBean) - valida input regole campo.
+    // 2) isValid(TempisticheBean) - valida regole tempistiche.
+    // 3) isValid(PenalitaBean) - valida regole penalita.
+    // 4) esito(...) - costruisce l'esito operazione.
+    // 5) appendLogSafe(...) - log best-effort su LogDAO.
+    // 6) generaNotificaAutomatica(...) - invia broadcast se disponibile.
+    // 7) updateCampoOperativo(...) - applica stato campo con fallback reflection.
+    // 8) invokeSetter(...) - helper reflection per setter.
+    // 9) setFieldIfExists(...) - helper reflection per field.
+    // 10) findField(...) - ricerca field nella gerarchia.
     // ========================
 
     // ---> FIX 1: forma condensata, elimina if ridondanti

@@ -26,7 +26,10 @@ public class LogicControllerGestoreDisponibilita
 
     // ========================
     // SEZIONE ARCHITETTURALE
-    // Interazioni con DAO e componenti esterni.
+    // Legenda architettura:
+    // A1) Collaboratori: implementa interfacce GestioneDisponibilita* (DIP).
+    // A2) IO verso GUI/CLI: riceve/ritorna bean DatiDisponibilitaBean/ParametriVerificaBean.
+    // A3) Persistenza: usa DAO via DAOFactory.
     // ========================
     private CampoDAO campoDAO() {
         return DAOFactory.getInstance().getCampoDAO();
@@ -148,6 +151,6 @@ public class LogicControllerGestoreDisponibilita
 
     // ========================
     // SEZIONE LOGICA
-    // Logica interna della classe (nessun helper aggiuntivo).
+    // Legenda metodi: nessun helper privato.
     // ========================
 }

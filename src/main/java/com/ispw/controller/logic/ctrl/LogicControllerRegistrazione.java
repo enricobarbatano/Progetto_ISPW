@@ -22,6 +22,14 @@ import com.ispw.model.enums.TipoOperazione;
 
 public class LogicControllerRegistrazione {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: usa interfaccia GestioneNotificaRegistrazione via parametro (DIP).
+    // A2) IO verso GUI/CLI: riceve DatiRegistrazioneBean, ritorna EsitoOperazioneBean/UtenteBean.
+    // A3) Persistenza: usa DAO via DAOFactory.
+    // ========================
+
     /**
      * Registra un nuovo utente in stato DA_CONFERMARE e invia la richiesta di conferma registrazione.
      * La dipendenza dal controller di notifica è passata via parametro (controller stateless).
@@ -134,20 +142,6 @@ public class LogicControllerRegistrazione {
         log().log(Level.INFO, "[REG-FINAL] Account attivato per utente #{0}", idUtente);
     }
 
-    // =========================
-    // Helper (stateless)
-    // =========================
-
-    private boolean isValid(DatiRegistrazioneBean b) {
-        return b != null && hasText(b.getNome()) && hasText(b.getCognome()) 
-                && hasText(b.getEmail()) && hasText(b.getPassword());
-    }
-    private boolean hasText(String s) { return s != null && !s.trim().isEmpty(); }
-
-    private UtenteBean toBean(GeneralUser u) {
-        return new UtenteBean(Objects.toString(u.getNome(), null), null, u.getEmail(), u.getRuolo());
-    }
-
     private void appendLog(int idUtente, TipoOperazione tipo, String descrizione) {
         final SystemLog log = new SystemLog();
         log.setTimestamp(LocalDateTime.now());
@@ -162,5 +156,23 @@ public class LogicControllerRegistrazione {
 
     @SuppressWarnings("java:S1312")
     private Logger log() { return Logger.getLogger(getClass().getName()); }
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda metodi:
+    // 1) isValid(...) - valida input registrazione.
+    // 2) hasText(...) - verifica stringhe.
+    // 3) toBean(...) - conversione entity->bean.
+    // ========================
+
+    private boolean isValid(DatiRegistrazioneBean b) {
+        return b != null && hasText(b.getNome()) && hasText(b.getCognome()) 
+                && hasText(b.getEmail()) && hasText(b.getPassword());
+    }
+    private boolean hasText(String s) { return s != null && !s.trim().isEmpty(); }
+
+    private UtenteBean toBean(GeneralUser u) {
+        return new UtenteBean(Objects.toString(u.getNome(), null), null, u.getEmail(), u.getRuolo());
+    }
 
 }
