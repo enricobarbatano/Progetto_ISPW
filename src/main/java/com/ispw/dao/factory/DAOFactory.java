@@ -58,6 +58,7 @@ public abstract class DAOFactory {
     /**
      * Package-private: reset the factory state. Intended for test usage only.
      */
+    @SuppressWarnings("unused") // invoked via reflection in tests
     static synchronized void resetForTests() {
         provider = null;
         fileSystemRoot = null;

@@ -54,7 +54,7 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
     // Ciclo FS: load / flush
     // -------------------------
 
-    protected void loadFromDisk() {
+    private void loadFromDisk() {
         lock.writeLock().lock();
         try {
             if (Files.notExists(filePath)) {
