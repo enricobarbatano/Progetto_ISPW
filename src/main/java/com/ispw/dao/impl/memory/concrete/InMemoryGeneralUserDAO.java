@@ -8,7 +8,6 @@ import java.util.Objects;
 import com.ispw.dao.impl.memory.InMemoryDAO;    // abstract
 import com.ispw.dao.interfaces.GeneralUserDAO;  // concreto da istanziare
 import com.ispw.model.entity.GeneralUser;
-import com.ispw.model.entity.UtenteFinale;
 
 /**
  * SEZIONE ARCHITETTURALE
@@ -40,9 +39,11 @@ public final class InMemoryGeneralUserDAO extends InMemoryDAO<Integer, GeneralUs
     }
 
     @Override
-    protected GeneralUser newEntity(Integer id) {
-        UtenteFinale u = new UtenteFinale();
-        u.setIdUtente(id != null ? id : 0);
+    public GeneralUser create(Integer id) {
+        GeneralUser u = super.create(id);
+        if (u != null && id != null) {
+            u.setIdUtente(id);
+        }
         return u;
     }
 

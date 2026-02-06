@@ -36,7 +36,7 @@ public abstract class InMemoryDAO<I, E> implements DAO<I, E> {
 
     protected abstract I getId(E entity);
 
-    protected E newEntity(I id) {
+    protected E newEntity() {
         return null;
     }
 
@@ -96,7 +96,7 @@ public abstract class InMemoryDAO<I, E> implements DAO<I, E> {
             if (store.containsKey(id)) {
                 return store.get(id);
             }
-            E e = newEntity(id);
+            E e = newEntity();
             if (e != null) {
                 store.put(id, e);
             }
