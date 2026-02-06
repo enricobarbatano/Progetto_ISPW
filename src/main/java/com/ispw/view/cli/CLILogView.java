@@ -7,8 +7,8 @@ import java.util.Scanner;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerLog;
-import com.ispw.model.enums.Ruolo;
 import com.ispw.view.interfaces.ViewLog;
+import com.ispw.view.shared.LogViewUtils;
 
 public class CLILogView extends GenericViewCLI implements ViewLog, NavigableController {
 
@@ -25,28 +25,17 @@ public class CLILogView extends GenericViewCLI implements ViewLog, NavigableCont
     }
 
     @Override
-    public void onShow() {
-        onShow(Map.of());
-    }
-
-    @Override
-    public void onHide() {
-        // no-op
-    }
-
-    @Override
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
-        Ruolo ruolo = (sessione != null && sessione.getUtente() != null) ? sessione.getUtente().getRuolo() : null;
-        if (ruolo != Ruolo.GESTORE) {
+        if (!LogViewUtils.isGestore(sessione)) {
             System.out.println("Accesso ai log riservato al gestore.");
             controller.tornaAllaHome();
             return;
         }
 
-        Object raw = lastParams.get(GraphicControllerUtils.KEY_LOGS);
-        if (!(raw instanceof List<?> logs)) {
+        List<String> logs = LogViewUtils.readLogs(lastParams);
+        if (logs == null) {
             controller.richiediLog(20);
             return;
         }

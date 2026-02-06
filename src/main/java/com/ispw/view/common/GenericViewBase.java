@@ -21,6 +21,15 @@ public abstract class GenericViewBase implements GenericView {
         }
     }
 
+    @Override
+    public void onShow() {
+        onShow(Map.of());
+    }
+
+    @Override
+    public void onHide() {
+    }
+
     public SessioneUtenteBean getSessione() { return sessione; }
 
     public Map<String, Object> getLastParams() { return lastParams; }

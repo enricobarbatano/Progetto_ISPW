@@ -32,16 +32,6 @@ public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole,
     }
 
     @Override
-    public void onShow() {
-        onShow(Map.of());
-    }
-
-    @Override
-    public void onHide() {
-        // no-op
-    }
-
-    @Override
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 

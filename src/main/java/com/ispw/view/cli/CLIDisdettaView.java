@@ -35,16 +35,6 @@ public class CLIDisdettaView extends GenericViewCLI implements ViewDisdettaPreno
     }
 
     @Override
-    public void onShow() {
-        onShow(Map.of());
-    }
-
-    @Override
-    public void onHide() {
-        // no-op
-    }
-
-    @Override
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 

@@ -1,6 +1,5 @@
 package com.ispw.view.cli;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -8,6 +7,7 @@ import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerRegistrazione;
 import com.ispw.view.interfaces.ViewRegistrazione;
+import com.ispw.view.shared.RegistrazioneViewUtils;
 
 /**
  * View CLI per la registrazione.
@@ -26,16 +26,6 @@ public class CLIRegistrazioneView extends GenericViewCLI implements ViewRegistra
     }
 
     @Override
-    public void onShow() {
-        onShow(Map.of());
-    }
-
-    @Override
-    public void onHide() {
-        // no-op
-    }
-
-    @Override
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
@@ -45,16 +35,17 @@ public class CLIRegistrazioneView extends GenericViewCLI implements ViewRegistra
 
         CliViewUtils.printMessages(getLastError(), getLastSuccess());
 
-        Map<String, Object> form = new HashMap<>();
         System.out.print("Nome: ");
-        form.put(GraphicControllerUtils.KEY_NOME, in.nextLine());
+        String nome = in.nextLine();
         System.out.print("Cognome: ");
-        form.put(GraphicControllerUtils.KEY_COGNOME, in.nextLine());
+        String cognome = in.nextLine();
         System.out.print("Email: ");
-        form.put(GraphicControllerUtils.KEY_EMAIL, in.nextLine());
+        String email = in.nextLine();
         System.out.print("Password: ");
-        form.put(GraphicControllerUtils.KEY_PASSWORD, in.nextLine());
+        String password = in.nextLine();
 
-        controller.inviaDatiRegistrazione(form);
+        controller.inviaDatiRegistrazione(
+            RegistrazioneViewUtils.buildForm(nome, cognome, email, password)
+        );
     }
 }

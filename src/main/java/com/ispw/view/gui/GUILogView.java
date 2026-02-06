@@ -6,8 +6,8 @@ import java.util.Map;
 import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerLog;
-import com.ispw.model.enums.Ruolo;
 import com.ispw.view.interfaces.ViewLog;
+import com.ispw.view.shared.LogViewUtils;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -28,21 +28,10 @@ public class GUILogView extends GenericViewGUI implements ViewLog, NavigableCont
     }
 
     @Override
-    public void onShow() {
-        onShow(Map.of());
-    }
-
-    @Override
-    public void onHide() {
-        // no-op
-    }
-
-    @Override
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
-        Ruolo ruolo = (sessione != null && sessione.getUtente() != null) ? sessione.getUtente().getRuolo() : null;
-        if (ruolo != Ruolo.GESTORE) {
+        if (!LogViewUtils.isGestore(sessione)) {
             VBox root = GuiViewUtils.createRoot();
             root.getChildren().add(new Label("Accesso ai log riservato al gestore"));
             Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome());
@@ -51,13 +40,11 @@ public class GUILogView extends GenericViewGUI implements ViewLog, NavigableCont
             return;
         }
 
-        Object raw = lastParams.get(GraphicControllerUtils.KEY_LOGS);
-        if (!(raw instanceof List<?>)) {
+        List<String> logs = LogViewUtils.readLogs(lastParams);
+        if (logs == null) {
             controller.richiediLog(20);
             return;
         }
-        @SuppressWarnings("unchecked")
-        List<String> logs = (List<String>) raw;
 
         VBox root = GuiViewUtils.createRoot();
         root.getChildren().add(new Label("Log di sistema"));

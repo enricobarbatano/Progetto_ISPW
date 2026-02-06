@@ -28,16 +28,6 @@ public class GUIAccountView extends GenericViewGUI implements ViewGestioneAccoun
     }
 
     @Override
-    public void onShow() {
-        onShow(Map.of());
-    }
-
-    @Override
-    public void onHide() {
-        // no-op
-    }
-
-    @Override
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
         VBox root = GuiViewUtils.createRoot();
