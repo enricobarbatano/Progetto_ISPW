@@ -8,6 +8,14 @@ import com.ispw.dao.impl.filesystem.FileSystemDAO;
 import com.ispw.dao.interfaces.FatturaDAO;
 import com.ispw.model.entity.Fattura;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO FileSystem per Fattura.
+ * Responsabilita': persistere una mappa serializzata su file locale.
+ *
+ * SEZIONE LOGICA
+ * Usa FileSystemDAO per (de)serializzazione e accesso alla cache.
+ */
 public class FileSystemFatturaDAO extends FileSystemDAO<Integer, Fattura> implements FatturaDAO {
 
     private static final String FILE_NAME = "fattura.ser";

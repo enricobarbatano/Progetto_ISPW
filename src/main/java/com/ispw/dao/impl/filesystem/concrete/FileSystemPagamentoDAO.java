@@ -8,10 +8,12 @@ import com.ispw.dao.interfaces.PagamentoDAO;
 import com.ispw.model.entity.Pagamento;
 
 /**
- * DAO FileSystem per Pagamento.
- * - Serializza una mappa <Integer, Pagamento> su disco (pagamento.ser).
- * - Tutto in cache in memoria, flush atomico su file tramite la base.
- * - Nessun SQL.
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO FileSystem per Pagamento.
+ * Responsabilita': persistere una mappa serializzata su file locale.
+ *
+ * SEZIONE LOGICA
+ * Usa FileSystemDAO per (de)serializzazione e accesso alla cache.
  */
 public class FileSystemPagamentoDAO extends FileSystemDAO<Integer, Pagamento> implements PagamentoDAO {
 

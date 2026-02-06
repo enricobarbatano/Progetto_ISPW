@@ -10,12 +10,23 @@ import com.ispw.controller.graphic.NavigableController;
 import com.ispw.model.enums.Ruolo;
 import com.ispw.view.interfaces.ViewHomeProfilo;
 
-/**
- * View CLI per home/profilo.
- */
 public class CLIHomeView extends GenericViewCLI implements ViewHomeProfilo, NavigableController {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: view CLI home, usa navigator.
+    // A2) IO: input console e sessione.
+    // ========================
     private final Scanner in = new Scanner(System.in);
     private final GraphicControllerNavigation navigator;
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) onShow: menu in base al ruolo.
+    // L2) goTo: navigazione con sessione.
+    // ========================
 
     public CLIHomeView(GraphicControllerNavigation navigator) {
         this.navigator = navigator;

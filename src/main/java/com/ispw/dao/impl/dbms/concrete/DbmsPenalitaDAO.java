@@ -16,6 +16,14 @@ import com.ispw.dao.interfaces.PenalitaDAO;
 import com.ispw.model.entity.Penalita;
 import com.ispw.model.enums.StatoPenalita;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO DBMS per Penalita.
+ * Responsabilita': gestire accesso al DB tramite SQL e mapping.
+ *
+ * SEZIONE LOGICA
+ * Usa DbmsDAO per eseguire query e mappare i record in entita'.
+ */
 public class DbmsPenalitaDAO extends DbmsDAO<Integer, Penalita> implements PenalitaDAO {
 
     public DbmsPenalitaDAO(ConnectionFactory cf) { super(cf); }

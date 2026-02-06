@@ -11,16 +11,27 @@ import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerRegole;
 import com.ispw.view.interfaces.ViewGestioneRegole;
 
-/**
- * View CLI per gestione regole.
- */
 public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole, NavigableController {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: view CLI regole, usa controller grafico.
+    // A2) IO: input console e lista campi.
+    // ========================
     private static final String CAMPI_HEADER = "=== CAMPI ===";
     private final Scanner in = new Scanner(System.in);
     private final CLIGraphicControllerRegole controller;
   
     private Integer selectedCampoId;
     private List<String> lastCampi;
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) onShow: menu e dispatch.
+    // L2) handle* e parse*: gestione input e mapping.
+    // ========================
 
     public CLIRegoleView(CLIGraphicControllerRegole controller) {
         this.controller = controller;

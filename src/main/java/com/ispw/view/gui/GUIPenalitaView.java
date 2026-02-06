@@ -16,7 +16,20 @@ import javafx.scene.layout.VBox;
 
 public class GUIPenalitaView extends GenericViewGUI implements ViewGestionePenalita, NavigableController {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: view GUI penalita, usa controller grafico.
+    // A2) IO: componenti JavaFX e lista utenti.
+    // ========================
+
     private final GUIGraphicControllerPenalita controller;
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) onShow: costruzione UI e wiring eventi.
+    // ========================
 
     public GUIPenalitaView(GUIGraphicControllerPenalita controller) {
         this.controller = controller;

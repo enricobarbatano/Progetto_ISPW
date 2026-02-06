@@ -16,7 +16,20 @@ import javafx.scene.layout.VBox;
 
 public class GUILogView extends GenericViewGUI implements ViewLog, NavigableController {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: view GUI log, usa controller grafico.
+    // A2) IO: componenti JavaFX e params log.
+    // ========================
+
     private final GUIGraphicControllerLog controller;
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) onShow: verifica ruolo e render logs.
+    // ========================
 
     public GUILogView(GUIGraphicControllerLog controller) {
         this.controller = controller;

@@ -5,6 +5,14 @@ import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
 import com.ispw.dao.interfaces.UtenteFinaleDAO;
 import com.ispw.model.entity.UtenteFinale;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO DBMS per UtenteFinale.
+ * Responsabilita': gestire accesso al DB tramite SQL e mapping.
+ *
+ * SEZIONE LOGICA
+ * Implementazione non disponibile: metodi non supportati.
+ */
 public class DbmsUtenteFinaleDAO extends DbmsDAO<Integer, UtenteFinale> implements UtenteFinaleDAO {
 
     public DbmsUtenteFinaleDAO(ConnectionFactory cf) { super(cf); }

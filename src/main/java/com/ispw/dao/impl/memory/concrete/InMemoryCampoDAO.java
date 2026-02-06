@@ -8,6 +8,14 @@ import com.ispw.dao.impl.memory.InMemoryDAO;
 import com.ispw.dao.interfaces.CampoDAO;
 import com.ispw.model.entity.Campo;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO InMemory per Campo.
+ * Responsabilita': gestire persistenza volatile per test/uso locale.
+ *
+ * SEZIONE LOGICA
+ * Delega a InMemoryDAO e applica filtri/ordinamenti specifici.
+ */
 public final class InMemoryCampoDAO extends InMemoryDAO<Integer, Campo> implements CampoDAO {
 
     public InMemoryCampoDAO() {

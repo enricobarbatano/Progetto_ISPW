@@ -7,12 +7,15 @@ import com.ispw.dao.impl.dbms.base.DbmsDAO;
 import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
 import com.ispw.dao.interfaces.FatturaDAO;
 import com.ispw.model.entity.Fattura;
-/**
- * DAO DBMS per Fattura.
- * - Persistenza su database relazionale via JDBC.
- * - SQL minimale.
- */
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO DBMS per Fattura.
+ * Responsabilita': gestire accesso al DB tramite SQL e mapping.
+ *
+ * SEZIONE LOGICA
+ * Usa DbmsDAO per eseguire query e mappare i record in entita'.
+ */
 public class DbmsFatturaDAO extends DbmsDAO<Integer, Fattura> implements FatturaDAO {
 
     private static final String TBL  = "fattura";

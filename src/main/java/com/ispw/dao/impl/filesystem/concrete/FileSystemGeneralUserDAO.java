@@ -12,10 +12,12 @@ import com.ispw.model.entity.GeneralUser;
 import com.ispw.model.entity.UtenteFinale;
 
 /**
- * DAO FileSystem per GeneralUser.
- * SonarCloud-friendly:
- * - costante per nome file, controlli input, no System.out;
- * - id autoincrement se 0.
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO FileSystem per GeneralUser.
+ * Responsabilita': persistere una mappa serializzata su file locale.
+ *
+ * SEZIONE LOGICA
+ * Usa FileSystemDAO per (de)serializzazione e accesso alla cache.
  */
 public final class FileSystemGeneralUserDAO extends FileSystemDAO<Integer, GeneralUser> implements GeneralUserDAO {
 

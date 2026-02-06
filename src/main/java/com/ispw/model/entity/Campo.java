@@ -9,12 +9,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Entity di dominio "Campo".
- * - Metodi minimi usati dai controller: isDisponibile, bloccoSlot, sbloccaSlot, updateStatoOperativo.
- * - La lista delle prenotazioni è opzionale e può non essere sempre caricata dai DAO.
- */
 public final class Campo implements Serializable {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: entity campo con prenotazioni associate.
+    // A2) IO: stato operativo e disponibilita'.
+    // ========================
 
     private int idCampo;
     private String nome;
@@ -25,6 +27,14 @@ public final class Campo implements Serializable {
 
    
     private final List<Prenotazione> listaPrenotazioni = new ArrayList<>();
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) getters/setters: dati anagrafici campo.
+    // L2) isDisponibile/bloccoSlot/sbloccaSlot: gestione disponibilita'.
+    // L3) updateStatoOperativo/updateDisponibilitaCampo: stato operativo.
+    // ========================
 
   
     public int getIdCampo() { return idCampo; }

@@ -5,13 +5,25 @@ import java.util.Map;
 import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.view.interfaces.GenericView;
 
-/**
- * Base condivisa per le view (CLI/GUI).
- */
 public abstract class GenericViewBase implements GenericView {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: base comune per view CLI/GUI.
+    // A2) IO: gestisce sessione e parametri di navigazione.
+    // ========================
 
     protected SessioneUtenteBean sessione;
     protected Map<String, Object> lastParams = Map.of();
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) onShow: aggiorna params e sessione.
+    // L2) onShow/onHide: lifecycle base.
+    // L3) getter: accesso a sessione, params e messaggi.
+    // ========================
 
     @Override
     public void onShow(Map<String, Object> params) {

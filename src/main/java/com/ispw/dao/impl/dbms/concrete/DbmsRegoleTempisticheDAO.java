@@ -12,6 +12,14 @@ import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
 import com.ispw.dao.interfaces.RegoleTempisticheDAO;
 import com.ispw.model.entity.RegoleTempistiche;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO DBMS per RegoleTempistiche.
+ * Responsabilita': gestire accesso al DB tramite SQL e mapping.
+ *
+ * SEZIONE LOGICA
+ * Gestisce una singola riga (id fisso) con transazione di aggiornamento.
+ */
 public final class DbmsRegoleTempisticheDAO
         extends DbmsDAO<Integer, RegoleTempistiche>
         implements RegoleTempisticheDAO {

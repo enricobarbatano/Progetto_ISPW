@@ -12,6 +12,14 @@ import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
 import com.ispw.dao.interfaces.RegolePenalitaDAO;
 import com.ispw.model.entity.RegolePenalita;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO DBMS per RegolePenalita.
+ * Responsabilita': gestire accesso al DB tramite SQL e mapping.
+ *
+ * SEZIONE LOGICA
+ * Gestisce una singola riga (id fisso) con transazione di aggiornamento.
+ */
 public final class DbmsRegolePenalitaDAO
         extends DbmsDAO<Integer, RegolePenalita>
         implements RegolePenalitaDAO {

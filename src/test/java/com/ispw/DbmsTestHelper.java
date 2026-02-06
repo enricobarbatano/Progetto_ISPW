@@ -7,6 +7,15 @@ import com.ispw.dao.factory.DAOFactory;
 import com.ispw.dao.impl.dbms.connection.DbmsConnectionFactory;
 import com.ispw.model.enums.PersistencyProvider;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: utilita' di test per eseguire scenari con persistenza DBMS.
+ * Responsabilita': inizializzare la connessione, configurare la DAOFactory e
+ * ripristinare lo stato in-memory al termine.
+ *
+ * SEZIONE LOGICA
+ * Incapsula setup DBMS, invocazione del test e pulizia finale della factory.
+ */
 public final class DbmsTestHelper {
 
     public static final String DEFAULT_URL =

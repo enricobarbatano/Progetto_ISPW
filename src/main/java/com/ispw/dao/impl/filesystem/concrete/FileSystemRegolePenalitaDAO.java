@@ -14,6 +14,14 @@ import java.nio.file.StandardOpenOption;
 import com.ispw.dao.interfaces.RegolePenalitaDAO;
 import com.ispw.model.entity.RegolePenalita;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO FileSystem per RegolePenalita.
+ * Responsabilita': persistere una singola regola su file locale.
+ *
+ * SEZIONE LOGICA
+ * (De)serializza l'oggetto su file con scrittura atomica.
+ */
 public class FileSystemRegolePenalitaDAO implements RegolePenalitaDAO {
 
     private final Path file;

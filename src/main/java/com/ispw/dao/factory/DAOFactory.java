@@ -17,10 +17,16 @@ import com.ispw.model.enums.PersistencyProvider;
 
 public abstract class DAOFactory {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: factory astratta per DAO, seleziona provider.
+    // A2) Stato: provider, instance e root FS.
+    // ========================
+
     private static PersistencyProvider provider;
     private static DAOFactory instance;
 
-    // config FileSystem (opzione 1)
     private static Path fileSystemRoot;
 
     protected static Path getFileSystemRootOrThrow() {
@@ -30,10 +36,13 @@ public abstract class DAOFactory {
         return fileSystemRoot;
     }
 
-    /**
-     * Initialize the DAOFactory atomically. Call this once during bootstrap.
-     * If the provider is FILE_SYSTEM, the root path must be supplied.
-     */
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) initialize/getInstance: selezione provider e singleton.
+    // L2) resetForTests: reset stato per test.
+    // L3) get*DAO: factory methods.
+    // ========================
     public static synchronized void initialize(PersistencyProvider p, Path root) {
         if (provider != null) {
             throw new IllegalStateException("DAOFactory già inizializzata.");
@@ -55,9 +64,6 @@ public abstract class DAOFactory {
         };
     }
 
-    /**
-     * Package-private: reset the factory state. Intended for test usage only.
-     */
     @SuppressWarnings("unused") // invoked via reflection in tests
     static synchronized void resetForTests() {
         provider = null;
@@ -65,7 +71,6 @@ public abstract class DAOFactory {
         instance = null;
     }
 
-    // GUI-safe: synchronized
     public static synchronized DAOFactory getInstance() {
         if (provider == null) {
             throw new IllegalStateException("DAOFactory non configurata. Chiama initialize(PersistencyProvider, Path) prima.");
@@ -80,7 +85,6 @@ public abstract class DAOFactory {
         return instance;
     }
 
-    // ===== metodi astratti per tutti i DAO =====
     public abstract CampoDAO getCampoDAO();
     public abstract FatturaDAO getFatturaDAO();
 

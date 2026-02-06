@@ -5,18 +5,29 @@ import java.time.LocalTime;
 
 public final class RegoleTempistiche implements Serializable {
 
-    // Se vuoi single-row in DB: id = 1
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: entity regole tempistiche.
+    // A2) IO: configurazione slot e orari.
+    // ========================
+
     private int idConfig = 1;
 
     private int durataSlot;          // minuti
     private LocalTime oraApertura;
     private LocalTime oraChiusura;
-    private int preavvisoMinimo;     // minuti
+    private int preavvisoMinimo;
 
-    /** Costruttore vuoto: utile per mapping JDBC/serializzazione */
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) costruttori: mapping/serializzazione.
+    // L2) getters/setters: accesso ai campi.
+    // ========================
+
     public RegoleTempistiche() {}
 
-    /** Costruttore comodo */
     public RegoleTempistiche(int durataSlot, LocalTime oraApertura, LocalTime oraChiusura, int preavvisoMinimo) {
         this.durataSlot = durataSlot;
         this.oraApertura = oraApertura;

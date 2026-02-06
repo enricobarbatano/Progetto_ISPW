@@ -5,12 +5,26 @@ import java.math.BigDecimal;
 
 public final class RegolePenalita implements Serializable {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: entity regole penalita.
+    // A2) IO: configurazione importo e preavviso.
+    // ========================
+
     private int idConfig = 1;
 
-    private BigDecimal valorePenalita; // importo base (o %), dipende dalle tue regole
-    private int preavvisoMinimo;       // minuti
+    private BigDecimal valorePenalita;
+    private int preavvisoMinimo;
 
-    public RegolePenalita() { /* default ctor for mapping/serialization */ }
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) costruttori: mapping/serializzazione.
+    // L2) getters/setters: accesso ai campi.
+    // ========================
+
+    public RegolePenalita() { }
 
     public RegolePenalita(BigDecimal valorePenalita, int preavvisoMinimo) {
         this.valorePenalita = valorePenalita;

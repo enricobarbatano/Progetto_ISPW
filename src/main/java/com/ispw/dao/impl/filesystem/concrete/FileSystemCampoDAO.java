@@ -10,9 +10,12 @@ import com.ispw.dao.interfaces.CampoDAO;
 import com.ispw.model.entity.Campo;
 
 /**
- * Implementazione FileSystem di CampoDAO.
- * - Salva/legge una mappa serializzata su file (campo.ser)
- * - Niente SQL, solo (de)serializzazione binaria tramite la base FileSystemDAO.
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO FileSystem per Campo.
+ * Responsabilita': persistere una mappa serializzata su file locale.
+ *
+ * SEZIONE LOGICA
+ * Usa FileSystemDAO per (de)serializzazione e accesso alla cache.
  */
 public class FileSystemCampoDAO extends FileSystemDAO<Integer, Campo> implements CampoDAO {
 

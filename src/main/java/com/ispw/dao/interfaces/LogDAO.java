@@ -6,11 +6,21 @@ import com.ispw.model.entity.SystemLog;
 
 public interface LogDAO {
 
-    /** Append-only: aggiunge un log (mai update/delete) */
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: DAO per log di sistema.
+    // A2) IO: operazioni append e query.
+    // ========================
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) append: aggiunta log.
+    // L2) findByUtente/findLast: query log.
+    // ========================
     void append(SystemLog log);
 
     List<SystemLog> findByUtente(int idUtente);
-
-    /** utile per debug */
     List<SystemLog> findLast(int limit);
 }

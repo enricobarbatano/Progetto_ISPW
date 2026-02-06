@@ -9,12 +9,22 @@ import com.ispw.controller.graphic.cli.CLIGraphicControllerRegistrazione;
 import com.ispw.view.interfaces.ViewRegistrazione;
 import com.ispw.view.shared.RegistrazioneViewUtils;
 
-/**
- * View CLI per la registrazione.
- */
 public class CLIRegistrazioneView extends GenericViewCLI implements ViewRegistrazione, NavigableController {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: view CLI registrazione, usa controller grafico.
+    // A2) IO: input console e Map di registrazione.
+    // ========================
     private final Scanner in = new Scanner(System.in);
     private final CLIGraphicControllerRegistrazione controller;
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) onShow: raccolta dati e invio al controller.
+    // ========================
 
     public CLIRegistrazioneView(CLIGraphicControllerRegistrazione controller) {
         this.controller = controller;

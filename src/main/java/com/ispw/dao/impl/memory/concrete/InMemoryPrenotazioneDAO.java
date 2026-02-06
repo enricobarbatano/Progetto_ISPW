@@ -9,6 +9,14 @@ import com.ispw.dao.interfaces.PrenotazioneDAO;
 import com.ispw.model.entity.Prenotazione;
 import com.ispw.model.enums.StatoPrenotazione;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO InMemory per Prenotazione.
+ * Responsabilita': gestire persistenza volatile per test/uso locale.
+ *
+ * SEZIONE LOGICA
+ * Delega a InMemoryDAO e applica filtri per utente/campo/stato.
+ */
 public class InMemoryPrenotazioneDAO extends InMemoryDAO<Integer, Prenotazione> implements PrenotazioneDAO {
 
     // Sequenza condivisa (store condiviso: super(true))

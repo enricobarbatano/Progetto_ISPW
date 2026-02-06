@@ -17,9 +17,12 @@ import com.ispw.model.entity.Prenotazione;
 import com.ispw.model.enums.StatoPrenotazione;
 
 /**
- * Implementazione DBMS di CampoDAO.
- * - Super snella: usa gli helper di DbmsDAO (executeUpdate/queryOne/queryList/queryExists).
- * - Niente logica applicativa qui dentro, solo SQL minimale.
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO DBMS per Campo.
+ * Responsabilita': gestire accesso al DB tramite SQL e mapping.
+ *
+ * SEZIONE LOGICA
+ * Usa DbmsDAO per eseguire query e mappare i record in entita'.
  */
 public class DbmsCampoDAO extends DbmsDAO<Integer, Campo> implements CampoDAO {
 

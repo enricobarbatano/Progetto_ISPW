@@ -14,6 +14,14 @@ import java.nio.file.StandardOpenOption;
 import com.ispw.dao.interfaces.RegoleTempisticheDAO;
 import com.ispw.model.entity.RegoleTempistiche;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO FileSystem per RegoleTempistiche.
+ * Responsabilita': persistere una singola regola su file locale.
+ *
+ * SEZIONE LOGICA
+ * (De)serializza l'oggetto su file con scrittura atomica.
+ */
 public class FileSystemRegoleTempisticheDAO implements RegoleTempisticheDAO {
 
     private final Path file;

@@ -13,8 +13,15 @@ import com.ispw.dao.interfaces.DAO;
 
 public abstract class DbmsDAO<I, E> implements DAO<I, E> {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: base DAO DBMS con ConnectionFactory.
+    // A2) IO: helper JDBC riusabili.
+    // ========================
+
     
-   @FunctionalInterface
+    @FunctionalInterface
     protected interface StatementBinder {
         void bind(PreparedStatement ps) throws SQLException;
     }
@@ -38,9 +45,12 @@ public abstract class DbmsDAO<I, E> implements DAO<I, E> {
         return new RuntimeException("Errore DBMS DAO: " + e.getMessage(), e);
     }
 
-    // ---------------------------
-    // Helper JDBC riutilizzabili
-    // ---------------------------
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) executeUpdate/queryOne/queryList/queryExists: helper JDBC.
+    // L2) openConnection/wrap: accesso e gestione errori.
+    // ========================
 
     protected int executeUpdate(String sql, StatementBinder binder) {
         try (Connection c = openConnection();

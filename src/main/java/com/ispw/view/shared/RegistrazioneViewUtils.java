@@ -7,8 +7,21 @@ import com.ispw.controller.graphic.GraphicControllerUtils;
 
 public final class RegistrazioneViewUtils {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: utility condivisa per view registrazione.
+    // A2) IO: produce Map per controller grafico.
+    // ========================
+
     private RegistrazioneViewUtils() {
     }
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) buildForm: costruisce i parametri di registrazione.
+    // ========================
 
     public static Map<String, Object> buildForm(String nome, String cognome, String email, String password) {
         Map<String, Object> form = new HashMap<>();

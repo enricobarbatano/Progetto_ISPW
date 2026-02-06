@@ -15,10 +15,23 @@ import javafx.scene.layout.VBox;
 
 public class GUILoginView extends GenericViewGUI implements ViewLogin, NavigableController {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: view GUI login, usa controller grafico.
+    // A2) IO: componenti JavaFX per credenziali.
+    // ========================
+
     private final GUIGraphicLoginController controller;
     private Label errorLabel;
     private TextField emailField;
     private PasswordField passwordField;
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) onShow: costruzione UI e wiring eventi.
+    // ========================
 
     public GUILoginView(GUIGraphicLoginController controller) {
         this.controller = controller;

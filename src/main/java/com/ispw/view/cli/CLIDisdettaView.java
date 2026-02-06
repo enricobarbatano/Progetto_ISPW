@@ -12,10 +12,14 @@ import com.ispw.view.cli.console.ConsoleDisdettaElencoView;
 import com.ispw.view.cli.console.ConsoleDisdettaEsitoView;
 import com.ispw.view.interfaces.ViewDisdettaPrenotazione;
 
-/**
- * View CLI per disdetta prenotazione.
- */
 public class CLIDisdettaView extends GenericViewCLI implements ViewDisdettaPrenotazione, NavigableController {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: view CLI disdetta, usa controller grafico e console view.
+    // A2) IO: input console e params di disdetta.
+    // ========================
 
     private final CLIGraphicControllerDisdetta controller;
     private final ConsoleDisdettaElencoView elencoView = new ConsoleDisdettaElencoView();
@@ -24,6 +28,13 @@ public class CLIDisdettaView extends GenericViewCLI implements ViewDisdettaPreno
     private final Scanner in = new Scanner(System.in);
 
     private Integer selectedId;
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) onShow: routing in base ai payload.
+    // L2) handleElenco/handleAnteprima/handleSuccess: gestione step.
+    // ========================
 
     public CLIDisdettaView(CLIGraphicControllerDisdetta controller) {
         this.controller = controller;

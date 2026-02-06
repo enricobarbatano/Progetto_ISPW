@@ -1,10 +1,19 @@
 package com.ispw.dao.interfaces;
-/**
- * DAO standard generica.
- * I = tipo della chiave primaria (es. Integer, String, UUID)
- * E = tipo dell'entità (es. GeneralUser, Prenotazione)
- */
+
 public interface DAO<I, E> {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: contratto base per DAO.
+    // A2) IO: operazioni CRUD su entita' E con chiave I.
+    // ========================
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) load/store/delete/exists/create: operazioni CRUD base.
+    // ========================
     E load(I id);
     void store(E entity);
     void delete(I id);

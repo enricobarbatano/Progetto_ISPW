@@ -8,13 +8,23 @@ import com.ispw.controller.graphic.cli.CLIGraphicLoginController;
 import com.ispw.view.cli.console.ConsoleLoginView;
 import com.ispw.view.interfaces.ViewLogin;
 
-/**
- * View CLI per la schermata di login.
- */
 public class CLILoginView extends GenericViewCLI implements ViewLogin, NavigableController {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: view CLI login, usa controller grafico e ConsoleLoginView.
+    // A2) IO: input console per credenziali.
+    // ========================
 
     private final CLIGraphicLoginController controller;
     private final ConsoleLoginView console;
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) onShow: rendering console e dispatch login/registrazione.
+    // ========================
 
     public CLILoginView(CLIGraphicLoginController controller) {
         this(controller, new ConsoleLoginView());

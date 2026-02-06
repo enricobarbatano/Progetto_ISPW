@@ -20,11 +20,12 @@ import com.ispw.model.enums.Ruolo;
 import com.ispw.model.enums.StatoAccount;
 
 /**
- * DAO DBMS per GeneralUser.
- * SonarCloud-friendly:
- * - costanti per SQL, try-with-resources, no System.out;
- * - helper per bind campi comuni (evita duplicazioni);
- * - validazioni input (early return).
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO DBMS per GeneralUser.
+ * Responsabilita': gestire accesso al DB tramite SQL e mapping.
+ *
+ * SEZIONE LOGICA
+ * Usa DbmsDAO per eseguire query e mappare i record in entita'.
  */
 public final class DbmsGeneralUserDAO extends DbmsDAO<Integer, GeneralUser> implements GeneralUserDAO {
     private static final String ID_UTENTE= "id_utente";

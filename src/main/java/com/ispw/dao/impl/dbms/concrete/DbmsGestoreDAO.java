@@ -8,6 +8,14 @@ import com.ispw.dao.interfaces.GestoreDAO;
 import com.ispw.model.entity.Gestore;
 import com.ispw.model.enums.Permesso;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO DBMS per Gestore.
+ * Responsabilita': gestire accesso al DB tramite SQL e mapping.
+ *
+ * SEZIONE LOGICA
+ * Implementazione non disponibile: metodi non supportati.
+ */
 public class DbmsGestoreDAO extends DbmsDAO<Integer, Gestore> implements GestoreDAO {
 
     public DbmsGestoreDAO(ConnectionFactory cf) { super(cf); }

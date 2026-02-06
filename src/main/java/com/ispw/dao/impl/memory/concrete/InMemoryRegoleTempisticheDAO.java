@@ -3,6 +3,14 @@ package com.ispw.dao.impl.memory.concrete;
 import com.ispw.dao.interfaces.RegoleTempisticheDAO;
 import com.ispw.model.entity.RegoleTempistiche;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO InMemory per RegoleTempistiche.
+ * Responsabilita': gestire persistenza volatile per test/uso locale.
+ *
+ * SEZIONE LOGICA
+ * Mantiene una sola regola in AtomicReference.
+ */
 public final class InMemoryRegoleTempisticheDAO implements RegoleTempisticheDAO {
     private final java.util.concurrent.atomic.AtomicReference<RegoleTempistiche> ref = new java.util.concurrent.atomic.AtomicReference<>();
     public InMemoryRegoleTempisticheDAO() { 

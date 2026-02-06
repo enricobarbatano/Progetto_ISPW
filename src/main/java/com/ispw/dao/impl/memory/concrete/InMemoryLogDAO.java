@@ -10,8 +10,12 @@ import com.ispw.dao.interfaces.LogDAO;
 import com.ispw.model.entity.SystemLog;
 
 /**
- * DAO InMemory per SystemLog (append-only).
- * SonarCloud-friendly: comparator riutilizzabile, nessun System.out, controlli input.
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO InMemory per SystemLog.
+ * Responsabilita': gestire persistenza volatile per test/uso locale.
+ *
+ * SEZIONE LOGICA
+ * Delega a InMemoryDAO e ordina i log per timestamp.
  */
 public final class InMemoryLogDAO extends InMemoryDAO<Integer, SystemLog> implements LogDAO {
 

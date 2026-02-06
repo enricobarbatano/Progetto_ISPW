@@ -17,11 +17,12 @@ import com.ispw.model.entity.SystemLog;
 import com.ispw.model.enums.TipoOperazione;
 
 /**
- * DAO DBMS per SystemLog (append-only).
- * - append() = INSERT con generated key.
- * - delete() vietata (UnsupportedOperationException).
- * - findByUtente / findLast: ORDER BY timestamp DESC, id_log DESC.
- * SonarCloud: try-with-resources, no System.out, costanti, early return.
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO DBMS per SystemLog.
+ * Responsabilita': gestire accesso al DB tramite SQL e mapping.
+ *
+ * SEZIONE LOGICA
+ * Usa DbmsDAO per eseguire query e mantenere append-only.
  */
 public final class DbmsLogDAO extends DbmsDAO<Integer, SystemLog> implements LogDAO {
     

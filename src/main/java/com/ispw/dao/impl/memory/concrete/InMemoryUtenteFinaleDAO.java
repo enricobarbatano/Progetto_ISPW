@@ -4,6 +4,14 @@ import com.ispw.dao.impl.memory.InMemoryDAO;
 import com.ispw.dao.interfaces.UtenteFinaleDAO;
 import com.ispw.model.entity.UtenteFinale;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO InMemory per UtenteFinale.
+ * Responsabilita': gestire persistenza volatile per test/uso locale.
+ *
+ * SEZIONE LOGICA
+ * Delega a InMemoryDAO e applica ricerche per email.
+ */
 public final class InMemoryUtenteFinaleDAO extends InMemoryDAO<Integer, UtenteFinale> implements UtenteFinaleDAO {
     public InMemoryUtenteFinaleDAO() { super(true); }
     @Override protected Integer getId(UtenteFinale e) { return e != null ? e.getIdUtente() : 0; }

@@ -41,14 +41,14 @@ import com.ispw.model.enums.Ruolo;
 import com.ispw.model.enums.StatoAccount;
 
 /**
- * Test JUnit 5 per "Applica Penalità".
- * Assunzione: In-Memory DAO attivi (vedi BaseDAOTest).
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: test di integrazione del caso d'uso Applica Penalita'.
+ * Responsabilita': verificare calcolo/applicazione penalita', pagamento e log.
+ *
+ * SEZIONE LOGICA
+ * Esegue flussi in-memory e scenario DBMS con regole penalita' e fattura.
  */
 @TestMethodOrder(MethodOrderer.DisplayName.class)
-/**
- * Test del caso d’uso Penalità: calcolo/applicazione penalità, pagamento
- * e blocco account (in-memory + DBMS).
- */
 class TestControllerApplicaPenalita extends BaseDAOTest {
 
     private LogicControllerApplicaPenalita controller;

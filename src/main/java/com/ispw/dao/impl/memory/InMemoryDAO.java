@@ -9,34 +9,23 @@ import java.util.function.Predicate;
 
 import com.ispw.dao.interfaces.DAO;
 
-/**
- * Base astratta per DAO in memoria.
- * Supporta:
- *  - store per istanza (default)
- *  - store condiviso per classe DAO (utile se non hai ancora la factory/caching)
- */
 public abstract class InMemoryDAO<I, E> implements DAO<I, E> {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: base DAO in memoria.
+    // A2) IO: CRUD thread-safe su Map.
+    // ========================
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    /**
-     * Storage effettivo. Può essere:
-     *  - una Map "per istanza"
-     *  - una Map "condivisa per classe DAO"
-     */
     protected final Map<I, E> store;
 
-    /**
-     * Costruttore default: store per istanza.
-     */
     protected InMemoryDAO() {
         this(false);
     }
 
-    /**
-     * @param sharedStore se true, tutte le istanze della stessa classe DAO concreta
-     *                    (es. InMemoryCampoDAO) condividono lo stesso store.
-     */
     protected InMemoryDAO(boolean sharedStore) {
         if (sharedStore) {
             this.store = SharedStoreRegistry.getStoreFor(getClass());
@@ -45,22 +34,19 @@ public abstract class InMemoryDAO<I, E> implements DAO<I, E> {
         }
     }
 
-    /** Ogni DAO concreto deve definire come ricavare la chiave (ID) dall'entità */
     protected abstract I getId(E entity);
 
-    /**
-     * (Opzionale) Factory method per create(id).
-     * Default: non crea nulla. Override nei concreti se ti serve.
-     * @param id l'identificatore dell'entità da creare - può essere utilizzato nelle sottoclassi per l'inizializzazione
-     * @return una nuova entità inizializzata con l'ID fornito, oppure null se non richiesto
-     */
     protected E newEntity(I id) {
         return null;
     }
 
-    // --------------------
-    // CRUD base (DAO<I,E>)
-    // --------------------
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) CRUD base: load/store/delete/exists/create.
+    // L2) snapshotValues/filter/clear: utility per DAO concreti.
+    // L3) SharedStoreRegistry: store condiviso opzionale.
+    // ========================
 
     @Override
     public E load(I id) {
@@ -104,11 +90,6 @@ public abstract class InMemoryDAO<I, E> implements DAO<I, E> {
     }
 
     @Override
-    /**
-     * Crea una nuova entità con l'ID specificato, se non esiste già nello store.
-     * @param id l'identificatore dell'entità da creare
-     * @return l'entità creata, o null se newEntity ritorna null
-     */
     public E create(I id) {
         lock.writeLock().lock();
         try {
@@ -125,13 +106,6 @@ public abstract class InMemoryDAO<I, E> implements DAO<I, E> {
         }
     }
 
-    // --------------------
-    // Utility utili per DAO specifici (findAll / filtri)
-    // --------------------
-
-    /**
-     * Snapshot consistente dei valori (evita ConcurrentModification e ti dà una lista stabile).
-     */
     protected List<E> snapshotValues() {
         lock.readLock().lock();
         try {
@@ -141,18 +115,12 @@ public abstract class InMemoryDAO<I, E> implements DAO<I, E> {
         }
     }
 
-    /**
-     * Filtro in memoria (utile per metodi tipo findByUtente, findByStato, ecc.)
-     */
     protected List<E> filter(Predicate<E> predicate) {
         List<E> all = snapshotValues();
         all.removeIf(predicate.negate());
         return all;
     }
 
-    /**
-     * Pulisce lo store (utile in test o reset applicativo).
-     */
     public void clear() {
         lock.writeLock().lock();
         try {
@@ -162,9 +130,6 @@ public abstract class InMemoryDAO<I, E> implements DAO<I, E> {
         }
     }
 
-    // --------------------
-    // Shared store registry (per evitare perdita stato senza factory)
-    // --------------------
     private static final class SharedStoreRegistry {
         private static final Map<Class<?>, Map<?, ?>> REGISTRY = new ConcurrentHashMap<>();
 

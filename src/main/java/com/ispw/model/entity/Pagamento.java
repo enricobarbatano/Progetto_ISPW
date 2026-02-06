@@ -9,12 +9,25 @@ import com.ispw.model.enums.MetodoPagamento;
 import com.ispw.model.enums.StatoPagamento;
 
 public final class Pagamento implements Serializable {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: entity pagamento.
+    // A2) IO: importo, metodo, stato e data.
+    // ========================
     private int idPagamento;
     private int idPrenotazione; // FK
     private BigDecimal importoFinale;
     private MetodoPagamento metodo;
     private StatoPagamento stato;
     private LocalDateTime dataPagamento;
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) getters/setters: accesso ai campi.
+    // ========================
 
     public int getIdPagamento() { return idPagamento; }
     public void setIdPagamento(int idPagamento) { this.idPagamento = idPagamento; }

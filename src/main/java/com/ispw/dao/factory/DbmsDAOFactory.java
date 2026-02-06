@@ -26,6 +26,13 @@ import com.ispw.dao.interfaces.UtenteFinaleDAO;
 
 public final class DbmsDAOFactory extends DAOFactory {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: factory concreta per DAO DBMS.
+    // A2) Stato: connection factory e istanze DAO memoizzate.
+    // ========================
+
     private final DbmsConnectionFactory cf = DbmsConnectionFactory.getInstance();
 
     private CampoDAO campoDAO;
@@ -42,6 +49,12 @@ public final class DbmsDAOFactory extends DAOFactory {
 
     private RegolePenalitaDAO regolePenalitaDAO;
     private RegoleTempisticheDAO regoleTempisticheDAO;
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) get*DAO: lazy init con connection factory.
+    // ========================
 
     @Override
     public synchronized CampoDAO getCampoDAO() {
@@ -97,15 +110,16 @@ public final class DbmsDAOFactory extends DAOFactory {
         return prenotazioneDAO;
     }
 
-    
-    @Override public synchronized RegoleTempisticheDAO getRegoleTempisticheDAO() {
-    if (regoleTempisticheDAO == null) regoleTempisticheDAO = new DbmsRegoleTempisticheDAO(cf);
-    return regoleTempisticheDAO;
+    @Override
+    public synchronized RegoleTempisticheDAO getRegoleTempisticheDAO() {
+        if (regoleTempisticheDAO == null) regoleTempisticheDAO = new DbmsRegoleTempisticheDAO(cf);
+        return regoleTempisticheDAO;
     }
 
-    @Override public synchronized RegolePenalitaDAO getRegolePenalitaDAO() {
-    if (regolePenalitaDAO == null) regolePenalitaDAO = new DbmsRegolePenalitaDAO(cf);
-    return regolePenalitaDAO;
+    @Override
+    public synchronized RegolePenalitaDAO getRegolePenalitaDAO() {
+        if (regolePenalitaDAO == null) regolePenalitaDAO = new DbmsRegolePenalitaDAO(cf);
+        return regolePenalitaDAO;
     }
 
 }

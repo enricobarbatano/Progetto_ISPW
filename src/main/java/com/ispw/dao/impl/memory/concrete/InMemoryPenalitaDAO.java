@@ -8,6 +8,14 @@ import com.ispw.dao.impl.memory.InMemoryDAO;
 import com.ispw.dao.interfaces.PenalitaDAO;
 import com.ispw.model.entity.Penalita;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO InMemory per Penalita.
+ * Responsabilita': gestire persistenza volatile per test/uso locale.
+ *
+ * SEZIONE LOGICA
+ * Delega a InMemoryDAO e applica ricerche per utente.
+ */
 public final class InMemoryPenalitaDAO extends InMemoryDAO<Integer, Penalita> implements PenalitaDAO {
     public InMemoryPenalitaDAO() { super(true); }
     @Override protected Integer getId(Penalita e) { return e != null ? e.getIdPenalita() : 0; }

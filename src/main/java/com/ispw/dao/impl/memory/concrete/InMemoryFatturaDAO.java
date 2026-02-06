@@ -7,6 +7,14 @@ import com.ispw.dao.impl.memory.InMemoryDAO;
 import com.ispw.dao.interfaces.FatturaDAO;
 import com.ispw.model.entity.Fattura;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO InMemory per Fattura.
+ * Responsabilita': gestire persistenza volatile per test/uso locale.
+ *
+ * SEZIONE LOGICA
+ * Delega a InMemoryDAO e applica filtri/ordinamenti specifici.
+ */
 public final class InMemoryFatturaDAO extends InMemoryDAO<Integer, Fattura> implements FatturaDAO {
 
     public InMemoryFatturaDAO() {

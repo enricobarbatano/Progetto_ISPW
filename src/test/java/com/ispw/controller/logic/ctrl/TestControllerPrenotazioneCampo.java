@@ -49,14 +49,14 @@ import com.ispw.model.enums.StatoPagamento;
 import com.ispw.model.enums.StatoPrenotazione;
 
 /**
- * Test JUnit 5 per il caso d'uso "Prenotazione Campo".
- * Assunzione: a runtime i DAO creati sono In-Memory.
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: test di integrazione del caso d'uso Prenotazione Campo.
+ * Responsabilita': verificare disponibilita', creazione prenotazione e pagamento.
+ *
+ * SEZIONE LOGICA
+ * Usa DAO in-memory per i test di base e DBMS per lo scenario end-to-end.
  */
 @TestMethodOrder(MethodOrderer.DisplayName.class)
-/**
- * Test del caso d’uso Prenotazione: disponibilità, creazione prenotazione,
- * completamento pagamento e flusso completo (in-memory + DBMS).
- */
 class TestControllerPrenotazioneCampo extends BaseDAOTest {
 
     // ========= costanti (no magic strings) =========

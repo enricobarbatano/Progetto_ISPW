@@ -9,6 +9,14 @@ import com.ispw.dao.interfaces.GestoreDAO;
 import com.ispw.model.entity.Gestore;
 import com.ispw.model.enums.Permesso;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO InMemory per Gestore.
+ * Responsabilita': gestire persistenza volatile per test/uso locale.
+ *
+ * SEZIONE LOGICA
+ * Delega a InMemoryDAO e applica filtri/ordinamenti specifici.
+ */
 public final class InMemoryGestoreDAO extends InMemoryDAO<Integer, Gestore> implements GestoreDAO {
 
     public InMemoryGestoreDAO() {

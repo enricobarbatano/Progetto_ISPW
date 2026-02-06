@@ -13,11 +13,12 @@ import com.ispw.model.enums.MetodoPagamento;
 import com.ispw.model.enums.StatoPagamento;
 
 /**
- * DAO DBMS per Pagamento (JDBC minimale).
- * - Usa gli helper di DbmsDAO (executeUpdate/queryOne/queryList/queryExists).
- * - Mappa BigDecimal e LocalDateTime <-> SQL DECIMAL/TIMESTAMP.
- * - ID auto-generato dal DB (generated keys).
- * - Nessuna logica applicativa qui: solo persistenza.
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO DBMS per Pagamento.
+ * Responsabilita': gestire accesso al DB tramite SQL e mapping.
+ *
+ * SEZIONE LOGICA
+ * Usa DbmsDAO per eseguire query e mappare i record in entita'.
  */
 public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements PagamentoDAO {
 

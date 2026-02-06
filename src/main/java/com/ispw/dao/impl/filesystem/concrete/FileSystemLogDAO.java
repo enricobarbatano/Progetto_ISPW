@@ -12,8 +12,12 @@ import com.ispw.dao.interfaces.LogDAO;
 import com.ispw.model.entity.SystemLog;
 
 /**
- * DAO FileSystem per SystemLog (append-only).
- * SonarCloud-friendly: comparator riutilizzabile, nessun System.out, controlli input.
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO FileSystem per SystemLog.
+ * Responsabilita': persistere una mappa serializzata su file locale.
+ *
+ * SEZIONE LOGICA
+ * Usa FileSystemDAO per (de)serializzazione e accesso alla cache.
  */
 public final class FileSystemLogDAO extends FileSystemDAO<Integer, SystemLog> implements LogDAO {
 

@@ -11,6 +11,14 @@ import com.ispw.dao.interfaces.GestoreDAO;
 import com.ispw.model.entity.Gestore;
 import com.ispw.model.enums.Permesso;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO FileSystem per Gestore.
+ * Responsabilita': persistere una mappa serializzata su file locale.
+ *
+ * SEZIONE LOGICA
+ * Usa FileSystemDAO per (de)serializzazione e accesso alla cache.
+ */
 public class FileSystemGestoreDAO extends FileSystemDAO<Integer, Gestore> implements GestoreDAO {
 
     private static final String FILE_NAME = "gestore.ser";

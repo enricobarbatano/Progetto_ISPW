@@ -20,8 +20,22 @@ import javafx.scene.layout.VBox;
 
 public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole, NavigableController {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: view GUI regole, usa controller grafico.
+    // A2) IO: componenti JavaFX e lista campi.
+    // ========================
+
     private final GUIGraphicControllerRegole controller;
     private boolean campiRequested;
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) onShow: costruzione UI e wiring eventi.
+    // L2) parseInt/parseIntOrDefault: parsing sicuro input.
+    // ========================
 
     public GUIRegoleView(GUIGraphicControllerRegole controller) {
         this.controller = controller;

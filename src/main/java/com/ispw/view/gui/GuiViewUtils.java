@@ -10,9 +10,24 @@ import javafx.scene.layout.VBox;
 
 public final class GuiViewUtils {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: utility per view GUI.
+    // A2) IO: costruzione componenti JavaFX.
+    // ========================
+
     private GuiViewUtils() {
-        // utility class
     }
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) createRoot: contenitore base.
+    // L2) buildErrorLabel/buildSuccessLabel: messaggi UI.
+    // L3) buildHomeButton: azione di ritorno.
+    // L4) fillList: popolamento list view.
+    // ========================
 
     public static VBox createRoot() {
         VBox root = new VBox(10);

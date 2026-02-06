@@ -23,6 +23,13 @@ import com.ispw.dao.interfaces.DAO;
 
 public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: base DAO file system con codec.
+    // A2) IO: cache in memoria + persistenza su file.
+    // ========================
+
     protected final Map<I, E> cache = new ConcurrentHashMap<>();
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -31,11 +38,6 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
 
     private static final Logger LOGGER = Logger.getLogger(FileSystemDAO.class.getName());
 
-    /**
-     * @param storageDir directory base (es: "storage/")
-     * @param fileName nome file per l'entità (es: "campo.dat")
-     * @param codec strategia di lettura/scrittura (binaria, json, ecc.)
-     */
     protected FileSystemDAO(Path storageDir, String fileName, FileCodec<I, E> codec) {
         this.codec = codec;
         try {
@@ -47,12 +49,15 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
         loadFromDisk();
     }
 
-    /** Come ricavo la chiave dall'entità */
     protected abstract I getId(E entity);
 
-    // -------------------------
-    // Ciclo FS: load / flush
-    // -------------------------
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) loadFromDisk/flushToDisk: sincronizzazione su file.
+    // L2) CRUD base: load/store/delete/exists/create.
+    // L3) FileCodec: strategia serializzazione.
+    // ========================
 
     private void loadFromDisk() {
         lock.writeLock().lock();
@@ -86,10 +91,6 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
             lock.writeLock().unlock();
         }
     }
-
-    // -------------------------
-    // Implementazione DAO base
-    // -------------------------
 
     @Override
     public E load(I id) {
@@ -139,28 +140,14 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
         return null;
     }
 
-    // ---------------------------------------------------------
-    // Codec: per scegliere formato senza cambiare FileSystemDAO
-    // ---------------------------------------------------------
-
     @FunctionalInterface
     protected interface FileCodec<K, V> {
-        /**
-         * Legge una mappa da file. Può lanciare DaoException in caso di errore di lettura critico.
-         * @param file percorso del file
-         * @return Optional contenente i dati letti, oppure Optional.empty() se il file non esiste
-         * @throws com.ispw.dao.exception.DaoException se si verifica un errore di deserializzazione
-         */
         Optional<Map<K, V>> read(Path file) throws com.ispw.dao.exception.DaoException;
         default void write(Path file, Map<K, V> data) throws IOException {
             throw new UnsupportedOperationException("write non implementato");
         }
     }
 
-    /**
-     * Codec binario basato su Java Serialization.
-     * Richiede che la Map e i contenuti siano Serializable.
-     */
     public static class JavaBinaryMapCodec<K, V> implements FileCodec<K, V> {
 
         @Override

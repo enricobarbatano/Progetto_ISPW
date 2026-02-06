@@ -11,10 +11,12 @@ import com.ispw.model.entity.GeneralUser;
 import com.ispw.model.entity.UtenteFinale;
 
 /**
- * DAO InMemory per GeneralUser.
- * SonarCloud-friendly:
- * - store condiviso per classe (super(true));
- * - id autoincrement se 0; validazioni / early return.
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO InMemory per GeneralUser.
+ * Responsabilita': gestire persistenza volatile per test/uso locale.
+ *
+ * SEZIONE LOGICA
+ * Delega a InMemoryDAO e gestisce ID e ricerca per email.
  */
 public final class InMemoryGeneralUserDAO extends InMemoryDAO<Integer, GeneralUser> implements GeneralUserDAO {
 

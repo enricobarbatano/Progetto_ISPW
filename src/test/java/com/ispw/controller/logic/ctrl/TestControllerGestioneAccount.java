@@ -33,14 +33,14 @@ import com.ispw.model.enums.Ruolo;
 import com.ispw.model.enums.StatoAccount;
 
 /**
- * Test JUnit 5 per il caso d'uso "Gestione Account".
- * Assunzione: a runtime i DAO creati sono In-Memory.
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: test di integrazione del caso d'uso Gestione Account.
+ * Responsabilita': verificare recupero dati, aggiornamento profilo e password.
+ *
+ * SEZIONE LOGICA
+ * Copre flussi in-memory e un percorso DBMS con logging e notifica.
  */
 @TestMethodOrder(MethodOrderer.DisplayName.class)
-/**
- * Test del caso d’uso Gestione Account: recupero dati, aggiornamento profilo
- * e cambio password (in-memory + DBMS).
- */
 class TestControllerGestioneAccount extends BaseDAOTest {
 
     private LogicControllerGestioneAccount controller;

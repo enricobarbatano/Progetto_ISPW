@@ -6,6 +6,14 @@ import com.ispw.dao.impl.memory.InMemoryDAO;
 import com.ispw.dao.interfaces.PagamentoDAO;
 import com.ispw.model.entity.Pagamento;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO InMemory per Pagamento.
+ * Responsabilita': gestire persistenza volatile per test/uso locale.
+ *
+ * SEZIONE LOGICA
+ * Delega a InMemoryDAO e applica ricerche per prenotazione/penalita'.
+ */
 public final class InMemoryPagamentoDAO extends InMemoryDAO<Integer, Pagamento> implements PagamentoDAO {
     public InMemoryPagamentoDAO() { super(true); }
     @Override protected Integer getId(Pagamento e) { return e != null ? e.getIdPagamento() : 0; }

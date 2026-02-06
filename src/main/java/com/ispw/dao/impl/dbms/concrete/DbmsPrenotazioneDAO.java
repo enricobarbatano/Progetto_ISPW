@@ -14,10 +14,12 @@ import com.ispw.model.entity.Prenotazione;
 import com.ispw.model.enums.StatoPrenotazione;
 
 /**
- * DAO DBMS per Prenotazione (JDBC minimale).
- * - Usa gli helper di DbmsDAO per evitare boilerplate.
- * - Mappa LocalDate/LocalTime con java.sql.Date/Time.
- * - Stato prenotazione salvato come VARCHAR (name() dell'enum).
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO DBMS per Prenotazione.
+ * Responsabilita': gestire accesso al DB tramite SQL e mapping.
+ *
+ * SEZIONE LOGICA
+ * Usa DbmsDAO per eseguire query e mappare i record in entita'.
  */
 public class DbmsPrenotazioneDAO extends DbmsDAO<Integer, Prenotazione> implements PrenotazioneDAO {
 

@@ -1,10 +1,36 @@
 package com.ispw.dao.factory;
 
-import com.ispw.dao.interfaces.*;
-
-import com.ispw.dao.impl.memory.concrete.*;
+import com.ispw.dao.impl.memory.concrete.InMemoryCampoDAO;
+import com.ispw.dao.impl.memory.concrete.InMemoryFatturaDAO;
+import com.ispw.dao.impl.memory.concrete.InMemoryGeneralUserDAO;
+import com.ispw.dao.impl.memory.concrete.InMemoryGestoreDAO;
+import com.ispw.dao.impl.memory.concrete.InMemoryLogDAO;
+import com.ispw.dao.impl.memory.concrete.InMemoryPagamentoDAO;
+import com.ispw.dao.impl.memory.concrete.InMemoryPenalitaDAO;
+import com.ispw.dao.impl.memory.concrete.InMemoryPrenotazioneDAO;
+import com.ispw.dao.impl.memory.concrete.InMemoryRegolePenalitaDAO;
+import com.ispw.dao.impl.memory.concrete.InMemoryRegoleTempisticheDAO;
+import com.ispw.dao.impl.memory.concrete.InMemoryUtenteFinaleDAO;
+import com.ispw.dao.interfaces.CampoDAO;
+import com.ispw.dao.interfaces.FatturaDAO;
+import com.ispw.dao.interfaces.GeneralUserDAO;
+import com.ispw.dao.interfaces.GestoreDAO;
+import com.ispw.dao.interfaces.LogDAO;
+import com.ispw.dao.interfaces.PagamentoDAO;
+import com.ispw.dao.interfaces.PenalitaDAO;
+import com.ispw.dao.interfaces.PrenotazioneDAO;
+import com.ispw.dao.interfaces.RegolePenalitaDAO;
+import com.ispw.dao.interfaces.RegoleTempisticheDAO;
+import com.ispw.dao.interfaces.UtenteFinaleDAO;
 
 public final class MemoryDAOFactory extends DAOFactory {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: factory concreta per DAO in memoria.
+    // A2) Stato: istanze DAO memoizzate.
+    // ========================
 
     private CampoDAO campoDAO;
     private FatturaDAO fatturaDAO;
@@ -20,6 +46,12 @@ public final class MemoryDAOFactory extends DAOFactory {
 
     private RegolePenalitaDAO regolePenalitaDAO;
     private RegoleTempisticheDAO regoleTempisticheDAO;
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) get*DAO: lazy init delle implementazioni in-memory.
+    // ========================
 
     @Override
     public synchronized CampoDAO getCampoDAO() {

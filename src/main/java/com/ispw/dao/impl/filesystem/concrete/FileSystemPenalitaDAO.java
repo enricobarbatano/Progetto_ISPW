@@ -9,6 +9,14 @@ import com.ispw.dao.impl.filesystem.FileSystemDAO;
 import com.ispw.dao.interfaces.PenalitaDAO;
 import com.ispw.model.entity.Penalita;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO FileSystem per Penalita.
+ * Responsabilita': persistere una mappa serializzata su file locale.
+ *
+ * SEZIONE LOGICA
+ * Usa FileSystemDAO per (de)serializzazione e accesso alla cache.
+ */
 public class FileSystemPenalitaDAO extends FileSystemDAO<Integer, Penalita> implements PenalitaDAO {
     private static final Comparator<Penalita> ORDER_BY_DATA_DESC_ID_DESC =
             Comparator.comparing(Penalita::getDataEmissione, Comparator.nullsLast(Comparator.naturalOrder()))

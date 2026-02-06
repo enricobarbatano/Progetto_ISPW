@@ -6,6 +6,13 @@ import com.ispw.model.enums.Ruolo;
 import com.ispw.model.enums.StatoAccount;
 
 public abstract class GeneralUser implements Serializable {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: base entity per utenti.
+    // A2) IO: stato anagrafico e credenziali.
+    // ========================
     private int idUtente;
     private String nome;
     private String cognome;
@@ -13,6 +20,12 @@ public abstract class GeneralUser implements Serializable {
     private String password;
     private StatoAccount statoAccount;
     private Ruolo ruolo;
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) getters/setters: accesso ai campi base.
+    // ========================
 
     protected GeneralUser() {}
 

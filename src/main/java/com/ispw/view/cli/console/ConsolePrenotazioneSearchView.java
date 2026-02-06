@@ -1,4 +1,3 @@
-// src/main/java/com/ispw/view/cli/ConsolePrenotazioneSearchView.java
 package com.ispw.view.cli.console;
 
 import java.time.LocalDate;
@@ -7,7 +6,23 @@ import java.util.List;
 import java.util.Scanner;
 
 public class ConsolePrenotazioneSearchView {
+
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: console view ricerca disponibilita'.
+    // A2) IO: input/output su standard input/output.
+    // ========================
+
     private final Scanner in = new Scanner(System.in);
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) renderSearchForm/showCampi/showResults: output.
+    // L2) readCampoId/readData/readOraInizio/readDurataMin: input.
+    // L3) askSlotSelectionIndex: selezione slot.
+    // ========================
     public void renderSearchForm() { System.out.println("\n=== CERCA DISPONIBILITA' ==="); }
     public int readCampoId()   { System.out.print("Id campo: "); return Integer.parseInt(in.nextLine()); }
     public String  readData()      {

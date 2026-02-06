@@ -2,9 +2,22 @@ package com.ispw.view.shared;
 
 public final class PrenotazioneViewUtils {
 
+    // ========================
+    // SEZIONE ARCHITETTURALE
+    // Legenda architettura:
+    // A1) Collaboratori: utility condivisa per view prenotazione.
+    // A2) IO: parsing slot e formattazione esiti.
+    // ========================
+
     private PrenotazioneViewUtils() {
-        // utility class
     }
+
+    // ========================
+    // SEZIONE LOGICA
+    // Legenda logica:
+    // L1) parseSlot: parsing data e orari da stringa.
+    // L2) formatEsitoPagamento: stringa di riepilogo.
+    // ========================
 
     public static SlotInfo parseSlot(String slot) {
         if (slot == null) return null;

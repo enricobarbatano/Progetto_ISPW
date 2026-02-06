@@ -11,9 +11,12 @@ import com.ispw.model.entity.Prenotazione;
 import com.ispw.model.enums.StatoPrenotazione;
 
 /**
- * DAO FileSystem per Prenotazione.
- * - Serializza una mappa <Integer, Prenotazione> su disco (prenotazione.ser).
- * - Operazioni di ricerca basate sulla cache in memoria fornita dalla base.
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO FileSystem per Prenotazione.
+ * Responsabilita': persistere una mappa serializzata su file locale.
+ *
+ * SEZIONE LOGICA
+ * Usa FileSystemDAO per (de)serializzazione e accesso alla cache.
  */
 public class FileSystemPrenotazioneDAO extends FileSystemDAO<Integer, Prenotazione> implements PrenotazioneDAO {
 

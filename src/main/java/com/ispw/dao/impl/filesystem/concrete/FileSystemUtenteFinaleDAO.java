@@ -8,6 +8,14 @@ import com.ispw.dao.impl.filesystem.FileSystemDAO;
 import com.ispw.dao.interfaces.UtenteFinaleDAO;
 import com.ispw.model.entity.UtenteFinale;
 
+/**
+ * SEZIONE ARCHITETTURALE
+ * Ruolo: DAO FileSystem per UtenteFinale.
+ * Responsabilita': persistere una mappa serializzata su file locale.
+ *
+ * SEZIONE LOGICA
+ * Usa FileSystemDAO per (de)serializzazione e accesso alla cache.
+ */
 public class FileSystemUtenteFinaleDAO extends FileSystemDAO<Integer, UtenteFinale> implements UtenteFinaleDAO {
 
     private static final String FILE_NAME = "utente_finale.ser";
