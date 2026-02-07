@@ -68,7 +68,7 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
                     Map.of(GraphicControllerUtils.KEY_SLOT_DISPONIBILI, slot));
             }
         } catch (Exception e) {
-            log().log(Level.SEVERE, "Errore ricerca disponibilitÃ ", e);
+            log().log(Level.SEVERE, "Errore ricerca disponibilita ", e);
         }
     }
 

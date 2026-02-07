@@ -42,7 +42,7 @@ public class LogicControllerDisdettaPrenotazione {
     private static final String MSG_INPUT_NON_VALIDO   = "Input non valido";
     private static final String MSG_UTENTE_INESISTENTE = "Utente inesistente";
     private static final String MSG_PREN_INESISTENTE   = "Prenotazione inesistente";
-    private static final String MSG_GIA_ANNULLATA      = "Prenotazione giÃ  annullata";
+    private static final String MSG_GIA_ANNULLATA      = "Prenotazione gia annullata";
     private static final String MSG_DISDETTA_OK        = "Disdetta eseguita";
     private static final String MSG_DISDETTA_KO        = "Disdetta non consentita";
 

@@ -46,8 +46,8 @@ public class LogicControllerConfiguraRegole {
     private static final String MSG_INPUT_TEMP_KO      = "Tempistiche non valide";
     private static final String MSG_UPDATE_TEMP_OK     = "Regole tempistiche aggiornate";
 
-    private static final String MSG_INPUT_PEN_KO       = "Regole penalitÃ  non valide";
-    private static final String MSG_UPDATE_PEN_OK      = "Regole penalitÃ  aggiornate";
+    private static final String MSG_INPUT_PEN_KO       = "Regole penalita  non valide";
+    private static final String MSG_UPDATE_PEN_OK      = "Regole penalita  aggiornate";
 
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
@@ -150,7 +150,7 @@ public class LogicControllerConfiguraRegole {
                     dispCtrl.rimuoviDisponibilita(idCampo);
                 }
             } catch (RuntimeException ex) {
-                log().log(Level.FINE, "Aggiorna disponibilitÃ  fallito: {0}", ex.getMessage());
+                log().log(Level.FINE, "Aggiorna disponibilità fallito: {0}", ex.getMessage());
             }
         }
 
@@ -202,7 +202,7 @@ public class LogicControllerConfiguraRegole {
         // DisponibilitÃ  â†’ rimuovi
         if (dispCtrl != null) {
             try { dispCtrl.rimuoviDisponibilita(idCampo); }
-            catch (RuntimeException ex) { log().log(Level.FINE, "Rimozione disponibilitÃ  fallita: {0}", ex.getMessage()); }
+            catch (RuntimeException ex) { log().log(Level.FINE, "Rimozione disponibilità fallita: {0}", ex.getMessage()); }
         }
 
         // Manutenzione â†’ alert
@@ -265,11 +265,11 @@ public class LogicControllerConfiguraRegole {
         try {
             penDAO().save(rp);
         } catch (RuntimeException ex) {
-            log().log(Level.FINE, "Salvataggio regole penalitÃ  fallito: {0}", ex.getMessage());
+            log().log(Level.FINE, "Salvataggio regole penalita  fallito: {0}", ex.getMessage());
             return esito(false, MSG_INPUT_PEN_KO);
         }
 
-        appendLogSafe(String.format("[REGOLE] PenalitÃ  aggiornata: valore=%s, preavviso=%d'",
+        appendLogSafe(String.format("[REGOLE] Penalita  aggiornata: valore=%s, preavviso=%d'",
                 rp.getValorePenalita(), rp.getPreavvisoMinimo()));
         return esito(true, MSG_UPDATE_PEN_OK);
     }

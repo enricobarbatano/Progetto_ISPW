@@ -42,7 +42,7 @@ public class GUIPenalitaView extends GenericViewGUI implements ViewGestionePenal
 
         VBox root = GuiViewUtils.createRoot();
 
-        Label title = new Label("PenalitÃ ");
+        Label title = new Label("Penalita ");
         Label error = GuiViewUtils.buildErrorLabel(getLastError());
         Label ok = GuiViewUtils.buildSuccessLabel(getLastSuccess());
 
@@ -62,7 +62,7 @@ public class GUIPenalitaView extends GenericViewGUI implements ViewGestionePenal
         Button lista = new Button("Lista utenti");
         lista.setOnAction(e -> controller.richiediListaUtenti());
 
-        Button applica = new Button("Applica penalitÃ ");
+        Button applica = new Button("Applica penalità");
         applica.setOnAction(e -> controller.applicaPenalita(
             Integer.parseInt(idUtente.getText().trim()),
             Float.parseFloat(importo.getText().trim()),

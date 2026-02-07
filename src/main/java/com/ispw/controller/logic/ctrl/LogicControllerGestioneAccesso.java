@@ -51,7 +51,7 @@ public class LogicControllerGestioneAccesso {
 
         // Consentito solo se attivo
         if (user.getStatoAccount() != StatoAccount.ATTIVO) {
-            throw new IllegalStateException("Non puoi accedere perchÃ¨ sei sospeso");
+            throw new IllegalStateException("Non puoi accedere percha¨ sei sospeso");
         }
 
         // Costruzione UtenteBean (cognome assente nel modello â†’ stringa vuota)

@@ -41,10 +41,10 @@ public abstract class DAOFactory {
     // L3) get*DAO: factory methods.
     public static synchronized void initialize(PersistencyProvider p, Path root) {
         if (provider != null) {
-            throw new IllegalStateException("DAOFactory giÃ  inizializzata.");
+            throw new IllegalStateException("DAOFactory gia  inizializzata.");
         }
         if (p == null) {
-            throw new IllegalArgumentException("PersistencyProvider non puÃ² essere null");
+            throw new IllegalArgumentException("PersistencyProvider non puo essere null");
         }
         if (p == PersistencyProvider.FILE_SYSTEM) {
             if (root == null) {

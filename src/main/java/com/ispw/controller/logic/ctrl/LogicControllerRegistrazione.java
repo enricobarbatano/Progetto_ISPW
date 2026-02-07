@@ -53,8 +53,8 @@ public class LogicControllerRegistrazione {
         final GeneralUser existing = userDAO.findByEmail(datiInput.getEmail());
         if (existing != null) {
             esito.setSuccesso(false);
-            esito.setMessaggio("Email giÃ  registrata");
-            log().log(Level.WARNING, "[REG] Email giÃ  presente: {0}", datiInput.getEmail());
+            esito.setMessaggio("Email gia  registrata");
+            log().log(Level.WARNING, "[REG] Email gia presente: {0}", datiInput.getEmail());
             return esito;
         }
 
