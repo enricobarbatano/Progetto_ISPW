@@ -46,8 +46,8 @@ public class LogicControllerConfiguraRegole {
     private static final String MSG_INPUT_TEMP_KO      = "Tempistiche non valide";
     private static final String MSG_UPDATE_TEMP_OK     = "Regole tempistiche aggiornate";
 
-    private static final String MSG_INPUT_PEN_KO       = "Regole penalita  non valide";
-    private static final String MSG_UPDATE_PEN_OK      = "Regole penalita  aggiornate";
+    private static final String MSG_INPUT_PEN_KO       = "Regole penalita non valide";
+    private static final String MSG_UPDATE_PEN_OK      = "Regole penalita aggiornate";
 
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
@@ -265,11 +265,11 @@ public class LogicControllerConfiguraRegole {
         try {
             penDAO().save(rp);
         } catch (RuntimeException ex) {
-            log().log(Level.FINE, "Salvataggio regole penalita  fallito: {0}", ex.getMessage());
+            log().log(Level.FINE, "Salvataggio regole penalita fallito: {0}", ex.getMessage());
             return esito(false, MSG_INPUT_PEN_KO);
         }
 
-        appendLogSafe(String.format("[REGOLE] Penalita  aggiornata: valore=%s, preavviso=%d'",
+        appendLogSafe(String.format("[REGOLE] Penalita aggiornata: valore=%s, preavviso=%d'",
                 rp.getValorePenalita(), rp.getPreavvisoMinimo()));
         return esito(true, MSG_UPDATE_PEN_OK);
     }

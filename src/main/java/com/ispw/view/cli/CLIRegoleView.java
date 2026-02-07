@@ -70,7 +70,7 @@ public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole,
         System.out.println("2) Seleziona campo");
         System.out.println("3) Aggiorna stato campo");
         System.out.println("4) Aggiorna tempistiche");
-        System.out.println("5) Aggiorna penalitÃ ");
+        System.out.println("5) Aggiorna penalita");
         System.out.println("0) Home");
         System.out.print("Scelta: ");
         String scelta = in.nextLine().trim();
@@ -162,7 +162,7 @@ public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole,
 
     private void handleAggiornaPenalita() {
         try {
-            System.out.print("Valore penalitÃ : ");
+            System.out.print("Valore penalita: ");
             BigDecimal valore = new BigDecimal(in.nextLine().trim());
             System.out.print("Preavviso minimo (min): ");
             String rawPreavviso = in.nextLine().trim();
@@ -173,7 +173,7 @@ public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole,
             payload.put(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI, preavviso);
             controller.aggiornaPenalita(payload);
         } catch (RuntimeException ex) {
-            System.err.println("[ERRORE] Dati penalitÃ  non validi");
+            System.err.println("[ERRORE] Dati penalita non validi");
         }
     }
 

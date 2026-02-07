@@ -54,7 +54,7 @@ public class GUIHomeView extends GenericViewGUI implements ViewHomeProfilo, Navi
         op1.setOnAction(e -> goTo(ruolo == Ruolo.GESTORE ? GraphicControllerUtils.ROUTE_REGOLE
                                                          : GraphicControllerUtils.ROUTE_PRENOTAZIONE));
 
-        Button op2 = new Button(ruolo == Ruolo.GESTORE ? "PenalitÃ " : "Disdetta");
+        Button op2 = new Button(ruolo == Ruolo.GESTORE ? "Penalita" : "Disdetta");
         op2.setOnAction(e -> goTo(ruolo == Ruolo.GESTORE ? GraphicControllerUtils.ROUTE_PENALITA
                                                          : GraphicControllerUtils.ROUTE_DISDETTA));
 

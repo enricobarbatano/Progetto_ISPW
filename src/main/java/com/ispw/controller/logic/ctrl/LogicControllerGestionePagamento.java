@@ -113,8 +113,8 @@ public class LogicControllerGestionePagamento
         pay.setStato(StatoPagamento.valueOf(stato)); // coerente con l'enum reale
         pagamentoDAO().store(pay);
 
-        // Ritorno il DTO richiesto dallâ€™interfaccia
-        return esito(ok, stato, newTxId("PX"), ok ? "Pagamento penalita  eseguito" : "Pagamento penalita  rifiutato");
+        // Ritorno il DTO richiesto dall'interfaccia
+        return esito(ok, stato, newTxId("PX"), ok ? "Pagamento penalita eseguito" : "Pagamento penalita rifiutato");
     }
 
     // SEZIONE LOGICA

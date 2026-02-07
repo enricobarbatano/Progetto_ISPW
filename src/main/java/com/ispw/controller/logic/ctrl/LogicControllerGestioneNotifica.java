@@ -72,7 +72,7 @@ public class LogicControllerGestioneNotifica implements
         final String dest = (idUtente == null || idUtente.trim().isEmpty())
                 ? "idUtente=VUOTO"
                 : "idUtente=" + idUtente.trim();
-        info("Notifica penalita ", dest, null);
+        info("Notifica penalita", dest, null);
     }
 
     //  NOTIFICHE PRENOTAZIONE

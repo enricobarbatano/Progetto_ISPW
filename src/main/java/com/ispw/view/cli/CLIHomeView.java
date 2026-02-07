@@ -51,7 +51,7 @@ public class CLIHomeView extends GenericViewCLI implements ViewHomeProfilo, Navi
             System.out.println("3) Disdetta");
         } else if (ruolo == Ruolo.GESTORE) {
             System.out.println("2) Regole");
-            System.out.println("3) PenalitÃ ");
+            System.out.println("3) Penalita");
             System.out.println("4) Log");
         }
         System.out.println("0) Logout");

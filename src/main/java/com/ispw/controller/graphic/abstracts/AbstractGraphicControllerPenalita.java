@@ -97,7 +97,7 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
                     Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
             }
         } catch (Exception e) {
-            log().log(Level.SEVERE, "Errore applicazione penalita ", e);
+            log().log(Level.SEVERE, "Errore applicazione penalita", e);
         }
     }
 

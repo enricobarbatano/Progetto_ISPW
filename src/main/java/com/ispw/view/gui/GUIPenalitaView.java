@@ -42,7 +42,7 @@ public class GUIPenalitaView extends GenericViewGUI implements ViewGestionePenal
 
         VBox root = GuiViewUtils.createRoot();
 
-        Label title = new Label("Penalita ");
+        Label title = new Label("Penalità");
         Label error = GuiViewUtils.buildErrorLabel(getLastError());
         Label ok = GuiViewUtils.buildSuccessLabel(getLastSuccess());
 

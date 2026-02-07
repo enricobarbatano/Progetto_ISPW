@@ -67,7 +67,7 @@ public final class GraphicControllerUtils {
     public static final String MSG_SESSIONE_UTENTE_MANCANTE = "Sessione utente mancante";
     public static final String MSG_ID_UTENTE_NON_VALIDO = "Id utente non valido";
     public static final String MSG_EMAIL_UTENTE_NON_VALIDA = "Email utente non valida";
-    public static final String MSG_DATI_PENALITA_NON_VALIDI = "Dati penalita  non validi";
+    public static final String MSG_DATI_PENALITA_NON_VALIDI = "Dati penalita non validi";
     public static final String MSG_OPERAZIONE_NON_RIUSCITA = "Operazione non riuscita";
     public static final String MSG_IMPOSSIBILE_RECUPERARE_DATI_ACCOUNT = "Impossibile recuperare dati account";
     public static final String MSG_DATI_ACCOUNT_MANCANTI = "Dati account mancanti";
@@ -77,7 +77,7 @@ public final class GraphicControllerUtils {
     public static final String MSG_DISDETTA_NON_RIUSCITA = "Disdetta non riuscita";
     public static final String MSG_PARAMETRI_REGOLA_CAMPO_MANCANTI = "Parametri regola campo mancanti";
     public static final String MSG_PARAMETRI_TEMPISTICHE_MANCANTI = "Parametri tempistiche mancanti";
-    public static final String MSG_PARAMETRI_PENALITA_MANCANTI = "Parametri penalità mancanti";
+    public static final String MSG_PARAMETRI_PENALITA_MANCANTI = "Parametri penalita mancanti";
     public static final String MSG_ID_CAMPO_NON_VALIDO = "Id campo non valido";
     public static final String MSG_CREDENZIALI_MANCANTI = "Credenziali mancanti";
     public static final String MSG_CREDENZIALI_NON_VALIDE = "Credenziali non valide";

@@ -34,7 +34,7 @@ public class LogicControllerGestioneAccount {
     private static final String MSG_SESSIONE_KO       = "Sessione non valida";
     private static final String MSG_UTENTE_NOT_FOUND  = "Utente non trovato";
     private static final String MSG_DATI_KO           = "Dati non validi";
-    private static final String MSG_EMAIL_DUP         = "Email giÃ  in uso";
+    private static final String MSG_EMAIL_DUP         = "Email gia in uso";
     private static final String MSG_UPDATE_OK         = "Dati account aggiornati";
     private static final String MSG_PWD_KO            = "Password non valida";
     private static final String MSG_PWD_OLD_WRONG     = "Vecchia password errata";

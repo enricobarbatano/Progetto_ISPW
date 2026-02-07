@@ -155,7 +155,7 @@ public class GUIPrenotazioneView extends GenericViewGUI implements ViewGestioneP
         TextField durata = new TextField();
         durata.setPromptText("Durata (min)");
 
-        Button cerca = new Button("Cerca disponibilitÃ ");
+        Button cerca = new Button("Cerca disponibilita");
         cerca.setOnAction(e -> {
             int id = Integer.parseInt(idCampo.getText().trim());
             int dur = Integer.parseInt(durata.getText().trim());

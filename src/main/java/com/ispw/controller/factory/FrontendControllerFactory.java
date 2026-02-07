@@ -23,7 +23,7 @@ public abstract class FrontendControllerFactory {
 
     public static void setFrontendProvider(FrontendProvider p) {
         if (provider != null) {
-            throw new IllegalStateException("FrontendProvider giÃ  impostato. Non puoi cambiarlo a runtime.");
+            throw new IllegalStateException("FrontendProvider gia impostato. Non puoi cambiarlo a runtime.");
         }
         provider = p;
     }

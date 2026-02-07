@@ -57,7 +57,7 @@ public class CLIPenalitaView extends GenericViewCLI implements ViewGestionePenal
         }
 
         System.out.println("1) Lista utenti");
-        System.out.println("2) Applica penalitÃ ");
+        System.out.println("2) Applica penalita");
         System.out.println("0) Home");
         System.out.print("Scelta: ");
         String scelta = in.nextLine().trim();

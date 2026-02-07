@@ -104,9 +104,9 @@ public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole,
         });
 
         TextField valorePen = new TextField();
-        valorePen.setPromptText("Valore penalitÃ ");
+        valorePen.setPromptText("Valore penalità");
 
-        Button aggiornaPen = new Button("Aggiorna penalitÃ ");
+        Button aggiornaPen = new Button("Aggiorna penalità");
         aggiornaPen.setOnAction(e -> {
             try {
                 Map<String, Object> payload = new java.util.HashMap<>();
@@ -114,7 +114,7 @@ public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole,
                 payload.put(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI, parseIntOrDefault(preavviso.getText(), 0));
                 controller.aggiornaPenalita(payload);
             } catch (RuntimeException ex) {
-                error.setText("Dati penalitÃ  non validi");
+                error.setText("Dati penalità non validi");
             }
         });
 
