@@ -46,7 +46,7 @@ public class ConsolePrenotazioneSearchView {
         }
     }
     public void showResults(List<String> slots) {
-        if (slots.isEmpty()) { System.out.println("Nessuna disponibilitÃ  trovata."); return; }
+        if (slots.isEmpty()) { System.out.println("Nessuna disponibilita trovata."); return; }
         System.out.println("Slot disponibili:");
         for (int i = 0; i < slots.size(); i++) System.out.println(String.format(" [%d] %s", i+1, slots.get(i)));
     }
