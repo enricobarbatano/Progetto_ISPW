@@ -8,13 +8,11 @@ import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerRegole;
 
 public class CLIGraphicControllerRegole extends AbstractGraphicControllerRegole {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: estende AbstractGraphicControllerRegole e usa GraphicControllerNavigation.
     // A2) IO verso GUI/CLI: routing verso home.
     // A3) Logica delegata: ereditata dalla classe astratta.
-    // ========================
     
     public CLIGraphicControllerRegole(GraphicControllerNavigation navigator) {
         super(navigator);
@@ -31,9 +29,7 @@ public class CLIGraphicControllerRegole extends AbstractGraphicControllerRegole 
         }
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi: nessun helper privato.
-    // ========================
 
 }

@@ -64,10 +64,10 @@ public class FileSystemGestoreDAO extends FileSystemDAO<Integer, Gestore> implem
 
     @Override
     public void assegnaPermesso(int idGestore, Permesso permesso) {
-        Objects.requireNonNull(permesso, "permesso non può essere null");
+        Objects.requireNonNull(permesso, "permesso non puÃ² essere null");
         final Gestore g = load(idGestore);
         if (g == null) return;
-        var list = g.getPermessi(); // è una List<Permesso>
+        var list = g.getPermessi(); // Ã¨ una List<Permesso>
         if (list != null && !list.contains(permesso) && list.add(permesso)) {
             store(g); // persisti su file
         }
@@ -75,7 +75,7 @@ public class FileSystemGestoreDAO extends FileSystemDAO<Integer, Gestore> implem
 
     @Override
     public void rimuoviPermesso(int idGestore, Permesso permesso) {
-        Objects.requireNonNull(permesso, "permesso non può essere null");
+        Objects.requireNonNull(permesso, "permesso non puÃ² essere null");
         final Gestore g = load(idGestore);
         if (g == null) return;
         var list = g.getPermessi();

@@ -21,7 +21,7 @@ public final class DbmsConnectionFactory implements ConnectionFactory {
 
     public static void init(String url, String user, String password) {
         if (instance != null) {
-            throw new IllegalStateException("DbmsConnectionFactory già inizializzata.");
+            throw new IllegalStateException("DbmsConnectionFactory giÃ  inizializzata.");
         }
         instance = new DbmsConnectionFactory(url, user, password);
     }

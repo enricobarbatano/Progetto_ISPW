@@ -8,12 +8,10 @@ import com.ispw.model.enums.StatoPrenotazione;
 
 public final class Prenotazione implements Serializable {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: entity prenotazione con riferimenti a campo/pagamento/fattura.
     // A2) IO: dati slot, stato e FK.
-    // ========================
     private int idPrenotazione;
 
     private int idUtente; // FK utile per DB
@@ -30,11 +28,9 @@ public final class Prenotazione implements Serializable {
     private Pagamento pagamento;
     private Fattura fattura;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) getters/setters: accesso ai campi.
-    // ========================
 
     public int getIdPrenotazione() { return idPrenotazione; }
     public void setIdPrenotazione(int idPrenotazione) { this.idPrenotazione = idPrenotazione; }

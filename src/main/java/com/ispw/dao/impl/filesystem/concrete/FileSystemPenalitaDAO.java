@@ -37,7 +37,7 @@ public class FileSystemPenalitaDAO extends FileSystemDAO<Integer, Penalita> impl
 
     @Override
     public void store(Penalita entity) {
-        Objects.requireNonNull(entity, "entity non può essere null");
+        Objects.requireNonNull(entity, "entity non puÃ² essere null");
         if (entity.getIdPenalita() == 0) {
             final int next = this.cache.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
             entity.setIdPenalita(next);

@@ -5,12 +5,10 @@ import java.time.LocalDate;
 
 public final class Fattura implements Serializable {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: entity fattura.
     // A2) IO: riferimenti prenotazione/utente e dati fiscali.
-    // ========================
     private int idFattura;
     private int idPrenotazione;      // FK verso prenotazione
     private int idUtente;            // <-- NUOVO: FK verso utente
@@ -18,11 +16,9 @@ public final class Fattura implements Serializable {
     private LocalDate dataEmissione;
     private String linkPdf;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) getters/setters: accesso ai campi.
-    // ========================
 
     public int getIdFattura() { return idFattura; }
     public void setIdFattura(int idFattura) { this.idFattura = idFattura; }

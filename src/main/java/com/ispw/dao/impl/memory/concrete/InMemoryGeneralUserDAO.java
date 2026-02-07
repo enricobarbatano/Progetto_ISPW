@@ -30,7 +30,7 @@ public final class InMemoryGeneralUserDAO extends InMemoryDAO<Integer, GeneralUs
 
     @Override
     public void store(GeneralUser entity) {
-        Objects.requireNonNull(entity, "entity non può essere null");
+        Objects.requireNonNull(entity, "entity non puÃ² essere null");
         if (entity.getIdUtente() == 0) {
             int next = store.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
             entity.setIdUtente(next);

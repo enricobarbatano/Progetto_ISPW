@@ -14,17 +14,15 @@ import com.ispw.controller.logic.interfaces.manutenzione.GestioneManutenzioneCon
  */
 public final class LogicControllerGestioneManutenzione implements GestioneManutenzioneConfiguraRegole {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: implementa l'interfaccia GestioneManutenzioneConfiguraRegole (DIP).
     // A2) IO verso GUI/CLI: non usa bean, lavora su id campo.
     // A3) Persistenza: non usa DAO in questa classe.
-    // ========================
 
     /**
      * Invia (simulato) un alert al manutentore per il campo indicato.
-     * Se l'idCampo non è valido, registra un warning ed esce senza effetti collaterali.
+     * Se l'idCampo non Ã¨ valido, registra un warning ed esce senza effetti collaterali.
      */
     @Override
     public void inviaAlertManutentore(int idCampo) {
@@ -36,11 +34,9 @@ public final class LogicControllerGestioneManutenzione implements GestioneManute
         log().log(Level.INFO, "[MANUTENZIONE] Invio alert manutentore per Campo#{0} ... riuscito", idCampo);
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi:
     // 1) log() - logger on-demand.
-    // ========================
     /** Logger on-demand per evitare campi (controller stateless). */
     @SuppressWarnings("java:S1312")
     private Logger log() {

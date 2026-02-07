@@ -5,12 +5,10 @@ import java.time.LocalTime;
 
 public final class RegoleTempistiche implements Serializable {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: entity regole tempistiche.
     // A2) IO: configurazione slot e orari.
-    // ========================
 
     private int idConfig = 1;
 
@@ -19,12 +17,10 @@ public final class RegoleTempistiche implements Serializable {
     private LocalTime oraChiusura;
     private int preavvisoMinimo;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) costruttori: mapping/serializzazione.
     // L2) getters/setters: accesso ai campi.
-    // ========================
 
     public RegoleTempistiche() {}
 

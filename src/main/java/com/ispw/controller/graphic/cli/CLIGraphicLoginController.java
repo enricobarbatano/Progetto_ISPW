@@ -12,13 +12,11 @@ import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccesso;
 
 public class CLIGraphicLoginController extends AbstractGraphicLoginController {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: estende AbstractGraphicLoginController e usa GraphicControllerNavigation.
     // A2) IO verso GUI/CLI: riceve DatiLoginBean, ritorna SessioneUtenteBean.
     // A3) Logica delegata: usa LogicControllerGestioneAccesso.
-    // ========================
     public CLIGraphicLoginController(GraphicControllerNavigation navigator) {
         super(navigator);
     }
@@ -75,9 +73,7 @@ public class CLIGraphicLoginController extends AbstractGraphicLoginController {
         new LogicControllerGestioneAccesso().saveLog(sessione);
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi: nessun helper privato.
-    // ========================
 
 }

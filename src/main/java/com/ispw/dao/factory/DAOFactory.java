@@ -17,12 +17,10 @@ import com.ispw.model.enums.PersistencyProvider;
 
 public abstract class DAOFactory {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: factory astratta per DAO, seleziona provider.
     // A2) Stato: provider, instance e root FS.
-    // ========================
 
     private static PersistencyProvider provider;
     private static DAOFactory instance;
@@ -36,19 +34,17 @@ public abstract class DAOFactory {
         return fileSystemRoot;
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) initialize/getInstance: selezione provider e singleton.
     // L2) resetForTests: reset stato per test.
     // L3) get*DAO: factory methods.
-    // ========================
     public static synchronized void initialize(PersistencyProvider p, Path root) {
         if (provider != null) {
-            throw new IllegalStateException("DAOFactory già inizializzata.");
+            throw new IllegalStateException("DAOFactory giÃ  inizializzata.");
         }
         if (p == null) {
-            throw new IllegalArgumentException("PersistencyProvider non può essere null");
+            throw new IllegalArgumentException("PersistencyProvider non puÃ² essere null");
         }
         if (p == PersistencyProvider.FILE_SYSTEM) {
             if (root == null) {

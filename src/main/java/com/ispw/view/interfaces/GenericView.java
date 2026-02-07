@@ -6,12 +6,10 @@ import com.ispw.bean.SessioneUtenteBean;
 
 public interface GenericView {
 
-	// ========================
 	// SEZIONE ARCHITETTURALE
 	// Legenda architettura:
 	// A1) Collaboratori: contratto base per le view (CLI/GUI).
 	// A2) IO verso controller: usa Map e SessioneUtenteBean.
-	// ========================
 
 	String KEY_ERROR = "error";
 	String KEY_SUCCESSO = "successo";
@@ -24,12 +22,10 @@ public interface GenericView {
 
 	default void onHide() { /* opzionale */ }
 
-	// ========================
 	// SEZIONE LOGICA
 	// Legenda logica:
 	// L1) Lifecycle: onShow/onHide.
 	// L2) readSession/readError/readSuccess: estrazione dati dai params.
-	// ========================
 
 	default SessioneUtenteBean readSession(Map<String, Object> params) {
 		if (params == null) {

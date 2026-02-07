@@ -24,13 +24,11 @@ public class LogicControllerGestoreDisponibilita
                    GestioneDisponibilitaGestioneRegole,
                    GestioneDisponibilitaPrenotazione {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: implementa interfacce GestioneDisponibilita* (DIP).
     // A2) IO verso GUI/CLI: riceve/ritorna bean DatiDisponibilitaBean/ParametriVerificaBean.
     // A3) Persistenza: usa DAO via DAOFactory.
-    // ========================
     private CampoDAO campoDAO() {
         return DAOFactory.getInstance().getCampoDAO();
     }
@@ -45,7 +43,7 @@ public class LogicControllerGestoreDisponibilita
      * - recupera/ottiene il Campo associato (diretto o via idCampo);
      * - invoca Campo.sbloccaSlot(data, oraInizio);
      * - persiste il Campo.
-     * Non cambia lo stato della prenotazione (delegalo al caso d’uso Disdetta).
+     * Non cambia lo stato della prenotazione (delegalo al caso dâ€™uso Disdetta).
      */
     @Override
     public void liberaSlot(int idPrenotazione) {
@@ -60,8 +58,8 @@ public class LogicControllerGestoreDisponibilita
     }
 
     /**
-     * Rimuove la disponibilità del campo (lo rende non prenotabile).
-     * Ritorna TRUE se l’operazione va a buon fine.
+     * Rimuove la disponibilitÃ  del campo (lo rende non prenotabile).
+     * Ritorna TRUE se lâ€™operazione va a buon fine.
      */
     @Override
     public Boolean rimuoviDisponibilita(int idCampo) {
@@ -79,7 +77,7 @@ public class LogicControllerGestoreDisponibilita
     }
 
     /**
-     * Attiva la disponibilità del campo (prenotabile).
+     * Attiva la disponibilitÃ  del campo (prenotabile).
      * Non avendo parametri temporali, restituiamo lista vuota (snello).
      */
     @Override
@@ -98,15 +96,15 @@ public class LogicControllerGestoreDisponibilita
     }
 
     /**
-     * Verifica disponibilità:
-     * - Se idCampo è presente, verifica solo quel campo, altrimenti su tutti i campi;
+     * Verifica disponibilitÃ :
+     * - Se idCampo Ã¨ presente, verifica solo quel campo, altrimenti su tutti i campi;
      * - Calcola oraFine = oraInizio + durataMin (default 60 se null);
      * - Usa Campo.isDisponibile(Date, Time, Time) e lo stato operativo;
      * - Costruisce DatiDisponibilitaBean con data/ore in stringa e costo pro-rata.
      */
     @Override
     public List<DatiDisponibilitaBean> verificaDisponibilita(ParametriVerificaBean param) {
-        Objects.requireNonNull(param, "ParametriVerificaBean non può essere null");
+        Objects.requireNonNull(param, "ParametriVerificaBean non puÃ² essere null");
 
         // Parse dei parametri STRING in tipi temporali
         LocalDate data = LocalDate.parse(param.getData());          // yyyy-MM-dd
@@ -149,8 +147,6 @@ public class LogicControllerGestoreDisponibilita
         return out;
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi: nessun helper privato.
-    // ========================
 }

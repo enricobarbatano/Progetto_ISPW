@@ -12,21 +12,17 @@ import com.ispw.view.interfaces.ViewHomeProfilo;
 
 public class CLIHomeView extends GenericViewCLI implements ViewHomeProfilo, NavigableController {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: view CLI home, usa navigator.
     // A2) IO: input console e sessione.
-    // ========================
     private final Scanner in = new Scanner(System.in);
     private final GraphicControllerNavigation navigator;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) onShow: menu in base al ruolo.
     // L2) goTo: navigazione con sessione.
-    // ========================
 
     public CLIHomeView(GraphicControllerNavigation navigator) {
         this.navigator = navigator;
@@ -55,7 +51,7 @@ public class CLIHomeView extends GenericViewCLI implements ViewHomeProfilo, Navi
             System.out.println("3) Disdetta");
         } else if (ruolo == Ruolo.GESTORE) {
             System.out.println("2) Regole");
-            System.out.println("3) Penalità");
+            System.out.println("3) PenalitÃ ");
             System.out.println("4) Log");
         }
         System.out.println("0) Logout");

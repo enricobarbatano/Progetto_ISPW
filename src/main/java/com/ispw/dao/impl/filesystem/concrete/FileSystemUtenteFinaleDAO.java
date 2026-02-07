@@ -31,7 +31,7 @@ public class FileSystemUtenteFinaleDAO extends FileSystemDAO<Integer, UtenteFina
 
     @Override
     public void store(UtenteFinale entity) {
-        Objects.requireNonNull(entity, "entity non può essere null");
+        Objects.requireNonNull(entity, "entity non puÃ² essere null");
         if (entity.getIdUtente() == 0) {
             final int next = this.cache.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
             entity.setIdUtente(next);

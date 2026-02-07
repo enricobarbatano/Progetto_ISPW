@@ -34,7 +34,7 @@ public final class FileSystemGeneralUserDAO extends FileSystemDAO<Integer, Gener
 
     @Override
     public void store(GeneralUser entity) {
-        Objects.requireNonNull(entity, "entity non può essere null");
+        Objects.requireNonNull(entity, "entity non puÃ² essere null");
         if (entity.getIdUtente() == 0) {
             int next = this.cache.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
             entity.setIdUtente(next);

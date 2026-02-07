@@ -39,35 +39,27 @@ import com.ispw.model.enums.StatoPrenotazione;
 
 public class LogicControllerPrenotazioneCampo {
     private static final String PAGATO= "PAGATO";
-    // ========================
     // Costanti di servizio
-    // ========================
     private static final int DEFAULT_DURATA_MIN = 60;
     private static final String MSG_SLOT_NON_DISP    = "[PRENOT] Slot non disponibile: campo={0} {1} {2}-{3}";
     private static final String MSG_NO_PREN_DA_PAG   = "Nessuna prenotazione da pagare";
     private static final String MSG_INPUT_NON_VALIDO = "Input non valido";
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: usa interfacce Gestione* via parametro (DIP).
     // A2) IO verso GUI/CLI: riceve/ritorna bean (CampiBean, DatiPagamentoBean, ecc.).
     // A3) Persistenza: usa DAO via DAOFactory.
-    // ========================
     @SuppressWarnings("java:S1312")
     private Logger log() { return Logger.getLogger(getClass().getName()); }
 
-    // ========================
     // DAO on-demand (no SQL nei controller)
-    // ========================
     private PrenotazioneDAO prenotazioneDAO() { return DAOFactory.getInstance().getPrenotazioneDAO(); }
     private CampoDAO        campoDAO()        { return DAOFactory.getInstance().getCampoDAO(); }
     private GeneralUserDAO  userDAO()         { return DAOFactory.getInstance().getGeneralUserDAO(); }
     private PagamentoDAO    pagamentoDAO()    { return DAOFactory.getInstance().getPagamentoDAO(); }
 
-    // =============================================================================
     // 0) Lista campi (supporto UI prenotazione)
-    // =============================================================================
     public CampiBean listaCampi() {
         CampiBean out = new CampiBean();
         out.setCampi(campoDAO().findAll().stream()
@@ -76,9 +68,7 @@ public class LogicControllerPrenotazioneCampo {
         return out;
     }
 
-    // =============================================================================
     // 1) TROVA SLOT DISPONIBILI
-    // =============================================================================
     public List<DatiDisponibilitaBean> trovaSlotDisponibili(ParametriVerificaBean param) {
         return trovaSlotDisponibili(param, new LogicControllerGestoreDisponibilita());
     }
@@ -89,9 +79,7 @@ public class LogicControllerPrenotazioneCampo {
         return dispCtrl.verificaDisponibilita(param);
     }
 
-    // =============================================================================
-    // 2) NUOVA PRENOTAZIONE (crea DA_PAGARE + blocca slot) → Riepilogo
-    // =============================================================================
+    // 2) NUOVA PRENOTAZIONE (crea DA_PAGARE + blocca slot) â†’ Riepilogo
     public RiepilogoPrenotazioneBean nuovaPrenotazione(DatiInputPrenotazioneBean input,
                                                        SessioneUtenteBean sessione) {
         return nuovaPrenotazione(input, sessione, new LogicControllerGestoreDisponibilita());
@@ -130,7 +118,7 @@ public class LogicControllerPrenotazioneCampo {
         final var user = userDAO().findByEmail(email);
         if (user == null) return null;
 
-        // 1) (ri)verifica disponibilità
+        // 1) (ri)verifica disponibilitÃ 
         ParametriVerificaBean pv = new ParametriVerificaBean();
         pv.setIdCampo(idCampo);
         pv.setData(data.toString());
@@ -170,10 +158,8 @@ public class LogicControllerPrenotazioneCampo {
         return buildRiepilogo(p, c, sessione.getUtente(), durataMin);
     }
 
-    // =============================================================================
-    // 3) COMPLETA PRENOTAZIONE (pagamento → conferma → fattura → notifica)
-    //    Rifattorizzato per ridurre la complessità cognitiva, senza cambiare la logica.
-    // =============================================================================
+    // 3) COMPLETA PRENOTAZIONE (pagamento â†’ conferma â†’ fattura â†’ notifica)
+    //    Rifattorizzato per ridurre la complessitÃ  cognitiva, senza cambiare la logica.
     public StatoPagamentoBean completaPrenotazione(DatiPagamentoBean dati,
                                                    SessioneUtenteBean sessione) {
         return completaPrenotazione(
@@ -214,7 +200,7 @@ public class LogicControllerPrenotazioneCampo {
         final StatoPagamento statoEnum = payCtrl.richiediPagamentoPrenotazione(dati, p.getIdPrenotazione());
         final boolean success = isPagamentoOk(statoEnum);
 
-        // 5) Post-pagamento (solo se successo): conferma → fattura → notifica
+        // 5) Post-pagamento (solo se successo): conferma â†’ fattura â†’ notifica
         if (success) {
             postPagamentoActions(p, email, fattCtrl, notiCtrl, sessione);
         }
@@ -223,7 +209,6 @@ public class LogicControllerPrenotazioneCampo {
         return composeEsito(p, success, statoEnum);
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi:
     // 1) isCheckoutInputValid(...) - valida input pagamento.
@@ -237,7 +222,6 @@ public class LogicControllerPrenotazioneCampo {
     // 9) isPagamentoOk(...) - interpreta StatoPagamento.
     // 10) newTxId(...) - genera id transazione.
     // 11) esitoPagamento(...) - costruisce esito pagamento.
-    // ========================
 
     private boolean isCheckoutInputValid(DatiPagamentoBean dati,
                                          SessioneUtenteBean sessione,
@@ -259,7 +243,7 @@ public class LogicControllerPrenotazioneCampo {
 
     /**
      * Conferma prenotazione + emette fattura + invia notifica (solo in caso di successo).
-     * Non cambia i messaggi né le modalità di invocazione.
+     * Non cambia i messaggi nÃ© le modalitÃ  di invocazione.
      */
     private void postPagamentoActions(Prenotazione p,
                                       String email,
@@ -269,7 +253,7 @@ public class LogicControllerPrenotazioneCampo {
         prenotazioneDAO().updateStato(p.getIdPrenotazione(), StatoPrenotazione.CONFERMATA);
 
         DatiFatturaBean fatt = new DatiFatturaBean();
-        // NB: rimane invariato il placeholder già presente
+        // NB: rimane invariato il placeholder giÃ  presente
         fatt.setCodiceFiscaleCliente(email);
         fattCtrl.generaFatturaPrenotazione(fatt, p.getIdPrenotazione());
 
@@ -279,7 +263,7 @@ public class LogicControllerPrenotazioneCampo {
 
     /**
      * Ricompone lo stato di pagamento preferendo quanto scritto dal DAO;
-     * se assente, usa il fallback identico all’implementazione originale.
+     * se assente, usa il fallback identico allâ€™implementazione originale.
      */
     private StatoPagamentoBean composeEsito(Prenotazione p, boolean success, StatoPagamento statoEnum) {
         Pagamento pag = pagamentoDAO().findByPrenotazione(p.getIdPrenotazione());
@@ -344,7 +328,7 @@ public class LogicControllerPrenotazioneCampo {
         return t.isEmpty() ? null : t.toLowerCase();
     }
 
-    // ✓ riconosce anche StatoPagamento.OK
+    // âœ“ riconosce anche StatoPagamento.OK
     private boolean isPagamentoOk(StatoPagamento stato) {
         if (stato == null) return false;
         if (stato == StatoPagamento.OK) return true; // esplicito

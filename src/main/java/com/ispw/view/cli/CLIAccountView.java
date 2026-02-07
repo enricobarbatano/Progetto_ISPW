@@ -10,21 +10,17 @@ import com.ispw.view.interfaces.ViewGestioneAccount;
 
 public class CLIAccountView extends GenericViewCLI implements ViewGestioneAccount, NavigableController {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: view CLI account, usa controller grafico.
     // A2) IO: input console, sessione e params.
-    // ========================
     private final Scanner in = new Scanner(System.in);
     private final CLIGraphicControllerAccount controller;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) onShow: menu e dispatch verso controller.
     // L2) handleAggiorna/handleCambiaPassword: input guidato.
-    // ========================
 
     public CLIAccountView(CLIGraphicControllerAccount controller) {
         this.controller = controller;

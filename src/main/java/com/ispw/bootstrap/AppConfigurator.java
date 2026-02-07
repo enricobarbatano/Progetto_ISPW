@@ -14,7 +14,7 @@ public final class AppConfigurator {
         FrontendProvider frontend = (uiChoice == 1) ? FrontendProvider.CLI : FrontendProvider.GUI;
 
         // 2) Mode
-        int modeChoice = menu.askOption("Seleziona Modalità",
+        int modeChoice = menu.askOption("Seleziona ModalitÃ ",
                 "DEMO (in-memory, no persistenza)", "STANDARD (con persistenza)");
         AppMode mode = (modeChoice == 1) ? AppMode.DEMO : AppMode.STANDARD;
 

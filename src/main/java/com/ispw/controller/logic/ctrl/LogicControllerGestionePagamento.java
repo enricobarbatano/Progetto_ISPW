@@ -27,13 +27,11 @@ public class LogicControllerGestionePagamento
     private static final String NEGATO= "NEGATO";
     private static final String KO= "KO";
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: implementa interfacce GestionePagamento* (DIP).
     // A2) IO verso GUI/CLI: riceve DatiPagamentoBean, ritorna StatoPagamento/StatoPagamentoBean.
     // A3) Persistenza: usa DAO via DAOFactory.
-    // ========================
 
     /* =========================================================
        1) Pagamento PRENOTAZIONE
@@ -41,12 +39,12 @@ public class LogicControllerGestionePagamento
        ========================================================= */
     @Override
     public StatoPagamento richiediPagamentoPrenotazione(DatiPagamentoBean dati, int idPrenotazione) {
-        // Validazioni semplici d’input
+        // Validazioni semplici dâ€™input
         if (dati == null) return pickStato(FALLITO, RIFIUTATO, NEGATO, KO);
         MetodoPagamento metodo = parseMetodo(dati.getMetodo());
         if (metodo == null) return pickStato(FALLITO, RIFIUTATO, NEGATO, KO);
         
-        // Se esiste già un pagamento registrato, riuso l’entity; altrimenti ne creo una nuova
+        // Se esiste giÃ  un pagamento registrato, riuso lâ€™entity; altrimenti ne creo una nuova
         Pagamento pay = pagamentoDAO().findByPrenotazione(idPrenotazione);
         if (pay == null) {
             pay = new Pagamento();
@@ -68,7 +66,7 @@ public class LogicControllerGestionePagamento
         // Persisto tramite DAO (nessun SQL qui)
         pagamentoDAO().store(pay);
 
-        // Ritorno il valore enum richiesto dall’interfaccia
+        // Ritorno il valore enum richiesto dallâ€™interfaccia
         return stato;
     }
 
@@ -99,7 +97,7 @@ public class LogicControllerGestionePagamento
         MetodoPagamento metodo = parseMetodo(dati.getMetodo());
         if (metodo == null) return esito(false, pickStato(FALLITO, RIFIUTATO, NEGATO, KO).name(), null, "Metodo pagamento non valido");
 
-        // Soluzione “scolastica”: traccio un Pagamento legato alla penalità usando idPrenotazione negativo
+        // Soluzione â€œscolasticaâ€: traccio un Pagamento legato alla penalitÃ  usando idPrenotazione negativo
         Pagamento pay = new Pagamento();
         pay.setIdPrenotazione(-Math.abs(idPenalita));
         pay.setImportoFinale(BigDecimal.valueOf(Math.max(0f, dati.getImporto())));
@@ -115,11 +113,10 @@ public class LogicControllerGestionePagamento
         pay.setStato(StatoPagamento.valueOf(stato)); // coerente con l'enum reale
         pagamentoDAO().store(pay);
 
-        // Ritorno il DTO richiesto dall’interfaccia
-        return esito(ok, stato, newTxId("PX"), ok ? "Pagamento penalità eseguito" : "Pagamento penalità rifiutato");
+        // Ritorno il DTO richiesto dallâ€™interfaccia
+        return esito(ok, stato, newTxId("PX"), ok ? "Pagamento penalitÃ  eseguito" : "Pagamento penalitÃ  rifiutato");
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi:
     // 1) pagamentoDAO() - accesso DAO.
@@ -127,7 +124,6 @@ public class LogicControllerGestionePagamento
     // 3) pickStato(...) - risolve StatoPagamento da alias.
     // 4) newTxId(...) - genera id transazione.
     // 5) esito(...) - costruisce StatoPagamentoBean.
-    // ========================
 
     private PagamentoDAO pagamentoDAO() {
         return DAOFactory.getInstance().getPagamentoDAO();

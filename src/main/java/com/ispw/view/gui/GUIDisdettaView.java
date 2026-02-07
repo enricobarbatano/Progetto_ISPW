@@ -16,21 +16,17 @@ import javafx.scene.layout.VBox;
 
 public class GUIDisdettaView extends GenericViewGUI implements ViewDisdettaPrenotazione, NavigableController {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: view GUI disdetta, usa controller grafico.
     // A2) IO: componenti JavaFX e params di disdetta.
-    // ========================
 
     private final GUIGraphicControllerDisdetta controller;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) onShow: routing in base ai payload.
     // L2) handle*/renderMessage: gestione step.
-    // ========================
 
     public GUIDisdettaView(GUIGraphicControllerDisdetta controller) {
         this.controller = controller;
@@ -105,7 +101,7 @@ public class GUIDisdettaView extends GenericViewGUI implements ViewDisdettaPreno
 
         VBox root = GuiViewUtils.createRoot();
         root.getChildren().add(new Label("Anteprima disdetta"));
-        root.getChildren().add(new Label("Possibile: " + poss + " - penale: " + pen + "€"));
+        root.getChildren().add(new Label("Possibile: " + poss + " - penale: " + pen + "â‚¬"));
 
         TextField idField = new TextField();
         idField.setPromptText("Id prenotazione");

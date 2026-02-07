@@ -8,13 +8,11 @@ import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerPrenotazio
 
 public class GUIGraphicControllerPrenotazione extends AbstractGraphicControllerPrenotazione {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: estende AbstractGraphicControllerPrenotazione e usa GraphicControllerNavigation.
     // A2) IO verso GUI/CLI: notifica errori e routing verso home.
     // A3) Logica delegata: ereditata dalla classe astratta.
-    // ========================
     public GUIGraphicControllerPrenotazione(GraphicControllerNavigation navigator) {
         super(navigator);
     }
@@ -36,9 +34,7 @@ public class GUIGraphicControllerPrenotazione extends AbstractGraphicControllerP
         }
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi: nessun helper privato.
-    // ========================
 
 }

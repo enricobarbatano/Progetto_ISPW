@@ -8,13 +8,11 @@ import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerPenalita;
 
 public class CLIGraphicControllerPenalita extends AbstractGraphicControllerPenalita {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: estende AbstractGraphicControllerPenalita e usa GraphicControllerNavigation.
     // A2) IO verso GUI/CLI: routing verso home.
     // A3) Logica delegata: ereditata dalla classe astratta.
-    // ========================
     
     public CLIGraphicControllerPenalita(GraphicControllerNavigation navigator) {
         super(navigator);
@@ -31,9 +29,7 @@ public class CLIGraphicControllerPenalita extends AbstractGraphicControllerPenal
         }
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi: nessun helper privato.
-    // ========================
 
 }

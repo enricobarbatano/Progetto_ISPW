@@ -20,22 +20,18 @@ import javafx.scene.layout.VBox;
 
 public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole, NavigableController {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: view GUI regole, usa controller grafico.
     // A2) IO: componenti JavaFX e lista campi.
-    // ========================
 
     private final GUIGraphicControllerRegole controller;
     private boolean campiRequested;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) onShow: costruzione UI e wiring eventi.
     // L2) parseInt/parseIntOrDefault: parsing sicuro input.
-    // ========================
 
     public GUIRegoleView(GUIGraphicControllerRegole controller) {
         this.controller = controller;
@@ -108,9 +104,9 @@ public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole,
         });
 
         TextField valorePen = new TextField();
-        valorePen.setPromptText("Valore penalità");
+        valorePen.setPromptText("Valore penalitÃ ");
 
-        Button aggiornaPen = new Button("Aggiorna penalità");
+        Button aggiornaPen = new Button("Aggiorna penalitÃ ");
         aggiornaPen.setOnAction(e -> {
             try {
                 Map<String, Object> payload = new java.util.HashMap<>();
@@ -118,7 +114,7 @@ public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole,
                 payload.put(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI, parseIntOrDefault(preavviso.getText(), 0));
                 controller.aggiornaPenalita(payload);
             } catch (RuntimeException ex) {
-                error.setText("Dati penalità non validi");
+                error.setText("Dati penalitÃ  non validi");
             }
         });
 

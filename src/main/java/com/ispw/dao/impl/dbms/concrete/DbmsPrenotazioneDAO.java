@@ -23,9 +23,7 @@ import com.ispw.model.enums.StatoPrenotazione;
  */
 public class DbmsPrenotazioneDAO extends DbmsDAO<Integer, Prenotazione> implements PrenotazioneDAO {
 
-    // =====================
     // SQL (adatta allo schema)
-    // =====================
     private static final String SQL_FIND_BY_ID =
         "SELECT id_prenotazione, id_utente, id_campo, data, ora_inizio, ora_fine, stato, notifica_richiesta " +
         "FROM prenotazioni WHERE id_prenotazione=?";
@@ -59,9 +57,7 @@ public class DbmsPrenotazioneDAO extends DbmsDAO<Integer, Prenotazione> implemen
         super(cf);
     }
 
-    // ================
     // RowMapper
-    // ================
     private final RowMapper<Prenotazione> mapper= rs -> {
         Prenotazione p = new Prenotazione();
         p.setIdPrenotazione(rs.getInt("id_prenotazione"));
@@ -82,9 +78,7 @@ public class DbmsPrenotazioneDAO extends DbmsDAO<Integer, Prenotazione> implemen
         return p;
     };
 
-    // ================
     // Metodi DAO base
-    // ================
     @Override
     public Prenotazione load(Integer id) {
         if (id == null) return null;
@@ -125,9 +119,7 @@ public class DbmsPrenotazioneDAO extends DbmsDAO<Integer, Prenotazione> implemen
         return p; // solo in memoria; persistilo poi con store()
     }
 
-    // ================
     // Finder specifici
-    // ================
     @Override
     public List<Prenotazione> findByUtente(int idUtente) {
         return queryList(SQL_FIND_BY_UTENTE, ps -> ps.setInt(1, idUtente), mapper);
@@ -149,9 +141,7 @@ public class DbmsPrenotazioneDAO extends DbmsDAO<Integer, Prenotazione> implemen
         });
     }
 
-    // ================
     // Helper interni
-    // ================
     private void insert(Prenotazione p) {
         executeUpdate(SQL_INSERT, ps -> {
             ps.setInt(1, p.getIdPrenotazione());

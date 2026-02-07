@@ -33,6 +33,6 @@ public class RiepilogoPrenotazioneBean {
     }
     @Override 
     public String toString() { 
-        return "Prenotazione #" + idPrenotazione + " - Importo " + importoTotale + "€"; 
+        return "Prenotazione #" + idPrenotazione + " - Importo " + importoTotale + "â‚¬"; 
     }
 }

@@ -15,21 +15,17 @@ import javafx.scene.layout.VBox;
 
 public class GUIHomeView extends GenericViewGUI implements ViewHomeProfilo, NavigableController {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: view GUI home, usa navigator.
     // A2) IO: componenti JavaFX e sessione.
-    // ========================
 
     private final GraphicControllerNavigation navigator;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) onShow: menu dinamico per ruolo.
     // L2) goTo: navigazione con sessione.
-    // ========================
 
     public GUIHomeView(GraphicControllerNavigation navigator) {
         this.navigator = navigator;
@@ -58,7 +54,7 @@ public class GUIHomeView extends GenericViewGUI implements ViewHomeProfilo, Navi
         op1.setOnAction(e -> goTo(ruolo == Ruolo.GESTORE ? GraphicControllerUtils.ROUTE_REGOLE
                                                          : GraphicControllerUtils.ROUTE_PRENOTAZIONE));
 
-        Button op2 = new Button(ruolo == Ruolo.GESTORE ? "Penalità" : "Disdetta");
+        Button op2 = new Button(ruolo == Ruolo.GESTORE ? "PenalitÃ " : "Disdetta");
         op2.setOnAction(e -> goTo(ruolo == Ruolo.GESTORE ? GraphicControllerUtils.ROUTE_PENALITA
                                                          : GraphicControllerUtils.ROUTE_DISDETTA));
 

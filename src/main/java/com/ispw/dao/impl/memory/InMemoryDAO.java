@@ -11,12 +11,10 @@ import com.ispw.dao.interfaces.DAO;
 
 public abstract class InMemoryDAO<I, E> implements DAO<I, E> {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: base DAO in memoria.
     // A2) IO: CRUD thread-safe su Map.
-    // ========================
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -40,13 +38,11 @@ public abstract class InMemoryDAO<I, E> implements DAO<I, E> {
         return null;
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) CRUD base: load/store/delete/exists/create.
     // L2) snapshotValues/filter/clear: utility per DAO concreti.
     // L3) SharedStoreRegistry: store condiviso opzionale.
-    // ========================
 
     @Override
     public E load(I id) {

@@ -25,7 +25,7 @@ public final class FileSystemLogDAO extends FileSystemDAO<Integer, SystemLog> im
     private static final int MIN_LIMIT = 1;
 
     /**
-     * Ordina per timestamp DESC (null last) e, a parità, per id DESC.
+     * Ordina per timestamp DESC (null last) e, a paritÃ , per id DESC.
      * Evita generics espliciti non necessari che causano errori d'inferenza.
      */
     private static final Comparator<SystemLog> ORDER_BY_TS_DESC_ID_DESC =
@@ -44,7 +44,7 @@ public final class FileSystemLogDAO extends FileSystemDAO<Integer, SystemLog> im
 
     @Override
     public void append(SystemLog log) {
-        Objects.requireNonNull(log, "log non può essere null");
+        Objects.requireNonNull(log, "log non puÃ² essere null");
         // Timestamp di default (evita null downstream)
         if (log.getTimestamp() == null) {
             log.setTimestamp(LocalDateTime.now());
@@ -83,6 +83,6 @@ public final class FileSystemLogDAO extends FileSystemDAO<Integer, SystemLog> im
     /** Append-only: vietato cancellare log. */
     @Override
     public void delete(Integer id) {
-        throw new UnsupportedOperationException("SystemLog è append-only: delete non consentita");
+        throw new UnsupportedOperationException("SystemLog Ã¨ append-only: delete non consentita");
     }
 }

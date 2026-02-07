@@ -15,12 +15,10 @@ import com.ispw.view.shared.PrenotazioneViewUtils;
 
 public class CLIPrenotazioneView extends GenericViewCLI implements ViewGestionePrenotazione, NavigableController {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: view CLI prenotazione, usa controller e console view.
     // A2) IO: input console, slot e riepilogo.
-    // ========================
 
     private final CLIGraphicControllerPrenotazione controller;
     private final ConsolePrenotazioneSearchView searchView = new ConsolePrenotazioneSearchView();
@@ -30,12 +28,10 @@ public class CLIPrenotazioneView extends GenericViewCLI implements ViewGestioneP
 
     private int lastCampoId;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) onShow: routing tra ricerca/risultati/riepilogo/pagamento.
     // L2) handle*Payload: gestione step specifici.
-    // ========================
 
     public CLIPrenotazioneView(CLIGraphicControllerPrenotazione controller) {
         this.controller = controller;

@@ -22,9 +22,7 @@ import com.ispw.model.enums.StatoPagamento;
  */
 public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements PagamentoDAO {
 
-    // =====================
     // SQL (adatta a schema)
-    // =====================
     private static final String SQL_FIND_BY_ID =
         "SELECT id_pagamento, id_prenotazione, importo_finale, metodo, stato, data_pagamento " +
         "FROM pagamenti WHERE id_pagamento=?";
@@ -32,7 +30,7 @@ public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements Pag
     private static final String SQL_EXISTS =
         "SELECT 1 FROM pagamenti WHERE id_pagamento=?";
 
-    // INSERT senza id_pagamento: è auto-generato dal DB
+    // INSERT senza id_pagamento: Ã¨ auto-generato dal DB
     private static final String SQL_INSERT =
         "INSERT INTO pagamenti (id_prenotazione, importo_finale, metodo, stato, data_pagamento) " +
         "VALUES (?, ?, ?, ?, ?)";
@@ -44,7 +42,7 @@ public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements Pag
     private static final String SQL_DELETE =
         "DELETE FROM pagamenti WHERE id_pagamento=?";
 
-    // Se possono esistere più pagamenti per una prenotazione, prendo il più recente (ordine deterministico)
+    // Se possono esistere piÃ¹ pagamenti per una prenotazione, prendo il piÃ¹ recente (ordine deterministico)
     private static final String SQL_FIND_BY_PRENOTAZIONE =
         "SELECT id_pagamento, id_prenotazione, importo_finale, metodo, stato, data_pagamento " +
         "FROM pagamenti WHERE id_prenotazione=? " +
@@ -54,9 +52,7 @@ public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements Pag
         super(cf);
     }
 
-    // =====================
     // RowMapper (ResultSet -> Entity)
-    // =====================
     private final RowMapper<Pagamento> mapper = rs -> {
         Pagamento p = new Pagamento();
         p.setIdPagamento(rs.getInt("id_pagamento"));
@@ -83,9 +79,7 @@ public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements Pag
         return p;
     };
 
-    // =====================
     // Metodi base DAO
-    // =====================
     @Override
     public Pagamento load(Integer id) {
         if (id == null) return null;
@@ -121,18 +115,14 @@ public class DbmsPagamentoDAO extends DbmsDAO<Integer, Pagamento> implements Pag
         return p; // crea solo in memoria; persistilo poi con store()
     }
 
-    // =====================
     // Finder specifico
-    // =====================
     @Override
     public Pagamento findByPrenotazione(int idPrenotazione) {
         return queryOne(SQL_FIND_BY_PRENOTAZIONE, ps -> ps.setInt(1, idPrenotazione), mapper)
                .orElse(null);
     }
 
-    // =====================
     // Helper insert/update
-    // =====================
     private void insert(Pagamento p) {
         try (var c = openConnection();
              var ps = c.prepareStatement(SQL_INSERT, java.sql.Statement.RETURN_GENERATED_KEYS)) {

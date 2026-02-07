@@ -16,20 +16,16 @@ import javafx.scene.layout.VBox;
 
 public class GUIPenalitaView extends GenericViewGUI implements ViewGestionePenalita, NavigableController {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: view GUI penalita, usa controller grafico.
     // A2) IO: componenti JavaFX e lista utenti.
-    // ========================
 
     private final GUIGraphicControllerPenalita controller;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) onShow: costruzione UI e wiring eventi.
-    // ========================
 
     public GUIPenalitaView(GUIGraphicControllerPenalita controller) {
         this.controller = controller;
@@ -46,7 +42,7 @@ public class GUIPenalitaView extends GenericViewGUI implements ViewGestionePenal
 
         VBox root = GuiViewUtils.createRoot();
 
-        Label title = new Label("Penalità");
+        Label title = new Label("PenalitÃ ");
         Label error = GuiViewUtils.buildErrorLabel(getLastError());
         Label ok = GuiViewUtils.buildSuccessLabel(getLastSuccess());
 
@@ -66,7 +62,7 @@ public class GUIPenalitaView extends GenericViewGUI implements ViewGestionePenal
         Button lista = new Button("Lista utenti");
         lista.setOnAction(e -> controller.richiediListaUtenti());
 
-        Button applica = new Button("Applica penalità");
+        Button applica = new Button("Applica penalitÃ ");
         applica.setOnAction(e -> controller.applicaPenalita(
             Integer.parseInt(idUtente.getText().trim()),
             Float.parseFloat(importo.getText().trim()),

@@ -16,20 +16,16 @@ import javafx.scene.layout.VBox;
 
 public class GUIRegistrazioneView extends GenericViewGUI implements ViewRegistrazione, NavigableController {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: view GUI registrazione, usa controller grafico.
     // A2) IO: componenti JavaFX e Map di registrazione.
-    // ========================
 
     private final GUIGraphicControllerRegistrazione controller;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) onShow: costruzione UI e submit.
-    // ========================
 
     public GUIRegistrazioneView(GUIGraphicControllerRegistrazione controller) {
         this.controller = controller;

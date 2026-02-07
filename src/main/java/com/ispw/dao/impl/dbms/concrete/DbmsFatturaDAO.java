@@ -38,7 +38,7 @@ public class DbmsFatturaDAO extends DbmsDAO<Integer, Fattura> implements Fattura
     private static final String SQL_DELETE =
             "DELETE FROM " + TBL + " WHERE id_fattura=?";
 
-    // Niente JOIN: ricerca diretta sull’utente
+    // Niente JOIN: ricerca diretta sullâ€™utente
     private static final String SQL_FIND_LAST_BY_UTENTE =
             "SELECT " + COLS + " FROM " + TBL + " WHERE id_utente = ? " +
             "ORDER BY data_emissione DESC, id_fattura DESC LIMIT 1";

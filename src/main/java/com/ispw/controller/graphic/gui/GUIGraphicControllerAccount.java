@@ -13,13 +13,11 @@ import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccount;
 
 public class GUIGraphicControllerAccount extends AbstractGraphicControllerAccount {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: estende AbstractGraphicControllerAccount e usa GraphicControllerNavigation.
     // A2) IO verso GUI/CLI: riceve/ritorna bean (DatiAccountBean, SessioneUtenteBean).
     // A3) Logica delegata: usa LogicControllerGestioneAccount.
-    // ========================
 
     public GUIGraphicControllerAccount(GraphicControllerNavigation navigator) {
         super(navigator);
@@ -63,9 +61,7 @@ public class GUIGraphicControllerAccount extends AbstractGraphicControllerAccoun
         return new LogicControllerGestioneAccount().cambiaPasswordConNotifica(vecchiaPassword, nuovaPassword, sessione);
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi: nessun helper privato.
-    // ========================
 
 }

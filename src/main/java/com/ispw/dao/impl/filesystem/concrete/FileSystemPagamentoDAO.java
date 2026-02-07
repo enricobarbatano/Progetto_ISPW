@@ -34,7 +34,7 @@ public class FileSystemPagamentoDAO extends FileSystemDAO<Integer, Pagamento> im
     @Override
     public void store(Pagamento entity) {
         if (entity == null) {
-            throw new IllegalArgumentException("entity non può essere null");
+            throw new IllegalArgumentException("entity non puÃ² essere null");
         }
         if (entity.getIdPagamento() == 0) {
             final int next = this.cache.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;

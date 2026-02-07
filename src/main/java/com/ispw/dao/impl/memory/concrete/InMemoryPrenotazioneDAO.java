@@ -26,7 +26,7 @@ public class InMemoryPrenotazioneDAO extends InMemoryDAO<Integer, Prenotazione> 
 
     @Override
     protected Integer getId(Prenotazione entity) {
-        // entity espone int → autoboxing verso Integer per la mappa
+        // entity espone int â†’ autoboxing verso Integer per la mappa
         return entity.getIdPrenotazione();
     }
 

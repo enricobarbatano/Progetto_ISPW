@@ -10,13 +10,11 @@ import com.ispw.controller.logic.ctrl.LogicControllerRegistrazione;
 
 public class CLIGraphicControllerRegistrazione extends AbstractGraphicControllerRegistrazione {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: estende AbstractGraphicControllerRegistrazione e usa GraphicControllerNavigation.
     // A2) IO verso GUI/CLI: riceve Map, costruisce bean, naviga su esito.
     // A3) Logica delegata: usa LogicControllerRegistrazione.
-    // ========================
 
     private static final Logger LOGGER = Logger.getLogger(CLIGraphicControllerRegistrazione.class.getName());
     public CLIGraphicControllerRegistrazione(GraphicControllerNavigation navigator) {
@@ -70,12 +68,10 @@ public class CLIGraphicControllerRegistrazione extends AbstractGraphicController
         }
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi:
     // 1) safeTrim(...) - normalizza input string.
     // 2) hasText(...) - verifica stringhe.
-    // ========================
     private String safeTrim(Object value) {
         return value == null ? null : value.toString().trim();
     }

@@ -32,12 +32,10 @@ import com.ispw.view.cli.CLIRegoleView;
 
 public final class CLIFrontendControllerFactory extends FrontendControllerFactory {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: crea controller/view CLI concreti.
     // A2) Stato: mantiene istanze per riuso e routing.
-    // ========================
 
     private CLIGraphicControllerNavigation navigationController;
     private CLIGraphicLoginController loginController;
@@ -221,13 +219,11 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
         return createNavigationController();
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) create*View: crea e memoizza le view CLI.
     // L2) create*Controller: crea e memoizza i controller CLI.
     // L3) registerRoutes: registra route -> view.
-    // ========================
 
     private void registerRoutes() {
         navigationController.registerRoute(createLoginView().getRouteName(), createLoginView());

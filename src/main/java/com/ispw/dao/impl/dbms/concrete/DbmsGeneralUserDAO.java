@@ -62,7 +62,7 @@ public final class DbmsGeneralUserDAO extends DbmsDAO<Integer, GeneralUser> impl
 
     // ======= RowMapper =======
     private static GeneralUser map(ResultSet rs) throws SQLException {
-        final UtenteFinale u = new UtenteFinale(); // GeneralUser è abstract
+        final UtenteFinale u = new UtenteFinale(); // GeneralUser Ã¨ abstract
         u.setIdUtente(rs.getInt(ID_UTENTE));
         u.setNome(rs.getString("nome"));
         u.setCognome(rs.getString("cognome"));
@@ -107,7 +107,7 @@ public final class DbmsGeneralUserDAO extends DbmsDAO<Integer, GeneralUser> impl
 
     @Override
     public void store(GeneralUser entity) {
-        Objects.requireNonNull(entity, "entity non può essere null");
+        Objects.requireNonNull(entity, "entity non puÃ² essere null");
         final int id = entity.getIdUtente();
 
         if (id > 0 && queryExists(SQL_EXISTS, ps -> ps.setInt(1, id))) {

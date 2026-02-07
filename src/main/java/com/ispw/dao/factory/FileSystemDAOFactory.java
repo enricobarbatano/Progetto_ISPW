@@ -27,12 +27,10 @@ import com.ispw.dao.interfaces.UtenteFinaleDAO;
 
 public final class FileSystemDAOFactory extends DAOFactory {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: factory concreta per DAO su file system.
     // A2) Stato: root FS e istanze DAO memoizzate.
-    // ========================
 
     private final Path root = DAOFactory.getFileSystemRootOrThrow();
 
@@ -51,11 +49,9 @@ public final class FileSystemDAOFactory extends DAOFactory {
     private RegolePenalitaDAO regolePenalitaDAO;
     private RegoleTempisticheDAO regoleTempisticheDAO;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) get*DAO: lazy init con root FS.
-    // ========================
 
     @Override
     public synchronized CampoDAO getCampoDAO() {

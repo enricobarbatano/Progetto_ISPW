@@ -10,13 +10,11 @@ import com.ispw.controller.graphic.NavigableController;
 
 public abstract class AbstractGraphicControllerNavigation implements GraphicControllerNavigation {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: usa NavigableController come interfaccia (DIP).
     // A2) IO verso GUI/CLI: routing tramite route e Map params.
     // A3) Persistenza: nessuna.
-    // ========================
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     protected final Map<String, NavigableController> routes = new HashMap<>();
@@ -67,8 +65,6 @@ public abstract class AbstractGraphicControllerNavigation implements GraphicCont
         System.exit(0);
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi: nessun helper privato.
-    // ========================
 }

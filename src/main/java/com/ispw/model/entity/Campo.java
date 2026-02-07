@@ -11,30 +11,26 @@ import java.util.List;
 
 public final class Campo implements Serializable {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: entity campo con prenotazioni associate.
     // A2) IO: stato operativo e disponibilita'.
-    // ========================
 
     private int idCampo;
     private String nome;
     private String tipoSport;
-    private Float costoOrario;       // es. 20.0f = 20€/h
-    private boolean isAttivo;        // se false, non è prenotabile
-    private boolean flagManutenzione;// se true, non è prenotabile
+    private Float costoOrario;       // es. 20.0f = 20â‚¬/h
+    private boolean isAttivo;        // se false, non Ã¨ prenotabile
+    private boolean flagManutenzione;// se true, non Ã¨ prenotabile
 
    
     private final List<Prenotazione> listaPrenotazioni = new ArrayList<>();
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) getters/setters: dati anagrafici campo.
     // L2) isDisponibile/bloccoSlot/sbloccaSlot: gestione disponibilita'.
     // L3) updateStatoOperativo/updateDisponibilitaCampo: stato operativo.
-    // ========================
 
   
     public int getIdCampo() { return idCampo; }
@@ -66,22 +62,22 @@ public final class Campo implements Serializable {
     }
 
     /**
-     * Verifica se il campo è prenotabile nella finestra richiesta.
+     * Verifica se il campo Ã¨ prenotabile nella finestra richiesta.
      * Regole semplici:
-     * 1) Se non è attivo o è in manutenzione -> NON disponibile.
+     * 1) Se non Ã¨ attivo o Ã¨ in manutenzione -> NON disponibile.
      * 2) Se non abbiamo prenotazioni caricate -> non possiamo verificare conflitti, quindi OK.
-     * 3) Altrimenti, controlliamo che l'intervallo non si sovrapponga a prenotazioni già esistenti (stesso giorno).
+     * 3) Altrimenti, controlliamo che l'intervallo non si sovrapponga a prenotazioni giÃ  esistenti (stesso giorno).
      *
      * @param data      giorno richiesto (java.sql.Date)
      * @param oraInizio ora inizio richiesta (java.sql.Time)
-     * @param oraFine   ora fine richiesta (può essere null -> slot "puntuale")
+     * @param oraFine   ora fine richiesta (puÃ² essere null -> slot "puntuale")
      * @return true se disponibile, false altrimenti
      */
     public boolean isDisponibile(Date data, Time oraInizio, Time oraFine) {
         // Stato operativo del campo
         if (!isAttivo || flagManutenzione) return false;
 
-        // Conversione in tipi java.time (più semplici da confrontare)
+        // Conversione in tipi java.time (piÃ¹ semplici da confrontare)
         LocalDate giorno = data.toLocalDate();
         LocalTime start  = oraInizio.toLocalTime();
         LocalTime end    = (oraFine != null ? oraFine.toLocalTime() : start); // se null, uso start (slot istantaneo)

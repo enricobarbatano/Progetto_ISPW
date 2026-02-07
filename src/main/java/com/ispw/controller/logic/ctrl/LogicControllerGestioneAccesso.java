@@ -19,13 +19,11 @@ import com.ispw.model.enums.TipoOperazione;
 
 public class LogicControllerGestioneAccesso {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: usa interfacce DAO via DAOFactory (DIP).
     // A2) IO verso GUI/CLI: riceve DatiLoginBean, ritorna SessioneUtenteBean.
     // A3) Persistenza: usa DAO per utenti e log.
-    // ========================
 
     /**
      * Verifica credenziali e, se valide, costruisce una SessioneUtenteBean (stateless).
@@ -53,10 +51,10 @@ public class LogicControllerGestioneAccesso {
 
         // Consentito solo se attivo
         if (user.getStatoAccount() != StatoAccount.ATTIVO) {
-            throw new IllegalStateException("Non puoi accedere perchè sei sospeso");
+            throw new IllegalStateException("Non puoi accedere perchÃ¨ sei sospeso");
         }
 
-        // Costruzione UtenteBean (cognome assente nel modello → stringa vuota)
+        // Costruzione UtenteBean (cognome assente nel modello â†’ stringa vuota)
         final UtenteBean ub = new UtenteBean(
                 user.getNome(),
                 user.getCognome(),
@@ -73,8 +71,8 @@ public class LogicControllerGestioneAccesso {
 
     /**
      * Salva il log di accesso per l'utente in sessione.
-     * Non modifica stato, nessun I/O esterno reale → stateless friendly.
-     * Se l'utente non è risolvibile via email, la funzione è no-op.
+     * Non modifica stato, nessun I/O esterno reale â†’ stateless friendly.
+     * Se l'utente non Ã¨ risolvibile via email, la funzione Ã¨ no-op.
      */
     public void saveLog(SessioneUtenteBean sessione) {
         if (sessione == null || sessione.getUtente() == null) return;
@@ -100,14 +98,12 @@ public class LogicControllerGestioneAccesso {
         log().fine(() -> "[LOGIN-LOG] Log di accesso salvato per utenteId=" + user.getIdUtente());
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi:
     // 1) log() - logger on-demand.
     // 2) userDAO() - accesso DAO.
-    // ========================
 
-    // Logger on-demand (niente campo statico) — SonarCloud: soppressione locale S1312
+    // Logger on-demand (niente campo statico) â€” SonarCloud: soppressione locale S1312
     @SuppressWarnings("java:S1312")
     private Logger log() {
         return Logger.getLogger(getClass().getName());

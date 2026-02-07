@@ -19,13 +19,11 @@ import com.ispw.controller.logic.ctrl.LogicControllerConfiguraRegole;
 
 public abstract class AbstractGraphicControllerRegole implements GraphicControllerRegole {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: implementa GraphicControllerRegole (interfaccia) e usa GraphicControllerNavigation.
     // A2) IO verso GUI/CLI: riceve/ritorna bean (CampiBean, RegolaCampoBean, TempisticheBean, PenalitaBean).
     // A3) Logica delegata: usa LogicControllerConfiguraRegole.
-    // ========================
 
     protected final GraphicControllerNavigation navigator;
 
@@ -133,7 +131,6 @@ public abstract class AbstractGraphicControllerRegole implements GraphicControll
         goToHome();
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi:
     // 1) notifyRegoleError(...) - notifica errore e naviga.
@@ -144,7 +141,6 @@ public abstract class AbstractGraphicControllerRegole implements GraphicControll
     // 6) formatCampi(...) - formatta lista campi.
     // 7) buildTempisticheBean(...) - costruisce bean tempistiche.
     // 8) buildPenalitaBean(...) - costruisce bean penalita.
-    // ========================
     private void notifyRegoleError(String message) {
         GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_REGOLE,
             GraphicControllerUtils.PREFIX_REGOLE, message);

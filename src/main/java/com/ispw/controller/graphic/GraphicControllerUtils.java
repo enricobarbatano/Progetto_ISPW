@@ -5,12 +5,10 @@ import java.util.logging.Logger;
 
 public final class GraphicControllerUtils {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: utility del layer graphic (stateless).
     // A2) IO verso GUI/CLI: chiavi standard e routing error/successo.
-    // ========================
 
     public static final String KEY_ERROR = "error";
     public static final String KEY_MESSAGE = "message";
@@ -69,7 +67,7 @@ public final class GraphicControllerUtils {
     public static final String MSG_SESSIONE_UTENTE_MANCANTE = "Sessione utente mancante";
     public static final String MSG_ID_UTENTE_NON_VALIDO = "Id utente non valido";
     public static final String MSG_EMAIL_UTENTE_NON_VALIDA = "Email utente non valida";
-    public static final String MSG_DATI_PENALITA_NON_VALIDI = "Dati penalità non validi";
+    public static final String MSG_DATI_PENALITA_NON_VALIDI = "Dati penalitÃ  non validi";
     public static final String MSG_OPERAZIONE_NON_RIUSCITA = "Operazione non riuscita";
     public static final String MSG_IMPOSSIBILE_RECUPERARE_DATI_ACCOUNT = "Impossibile recuperare dati account";
     public static final String MSG_DATI_ACCOUNT_MANCANTI = "Dati account mancanti";
@@ -79,14 +77,14 @@ public final class GraphicControllerUtils {
     public static final String MSG_DISDETTA_NON_RIUSCITA = "Disdetta non riuscita";
     public static final String MSG_PARAMETRI_REGOLA_CAMPO_MANCANTI = "Parametri regola campo mancanti";
     public static final String MSG_PARAMETRI_TEMPISTICHE_MANCANTI = "Parametri tempistiche mancanti";
-    public static final String MSG_PARAMETRI_PENALITA_MANCANTI = "Parametri penalità mancanti";
+    public static final String MSG_PARAMETRI_PENALITA_MANCANTI = "Parametri penalitÃ  mancanti";
     public static final String MSG_ID_CAMPO_NON_VALIDO = "Id campo non valido";
     public static final String MSG_CREDENZIALI_MANCANTI = "Credenziali mancanti";
     public static final String MSG_CREDENZIALI_NON_VALIDE = "Credenziali non valide";
     public static final String MSG_DATI_REGISTRAZIONE_MANCANTI = "Dati registrazione mancanti";
     public static final String MSG_CAMPI_OBBLIGATORI_MANCANTI = "Compila tutti i campi obbligatori";
     public static final String MSG_REGISTRAZIONE_NON_RIUSCITA = "Registrazione non riuscita";
-    public static final String MSG_PARAMETRI_RICERCA_DISPONIBILITA_NULLI = "Parametri ricerca disponibilità nulli";
+    public static final String MSG_PARAMETRI_RICERCA_DISPONIBILITA_NULLI = "Parametri ricerca disponibilitÃ  nulli";
     public static final String MSG_DATI_PRENOTAZIONE_NULLI = "Dati prenotazione nulli";
     public static final String MSG_SESSIONE_MANCANTE_PRENOTAZIONE = "Sessione utente mancante per prenotazione";
     public static final String MSG_PRENOTAZIONE_NON_CREATA = "Prenotazione non creata";
@@ -97,12 +95,10 @@ public final class GraphicControllerUtils {
     private GraphicControllerUtils() {
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) notifyError: logga e naviga alla route con errore.
     // L2) handleOnShow: interpreta parametri e logga messaggi.
-    // ========================
 
     public static void notifyError(Logger log,
                                    GraphicControllerNavigation navigator,

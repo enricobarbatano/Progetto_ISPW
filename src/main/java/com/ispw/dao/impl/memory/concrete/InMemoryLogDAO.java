@@ -22,7 +22,7 @@ public final class InMemoryLogDAO extends InMemoryDAO<Integer, SystemLog> implem
     private static final int MIN_LIMIT = 1;
 
     /**
-     * Ordina per timestamp DESC (null last) e, a parità, per id DESC.
+     * Ordina per timestamp DESC (null last) e, a paritÃ , per id DESC.
      */
     private static final Comparator<SystemLog> ORDER_BY_TS_DESC_ID_DESC =
             Comparator.comparing(SystemLog::getTimestamp, Comparator.nullsLast(Comparator.naturalOrder()))
@@ -40,7 +40,7 @@ public final class InMemoryLogDAO extends InMemoryDAO<Integer, SystemLog> implem
 
     @Override
     public void append(SystemLog log) {
-        Objects.requireNonNull(log, "log non può essere null");
+        Objects.requireNonNull(log, "log non puÃ² essere null");
         if (log.getTimestamp() == null) {
             log.setTimestamp(LocalDateTime.now());
         }
@@ -77,6 +77,6 @@ public final class InMemoryLogDAO extends InMemoryDAO<Integer, SystemLog> implem
     /** Append-only: vietato cancellare log. */
     @Override
     public void delete(Integer id) {
-        throw new UnsupportedOperationException("SystemLog è append-only: delete non consentita");
+        throw new UnsupportedOperationException("SystemLog Ã¨ append-only: delete non consentita");
     }
 }

@@ -11,23 +11,19 @@ import com.ispw.view.interfaces.ViewGestionePenalita;
 
 public class CLIPenalitaView extends GenericViewCLI implements ViewGestionePenalita, NavigableController {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: view CLI penalita, usa controller grafico.
     // A2) IO: input console e lista utenti.
-    // ========================
     private final Scanner in = new Scanner(System.in);
     private final CLIGraphicControllerPenalita controller;
 
     private Integer lastId;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) onShow: menu e dispatch.
     // L2) handleApplicaPenalita/readIdUtente: input guidato.
-    // ========================
 
     public CLIPenalitaView(CLIGraphicControllerPenalita controller) {
         this.controller = controller;
@@ -61,7 +57,7 @@ public class CLIPenalitaView extends GenericViewCLI implements ViewGestionePenal
         }
 
         System.out.println("1) Lista utenti");
-        System.out.println("2) Applica penalità");
+        System.out.println("2) Applica penalitÃ ");
         System.out.println("0) Home");
         System.out.print("Scelta: ");
         String scelta = in.nextLine().trim();

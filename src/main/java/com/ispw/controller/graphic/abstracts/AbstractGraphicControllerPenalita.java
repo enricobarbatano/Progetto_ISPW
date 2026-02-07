@@ -17,13 +17,11 @@ import com.ispw.controller.logic.ctrl.LogicControllerApplicaPenalita;
 
 public abstract class AbstractGraphicControllerPenalita implements GraphicControllerPenalita {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: implementa GraphicControllerPenalita (interfaccia) e usa GraphicControllerNavigation.
     // A2) IO verso GUI/CLI: riceve/ritorna bean (DatiPenalitaBean, UtentiBean) e Map.
     // A3) Logica delegata: usa LogicControllerApplicaPenalita.
-    // ========================
 
     protected final GraphicControllerNavigation navigator;
 
@@ -80,7 +78,13 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
         try {
             DatiPenalitaBean dati = buildPenalitaBean(idUtente, importo, motivazione);
 
-            EsitoOperazioneBean esito = logicController().applicaSanzione(dati);
+            EsitoOperazioneBean esito = logicController().applicaSanzione(
+                dati,
+                null,
+                null,
+                null,
+                null,
+                null);
 
             if (esito == null || !esito.isSuccesso()) {
                 notifyPenalitaError(esito != null ? esito.getMessaggio()
@@ -93,7 +97,7 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
                     Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
             }
         } catch (Exception e) {
-            log().log(Level.SEVERE, "Errore applicazione penalità", e);
+            log().log(Level.SEVERE, "Errore applicazione penalitÃ ", e);
         }
     }
 
@@ -102,7 +106,6 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
         goToHome();
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi:
     // 1) notifyPenalitaError(...) - notifica errore e naviga.
@@ -112,7 +115,6 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
     // 5) buildPenalitaBean(...) - costruisce bean penalita.
     // 6) formatUtenti(...) - formatta lista utenti.
     // 7) formatUtente(...) - formatta singolo utente.
-    // ========================
     private void notifyPenalitaError(String message) {
         GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PENALITA,
             GraphicControllerUtils.PREFIX_PENALITA, message);

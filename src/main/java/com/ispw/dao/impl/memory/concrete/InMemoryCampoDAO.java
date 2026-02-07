@@ -29,7 +29,7 @@ public final class InMemoryCampoDAO extends InMemoryDAO<Integer, Campo> implemen
 
     @Override
     public List<Campo> findAll() {
-        // snapshotValues() è già thread-safe; restituiamo una copia difensiva
+        // snapshotValues() Ã¨ giÃ  thread-safe; restituiamo una copia difensiva
         List<Campo> all = new ArrayList<>(snapshotValues());
         all.sort(Comparator.comparingInt(Campo::getIdCampo));
         return all;

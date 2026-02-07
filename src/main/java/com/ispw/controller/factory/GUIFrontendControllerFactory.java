@@ -33,12 +33,10 @@ import com.ispw.view.gui.GuiLauncher;
 
 public final class GUIFrontendControllerFactory extends FrontendControllerFactory {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: crea controller/view GUI concreti.
     // A2) Stato: mantiene istanze per riuso e routing.
-    // ========================
 
     private static final Logger logger = Logger.getLogger(GUIFrontendControllerFactory.class.getName());
     private GUIGraphicControllerNavigation navigationController;
@@ -223,13 +221,11 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
         return createNavigationController();
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) create*View: crea e memoizza le view GUI.
     // L2) create*Controller: crea e memoizza i controller GUI.
     // L3) registerRoutes: registra route -> view.
-    // ========================
 
     private void registerRoutes() {
         navigationController.registerRoute(createLoginView().getRouteName(), createLoginView());

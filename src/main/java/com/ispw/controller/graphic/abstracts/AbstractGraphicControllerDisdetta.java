@@ -17,13 +17,11 @@ import com.ispw.controller.logic.ctrl.LogicControllerDisdettaPrenotazione;
 
 public abstract class AbstractGraphicControllerDisdetta implements GraphicControllerDisdetta {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: implementa GraphicControllerDisdetta (interfaccia) e usa GraphicControllerNavigation.
     // A2) IO verso GUI/CLI: riceve/ritorna bean (SessioneUtenteBean, RiepilogoPrenotazioneBean, EsitoDisdettaBean).
     // A3) Logica delegata: usa LogicControllerDisdettaPrenotazione.
-    // ========================
 
     protected final GraphicControllerNavigation navigator;
 
@@ -140,13 +138,11 @@ public abstract class AbstractGraphicControllerDisdetta implements GraphicContro
         goToHome();
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi:
     // 1) notifyDisdettaError(...) - notifica errore e naviga.
     // 2) isSessioneNonValida(...) - valida sessione.
     // 3) isIdNonValido(...) - valida id prenotazione.
-    // ========================
     private void notifyDisdettaError(String message) {
         GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_DISDETTA,
             GraphicControllerUtils.PREFIX_DISDETTA, message);

@@ -16,21 +16,17 @@ import javafx.scene.layout.VBox;
 
 public class GUIAccountView extends GenericViewGUI implements ViewGestioneAccount, NavigableController {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: view GUI account, usa controller grafico.
     // A2) IO: componenti JavaFX e params.
-    // ========================
 
     private final GUIGraphicControllerAccount controller;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) onShow: costruzione UI e wiring eventi.
     // L2) setup/load/build*: supporto campi e payload.
-    // ========================
 
     public GUIAccountView(GUIGraphicControllerAccount controller) {
         this.controller = controller;

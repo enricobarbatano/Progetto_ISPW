@@ -4,22 +4,18 @@ import java.util.Scanner;
 
 public class ConsoleLoginView {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: console view login.
     // A2) IO: input/output su standard input/output.
-    // ========================
 
     private final Scanner in = new Scanner(System.in);
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) render: stampa menu.
     // L2) readChoice/readEmail/readPassword: input utente.
     // L3) showError/showWelcome: messaggi.
-    // ========================
     public void render() {
         System.out.println("\n=== LOGIN ===");
         System.out.println("1) Login");

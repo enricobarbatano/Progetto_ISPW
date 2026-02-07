@@ -78,7 +78,7 @@ public final class DbmsLogDAO extends DbmsDAO<Integer, SystemLog> implements Log
     @Override
     public void append(SystemLog log) {
         if (log == null) {
-            throw new IllegalArgumentException("log non può essere null");
+            throw new IllegalArgumentException("log non puÃ² essere null");
         }
         final Timestamp ts = Timestamp.valueOf(
                 log.getTimestamp() != null ? log.getTimestamp() : LocalDateTime.now());
@@ -129,7 +129,7 @@ public final class DbmsLogDAO extends DbmsDAO<Integer, SystemLog> implements Log
     /** Append-only: delete vietata. */
     @Override
     public void delete(Integer id) {
-        throw new UnsupportedOperationException("SystemLog è append-only: delete non consentita");
+        throw new UnsupportedOperationException("SystemLog Ã¨ append-only: delete non consentita");
     }
 
     @Override

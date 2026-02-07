@@ -25,12 +25,10 @@ import com.ispw.dao.interfaces.UtenteFinaleDAO;
 
 public final class MemoryDAOFactory extends DAOFactory {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: factory concreta per DAO in memoria.
     // A2) Stato: istanze DAO memoizzate.
-    // ========================
 
     private CampoDAO campoDAO;
     private FatturaDAO fatturaDAO;
@@ -47,11 +45,9 @@ public final class MemoryDAOFactory extends DAOFactory {
     private RegolePenalitaDAO regolePenalitaDAO;
     private RegoleTempisticheDAO regoleTempisticheDAO;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) get*DAO: lazy init delle implementazioni in-memory.
-    // ========================
 
     @Override
     public synchronized CampoDAO getCampoDAO() {

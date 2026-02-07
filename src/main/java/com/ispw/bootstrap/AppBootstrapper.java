@@ -20,7 +20,7 @@ public final class AppBootstrapper {
         // 2) Config DBMS (solo se DBMS)
         if (config.persistency() == PersistencyProvider.DBMS) {
             DbmsConnectionFactory.init(
-                // NOTA: niente HTML entities nell’URL
+                // NOTA: niente HTML entities nellâ€™URL
                 "jdbc:mysql://localhost:3306/centro_sportivo?useSSL=false&serverTimezone=Europe/Rome",
                 "ispw_user",
                 "ispw_user"

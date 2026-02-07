@@ -26,12 +26,10 @@ import com.ispw.dao.interfaces.UtenteFinaleDAO;
 
 public final class DbmsDAOFactory extends DAOFactory {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: factory concreta per DAO DBMS.
     // A2) Stato: connection factory e istanze DAO memoizzate.
-    // ========================
 
     private final DbmsConnectionFactory cf = DbmsConnectionFactory.getInstance();
 
@@ -50,11 +48,9 @@ public final class DbmsDAOFactory extends DAOFactory {
     private RegolePenalitaDAO regolePenalitaDAO;
     private RegoleTempisticheDAO regoleTempisticheDAO;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) get*DAO: lazy init con connection factory.
-    // ========================
 
     @Override
     public synchronized CampoDAO getCampoDAO() {

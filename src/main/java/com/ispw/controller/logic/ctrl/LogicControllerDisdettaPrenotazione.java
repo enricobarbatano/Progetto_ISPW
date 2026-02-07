@@ -38,25 +38,19 @@ import com.ispw.model.enums.StatoPrenotazione;
  */
 public class LogicControllerDisdettaPrenotazione {
 
-    // ========================
     // Costanti messaggi (no magic strings)
-    // ========================
     private static final String MSG_INPUT_NON_VALIDO   = "Input non valido";
     private static final String MSG_UTENTE_INESISTENTE = "Utente inesistente";
     private static final String MSG_PREN_INESISTENTE   = "Prenotazione inesistente";
-    private static final String MSG_GIA_ANNULLATA      = "Prenotazione già annullata";
+    private static final String MSG_GIA_ANNULLATA      = "Prenotazione giÃ  annullata";
     private static final String MSG_DISDETTA_OK        = "Disdetta eseguita";
     private static final String MSG_DISDETTA_KO        = "Disdetta non consentita";
 
-    // ========================
-    // Logger on-demand (niente campo statico) – S1312
-    // ========================
+    // Logger on-demand (niente campo statico) â€“ S1312
     @SuppressWarnings("java:S1312")
     private Logger log() { return Logger.getLogger(getClass().getName()); }
 
-    // ========================
     // DAO (factory; nessun accoppiamento a concreti)
-    // ========================
     private PrenotazioneDAO      prenotazioneDAO()     { return DAOFactory.getInstance().getPrenotazioneDAO(); }
     private GeneralUserDAO       userDAO()             { return DAOFactory.getInstance().getGeneralUserDAO(); }
     private PagamentoDAO         pagamentoDAO()        { return DAOFactory.getInstance().getPagamentoDAO(); }
@@ -64,17 +58,13 @@ public class LogicControllerDisdettaPrenotazione {
     private RegoleTempisticheDAO tempisticheDAO()      { return DAOFactory.getInstance().getRegoleTempisticheDAO(); }
     private RegolePenalitaDAO    penalitaDAO()         { return DAOFactory.getInstance().getRegolePenalitaDAO(); }
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: usa interfacce Gestione* via parametro (DIP).
     // A2) IO verso GUI/CLI: riceve/ritorna bean (EsitoDisdettaBean, EsitoOperazioneBean, RiepilogoPrenotazioneBean).
     // A3) Persistenza: usa DAO via DAOFactory.
-    // ========================
-    // =====================================================================================
     // + ottieniPrenotazioniCancellabili(UtenteBean): List<RiepilogoPrenotazioneBean>
-    //   - Restituisce prenotazioni future e non ANNULLATE dell’utente (riepilogo con importo pagato se disponibile).
-    // =====================================================================================
+    //   - Restituisce prenotazioni future e non ANNULLATE dellâ€™utente (riepilogo con importo pagato se disponibile).
     public List<RiepilogoPrenotazioneBean> ottieniPrenotazioniCancellabili(UtenteBean utente) {
         if (utente == null || isBlank(utente.getEmail())) return List.of();
 
@@ -105,19 +95,15 @@ public class LogicControllerDisdettaPrenotazione {
         return out;
     }
 
-    // =====================================================================================
     // + anteprimaDisdetta(int, SessioneUtenteBean): EsitoDisdettaBean
     //   - Wrapper della validazione (possibile + penale stimata).
-    // =====================================================================================
     public EsitoDisdettaBean anteprimaDisdetta(int idPrenotazione, SessioneUtenteBean sessione) {
         return validaDisdetta(idPrenotazione, sessione);
     }
 
-    // =====================================================================================
     // + eseguiAnnullamento(int, SessioneUtenteBean): EsitoOperazioneBean
-    //   - Esegue il flusso: valida → (eventuale rimborso) → update stato → libera slot → notifica → log.
+    //   - Esegue il flusso: valida â†’ (eventuale rimborso) â†’ update stato â†’ libera slot â†’ notifica â†’ log.
     //   - DIP via parametri per evitare accoppiamenti e favorire i test.
-    // =====================================================================================
     public EsitoOperazioneBean eseguiAnnullamento(
             int idPrenotazione,
             SessioneUtenteBean sessione,
@@ -168,10 +154,8 @@ public class LogicControllerDisdettaPrenotazione {
                 new LogicControllerGestoreDisponibilita());
     }
 
-    // =====================================================================================
     // - validaDisdetta(int, SessioneUtenteBean): EsitoDisdettaBean
-    //   - Titolarità, stato e finestra temporale; calcolo penale da regole singleton.
-    // =====================================================================================
+    //   - TitolaritÃ , stato e finestra temporale; calcolo penale da regole singleton.
     EsitoDisdettaBean validaDisdetta(int idPrenotazione, SessioneUtenteBean sessione) {
         EsitoDisdettaBean out = new EsitoDisdettaBean();
 
@@ -217,10 +201,8 @@ public class LogicControllerDisdettaPrenotazione {
         return out;
     }
 
-    // =====================================================================================
     // - calcolaPenale(Prenotazione, RegoleTempistiche, RegolePenalita): float
     //   - Se il preavviso residuo >= minimo, penale 0; altrimenti penale fissa da regole.
-    // =====================================================================================
     float calcolaPenale(Prenotazione p, RegoleTempistiche rt, RegolePenalita rp) {
         if (p == null) return 0f;
 
@@ -240,9 +222,7 @@ public class LogicControllerDisdettaPrenotazione {
         return Math.max(0f, penale);
     }
 
-    // =====================================================================================
     // - liberaRisorsa(int): void   (DIP: riceve il collaboratore in input)
-    // =====================================================================================
     void liberaRisorsa(int idPrenotazione, GestioneDisponibilitaDisdetta dispCtrl) {
         if (dispCtrl == null) return;
         try {
@@ -282,16 +262,15 @@ public class LogicControllerDisdettaPrenotazione {
                               float penale) {
         try {
             noti.inviaConfermaCancellazione(sessione.getUtente(),
-                    "Prenotazione #" + idPrenotazione + " annullata (penale " + penale + "€)");
+                    "Prenotazione #" + idPrenotazione + " annullata (penale " + penale + "â‚¬)");
         } catch (RuntimeException ex) {
             // best-effort
             log().log(Level.FINE, "Notifica disdetta fallita: {0}", new Object[]{ex.getMessage()});
         }
 
-        appendLogSafe(idUtente, "DISDETTA_PRENOTAZIONE #" + idPrenotazione + " - penale " + penale + "€");
+        appendLogSafe(idUtente, "DISDETTA_PRENOTAZIONE #" + idPrenotazione + " - penale " + penale + "â‚¬");
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi:
     // 1) isCancellablePrenotazione(...) - verifica prenotazione cancellabile.
@@ -299,9 +278,8 @@ public class LogicControllerDisdettaPrenotazione {
     // 3) normalizeEmail(...) - normalizza email.
     // 4) esito(...) - costruisce esito operazione.
     // 5) appendLogSafe(...) - log best-effort su LogDAO.
-    // ========================
     /**
-     * Verifica se una prenotazione è cancellabile (futura e non annullata).
+     * Verifica se una prenotazione Ã¨ cancellabile (futura e non annullata).
      */
     private boolean isCancellablePrenotazione(Prenotazione p, LocalDateTime now) {
         if (p == null) return false;

@@ -21,13 +21,11 @@ import com.ispw.model.entity.Prenotazione;
 public class LogicControllerGestioneFattura
         implements GestioneFatturaPrenotazione, GestioneFatturaPenalita, GestioneFatturaRimborso {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: implementa le interfacce GestioneFattura* (DIP).
     // A2) IO verso GUI/CLI: riceve DatiFatturaBean, ritorna Fattura.
     // A3) Persistenza: usa DAO via DAOFactory.
-    // ========================
 
     /** DAO on-demand (nessun campo, nessuna dipendenza da concreti). */
     private FatturaDAO fatturaDAO() {
@@ -82,13 +80,11 @@ public class LogicControllerGestioneFattura
         return f;
     }
 
-    // ===============================================================
-    //  FATTURA PENALITÀ
-    // ===============================================================
+    //  FATTURA PENALITÃ€
 
     /**
-     * Genera una fattura per penalità (convenzione: ref prenotazione = -idPenalita).
-     * NB: nome del metodo SENZA accento, come nell’interfaccia.
+     * Genera una fattura per penalitÃ  (convenzione: ref prenotazione = -idPenalita).
+     * NB: nome del metodo SENZA accento, come nellâ€™interfaccia.
      */
     @Override
     public Fattura generaFatturaPenalita(DatiFatturaBean dati, int idPenalita) {
@@ -123,9 +119,7 @@ public class LogicControllerGestioneFattura
         return f;
     }
 
-    // ===============================================================
     //  NOTA DI CREDITO (RIMBORSO)
-    // ===============================================================
 
     /** Emette una nota di credito per la prenotazione indicata (id int, come da interfaccia). */
     @Override
@@ -144,7 +138,7 @@ public class LogicControllerGestioneFattura
         Fattura nc = new Fattura();
         nc.setIdPrenotazione(idPrenotazione);
         nc.setIdUtente(p.getIdUtente());
-        // Il CF può essere popolato da un orchestratore principale, se necessario.
+        // Il CF puÃ² essere popolato da un orchestratore principale, se necessario.
         nc.setDataEmissione(oggi);
         nc.setLinkPdf(buildPdfLink("NC", idPrenotazione, oggi));
 
@@ -153,7 +147,6 @@ public class LogicControllerGestioneFattura
                 new Object[]{idPrenotazione, nc.getLinkPdf()});
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi:
     // 1) isValidDati(...) - valida dati fattura.
@@ -162,7 +155,6 @@ public class LogicControllerGestioneFattura
     // 4) buildPdfLink(...) - crea link pdf fittizio.
     // 5) resolveIdUtente(...) - risolve id utente da dati.
     // 6) firstNonBlank(...) - primo valore non vuoto.
-    // ========================
 
     /** Validazione "scolastica": bean non nullo e CF presente. */
     private boolean isValidDati(DatiFatturaBean dati) {

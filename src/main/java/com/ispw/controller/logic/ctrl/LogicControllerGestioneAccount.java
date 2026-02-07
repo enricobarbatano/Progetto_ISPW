@@ -30,34 +30,26 @@ import com.ispw.model.enums.TipoOperazione;
  */
 public class LogicControllerGestioneAccount {
 
-    // ========================
     // Messaggi centralizzati
-    // ========================
     private static final String MSG_SESSIONE_KO       = "Sessione non valida";
     private static final String MSG_UTENTE_NOT_FOUND  = "Utente non trovato";
     private static final String MSG_DATI_KO           = "Dati non validi";
-    private static final String MSG_EMAIL_DUP         = "Email già in uso";
+    private static final String MSG_EMAIL_DUP         = "Email giÃ  in uso";
     private static final String MSG_UPDATE_OK         = "Dati account aggiornati";
     private static final String MSG_PWD_KO            = "Password non valida";
     private static final String MSG_PWD_OLD_WRONG     = "Vecchia password errata";
     private static final String MSG_PWD_OK            = "Password aggiornata";
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: usa interfaccia GestioneNotificaGestioneAccount via parametro (DIP).
     // A2) IO verso GUI/CLI: riceve/ritorna bean (DatiAccountBean, SessioneUtenteBean, LogsBean).
     // A3) Persistenza: usa DAO via DAOFactory.
-    // ========================
-    // ========================
     // Logger on-demand (S1312)
-    // ========================
     @SuppressWarnings("java:S1312")
     private Logger log() { return Logger.getLogger(getClass().getName()); }
 
-    // ========================
     // DAO accessors (no concreti)
-    // ========================
     private GeneralUserDAO userDAO() {
         return DAOFactory.getInstance().getGeneralUserDAO();
     }
@@ -65,9 +57,7 @@ public class LogicControllerGestioneAccount {
         return DAOFactory.getInstance().getLogDAO();
     }
 
-    // =====================================================================================
     // 0) Log di sistema (gestore)
-    // =====================================================================================
     public LogsBean listaUltimiLog(int limit) {
         int safeLimit = limit > 0 ? limit : 20;
         LogsBean out = new LogsBean();
@@ -89,9 +79,7 @@ public class LogicControllerGestioneAccount {
         return bean;
     }
 
-    // =====================================================================================
     // 1) Recupera informazioni account
-    // =====================================================================================
     /** Ritorna i dati account dell'utente legato alla sessione; null se sessione/utente/email non validi o utente assente. */
     public DatiAccountBean recuperaInformazioniAccount(SessioneUtenteBean sessione) {
         if (sessione == null || sessione.getUtente() == null || isBlank(sessione.getUtente().getEmail())) {
@@ -106,19 +94,17 @@ public class LogicControllerGestioneAccount {
         out.setNome(u.getNome());
         out.setCognome(u.getCognome());
         out.setEmail(u.getEmail());
-        // Nota: GeneralUser non espone telefono/indirizzo → lasciamo null
+        // Nota: GeneralUser non espone telefono/indirizzo â†’ lasciamo null
         return out;
     }
 
-    // =====================================================================================
     // 2) Aggiorna dati account
-    // =====================================================================================
     /** Versione con notifica interna (controller secondario creato internamente). */
     public EsitoOperazioneBean aggiornaDatiAccountConNotifica(DatiAccountBean nuovidati) {
         return aggiornaDatiAccount(nuovidati, new LogicControllerGestioneNotifica());
     }
 
-    /** Firma essenziale: aggiorna nome/email (telefono/indirizzo non gestiti perché assenti in GeneralUser). */
+    /** Firma essenziale: aggiorna nome/email (telefono/indirizzo non gestiti perchÃ© assenti in GeneralUser). */
     public EsitoOperazioneBean aggiornaDatiAccount(DatiAccountBean nuovidati) {
         if (!isValid(nuovidati)) {
             return esito(false, MSG_DATI_KO);
@@ -151,7 +137,7 @@ public class LogicControllerGestioneAccount {
             u.setCognome(nuovidati.getCognome().trim());
         }
 
-        // Telefono/Indirizzo NON presenti su GeneralUser → ignorati (non fallire)
+        // Telefono/Indirizzo NON presenti su GeneralUser â†’ ignorati (non fallire)
         userDAO().store(u);
         appendLogSafe(u.getIdUtente(), "[ACCOUNT] Aggiornati dati account",
             TipoOperazione.AGGIORNAMENTO_DATI_PERSONALI);
@@ -177,9 +163,7 @@ public class LogicControllerGestioneAccount {
         return esito;
     }
 
-    // =====================================================================================
     // 3) Cambia password
-    // =====================================================================================
     /** Versione con notifica interna (controller secondario creato internamente). */
     public EsitoOperazioneBean cambiaPasswordConNotifica(String vecchiaPwd, String nuovaPwd, SessioneUtenteBean sessione) {
         return cambiaPassword(vecchiaPwd, nuovaPwd, sessione, new LogicControllerGestioneNotifica());
@@ -232,9 +216,7 @@ public class LogicControllerGestioneAccount {
         return esito;
     }
 
-    // =====================================================================================
     // 4) Conferma modifica account (es. verifica via link email)
-    // =====================================================================================
     /** Best-effort: porta lo stato a ATTIVO e logga; non lancia eccezioni al chiamante. */
     public void confermaModificaAccount(UtenteBean utente) {
         if (utente == null || isBlank(utente.getEmail())) return;
@@ -254,7 +236,6 @@ public class LogicControllerGestioneAccount {
             TipoOperazione.ACCOUNT_ATTIVATO);
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi:
     // 1) isBlank(...) - verifica stringhe vuote.
@@ -262,7 +243,6 @@ public class LogicControllerGestioneAccount {
     // 3) isValid(DatiAccountBean) - valida input account.
     // 4) esito(...) - costruisce l'esito operazione.
     // 5) appendLogSafe(...) - log best-effort su LogDAO.
-    // ========================
     private static boolean isBlank(String s) {
         return s == null || s.trim().isEmpty();
     }

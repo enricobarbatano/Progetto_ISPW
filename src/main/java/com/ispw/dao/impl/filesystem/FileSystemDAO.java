@@ -23,12 +23,10 @@ import com.ispw.dao.interfaces.DAO;
 
 public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: base DAO file system con codec.
     // A2) IO: cache in memoria + persistenza su file.
-    // ========================
 
     protected final Map<I, E> cache = new ConcurrentHashMap<>();
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
@@ -51,13 +49,11 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
 
     protected abstract I getId(E entity);
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) loadFromDisk/flushToDisk: sincronizzazione su file.
     // L2) CRUD base: load/store/delete/exists/create.
     // L3) FileCodec: strategia serializzazione.
-    // ========================
 
     private void loadFromDisk() {
         lock.writeLock().lock();
@@ -136,7 +132,7 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
 
     @Override
     public E create(I id) {
-        // in FS di solito non si “crea” senza dati, ma puoi override nei concreti
+        // in FS di solito non si â€œcreaâ€ senza dati, ma puoi override nei concreti
         return null;
     }
 

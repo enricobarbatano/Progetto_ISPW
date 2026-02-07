@@ -22,17 +22,15 @@ import com.ispw.model.enums.TipoOperazione;
 
 public class LogicControllerRegistrazione {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: usa interfaccia GestioneNotificaRegistrazione via parametro (DIP).
     // A2) IO verso GUI/CLI: riceve DatiRegistrazioneBean, ritorna EsitoOperazioneBean/UtenteBean.
     // A3) Persistenza: usa DAO via DAOFactory.
-    // ========================
 
     /**
      * Registra un nuovo utente in stato DA_CONFERMARE e invia la richiesta di conferma registrazione.
-     * La dipendenza dal controller di notifica è passata via parametro (controller stateless).
+     * La dipendenza dal controller di notifica Ã¨ passata via parametro (controller stateless).
      */
     public EsitoOperazioneBean registraNuovoUtente(DatiRegistrazioneBean datiInput) {
         return registraNuovoUtente(datiInput, new LogicControllerGestioneNotifica());
@@ -50,17 +48,17 @@ public class LogicControllerRegistrazione {
             return esito;
         }
 
-        // 1) Unicità email via DAO (no SQL qui)
+        // 1) UnicitÃ  email via DAO (no SQL qui)
         final GeneralUserDAO userDAO = generalUserDAO();
         final GeneralUser existing = userDAO.findByEmail(datiInput.getEmail());
         if (existing != null) {
             esito.setSuccesso(false);
-            esito.setMessaggio("Email già registrata");
-            log().log(Level.WARNING, "[REG] Email già presente: {0}", datiInput.getEmail());
+            esito.setMessaggio("Email giÃ  registrata");
+            log().log(Level.WARNING, "[REG] Email giÃ  presente: {0}", datiInput.getEmail());
             return esito;
         }
 
-        // 2) Creazione utente (GeneralUser è abstract → uso UtenteFinale)
+        // 2) Creazione utente (GeneralUser Ã¨ abstract â†’ uso UtenteFinale)
         final UtenteFinale nuovo = new UtenteFinale();
         nuovo.setNome(datiInput.getNome());
         nuovo.setCognome(datiInput.getCognome());
@@ -94,8 +92,8 @@ public class LogicControllerRegistrazione {
     }
 
     /**
-     * Conferma un account (lookup via email) → stato ATTIVO + log ACCOUNT_ATTIVATO.
-     * Il controller di notifica non serve qui, quindi non è richiesto come parametro.
+     * Conferma un account (lookup via email) â†’ stato ATTIVO + log ACCOUNT_ATTIVATO.
+     * Il controller di notifica non serve qui, quindi non Ã¨ richiesto come parametro.
      */
     public void confermaNuovoAccount(UtenteBean utente) {
         if (utente == null || !hasText(utente.getEmail())) {
@@ -119,7 +117,7 @@ public class LogicControllerRegistrazione {
     }
 
     /**
-     * Finalizza l’attivazione via id utente → stato ATTIVO + log ACCOUNT_ATTIVATO.
+     * Finalizza lâ€™attivazione via id utente â†’ stato ATTIVO + log ACCOUNT_ATTIVATO.
      */
     public void finalizzaAttivazioneAccount(int idUtente) {
         if (idUtente <= 0) {
@@ -157,13 +155,11 @@ public class LogicControllerRegistrazione {
     @SuppressWarnings("java:S1312")
     private Logger log() { return Logger.getLogger(getClass().getName()); }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi:
     // 1) isValid(...) - valida input registrazione.
     // 2) hasText(...) - verifica stringhe.
     // 3) toBean(...) - conversione entity->bean.
-    // ========================
 
     private boolean isValid(DatiRegistrazioneBean b) {
         return b != null && hasText(b.getNome()) && hasText(b.getCognome()) 

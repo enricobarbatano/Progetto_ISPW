@@ -8,13 +8,11 @@ import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerLog;
 
 public class CLIGraphicControllerLog extends AbstractGraphicControllerLog {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: estende AbstractGraphicControllerLog e usa GraphicControllerNavigation.
     // A2) IO verso GUI/CLI: routing verso home.
     // A3) Logica delegata: ereditata dalla classe astratta.
-    // ========================
 
     public CLIGraphicControllerLog(GraphicControllerNavigation navigator) {
         super(navigator);
@@ -31,8 +29,6 @@ public class CLIGraphicControllerLog extends AbstractGraphicControllerLog {
         }
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi: nessun helper privato.
-    // ========================
 }

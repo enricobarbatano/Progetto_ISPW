@@ -17,7 +17,7 @@ public class EsitoDisdettaBean {
              }
     @Override 
     public String toString() { 
-        return "Disdetta " + (possibile? "possibile":"non possibile") + " - penale "+penale+"€"; 
+        return "Disdetta " + (possibile? "possibile":"non possibile") + " - penale "+penale+"â‚¬"; 
     }
 }
 

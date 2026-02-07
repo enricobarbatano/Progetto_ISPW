@@ -9,22 +9,18 @@ import com.ispw.model.enums.Ruolo;
 
 public final class LogViewUtils {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: utility condivisa per view log.
     // A2) IO: filtra ruolo e legge lista log dai params.
-    // ========================
 
     private LogViewUtils() {
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) isGestore: verifica accesso.
     // L2) readLogs: estrazione e normalizzazione logs.
-    // ========================
 
     public static boolean isGestore(SessioneUtenteBean sessione) {
         return sessione != null

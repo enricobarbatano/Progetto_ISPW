@@ -49,7 +49,7 @@ public final class InMemoryGestoreDAO extends InMemoryDAO<Integer, Gestore> impl
     public Set<Permesso> getPermessi(int idGestore) {
         final Gestore g = load(idGestore);
         if (g == null || g.getPermessi() == null) return Set.of();
-        // l’entity espone List<Permesso>; ritorno un Set “read-only” come copia difensiva
+        // lâ€™entity espone List<Permesso>; ritorno un Set â€œread-onlyâ€ come copia difensiva
         return Set.copyOf(g.getPermessi());
     }
 
@@ -61,19 +61,19 @@ public final class InMemoryGestoreDAO extends InMemoryDAO<Integer, Gestore> impl
 
     @Override
     public void assegnaPermesso(int idGestore, Permesso permesso) {
-        Objects.requireNonNull(permesso, "permesso non può essere null");
+        Objects.requireNonNull(permesso, "permesso non puÃ² essere null");
         final Gestore g = load(idGestore);
         if (g == null || g.getPermessi() == null) return;
         if (!g.getPermessi().contains(permesso)) {
             g.getPermessi().add(permesso);
-            // opzionale: store(g) per rendere esplicita la persistenza sulla mappa (in-memory è per riferimento)
+            // opzionale: store(g) per rendere esplicita la persistenza sulla mappa (in-memory Ã¨ per riferimento)
             store(g);
         }
     }
 
     @Override
     public void rimuoviPermesso(int idGestore, Permesso permesso) {
-        Objects.requireNonNull(permesso, "permesso non può essere null");
+        Objects.requireNonNull(permesso, "permesso non puÃ² essere null");
         final Gestore g = load(idGestore);
         if (g == null || g.getPermessi() == null) return;
         if (g.getPermessi().remove(permesso)) {

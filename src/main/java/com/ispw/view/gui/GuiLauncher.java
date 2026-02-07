@@ -8,12 +8,10 @@ import javafx.stage.Stage;
 
 public class GuiLauncher extends Application {
 
-	// ========================
 	// SEZIONE ARCHITETTURALE
 	// Legenda architettura:
 	// A1) Collaboratori: entry point JavaFX per GUI.
 	// A2) Stato: stage e callback di avvio.
-	// ========================
 
 	private static Stage stage;
 	private static Runnable onReady;
@@ -40,13 +38,11 @@ public class GuiLauncher extends Application {
 		stage = primaryStage;
 	}
 
-	// ========================
 	// SEZIONE LOGICA
 	// Legenda logica:
 	// L1) launchApp: avvio JavaFX e callback.
 	// L2) setRoot/setStage: gestione scena.
 	// L3) start: inizializzazione stage.
-	// ========================
 
 	@Override
 	public void start(Stage primaryStage) {

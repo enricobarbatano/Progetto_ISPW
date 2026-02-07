@@ -21,17 +21,13 @@ public class LogicControllerGestioneNotifica implements
         GestioneNotificaGestioneAccount,
         GestioneNotificaPenalita {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: implementa interfacce GestioneNotifica* (DIP).
     // A2) IO verso GUI/CLI: riceve UtenteBean e dati di contesto.
     // A3) Persistenza: non usa DAO in questa classe.
-    // ========================
 
-    // =======================
     //  NOTIFICHE DISDETTA
-    // =======================
         private static final String UTENTE_NULL = "utente=null";
     /** Invia (simulato) conferma cancellazione prenotazione. */
     @Override
@@ -44,9 +40,7 @@ public class LogicControllerGestioneNotifica implements
         info("Conferma cancellazione", destinatario(utente), dettaglio);
     }
 
-    // =======================
     //  NOTIFICHE REGISTRAZIONE
-    // =======================
 
     /** Invia (simulato) conferma registrazione account. */
     @Override
@@ -58,9 +52,7 @@ public class LogicControllerGestioneNotifica implements
         info("Conferma registrazione", destinatario(utente), null);
     }
 
-    // =======================
     //  NOTIFICHE ACCOUNT
-    // =======================
 
     /** Invia (simulato) conferma aggiornamento dati account. */
     @Override
@@ -72,22 +64,18 @@ public class LogicControllerGestioneNotifica implements
         info("Aggiornamento account", destinatario(utente), null);
     }
 
-    // =======================
-    //  NOTIFICHE PENALITÀ
-    // =======================
+    //  NOTIFICHE PENALITÃ€
 
-    /** Invia (simulato) notifica penalità all'utente indicato (id in String). */
+    /** Invia (simulato) notifica penalitÃ  all'utente indicato (id in String). */
     @Override
     public void inviaNotificaPenalita(String idUtente) {
         final String dest = (idUtente == null || idUtente.trim().isEmpty())
                 ? "idUtente=VUOTO"
                 : "idUtente=" + idUtente.trim();
-        info("Notifica penalità", dest, null);
+        info("Notifica penalitÃ ", dest, null);
     }
 
-    // =======================
     //  NOTIFICHE PRENOTAZIONE
-    // =======================
 
     /** Invia (simulato) conferma prenotazione con eventuale dettaglio. */
     @Override
@@ -118,9 +106,7 @@ public class LogicControllerGestioneNotifica implements
             new Object[]{idPrenotazione, minutiAnticipo});
     }
 
-    // =======================
     //  NOTIFICHE REGOLE
-    // =======================
 
     /** Invia (simulato) broadcast di aggiornamento regolamenti. */
     @Override
@@ -128,7 +114,6 @@ public class LogicControllerGestioneNotifica implements
         info("Aggiornamento regole", "BROADCAST: utenti interessati", null);
     }
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda metodi:
     // 1) info(...) - log informativo.
@@ -136,7 +121,6 @@ public class LogicControllerGestioneNotifica implements
     // 3) compose(...) - compone messaggio.
     // 4) destinatario(...) - descrive destinatario.
     // 5) log() - logger on-demand.
-    // ========================
 
     /** Log INFO standardizzato. */
     private void info(String tipo, String destinatario, String dettaglio) {

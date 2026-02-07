@@ -13,6 +13,6 @@ public class DatiDisponibilitaBean extends BaseSlotBean {
 
     @Override
     public String toString() {
-        return getData() + " " + getOraInizio() + "-" + getOraFine() + " (" + costo + "€)";
+        return getData() + " " + getOraInizio() + "-" + getOraFine() + " (" + costo + "â‚¬)";
     }
 }

@@ -17,22 +17,18 @@ import javafx.scene.layout.VBox;
 
 public class GUIPrenotazioneView extends GenericViewGUI implements ViewGestionePrenotazione, NavigableController {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: view GUI prenotazione, usa controller grafico.
     // A2) IO: componenti JavaFX, slot e pagamento.
-    // ========================
 
     private final GUIGraphicControllerPrenotazione controller;
     private int lastCampoId;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) onShow: routing tra ricerca/slot/riepilogo/pagamento.
     // L2) handle*/render*: gestione step UI.
-    // ========================
 
     public GUIPrenotazioneView(GUIGraphicControllerPrenotazione controller) {
         this.controller = controller;
@@ -159,7 +155,7 @@ public class GUIPrenotazioneView extends GenericViewGUI implements ViewGestioneP
         TextField durata = new TextField();
         durata.setPromptText("Durata (min)");
 
-        Button cerca = new Button("Cerca disponibilità");
+        Button cerca = new Button("Cerca disponibilitÃ ");
         cerca.setOnAction(e -> {
             int id = Integer.parseInt(idCampo.getText().trim());
             int dur = Integer.parseInt(durata.getText().trim());

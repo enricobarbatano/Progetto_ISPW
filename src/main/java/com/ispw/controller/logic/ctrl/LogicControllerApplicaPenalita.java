@@ -35,7 +35,7 @@ import com.ispw.model.enums.StatoAccount;
 public final class LogicControllerApplicaPenalita {
 
     // === Messaggi centralizzati ===
-    private static final String MSG_OK                  = "Operazione completata";
+    private static final String MSG_OK                 = "Operazione completata";
     private static final String MSG_INPUT_NON_VALIDO   = "Dati penalità non validi";
     private static final String MSG_UTENTE_INESISTENTE = "Utente inesistente";
     private static final String MSG_IMPORTO_NON_VALIDO = "Importo penalità non valido";
@@ -45,13 +45,13 @@ public final class LogicControllerApplicaPenalita {
     private static final Logger LOGGER =
             Logger.getLogger(LogicControllerApplicaPenalita.class.getName());
 
-    // ========================
+    
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: usa interfacce Gestione* via parametro (DIP).
     // A2) IO verso GUI/CLI: riceve/ritorna bean (DatiPenalitaBean, DatiPagamentoBean, DatiFatturaBean, UtentiBean).
     // A3) Persistenza: usa DAO via DAOFactory.
-    // ========================
+    
     private GeneralUserDAO userDAO() {
         return DAOFactory.getInstance().getGeneralUserDAO();
     }
@@ -62,19 +62,8 @@ public final class LogicControllerApplicaPenalita {
         return DAOFactory.getInstance().getRegolePenalitaDAO();
     }
 
-    // ========================================================================
+    
     //  Metodo pubblico (rifattorizzato: bassa complessità cognitiva)
-    // ========================================================================
-    public EsitoOperazioneBean applicaSanzione(DatiPenalitaBean dati) {
-        return applicaSanzione(
-                dati,
-                null,
-                null,
-                new LogicControllerGestionePagamento(),
-                new LogicControllerGestioneFattura(),
-                new LogicControllerGestioneNotifica());
-    }
-
     public UtentiBean listaUtentiPerPenalita() {
         UtentiBean out = new UtentiBean();
         out.setUtenti(userDAO().findAll().stream()
@@ -130,7 +119,7 @@ public final class LogicControllerApplicaPenalita {
         return esito(true, MSG_OK);
     }
 
-    // ========================
+    
     // SEZIONE LOGICA
     // Legenda metodi:
     // 1) isDatiPenalitaValidi(...) - valida input.
@@ -150,7 +139,7 @@ public final class LogicControllerApplicaPenalita {
     // 15) log() - logger on-demand.
     // 16) toBean(...) - conversione entity->bean.
     // 17) esito(...) - costruisce esito operazione.
-    // ========================
+    
 
     private boolean isDatiPenalitaValidi(DatiPenalitaBean d) {
         return d != null
@@ -183,9 +172,8 @@ public final class LogicControllerApplicaPenalita {
         return imp;
     }
 
-    // ========================================================================
     //  Collaborazioni best-effort (notifica/pagamento/fattura)
-    // ========================================================================
+    
 
     private void handleNotifica(GestioneNotificaPenalita notiCtrl, int idUtente) {
         if (notiCtrl == null) return;
@@ -234,9 +222,7 @@ public final class LogicControllerApplicaPenalita {
         }
     }
 
-    // ========================================================================
     //  Persistenza penalità (best-effort + fallback deterministico)
-    // ========================================================================
 
     private int persistOrComputeId(DatiPenalitaBean d, BigDecimal importo) {
         try {
@@ -260,9 +246,7 @@ public final class LogicControllerApplicaPenalita {
         return (hash == 0 ? 1 : hash);
     }
 
-    // ========================================================================
     //  Infrastruttura: logging best-effort, utilità, esito, accesso DAO
-    // ========================================================================
 
     /**
      * Logga sempre via JUL e, se disponibile, persiste su LogDAO in best-effort.

@@ -9,12 +9,10 @@ import com.ispw.model.enums.StatoPenalita;
 
 public final class Penalita implements Serializable {
 
-    // ========================
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
     // A1) Collaboratori: entity penalita.
     // A2) IO: importo, motivazione, stato e data.
-    // ========================
     private int idPenalita;
     private int idUtente; // FK
     private LocalDate dataEmissione;
@@ -22,11 +20,9 @@ public final class Penalita implements Serializable {
     private String motivazione;
     private StatoPenalita stato;
 
-    // ========================
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) getters/setters: accesso ai campi.
-    // ========================
 
     public int getIdPenalita() { return idPenalita; }
     public void setIdPenalita(int idPenalita) { this.idPenalita = idPenalita; }
