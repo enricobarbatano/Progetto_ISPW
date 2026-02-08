@@ -12,6 +12,6 @@ public class ConsoleDisdettaAnteprimaView {
     // L1) show: stampa anteprima disdetta.
     public void show(boolean possibile, float penale) {
         System.out.println("\n=== ANTEPRIMA DISDETTA ===");
-        System.out.println("Possibile: " + possibile + ", penale: " + penale + "â‚¬");
+        System.out.println("Possibile: " + possibile + ", penale: " + penale + " EUR");
     }
 } 

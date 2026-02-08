@@ -17,7 +17,7 @@ public class ConsolePagamentoView {
     // L2) readMetodoPagamento/readCredenzialiPagamento: input utente.
     // L3) showPaymentOutcome/showError: output messaggi.
     public void renderPaymentForm(float importo, String metodo) {
-        System.out.println(String.format("%n=== PAGAMENTO ===%nImporto: %.2f â‚¬%nMetodo suggerito: %s", importo, metodo));
+        System.out.println(String.format("%n=== PAGAMENTO ===%nImporto: %.2f EUR%nMetodo suggerito: %s", importo, metodo));
     }
     public String readMetodoPagamento() {
         System.out.print("Metodo (SATISPAY|PAYPAL|BONIFICO): ");

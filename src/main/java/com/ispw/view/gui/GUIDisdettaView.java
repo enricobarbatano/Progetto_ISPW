@@ -101,7 +101,7 @@ public class GUIDisdettaView extends GenericViewGUI implements ViewDisdettaPreno
 
         VBox root = GuiViewUtils.createRoot();
         root.getChildren().add(new Label("Anteprima disdetta"));
-        root.getChildren().add(new Label("Possibile: " + poss + " - penale: " + pen + "â‚¬"));
+        root.getChildren().add(new Label("Possibile: " + poss + " - penale: " + pen + " EUR"));
 
         TextField idField = new TextField();
         idField.setPromptText("Id prenotazione");

@@ -262,13 +262,13 @@ public class LogicControllerDisdettaPrenotazione {
                               float penale) {
         try {
             noti.inviaConfermaCancellazione(sessione.getUtente(),
-                    "Prenotazione #" + idPrenotazione + " annullata (penale " + penale + "â‚¬)");
+                    "Prenotazione #" + idPrenotazione + " annullata (penale " + penale + " EUR)");
         } catch (RuntimeException ex) {
             // best-effort
             log().log(Level.FINE, "Notifica disdetta fallita: {0}", new Object[]{ex.getMessage()});
         }
 
-        appendLogSafe(idUtente, "DISDETTA_PRENOTAZIONE #" + idPrenotazione + " - penale " + penale + "â‚¬");
+        appendLogSafe(idUtente, "DISDETTA_PRENOTAZIONE #" + idPrenotazione + " - penale " + penale + " EUR");
     }
 
     // SEZIONE LOGICA

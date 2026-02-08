@@ -23,7 +23,7 @@ public final class GraphicControllerPrenotazioneUtils {
             return List.of();
         }
         return slot.stream()
-            .map(s -> s.getData() + " " + s.getOraInizio() + "-" + s.getOraFine() + " (â‚¬" + s.getCosto() + ")")
+            .map(s -> s.getData() + " " + s.getOraInizio() + "-" + s.getOraFine() + " (" + s.getCosto() + " EUR)")
             .toList();
     }
 }

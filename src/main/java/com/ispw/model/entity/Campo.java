@@ -19,7 +19,7 @@ public final class Campo implements Serializable {
     private int idCampo;
     private String nome;
     private String tipoSport;
-    private Float costoOrario;       // es. 20.0f = 20â‚¬/h
+    private Float costoOrario;       // es. 20.0f = 20 EUR/h
     private boolean isAttivo;        // se false, non Ã¨ prenotabile
     private boolean flagManutenzione;// se true, non Ã¨ prenotabile
 
