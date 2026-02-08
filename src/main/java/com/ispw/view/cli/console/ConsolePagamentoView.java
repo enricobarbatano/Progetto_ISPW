@@ -24,7 +24,7 @@ public class ConsolePagamentoView {
         return in.nextLine().trim();
     }
     public String readCredenzialiPagamento() {
-        System.out.print("Credenziale/Token/Email: ");
+        System.out.print("Codice fiscale: ");
         return in.nextLine().trim();
     }
     public void showPaymentOutcome(String esito) { System.out.println(esito); }
