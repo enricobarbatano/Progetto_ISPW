@@ -85,6 +85,10 @@ public class CLIPrenotazioneView extends GenericViewCLI implements ViewGestioneP
         @SuppressWarnings("unchecked")
         List<String> slots = (List<String>) slotsObj;
         searchView.showResults(slots);
+        if (slots.isEmpty()) {
+            CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
+            return true;
+        }
         int sel = searchView.askSlotSelectionIndex(slots.size());
         if (sel < 0) {
             return true;
@@ -107,7 +111,13 @@ public class CLIPrenotazioneView extends GenericViewCLI implements ViewGestioneP
         Object riepilogoStr = riepilogo.get(GraphicControllerUtils.KEY_RIEPILOGO);
         Object importo = riepilogo.get(GraphicControllerUtils.KEY_IMPORTO_TOTALE);
 
-        confirmView.renderSummary(String.valueOf(riepilogoStr));
+        String riepilogoText = (riepilogoStr == null) ? "" : String.valueOf(riepilogoStr).trim();
+        if (riepilogoText.isBlank()) {
+            confirmView.showInfo("Nessuno slot disponibile.");
+            CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
+            return true;
+        }
+        confirmView.renderSummary(riepilogoText);
         boolean conferma = confirmView.askConfirmation();
         if (!conferma) {
             confirmView.showInfo("Operazione annullata");

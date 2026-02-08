@@ -78,6 +78,14 @@ public class GUIPrenotazioneView extends GenericViewGUI implements ViewGestioneP
         VBox root = GuiViewUtils.createRoot();
         root.getChildren().add(new Label("Slot disponibili"));
 
+        if (slots.isEmpty()) {
+            root.getChildren().add(new Label("Nessuna disponibilita trovata."));
+            Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome());
+            root.getChildren().add(home);
+            GuiLauncher.setRoot(root);
+            return true;
+        }
+
         ListView<String> list = new ListView<>();
         GuiViewUtils.fillList(list, slots);
 
@@ -105,7 +113,18 @@ public class GUIPrenotazioneView extends GenericViewGUI implements ViewGestioneP
         float importoVal = (importo instanceof Number n) ? n.floatValue() : 0f;
 
         VBox root = GuiViewUtils.createRoot();
-        root.getChildren().addAll(new Label("Riepilogo prenotazione"), new Label(String.valueOf(riepilogoStr)));
+        root.getChildren().add(new Label("Riepilogo prenotazione"));
+
+        String riepilogoText = (riepilogoStr == null) ? "" : String.valueOf(riepilogoStr).trim();
+        if (riepilogoText.isBlank()) {
+            root.getChildren().add(new Label("Nessuno slot disponibile."));
+            Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome());
+            root.getChildren().add(home);
+            GuiLauncher.setRoot(root);
+            return true;
+        }
+
+        root.getChildren().add(new Label(riepilogoText));
 
         TextField metodo = new TextField("PAYPAL");
         metodo.setPromptText("Metodo");

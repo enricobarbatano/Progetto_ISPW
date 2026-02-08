@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36 Edg/144.0.0.0" version="29.3.8">
+  <diagram name="PrenotazioneAccount_v2" id="state-prenotazione-account-v2">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="start" value="" style="ellipse;html=1;shape=startState;fillColor=#000000;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="220" y="20" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="home" value="home" style="rounded=1;whiteSpace=wrap;html=1;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="170" y="70" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="prenotazione" value="formprenotazioneCampo" style="rounded=1;whiteSpace=wrap;html=1;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="150" y="150" width="160" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="slot_disponibile" value="confermaPrenotazione" style="rounded=1;whiteSpace=wrap;html=1;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="160" y="230" width="140" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pagamento" value="form pagamento" style="rounded=1;whiteSpace=wrap;html=1;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="170" y="310" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="confermata" value="conferma pagamento" style="rounded=1;whiteSpace=wrap;html=1;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="135" y="390" width="190" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="messaggio_ko" value="slot non disponibile" style="rounded=1;whiteSpace=wrap;html=1;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="470" y="150" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="errore_pagamento" value="errore pagamento" style="rounded=1;whiteSpace=wrap;html=1;arcSize=20;" vertex="1" parent="1">
+          <mxGeometry x="470" y="310" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="e_start_home" value="" style="edgeStyle=elbowEdgeStyle;rounded=1;curved=1;endArrow=open;endSize=8;" edge="1" parent="1" source="start" target="home">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_home_prenotazione" value="click button[button==prenotazione]/ displey create formprenotazione" style="edgeStyle=elbowEdgeStyle;rounded=1;curved=1;endArrow=open;endSize=8;" edge="1" parent="1" source="home" target="prenotazione">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_prenotazione_slot_ok" value="clickInvio [slotLibero]" style="edgeStyle=elbowEdgeStyle;rounded=1;curved=1;endArrow=open;endSize=8;" edge="1" parent="1" source="prenotazione" target="slot_disponibile">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_prenotazione_slot_ko" value="clickInvio [slotNonDisponibile]" style="edgeStyle=elbowEdgeStyle;rounded=1;curved=1;endArrow=open;endSize=8;" edge="1" parent="1" source="prenotazione" target="messaggio_ko">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="170" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_messaggio_home" value="clickOk" style="edgeStyle=elbowEdgeStyle;rounded=1;curved=1;endArrow=open;endSize=8;" edge="1" parent="1" source="messaggio_ko" target="home">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="590" y="170" />
+              <mxPoint x="590" y="90" />
+              <mxPoint x="270" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_slot_confirm" value="clickConferma" style="edgeStyle=elbowEdgeStyle;rounded=1;curved=1;endArrow=open;endSize=8;" edge="1" parent="1" source="slot_disponibile" target="pagamento">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_slot_annulla" value="clickAnnulla" style="edgeStyle=elbowEdgeStyle;rounded=1;curved=1;endArrow=open;endSize=8;" edge="1" parent="1" source="slot_disponibile" target="home">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="250" />
+              <mxPoint x="360" y="90" />
+              <mxPoint x="270" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_pagamento_ok" value="clickInvio [pagamentoOK]" style="edgeStyle=elbowEdgeStyle;rounded=1;curved=1;endArrow=open;endSize=8;" edge="1" parent="1" source="pagamento" target="confermata">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_pagamento_ko" value="clickInvio [pagamentoKO]" style="edgeStyle=elbowEdgeStyle;rounded=1;curved=1;endArrow=open;endSize=8;" edge="1" parent="1" source="pagamento" target="errore_pagamento">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_errore_retry" value="clickRiprova" style="edgeStyle=elbowEdgeStyle;rounded=1;curved=1;endArrow=open;endSize=8;" edge="1" parent="1" source="errore_pagamento" target="pagamento">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="330" />
+              <mxPoint x="420" y="330" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_errore_home" value="clickOk" style="edgeStyle=elbowEdgeStyle;rounded=1;curved=1;endArrow=open;endSize=8;" edge="1" parent="1" source="errore_pagamento" target="home">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="590" y="330" />
+              <mxPoint x="590" y="90" />
+              <mxPoint x="270" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_confermata_home" value="clickTornaHome" style="edgeStyle=elbowEdgeStyle;rounded=1;curved=1;endArrow=open;endSize=8;" edge="1" parent="1" source="confermata" target="home">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="410" />
+              <mxPoint x="420" y="90" />
+              <mxPoint x="270" y="90" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
