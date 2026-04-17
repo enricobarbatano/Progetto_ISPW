@@ -7,12 +7,12 @@ import com.ispw.dao.impl.filesystem.concrete.FileSystemFatturaDAO;
 import com.ispw.dao.impl.filesystem.concrete.FileSystemGeneralUserDAO;
 import com.ispw.dao.impl.filesystem.concrete.FileSystemGestoreDAO;
 import com.ispw.dao.impl.filesystem.concrete.FileSystemLogDAO;
-import com.ispw.dao.impl.filesystem.concrete.FileSystemPagamentoDAO;
 import com.ispw.dao.impl.filesystem.concrete.FileSystemPenalitaDAO;
 import com.ispw.dao.impl.filesystem.concrete.FileSystemPrenotazioneDAO;
 import com.ispw.dao.impl.filesystem.concrete.FileSystemRegolePenalitaDAO;
 import com.ispw.dao.impl.filesystem.concrete.FileSystemRegoleTempisticheDAO;
 import com.ispw.dao.impl.filesystem.concrete.FileSystemUtenteFinaleDAO;
+import com.ispw.dao.impl.filesystem.concrete.PagamentoDAOFileSystem;
 import com.ispw.dao.interfaces.CampoDAO;
 import com.ispw.dao.interfaces.FatturaDAO;
 import com.ispw.dao.interfaces.GeneralUserDAO;
@@ -91,7 +91,7 @@ public final class FileSystemDAOFactory extends DAOFactory {
 
     @Override
     public synchronized PagamentoDAO getPagamentoDAO() {
-        if (pagamentoDAO == null) pagamentoDAO = new FileSystemPagamentoDAO(root);
+        if (pagamentoDAO == null) pagamentoDAO = new PagamentoDAOFileSystem(root);
         return pagamentoDAO;
     }
 

@@ -5,12 +5,12 @@ import com.ispw.dao.impl.dbms.concrete.DbmsFatturaDAO;
 import com.ispw.dao.impl.dbms.concrete.DbmsGeneralUserDAO;
 import com.ispw.dao.impl.dbms.concrete.DbmsGestoreDAO;
 import com.ispw.dao.impl.dbms.concrete.DbmsLogDAO;
-import com.ispw.dao.impl.dbms.concrete.DbmsPagamentoDAO;
 import com.ispw.dao.impl.dbms.concrete.DbmsPenalitaDAO;
 import com.ispw.dao.impl.dbms.concrete.DbmsPrenotazioneDAO;
 import com.ispw.dao.impl.dbms.concrete.DbmsRegolePenalitaDAO;
 import com.ispw.dao.impl.dbms.concrete.DbmsRegoleTempisticheDAO;
 import com.ispw.dao.impl.dbms.concrete.DbmsUtenteFinaleDAO;
+import com.ispw.dao.impl.dbms.concrete.PagamentoDAODbms;
 import com.ispw.dao.impl.dbms.connection.DbmsConnectionFactory;
 import com.ispw.dao.interfaces.CampoDAO;
 import com.ispw.dao.interfaces.FatturaDAO;
@@ -90,7 +90,7 @@ public final class DbmsDAOFactory extends DAOFactory {
 
     @Override
     public synchronized PagamentoDAO getPagamentoDAO() {
-        if (pagamentoDAO == null) pagamentoDAO = new DbmsPagamentoDAO(cf);
+        if (pagamentoDAO == null) pagamentoDAO = new PagamentoDAODbms(cf);
         return pagamentoDAO;
     }
 

@@ -132,7 +132,7 @@ public abstract class FileSystemDAO<I, E> implements DAO<I, E> {
 
     @Override
     public E create(I id) {
-        // in FS di solito non si â€œcreaâ€ senza dati, ma puoi override nei concreti
+        // in FS di solito non si crea senza dati, ma puoi override nei concreti
         return null;
     }
 

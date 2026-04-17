@@ -1,11 +1,11 @@
 package com.ispw.dao.factory;
 
+import com.ispw.dao.impl.base.BasePagamentoDAO;
 import com.ispw.dao.impl.memory.concrete.InMemoryCampoDAO;
 import com.ispw.dao.impl.memory.concrete.InMemoryFatturaDAO;
 import com.ispw.dao.impl.memory.concrete.InMemoryGeneralUserDAO;
 import com.ispw.dao.impl.memory.concrete.InMemoryGestoreDAO;
 import com.ispw.dao.impl.memory.concrete.InMemoryLogDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryPagamentoDAO;
 import com.ispw.dao.impl.memory.concrete.InMemoryPenalitaDAO;
 import com.ispw.dao.impl.memory.concrete.InMemoryPrenotazioneDAO;
 import com.ispw.dao.impl.memory.concrete.InMemoryRegolePenalitaDAO;
@@ -87,7 +87,7 @@ public final class MemoryDAOFactory extends DAOFactory {
 
     @Override
     public synchronized PagamentoDAO getPagamentoDAO() {
-        if (pagamentoDAO == null) pagamentoDAO = new InMemoryPagamentoDAO();
+        if (pagamentoDAO == null) pagamentoDAO = new BasePagamentoDAO();
         return pagamentoDAO;
     }
 

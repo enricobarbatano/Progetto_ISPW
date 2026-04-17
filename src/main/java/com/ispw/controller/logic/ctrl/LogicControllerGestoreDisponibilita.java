@@ -147,6 +147,5 @@ public class LogicControllerGestoreDisponibilita
         return out;
     }
 
-    // SEZIONE LOGICA
-    // Legenda metodi: nessun helper privato.
+    
 }

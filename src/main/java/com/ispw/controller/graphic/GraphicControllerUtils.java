@@ -58,7 +58,7 @@ public final class GraphicControllerUtils {
     public static final String PREFIX_LOGIN = "[LOGIN]";
     public static final String PREFIX_REGISTRAZIONE = "[REGISTRAZIONE]";
     public static final String PREFIX_ACCOUNT = "[ACCOUNT]";
-    public static final String PREFIX_PRENOT = "[PRENOT]";
+    public static final String PREFIX_PRENOT = "[PRENOTA]";
     public static final String PREFIX_DISDETTA = "[DISDETTA]";
     public static final String PREFIX_PENALITA = "[PENALITA]";
     public static final String PREFIX_REGOLE = "[REGOLE]";
