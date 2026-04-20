@@ -1,40 +1,43 @@
 package com.ispw.dao.impl.base;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import com.ispw.dao.interfaces.PagamentoDAO;
-import com.ispw.model.entity.Pagamento;
+import com.ispw.dao.interfaces.PrenotazioneDAO;
+import com.ispw.model.entity.Prenotazione;
+import com.ispw.model.enums.StatoPrenotazione;
 
 /**
- * Base concrete Pagamento DAO implementing cache-first behavior.
+ * Base concrete Prenotazione DAO implementing cache-first behavior.
  * Acts as the IN_MEMORY provider when instantiated directly.
  *
  * DBMS/FileSystem subclasses should extend this class and override
  * the protected raw* methods to perform actual I/O. To mark a subclass
  * as persistent set the `persistent` flag via the protected constructor.
  */
-public class BasePagamentoDAO implements PagamentoDAO {
+public class BasePrenotazioneDAO implements PrenotazioneDAO {
 
-        private static final Comparator<Pagamento> ORDER_BY_DATA_DESC_ID_DESC =
-            Comparator.comparing(Pagamento::getDataPagamento, Comparator.nullsLast(Comparator.reverseOrder()))
-                  .thenComparing(Comparator.comparingInt(Pagamento::getIdPagamento).reversed());
+    private static final Comparator<Prenotazione> ORDER_BY_DATA_ORA_ID =
+            Comparator.comparing(Prenotazione::getData, Comparator.nullsLast(Comparator.naturalOrder()))
+                      .thenComparing(Prenotazione::getOraInizio, Comparator.nullsLast(Comparator.naturalOrder()))
+                      .thenComparingInt(Prenotazione::getIdPrenotazione);
 
-    protected final Map<Integer, Pagamento> cache = new ConcurrentHashMap<>();
+    protected final Map<Integer, Prenotazione> cache = new ConcurrentHashMap<>();
     protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     // When false (default) this instance behaves as pure IN_MEMORY.
     // Subclasses that perform persistence should call super(true).
     private final boolean persistent;
 
-    public BasePagamentoDAO() {
+    public BasePrenotazioneDAO() {
         this(false);
     }
 
-    protected BasePagamentoDAO(boolean persistent) {
+    protected BasePrenotazioneDAO(boolean persistent) {
         this.persistent = persistent;
     }
 
@@ -43,11 +46,11 @@ public class BasePagamentoDAO implements PagamentoDAO {
     // Subclasses override these to provide DB/FS I/O.
     // Default implementations are no-op / null and are valid for IN_MEMORY base.
     // -----------------------
-    protected Pagamento rawLoad(Integer id) {
+    protected Prenotazione rawLoad(Integer id) {
         return null;
     }
 
-    protected void rawStore(Pagamento entity) {
+    protected void rawStore(Prenotazione entity) {
         // default: no-op for IN_MEMORY base
     }
 
@@ -55,21 +58,29 @@ public class BasePagamentoDAO implements PagamentoDAO {
         // default: no-op for IN_MEMORY base
     }
 
-    protected Pagamento rawFindByPrenotazione(int idPrenotazione) {
+    protected List<Prenotazione> rawFindByUtente(int idUtente) {
         return null;
+    }
+
+    protected List<Prenotazione> rawFindByUtenteAndStato(int idUtente, StatoPrenotazione stato) {
+        return null;
+    }
+
+    protected void rawUpdateStato(int idPrenotazione, StatoPrenotazione nuovoStato) {
+        // default: no-op
     }
 
     // -----------------------
     // DAO interface implementations (cache-first template)
     // -----------------------
     @Override
-    public Pagamento load(Integer id) {
+    public Prenotazione load(Integer id) {
         if (id == null || id <= 0) return null;
 
         // STEP 1: Check cache
         lock.readLock().lock();
         try {
-            Pagamento cached = cache.get(id);
+            Prenotazione cached = cache.get(id);
             if (cached != null) return cached;
         } finally {
             lock.readLock().unlock();
@@ -77,11 +88,11 @@ public class BasePagamentoDAO implements PagamentoDAO {
 
         // STEP 2: Fallback to persistent rawLoad if configured
         if (persistent) {
-            Pagamento p = rawLoad(id);
+            Prenotazione p = rawLoad(id);
             if (p != null) {
                 lock.writeLock().lock();
                 try {
-                    cache.put(p.getIdPagamento(), p);
+                    cache.put(p.getIdPrenotazione(), p);
                 } finally {
                     lock.writeLock().unlock();
                 }
@@ -94,22 +105,20 @@ public class BasePagamentoDAO implements PagamentoDAO {
     }
 
     @Override
-    public void store(Pagamento entity) {
+    public void store(Prenotazione entity) {
         if (entity == null) return;
 
         // If new entity (id == 0) we must handle differently for persistent vs in-memory:
-        if (entity.getIdPagamento() == 0) {
+        if (entity.getIdPrenotazione() == 0) {
             if (persistent) {
-                // For persistent providers, let rawStore generate id (e.g., DB auto-generated key)
                 rawStore(entity); // expected to set entity.id when inserted
-                int id = entity.getIdPagamento();
+                int id = entity.getIdPrenotazione();
                 if (id <= 0) {
-                    // Defensive: if rawStore didn't set id, generate a synthetic one in cache space.
                     lock.writeLock().lock();
                     try {
                         int next = cache.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
-                        entity.setIdPagamento(next);
-                        cache.put(entity.getIdPagamento(), entity);
+                        entity.setIdPrenotazione(next);
+                        cache.put(entity.getIdPrenotazione(), entity);
                     } finally {
                         lock.writeLock().unlock();
                     }
@@ -127,7 +136,7 @@ public class BasePagamentoDAO implements PagamentoDAO {
                 lock.writeLock().lock();
                 try {
                     int next = cache.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
-                    entity.setIdPagamento(next);
+                    entity.setIdPrenotazione(next);
                     cache.put(next, entity);
                 } finally {
                     lock.writeLock().unlock();
@@ -137,7 +146,7 @@ public class BasePagamentoDAO implements PagamentoDAO {
         }
 
         // Existing entity: update cache first
-        int id = entity.getIdPagamento();
+        int id = entity.getIdPrenotazione();
         lock.writeLock().lock();
         try {
             cache.put(id, entity);
@@ -146,7 +155,6 @@ public class BasePagamentoDAO implements PagamentoDAO {
         }
 
         if (persistent) {
-            // persist change (update)
             rawStore(entity);
         }
     }
@@ -182,11 +190,11 @@ public class BasePagamentoDAO implements PagamentoDAO {
 
         // STEP 2: fallback to rawLoad for persistent providers
         if (persistent) {
-            Pagamento p = rawLoad(id);
+            Prenotazione p = rawLoad(id);
             if (p != null) {
                 lock.writeLock().lock();
                 try {
-                    cache.put(p.getIdPagamento(), p);
+                    cache.put(p.getIdPrenotazione(), p);
                 } finally {
                     lock.writeLock().unlock();
                 }
@@ -198,42 +206,102 @@ public class BasePagamentoDAO implements PagamentoDAO {
     }
 
     @Override
-    public Pagamento create(Integer id) {
-        Pagamento p = new Pagamento();
-        if (id != null && id > 0) p.setIdPagamento(id);
+    public Prenotazione create(Integer id) {
+        Prenotazione p = new Prenotazione();
+        if (id != null && id > 0) p.setIdPrenotazione(id);
         return p;
     }
 
     @Override
-    public Pagamento findByPrenotazione(int idPrenotazione) {
-        // STEP 1: search cache
+    public Prenotazione findById(int idPrenotazione) {
+        return load(idPrenotazione);
+    }
+
+    @Override
+    public List<Prenotazione> findByUtente(int idUtente) {
+        // If persistent provider, always query the persistent store to avoid
+        // returning incomplete results based only on a potentially partial cache.
+        if (persistent) {
+            List<Prenotazione> res = rawFindByUtente(idUtente);
+            if (res == null) return new ArrayList<>();
+            res.sort(ORDER_BY_DATA_ORA_ID);
+            lock.writeLock().lock();
+            try {
+                for (Prenotazione p : res) {
+                    if (p != null) cache.put(p.getIdPrenotazione(), p);
+                }
+            } finally {
+                lock.writeLock().unlock();
+            }
+            return res;
+        }
+
+        // IN_MEMORY: read from cache only
         lock.readLock().lock();
         try {
-            Optional<Pagamento> fromCache = cache.values().stream()
-                    .filter(p -> p != null && p.getIdPrenotazione() == idPrenotazione)
-                    .sorted(ORDER_BY_DATA_DESC_ID_DESC)
-                    .findFirst();
-            if (fromCache.isPresent()) return fromCache.get();
+            List<Prenotazione> out = new ArrayList<>();
+            for (Prenotazione p : cache.values()) {
+                if (p != null && p.getIdUtente() == idUtente) out.add(p);
+            }
+            out.sort(ORDER_BY_DATA_ORA_ID);
+            return out;
         } finally {
             lock.readLock().unlock();
         }
+    }
 
-        // STEP 2: fallback to raw query if persistent
+    @Override
+    public List<Prenotazione> findByUtenteAndStato(int idUtente, StatoPrenotazione stato) {
         if (persistent) {
-            Pagamento p = rawFindByPrenotazione(idPrenotazione);
-            if (p != null) {
-                lock.writeLock().lock();
-                try {
-                    cache.put(p.getIdPagamento(), p);
-                } finally {
-                    lock.writeLock().unlock();
+            List<Prenotazione> res = rawFindByUtenteAndStato(idUtente, stato);
+            if (res == null) return new ArrayList<>();
+            res.sort(ORDER_BY_DATA_ORA_ID);
+            lock.writeLock().lock();
+            try {
+                for (Prenotazione p : res) {
+                    if (p != null) cache.put(p.getIdPrenotazione(), p);
                 }
+            } finally {
+                lock.writeLock().unlock();
             }
-            return p;
+            return res;
         }
 
-        return null;
+        // IN_MEMORY: read from cache only
+        lock.readLock().lock();
+        try {
+            List<Prenotazione> out = new ArrayList<>();
+            for (Prenotazione p : cache.values()) {
+                if (p != null && p.getIdUtente() == idUtente && p.getStato() == stato) out.add(p);
+            }
+            out.sort(ORDER_BY_DATA_ORA_ID);
+            return out;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
+
+    @Override
+    public void updateStato(int idPrenotazione, StatoPrenotazione nuovoStato) {
+        // update cache if present
+        boolean updatedInCache = false;
+        lock.writeLock().lock();
+        try {
+            Prenotazione p = cache.get(idPrenotazione);
+            if (p != null) {
+                p.setStato(nuovoStato);
+                cache.put(idPrenotazione, p);
+                updatedInCache = true;
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
+
+        if (persistent) {
+            rawUpdateStato(idPrenotazione, nuovoStato);
+        }
+    }
+
     /**
      * Compatibilità: pulisce la cache (usato dai test tramite reflection).
      */

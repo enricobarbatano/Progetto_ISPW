@@ -1,16 +1,16 @@
 package com.ispw.dao.factory;
 
+import com.ispw.dao.impl.base.BaseCampoDAO;
+import com.ispw.dao.impl.base.BaseFatturaDAO;
+import com.ispw.dao.impl.base.BaseGeneralUserDAO;
+import com.ispw.dao.impl.base.BaseLogDAO;
 import com.ispw.dao.impl.base.BasePagamentoDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryCampoDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryFatturaDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryGeneralUserDAO;
+import com.ispw.dao.impl.base.BasePenalitaDAO;
+import com.ispw.dao.impl.base.BasePrenotazioneDAO;
+import com.ispw.dao.impl.base.BaseUtenteFinaleDAO;
 import com.ispw.dao.impl.memory.concrete.InMemoryGestoreDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryLogDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryPenalitaDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryPrenotazioneDAO;
 import com.ispw.dao.impl.memory.concrete.InMemoryRegolePenalitaDAO;
 import com.ispw.dao.impl.memory.concrete.InMemoryRegoleTempisticheDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryUtenteFinaleDAO;
 import com.ispw.dao.interfaces.CampoDAO;
 import com.ispw.dao.interfaces.FatturaDAO;
 import com.ispw.dao.interfaces.GeneralUserDAO;
@@ -51,19 +51,19 @@ public final class MemoryDAOFactory extends DAOFactory {
 
     @Override
     public synchronized CampoDAO getCampoDAO() {
-        if (campoDAO == null) campoDAO = new InMemoryCampoDAO();
+        if (campoDAO == null) campoDAO = new BaseCampoDAO();
         return campoDAO;
     }
 
     @Override
     public synchronized FatturaDAO getFatturaDAO() {
-        if (fatturaDAO == null) fatturaDAO = new InMemoryFatturaDAO();
+        if (fatturaDAO == null) fatturaDAO = new BaseFatturaDAO();
         return fatturaDAO;
     }
 
     @Override
     public synchronized GeneralUserDAO getGeneralUserDAO() {
-        if (generalUserDAO == null) generalUserDAO = new InMemoryGeneralUserDAO();
+        if (generalUserDAO == null) generalUserDAO = new BaseGeneralUserDAO();
         return generalUserDAO;
     }
 
@@ -75,13 +75,13 @@ public final class MemoryDAOFactory extends DAOFactory {
 
     @Override
     public synchronized UtenteFinaleDAO getUtenteFinaleDAO() {
-        if (utenteFinaleDAO == null) utenteFinaleDAO = new InMemoryUtenteFinaleDAO();
+        if (utenteFinaleDAO == null) utenteFinaleDAO = new BaseUtenteFinaleDAO();
         return utenteFinaleDAO;
     }
 
     @Override
     public synchronized LogDAO getLogDAO() {
-        if (logDAO == null) logDAO = new InMemoryLogDAO();
+        if (logDAO == null) logDAO = new BaseLogDAO();
         return logDAO;
     }
 
@@ -93,13 +93,13 @@ public final class MemoryDAOFactory extends DAOFactory {
 
     @Override
     public synchronized PenalitaDAO getPenalitaDAO() {
-        if (penalitaDAO == null) penalitaDAO = new InMemoryPenalitaDAO();
+        if (penalitaDAO == null) penalitaDAO = new BasePenalitaDAO();
         return penalitaDAO;
     }
 
     @Override
     public synchronized PrenotazioneDAO getPrenotazioneDAO() {
-        if (prenotazioneDAO == null) prenotazioneDAO = new InMemoryPrenotazioneDAO();
+        if (prenotazioneDAO == null) prenotazioneDAO = new BasePrenotazioneDAO();
         return prenotazioneDAO;
     }
 

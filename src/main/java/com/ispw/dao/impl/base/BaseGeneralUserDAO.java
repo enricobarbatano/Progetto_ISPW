@@ -1,40 +1,39 @@
 package com.ispw.dao.impl.base;
 
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import com.ispw.dao.interfaces.PagamentoDAO;
-import com.ispw.model.entity.Pagamento;
+import com.ispw.dao.interfaces.GeneralUserDAO;
+import com.ispw.model.entity.GeneralUser;
+import com.ispw.model.entity.UtenteFinale;
 
 /**
- * Base concrete Pagamento DAO implementing cache-first behavior.
+ * Base concrete GeneralUser DAO implementing cache-first behavior.
  * Acts as the IN_MEMORY provider when instantiated directly.
  *
  * DBMS/FileSystem subclasses should extend this class and override
  * the protected raw* methods to perform actual I/O. To mark a subclass
  * as persistent set the `persistent` flag via the protected constructor.
  */
-public class BasePagamentoDAO implements PagamentoDAO {
+public class BaseGeneralUserDAO implements GeneralUserDAO {
 
-        private static final Comparator<Pagamento> ORDER_BY_DATA_DESC_ID_DESC =
-            Comparator.comparing(Pagamento::getDataPagamento, Comparator.nullsLast(Comparator.reverseOrder()))
-                  .thenComparing(Comparator.comparingInt(Pagamento::getIdPagamento).reversed());
-
-    protected final Map<Integer, Pagamento> cache = new ConcurrentHashMap<>();
+    protected final Map<Integer, GeneralUser> cache = new ConcurrentHashMap<>();
     protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     // When false (default) this instance behaves as pure IN_MEMORY.
     // Subclasses that perform persistence should call super(true).
     private final boolean persistent;
 
-    public BasePagamentoDAO() {
+    public BaseGeneralUserDAO() {
         this(false);
     }
 
-    protected BasePagamentoDAO(boolean persistent) {
+    protected BaseGeneralUserDAO(boolean persistent) {
         this.persistent = persistent;
     }
 
@@ -43,11 +42,11 @@ public class BasePagamentoDAO implements PagamentoDAO {
     // Subclasses override these to provide DB/FS I/O.
     // Default implementations are no-op / null and are valid for IN_MEMORY base.
     // -----------------------
-    protected Pagamento rawLoad(Integer id) {
+    protected GeneralUser rawLoad(Integer id) {
         return null;
     }
 
-    protected void rawStore(Pagamento entity) {
+    protected void rawStore(GeneralUser entity) {
         // default: no-op for IN_MEMORY base
     }
 
@@ -55,7 +54,11 @@ public class BasePagamentoDAO implements PagamentoDAO {
         // default: no-op for IN_MEMORY base
     }
 
-    protected Pagamento rawFindByPrenotazione(int idPrenotazione) {
+    protected List<GeneralUser> rawFindAll() {
+        return null;
+    }
+
+    protected GeneralUser rawFindByEmail(String email) {
         return null;
     }
 
@@ -63,13 +66,13 @@ public class BasePagamentoDAO implements PagamentoDAO {
     // DAO interface implementations (cache-first template)
     // -----------------------
     @Override
-    public Pagamento load(Integer id) {
+    public GeneralUser load(Integer id) {
         if (id == null || id <= 0) return null;
 
         // STEP 1: Check cache
         lock.readLock().lock();
         try {
-            Pagamento cached = cache.get(id);
+            GeneralUser cached = cache.get(id);
             if (cached != null) return cached;
         } finally {
             lock.readLock().unlock();
@@ -77,16 +80,16 @@ public class BasePagamentoDAO implements PagamentoDAO {
 
         // STEP 2: Fallback to persistent rawLoad if configured
         if (persistent) {
-            Pagamento p = rawLoad(id);
-            if (p != null) {
+            GeneralUser g = rawLoad(id);
+            if (g != null) {
                 lock.writeLock().lock();
                 try {
-                    cache.put(p.getIdPagamento(), p);
+                    cache.put(g.getIdUtente(), g);
                 } finally {
                     lock.writeLock().unlock();
                 }
             }
-            return p;
+            return g;
         }
 
         // IN_MEMORY and not present -> not found
@@ -94,22 +97,19 @@ public class BasePagamentoDAO implements PagamentoDAO {
     }
 
     @Override
-    public void store(Pagamento entity) {
+    public void store(GeneralUser entity) {
         if (entity == null) return;
 
-        // If new entity (id == 0) we must handle differently for persistent vs in-memory:
-        if (entity.getIdPagamento() == 0) {
+        if (entity.getIdUtente() == 0) {
             if (persistent) {
-                // For persistent providers, let rawStore generate id (e.g., DB auto-generated key)
                 rawStore(entity); // expected to set entity.id when inserted
-                int id = entity.getIdPagamento();
+                int id = entity.getIdUtente();
                 if (id <= 0) {
-                    // Defensive: if rawStore didn't set id, generate a synthetic one in cache space.
                     lock.writeLock().lock();
                     try {
                         int next = cache.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
-                        entity.setIdPagamento(next);
-                        cache.put(entity.getIdPagamento(), entity);
+                        entity.setIdUtente(next);
+                        cache.put(entity.getIdUtente(), entity);
                     } finally {
                         lock.writeLock().unlock();
                     }
@@ -127,7 +127,7 @@ public class BasePagamentoDAO implements PagamentoDAO {
                 lock.writeLock().lock();
                 try {
                     int next = cache.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
-                    entity.setIdPagamento(next);
+                    entity.setIdUtente(next);
                     cache.put(next, entity);
                 } finally {
                     lock.writeLock().unlock();
@@ -137,7 +137,7 @@ public class BasePagamentoDAO implements PagamentoDAO {
         }
 
         // Existing entity: update cache first
-        int id = entity.getIdPagamento();
+        int id = entity.getIdUtente();
         lock.writeLock().lock();
         try {
             cache.put(id, entity);
@@ -146,7 +146,6 @@ public class BasePagamentoDAO implements PagamentoDAO {
         }
 
         if (persistent) {
-            // persist change (update)
             rawStore(entity);
         }
     }
@@ -182,11 +181,11 @@ public class BasePagamentoDAO implements PagamentoDAO {
 
         // STEP 2: fallback to rawLoad for persistent providers
         if (persistent) {
-            Pagamento p = rawLoad(id);
-            if (p != null) {
+            GeneralUser g = rawLoad(id);
+            if (g != null) {
                 lock.writeLock().lock();
                 try {
-                    cache.put(p.getIdPagamento(), p);
+                    cache.put(g.getIdUtente(), g);
                 } finally {
                     lock.writeLock().unlock();
                 }
@@ -198,42 +197,91 @@ public class BasePagamentoDAO implements PagamentoDAO {
     }
 
     @Override
-    public Pagamento create(Integer id) {
-        Pagamento p = new Pagamento();
-        if (id != null && id > 0) p.setIdPagamento(id);
-        return p;
+    public GeneralUser create(Integer id) {
+        /**
+         * Nota: per compatibilita' con il codice esistente questa factory
+         * crea di default un `UtenteFinale` (non un `Gestore`). Il `Gestore`
+         * e' seedato altrove nel bootstrap; non cambiare i controller che
+         * si aspettano questo comportamento.
+         */
+        final UtenteFinale u = new UtenteFinale();
+        u.setIdUtente(id != null ? id : 0);
+        return u;
     }
 
     @Override
-    public Pagamento findByPrenotazione(int idPrenotazione) {
-        // STEP 1: search cache
+    public List<GeneralUser> findAll() {
+        if (persistent) {
+            List<GeneralUser> res = rawFindAll();
+            if (res == null) return new ArrayList<>();
+            lock.writeLock().lock();
+            try {
+                for (GeneralUser g : res) {
+                    if (g == null) continue;
+                    int id = g.getIdUtente();
+                    if (id > 0) cache.put(id, g);
+                }
+            } finally {
+                lock.writeLock().unlock();
+            }
+            return res;
+        }
+
         lock.readLock().lock();
         try {
-            Optional<Pagamento> fromCache = cache.values().stream()
-                    .filter(p -> p != null && p.getIdPrenotazione() == idPrenotazione)
-                    .sorted(ORDER_BY_DATA_DESC_ID_DESC)
+            return new ArrayList<>(cache.values());
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    @Override
+    public GeneralUser findByEmail(String email) {
+        final String norm = normalizeEmail(email);
+        if (norm == null || norm.isBlank()) return null;
+
+        // STEP 1: check cache
+        lock.readLock().lock();
+        try {
+            Optional<GeneralUser> fromCache = cache.values().stream()
+                    .filter(u -> {
+                        String ue = u.getEmail();
+                        if (ue == null) return false;
+                        String uNorm = normalizeEmail(ue);
+                        return uNorm != null && uNorm.equals(norm);
+                    })
                     .findFirst();
             if (fromCache.isPresent()) return fromCache.get();
         } finally {
             lock.readLock().unlock();
         }
 
-        // STEP 2: fallback to raw query if persistent
+        // STEP 2: fallback to persistent rawFindByEmail
         if (persistent) {
-            Pagamento p = rawFindByPrenotazione(idPrenotazione);
-            if (p != null) {
+            GeneralUser g = rawFindByEmail(norm);
+            if (g != null) {
                 lock.writeLock().lock();
                 try {
-                    cache.put(p.getIdPagamento(), p);
+                    cache.put(g.getIdUtente(), g);
                 } finally {
                     lock.writeLock().unlock();
                 }
             }
-            return p;
+            return g;
         }
 
         return null;
     }
+
+    @Override
+    public GeneralUser findById(int idUtente) {
+        return load(idUtente);
+    }
+
+    private static String normalizeEmail(String email) {
+        return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
+    }
+
     /**
      * Compatibilità: pulisce la cache (usato dai test tramite reflection).
      */

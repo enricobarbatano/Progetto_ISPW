@@ -1,16 +1,16 @@
 package com.ispw.dao.factory;
 
-import com.ispw.dao.impl.dbms.concrete.DbmsCampoDAO;
-import com.ispw.dao.impl.dbms.concrete.DbmsFatturaDAO;
-import com.ispw.dao.impl.dbms.concrete.DbmsGeneralUserDAO;
+import com.ispw.dao.impl.dbms.concrete.CampoDAODbms;
 import com.ispw.dao.impl.dbms.concrete.DbmsGestoreDAO;
-import com.ispw.dao.impl.dbms.concrete.DbmsLogDAO;
-import com.ispw.dao.impl.dbms.concrete.DbmsPenalitaDAO;
-import com.ispw.dao.impl.dbms.concrete.DbmsPrenotazioneDAO;
 import com.ispw.dao.impl.dbms.concrete.DbmsRegolePenalitaDAO;
 import com.ispw.dao.impl.dbms.concrete.DbmsRegoleTempisticheDAO;
-import com.ispw.dao.impl.dbms.concrete.DbmsUtenteFinaleDAO;
+import com.ispw.dao.impl.dbms.concrete.FatturaDAODbms;
+import com.ispw.dao.impl.dbms.concrete.GeneralUserDAODbms;
+import com.ispw.dao.impl.dbms.concrete.LogDAODbms;
 import com.ispw.dao.impl.dbms.concrete.PagamentoDAODbms;
+import com.ispw.dao.impl.dbms.concrete.PenalitaDAODbms;
+import com.ispw.dao.impl.dbms.concrete.PrenotazioneDAODbms;
+import com.ispw.dao.impl.dbms.concrete.UtenteFinaleDAODbms;
 import com.ispw.dao.impl.dbms.connection.DbmsConnectionFactory;
 import com.ispw.dao.interfaces.CampoDAO;
 import com.ispw.dao.interfaces.FatturaDAO;
@@ -54,19 +54,19 @@ public final class DbmsDAOFactory extends DAOFactory {
 
     @Override
     public synchronized CampoDAO getCampoDAO() {
-        if (campoDAO == null) campoDAO = new DbmsCampoDAO(cf);
+        if (campoDAO == null) campoDAO = new CampoDAODbms(cf);
         return campoDAO;
     }
 
     @Override
     public synchronized FatturaDAO getFatturaDAO() {
-        if (fatturaDAO == null) fatturaDAO = new DbmsFatturaDAO(cf);
+        if (fatturaDAO == null) fatturaDAO = new FatturaDAODbms(cf);
         return fatturaDAO;
     }
 
     @Override
     public synchronized GeneralUserDAO getGeneralUserDAO() {
-        if (generalUserDAO == null) generalUserDAO = new DbmsGeneralUserDAO(cf);
+        if (generalUserDAO == null) generalUserDAO = new GeneralUserDAODbms(cf);
         return generalUserDAO;
     }
 
@@ -78,13 +78,13 @@ public final class DbmsDAOFactory extends DAOFactory {
 
     @Override
     public synchronized UtenteFinaleDAO getUtenteFinaleDAO() {
-        if (utenteFinaleDAO == null) utenteFinaleDAO = new DbmsUtenteFinaleDAO(cf);
+        if (utenteFinaleDAO == null) utenteFinaleDAO = new UtenteFinaleDAODbms(cf);
         return utenteFinaleDAO;
     }
 
     @Override
     public synchronized LogDAO getLogDAO() {
-        if (logDAO == null) logDAO = new DbmsLogDAO(cf);
+        if (logDAO == null) logDAO = new LogDAODbms(cf);
         return logDAO;
     }
 
@@ -96,13 +96,13 @@ public final class DbmsDAOFactory extends DAOFactory {
 
     @Override
     public synchronized PenalitaDAO getPenalitaDAO() {
-        if (penalitaDAO == null) penalitaDAO = new DbmsPenalitaDAO(cf);
+        if (penalitaDAO == null) penalitaDAO = new PenalitaDAODbms(cf);
         return penalitaDAO;
     }
 
     @Override
     public synchronized PrenotazioneDAO getPrenotazioneDAO() {
-        if (prenotazioneDAO == null) prenotazioneDAO = new DbmsPrenotazioneDAO(cf);
+        if (prenotazioneDAO == null) prenotazioneDAO = new PrenotazioneDAODbms(cf);
         return prenotazioneDAO;
     }
 
