@@ -18,14 +18,14 @@ import com.ispw.model.entity.Prenotazione;
 import com.ispw.model.enums.StatoPrenotazione;
 
 public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
-
+    // query SQL per le operazioni CRUD e di ricerca specifiche per Prenotazione
     private static final String SQL_FIND_BY_ID =
         "SELECT id_prenotazione, id_utente, id_campo, data, ora_inizio, ora_fine, stato, notifica_richiesta " +
         "FROM prenotazioni WHERE id_prenotazione=?";
-
+    // query SQL per verificare l'esistenza di una prenotazione con un certo id
     private static final String SQL_EXISTS =
         "SELECT 1 FROM prenotazioni WHERE id_prenotazione=?";
-
+    // query SQL per inserire una nuova prenotazione (inserisce anche l'id, che deve essere generato prima)
     private static final String SQL_INSERT =
         "INSERT INTO prenotazioni (id_prenotazione, id_utente, id_campo, data, ora_inizio, ora_fine, stato, notifica_richiesta) " +
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -58,6 +58,8 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
         this.cf = cf;
     }
 
+
+    // carico nella entity una prenotazione dal db
     @Override
     protected Prenotazione rawLoad(Integer id) {
         if (id == null || id <= 0) return null;
@@ -71,7 +73,8 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
             throw new RuntimeException("Errore DBMS Prenotazione rawLoad", e);
         }
     }
-
+    
+    // carico nella entity tutte le prenotazioni di un utente (in base al suo id)
     @Override
     protected List<Prenotazione> rawFindByUtente(int idUtente) {
         List<Prenotazione> out = new ArrayList<>();
@@ -87,6 +90,7 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
         return out;
     }
 
+    // carico nella entity tutte le prenotazioni di un utente filtrate per stato (in base al suo id)
     @Override
     protected List<Prenotazione> rawFindByUtenteAndStato(int idUtente, StatoPrenotazione stato) {
         List<Prenotazione> out = new ArrayList<>();
@@ -103,6 +107,7 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
         return out;
     }
 
+    // aggiorno lo stato di una prenotazione (in base al suo id)
     @Override
     protected void rawUpdateStato(int idPrenotazione, StatoPrenotazione nuovoStato) {
         try (Connection c = cf.getConnection();
@@ -114,7 +119,7 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
             throw new RuntimeException("Errore DBMS Prenotazione rawUpdateStato", e);
         }
     }
-
+    // cancello una prenotazione dal db (in base al suo id)
     @Override
     protected void rawDelete(Integer id) {
         if (id == null || id <= 0) return;
@@ -126,7 +131,7 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
             throw new RuntimeException("Errore DBMS Prenotazione rawDelete", e);
         }
     }
-
+    // salvo una prenotazione nel db (se id==0, genero un nuovo id, altrimenti aggiorno la prenotazione esistente)
     @Override
     protected void rawStore(Prenotazione entity) {
         if (entity == null) return;
@@ -137,6 +142,7 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
             if (entity.getIdPrenotazione() == 0) {
                 entity.setIdPrenotazione(nextId(c));
             }
+            // Se id!=0, verifica se esiste già una prenotazione con quell'id per decidere se fare UPDATE o INSERT
 
             if (existsDb(c, entity.getIdPrenotazione())) {
                 try (PreparedStatement ps = c.prepareStatement(SQL_UPDATE)) {
@@ -164,7 +170,7 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
             throw new RuntimeException("Errore DBMS Prenotazione rawStore", e);
         }
     }
-
+    // verifica se esiste una prenotazione con un certo id nel db
     private boolean existsDb(Connection c, int idPrenotazione) throws SQLException {
         try (PreparedStatement ps = c.prepareStatement(SQL_EXISTS)) {
             ps.setInt(1, idPrenotazione);
@@ -173,14 +179,14 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
             }
         }
     }
-
+    // genera un nuovo id per una prenotazione (calcolando il max id esistente + 1)
     private int nextId(Connection c) throws SQLException {
         try (PreparedStatement ps = c.prepareStatement(SQL_NEXT_ID);
              ResultSet rs = ps.executeQuery()) {
             return rs.next() ? rs.getInt("next_id") : 1;
         }
     }
-
+    // mappa una riga del ResultSet in un oggetto Prenotazione 
     private Prenotazione mapRow(ResultSet rs) throws SQLException {
         Prenotazione p = new Prenotazione();
         p.setIdPrenotazione(rs.getInt("id_prenotazione"));
@@ -200,7 +206,7 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
         p.setNotificaRichiesta(rs.getBoolean("notifica_richiesta"));
         return p;
     }
-
+    // metodo di utilità per bindare data e orari in un PreparedStatement, gestendo anche i valori null
     private void bindDateTime(PreparedStatement ps, int idxDate, int idxStart, int idxEnd,
                               Prenotazione p) throws SQLException {
         LocalDate d = p.getData();
@@ -211,7 +217,7 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
         if (tStart != null) ps.setTime(idxStart, Time.valueOf(tStart)); else ps.setNull(idxStart, Types.TIME);
         if (tEnd != null) ps.setTime(idxEnd, Time.valueOf(tEnd)); else ps.setNull(idxEnd, Types.TIME);
     }
-
+    // metodo di utilità per bindare lo stato in un PreparedStatement, gestendo anche il valore null
     private void bindStato(PreparedStatement ps, int idxStato, Prenotazione p) throws SQLException {
         ps.setString(idxStato, p.getStato() != null ? p.getStato().name() : null);
     }

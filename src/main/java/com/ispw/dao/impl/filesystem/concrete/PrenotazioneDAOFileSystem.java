@@ -3,28 +3,39 @@ package com.ispw.dao.impl.filesystem.concrete;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.ispw.dao.exception.DaoException;
 import com.ispw.dao.impl.base.BasePrenotazioneDAO;
-import com.ispw.dao.impl.filesystem.FileSystemDAO;
+import com.ispw.dao.impl.filesystem.json.JsonListFileStore; // <-- adatta al tuo package reale
 import com.ispw.model.entity.Prenotazione;
 import com.ispw.model.enums.StatoPrenotazione;
 
 /**
- * FileSystem Prenotazione DAO implemented as subclass of BasePrenotazioneDAO.
- * Implements raw I/O reading/writing a map serialized on disk.
+ * FileSystem Prenotazione DAO (JSON) implemented as subclass of BasePrenotazioneDAO.
+ * Implements raw I/O reading/writing a list of Prenotazione on disk (prenotazioni.json).
+ *
+ * NOTE: Prenotazione entity should @JsonIgnore composed fields (campo/pagamento/fattura)
+ * so that we persist RAW data only (FK + slot + stato).
  */
 public class PrenotazioneDAOFileSystem extends BasePrenotazioneDAO {
 
+    private static final Comparator<Prenotazione> ORDER_BY_DATA_ORA_ID =
+            Comparator.comparing(Prenotazione::getData, Comparator.nullsLast(Comparator.naturalOrder()))
+                      .thenComparing(Prenotazione::getOraInizio, Comparator.nullsLast(Comparator.naturalOrder()))
+                      .thenComparingInt(Prenotazione::getIdPrenotazione);
+
+    // ordine stabile nel file (opzionale ma utile)
+    private static final Comparator<Prenotazione> ORDER_BY_ID =
+            Comparator.comparingInt(Prenotazione::getIdPrenotazione);
+
     private final Path filePath;
-    private final FileSystemDAO.JavaBinaryMapCodec<Integer, Prenotazione> codec = new FileSystemDAO.JavaBinaryMapCodec<>();
+    private final JsonListFileStore<Prenotazione> jsonStore;
 
     public PrenotazioneDAOFileSystem(Path storageDir) {
         super(true); // persistent
@@ -33,100 +44,91 @@ public class PrenotazioneDAOFileSystem extends BasePrenotazioneDAO {
         } catch (IOException e) {
             throw new DaoException("Impossibile creare directory storage: " + storageDir, e);
         }
-        this.filePath = storageDir.resolve("prenotazione.ser");
+
+        // da .ser a .json
+        this.filePath = storageDir.resolve("prenotazioni.json");
+
+        // store generico: 1 file JSON per entità
+        this.jsonStore = new JsonListFileStore<>(
+                filePath,
+                new TypeReference<List<Prenotazione>>() {},
+                ORDER_BY_ID
+        );
     }
 
-    @SuppressWarnings("unchecked")
-    private Map<Integer, Prenotazione> readAll() {
-        try {
-            Optional<Map<Integer, Prenotazione>> maybe = codec.read(filePath);
-            return maybe.orElseGet(ConcurrentHashMap::new);
-        } catch (DaoException e) {
-            throw e;
+    private Map<Integer, Prenotazione> readAllAsMap() {
+        List<Prenotazione> list = jsonStore.readAll();
+        Map<Integer, Prenotazione> map = new ConcurrentHashMap<>();
+        for (Prenotazione p : list) {
+            if (p != null && p.getIdPrenotazione() > 0) {
+                map.put(p.getIdPrenotazione(), p);
+            }
         }
+        return map;
+    }
+
+    private void writeAllFromMap(Map<Integer, Prenotazione> data) {
+        jsonStore.writeAll(new ArrayList<>(data.values()));
     }
 
     @Override
     protected Prenotazione rawLoad(Integer id) {
         if (id == null) return null;
-        Map<Integer, Prenotazione> data = readAll();
-        return data.get(id);
+        return readAllAsMap().get(id);
     }
 
     @Override
     protected void rawStore(Prenotazione entity) {
         if (entity == null) return;
-        Map<Integer, Prenotazione> data = readAll();
+        Map<Integer, Prenotazione> data = readAllAsMap();
 
         if (entity.getIdPrenotazione() == 0) {
             int next = data.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
             entity.setIdPrenotazione(next);
         }
-        data.put(entity.getIdPrenotazione(), entity);
 
-        // atomic write: tmp -> move
-        try {
-            Path tmp = filePath.resolveSibling(filePath.getFileName() + ".tmp");
-            codec.write(tmp, data);
-            Files.move(tmp, filePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-        } catch (IOException e) {
-            throw new DaoException("Errore scrittura su file: " + filePath, e);
-        }
+        data.put(entity.getIdPrenotazione(), entity);
+        writeAllFromMap(data);
     }
 
     @Override
     protected void rawDelete(Integer id) {
         if (id == null) return;
-        Map<Integer, Prenotazione> data = readAll();
+        Map<Integer, Prenotazione> data = readAllAsMap();
         data.remove(id);
-        try {
-            Path tmp = filePath.resolveSibling(filePath.getFileName() + ".tmp");
-            codec.write(tmp, data);
-            Files.move(tmp, filePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-        } catch (IOException e) {
-            throw new DaoException("Errore scrittura su file: " + filePath, e);
-        }
+        writeAllFromMap(data);
     }
 
     @Override
     protected List<Prenotazione> rawFindByUtente(int idUtente) {
-        Map<Integer, Prenotazione> data = readAll();
+        Map<Integer, Prenotazione> data = readAllAsMap();
         List<Prenotazione> out = new ArrayList<>();
         for (Prenotazione p : data.values()) {
             if (p != null && p.getIdUtente() == idUtente) out.add(p);
         }
-        out.sort(Comparator.comparing(Prenotazione::getData, Comparator.nullsLast(Comparator.naturalOrder()))
-                         .thenComparing(Prenotazione::getOraInizio, Comparator.nullsLast(Comparator.naturalOrder()))
-                         .thenComparingInt(Prenotazione::getIdPrenotazione));
+        out.sort(ORDER_BY_DATA_ORA_ID);
         return out;
     }
 
     @Override
     protected List<Prenotazione> rawFindByUtenteAndStato(int idUtente, StatoPrenotazione stato) {
-        Map<Integer, Prenotazione> data = readAll();
+        Map<Integer, Prenotazione> data = readAllAsMap();
         List<Prenotazione> out = new ArrayList<>();
         for (Prenotazione p : data.values()) {
             if (p != null && p.getIdUtente() == idUtente && p.getStato() == stato) out.add(p);
         }
-        out.sort(Comparator.comparing(Prenotazione::getData, Comparator.nullsLast(Comparator.naturalOrder()))
-                         .thenComparing(Prenotazione::getOraInizio, Comparator.nullsLast(Comparator.naturalOrder()))
-                         .thenComparingInt(Prenotazione::getIdPrenotazione));
+        out.sort(ORDER_BY_DATA_ORA_ID);
         return out;
     }
 
     @Override
     protected void rawUpdateStato(int idPrenotazione, StatoPrenotazione nuovoStato) {
-        Map<Integer, Prenotazione> data = readAll();
+        Map<Integer, Prenotazione> data = readAllAsMap();
         Prenotazione p = data.get(idPrenotazione);
         if (p != null) {
             p.setStato(nuovoStato);
-            try {
-                Path tmp = filePath.resolveSibling(filePath.getFileName() + ".tmp");
-                codec.write(tmp, data);
-                Files.move(tmp, filePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-            } catch (IOException e) {
-                throw new DaoException("Errore scrittura su file: " + filePath, e);
-            }
+            data.put(idPrenotazione, p);
+            writeAllFromMap(data);
         }
     }
 }

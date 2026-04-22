@@ -4,9 +4,17 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.ispw.model.enums.StatoPrenotazione;
 
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public final class Prenotazione implements Serializable {
+
+
+
 
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
@@ -23,9 +31,11 @@ public final class Prenotazione implements Serializable {
     private StatoPrenotazione stato;
     private boolean notificaRichiesta;
 
-    // opzionali (popolati solo se necessari)
+    @JsonIgnore
     private Campo campo;
+    @JsonIgnore
     private Pagamento pagamento;
+    @JsonIgnore
     private Fattura fattura;
 
     // SEZIONE LOGICA
@@ -64,4 +74,8 @@ public final class Prenotazione implements Serializable {
 
     public Fattura getFattura() { return fattura; }
     public void setFattura(Fattura fattura) { this.fattura = fattura; }
+
+
+
+
 }
