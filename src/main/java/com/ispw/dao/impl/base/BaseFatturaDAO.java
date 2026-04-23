@@ -9,16 +9,20 @@ import com.ispw.dao.interfaces.FatturaDAO;
 import com.ispw.model.entity.Fattura;
 
 /**
- * Base concrete Fattura DAO implementing cache-first behavior.
- * Acts as the IN_MEMORY provider when instantiated directly.
+ * Base concreta del DAO Fattura con comportamento cache-first.
+ * - Istanza diretta => IN_MEMORY (persistent=false)
+ * - Subclass DBMS/FS => persistent=true, usa raw* come I/O
  */
 public class BaseFatturaDAO implements FatturaDAO {
 
-    private static final Comparator<Fattura> ORDER_BY_DATA_DESC_ID_DESC =
-            Comparator.<Fattura, java.time.LocalDate>comparing(Fattura::getDataEmissione,
-                    Comparator.nullsLast(Comparator.naturalOrder()))
-                      .thenComparingInt(Fattura::getIdFattura)
-                      .reversed();
+    /**
+     * Comparator "ultima fattura": dataEmissione desc (null in fondo), poi idFattura desc.
+     * Evito reversed globale per non invertire nullsLast.
+     */
+    protected static final Comparator<Fattura> ORDER_LAST_BY_DATE_ID_DESC =
+            Comparator.comparing(Fattura::getDataEmissione,
+                    Comparator.nullsLast(Comparator.reverseOrder()))
+                      .thenComparing(Comparator.comparingInt(Fattura::getIdFattura).reversed());
 
     protected final Map<Integer, Fattura> cache = new ConcurrentHashMap<>();
     protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
@@ -29,115 +33,202 @@ public class BaseFatturaDAO implements FatturaDAO {
 
     protected BaseFatturaDAO(boolean persistent) { this.persistent = persistent; }
 
-    // raw hooks
+    // -----------------------
+    // RAW HOOKS (I/O) - override in DBMS/FS
+    // -----------------------
     protected Fattura rawLoad(Integer id) { return null; }
-    protected void rawStore(Fattura entity) { }
-    protected void rawDelete(Integer id) { }
+    protected void rawStore(Fattura entity) { /* no-op in memory */ }
+    protected void rawDelete(Integer id) { /* no-op in memory */ }
+
+    /**
+     * Per persistent provider deve restituire l'ultima fattura dell'utente (DB/FS).
+     * Default IN_MEMORY: null.
+     */
     protected Fattura rawFindLastByUtente(int idUtente) { return null; }
 
+    // -----------------------
+    // DAO API - cache-first
+    // -----------------------
     @Override
     public Fattura load(Integer id) {
         if (id == null || id <= 0) return null;
-        lock.readLock().lock();
-        try { Fattura cached = cache.get(id); if (cached != null) return cached; }
-        finally { lock.readLock().unlock(); }
 
-        if (persistent) {
-            Fattura f = rawLoad(id);
-            if (f != null) {
-                lock.writeLock().lock();
-                try { cache.put(f.getIdFattura(), f); } finally { lock.writeLock().unlock(); }
-            }
-            return f;
+        // 1) cache-first
+        lock.readLock().lock();
+        try {
+            Fattura cached = cache.get(id);
+            if (cached != null) return cached;
+        } finally {
+            lock.readLock().unlock();
         }
-        return null;
+
+        // 2) fallback raw se persistent
+        if (!persistent) return null;
+
+        Fattura f = rawLoad(id);
+        if (f != null && f.getIdFattura() > 0) {
+            lock.writeLock().lock();
+            try {
+                cache.put(f.getIdFattura(), f);
+            } finally {
+                lock.writeLock().unlock();
+            }
+        }
+        return f;
     }
 
     @Override
     public void store(Fattura entity) {
         if (entity == null) return;
+
+        // Caso nuovo (id==0)
         if (entity.getIdFattura() == 0) {
             if (persistent) {
+                // il provider (DB/FS) deve assegnare id
                 rawStore(entity);
+
                 int id = entity.getIdFattura();
                 if (id <= 0) {
+                    // fallback difensivo (idealmente non dovrebbe accadere per DBMS con generated keys)
                     lock.writeLock().lock();
                     try {
                         int next = cache.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
                         entity.setIdFattura(next);
                         cache.put(next, entity);
-                    } finally { lock.writeLock().unlock(); }
-                } else {
-                    lock.writeLock().lock();
-                    try { cache.put(id, entity); } finally { lock.writeLock().unlock(); }
+                    } finally {
+                        lock.writeLock().unlock();
+                    }
+                    return;
+                }
+
+                lock.writeLock().lock();
+                try {
+                    cache.put(id, entity);
+                } finally {
+                    lock.writeLock().unlock();
                 }
                 return;
+
             } else {
+                // IN_MEMORY: genera id e salva in cache
                 lock.writeLock().lock();
                 try {
                     int next = cache.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
                     entity.setIdFattura(next);
                     cache.put(next, entity);
-                } finally { lock.writeLock().unlock(); }
+                } finally {
+                    lock.writeLock().unlock();
+                }
                 return;
             }
         }
 
+        // Caso esistente (id!=0): cache-put e poi persistenza se necessario
         int id = entity.getIdFattura();
         lock.writeLock().lock();
-        try { cache.put(id, entity); } finally { lock.writeLock().unlock(); }
+        try {
+            cache.put(id, entity);
+        } finally {
+            lock.writeLock().unlock();
+        }
+
         if (persistent) rawStore(entity);
     }
 
     @Override
     public void delete(Integer id) {
         if (id == null || id <= 0) return;
+
         lock.writeLock().lock();
-        try { cache.remove(id); } finally { lock.writeLock().unlock(); }
+        try {
+            cache.remove(id);
+        } finally {
+            lock.writeLock().unlock();
+        }
+
         if (persistent) rawDelete(id);
     }
 
     @Override
     public boolean exists(Integer id) {
         if (id == null || id <= 0) return false;
+
         lock.readLock().lock();
-        try { if (cache.containsKey(id)) return true; } finally { lock.readLock().unlock(); }
-        if (persistent) {
-            Fattura f = rawLoad(id);
-            if (f != null) {
-                lock.writeLock().lock();
-                try { cache.put(f.getIdFattura(), f); } finally { lock.writeLock().unlock(); }
-                return true;
+        try {
+            if (cache.containsKey(id)) return true;
+        } finally {
+            lock.readLock().unlock();
+        }
+
+        if (!persistent) return false;
+
+        // fallback rawLoad (costoso ma compatibile)
+        Fattura f = rawLoad(id);
+        if (f != null && f.getIdFattura() > 0) {
+            lock.writeLock().lock();
+            try {
+                cache.put(f.getIdFattura(), f);
+            } finally {
+                lock.writeLock().unlock();
             }
+            return true;
         }
         return false;
     }
 
     @Override
-    public Fattura create(Integer id) { Fattura f = new Fattura(); if (id != null) f.setIdFattura(id); return f; }
+    public Fattura create(Integer id) {
+        Fattura f = new Fattura();
+        f.setIdFattura(id != null ? id : 0);
+        return f;
+    }
 
+    /**
+     * Recupera l'ultima fattura emessa per un utente.
+     *
+     * - Provider persistente: query raw (cache parziale non garantisce "ultima" corretta).
+     * - IN_MEMORY: calcolo su cache.
+     */
     @Override
     public Fattura findLastByUtente(int idUtente) {
-        // STEP 1: try cache
-        lock.readLock().lock();
-        try {
-            var fromCache = cache.values().stream()
-                    .filter(f -> f != null && f.getIdUtente() == idUtente)
-                    .sorted(ORDER_BY_DATA_DESC_ID_DESC)
-                    .findFirst();
-            if (fromCache.isPresent()) return fromCache.get();
-        } finally { lock.readLock().unlock(); }
+        if (idUtente <= 0) return null;
 
-        // STEP 2: fallback to persistent store if configured
         if (persistent) {
+            // Correttezza: vai su raw per avere veramente l'ultima nel provider
             Fattura f = rawFindLastByUtente(idUtente);
             if (f != null && f.getIdFattura() > 0) {
                 lock.writeLock().lock();
-                try { cache.put(f.getIdFattura(), f); } finally { lock.writeLock().unlock(); }
+                try {
+                    cache.put(f.getIdFattura(), f);
+                } finally {
+                    lock.writeLock().unlock();
+                }
             }
             return f;
         }
 
-        return null;
+        // IN_MEMORY: trova l'ultima dalla cache
+        lock.readLock().lock();
+        try {
+            return cache.values().stream()
+                    .filter(f -> f != null && f.getIdUtente() == idUtente)
+                    .sorted(ORDER_LAST_BY_DATE_ID_DESC)
+                    .findFirst()
+                    .orElse(null);
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    /** Utility per test/cleanup
+     *  
+     */
+    public void clear() {
+        lock.writeLock().lock();
+        try {
+            cache.clear();
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 }
