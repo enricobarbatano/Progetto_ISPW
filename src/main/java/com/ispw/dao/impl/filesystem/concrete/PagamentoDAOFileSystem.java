@@ -3,91 +3,79 @@ package com.ispw.dao.impl.filesystem.concrete;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.ispw.dao.exception.DaoException;
 import com.ispw.dao.impl.base.BasePagamentoDAO;
-import com.ispw.dao.impl.filesystem.FileSystemDAO;
+import com.ispw.dao.impl.filesystem.json.JsonListFileStore;
 import com.ispw.model.entity.Pagamento;
 
-/**
- * FileSystem Pagamento DAO implemented as subclass of BasePagamentoDAO.
- * Implements raw I/O reading/writing a map serialized on disk.
- */
 public class PagamentoDAOFileSystem extends BasePagamentoDAO {
 
-    private final Path filePath;
-    private final FileSystemDAO.JavaBinaryMapCodec<Integer, Pagamento> codec = new FileSystemDAO.JavaBinaryMapCodec<>();
+    private final JsonListFileStore<Pagamento> store;
 
     public PagamentoDAOFileSystem(Path storageDir) {
-        super(true); // persistent
+        super(true);
         try {
             Files.createDirectories(storageDir);
         } catch (IOException e) {
-            throw new DaoException("Impossibile creare directory storage: " + storageDir, e);
+            throw new DaoException("Impossibile creare directory storage", e);
         }
-        this.filePath = storageDir.resolve("pagamento.ser");
+
+        this.store = new JsonListFileStore<>(
+                storageDir.resolve("pagamenti.json"),
+                new TypeReference<List<Pagamento>>() {}
+        );
     }
 
-    @SuppressWarnings("unchecked")
-    private Map<Integer, Pagamento> readAll() {
-        try {
-            Optional<Map<Integer, Pagamento>> maybe = codec.read(filePath);
-            return maybe.orElseGet(ConcurrentHashMap::new);
-        } catch (DaoException e) {
-            throw e;
+    private Map<Integer, Pagamento> readAllAsMap() {
+        Map<Integer, Pagamento> map = new ConcurrentHashMap<>();
+        for (Pagamento p : store.readAll()) {
+            if (p != null && p.getIdPagamento() > 0) {
+                map.put(p.getIdPagamento(), p);
+            }
         }
+        return map;
     }
 
     @Override
     protected Pagamento rawLoad(Integer id) {
-        if (id == null) return null;
-        Map<Integer, Pagamento> data = readAll();
-        return data.get(id);
+        if (id == null || id <= 0) return null;
+        return readAllAsMap().get(id);
     }
 
     @Override
     protected void rawStore(Pagamento entity) {
         if (entity == null) return;
-        Map<Integer, Pagamento> data = readAll();
+
+        List<Pagamento> all = new ArrayList<>(store.readAll());
 
         if (entity.getIdPagamento() == 0) {
-            int next = data.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
+            int next = all.stream().mapToInt(Pagamento::getIdPagamento).max().orElse(0) + 1;
             entity.setIdPagamento(next);
         }
-        data.put(entity.getIdPagamento(), entity);
 
-        // atomic write: tmp -> move
-        try {
-            Path tmp = filePath.resolveSibling(filePath.getFileName() + ".tmp");
-            codec.write(tmp, data);
-            Files.move(tmp, filePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-        } catch (IOException e) {
-            throw new DaoException("Errore scrittura su file: " + filePath, e);
-        }
+        all.removeIf(p -> p.getIdPagamento() == entity.getIdPagamento());
+        all.add(entity);
+        store.writeAll(all);
     }
 
     @Override
     protected void rawDelete(Integer id) {
-        if (id == null) return;
-        Map<Integer, Pagamento> data = readAll();
-        data.remove(id);
-        try {
-            Path tmp = filePath.resolveSibling(filePath.getFileName() + ".tmp");
-            codec.write(tmp, data);
-            Files.move(tmp, filePath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-        } catch (IOException e) {
-            throw new DaoException("Errore scrittura su file: " + filePath, e);
-        }
+        if (id == null || id <= 0) return;
+
+        List<Pagamento> all = store.readAll();
+        all.removeIf(p -> p.getIdPagamento() == id);
+        store.writeAll(all);
     }
 
     @Override
     protected Pagamento rawFindByPrenotazione(int idPrenotazione) {
-        Map<Integer, Pagamento> data = readAll();
-        return data.values().stream()
+        return store.readAll().stream()
                 .filter(p -> p != null && p.getIdPrenotazione() == idPrenotazione)
                 .sorted((a, b) -> {
                     if (a.getDataPagamento() == null && b.getDataPagamento() == null) {
