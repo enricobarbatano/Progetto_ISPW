@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public final class Campo implements Serializable {
 
     // SEZIONE ARCHITETTURALE
@@ -23,7 +25,7 @@ public final class Campo implements Serializable {
     private boolean isAttivo;        // se false, non Ã¨ prenotabile
     private boolean flagManutenzione;// se true, non Ã¨ prenotabile
 
-   
+   @JsonIgnore
     private final List<Prenotazione> listaPrenotazioni = new ArrayList<>();
 
     // SEZIONE LOGICA

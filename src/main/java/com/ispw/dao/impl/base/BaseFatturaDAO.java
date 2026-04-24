@@ -27,10 +27,14 @@ public class BaseFatturaDAO implements FatturaDAO {
     protected final Map<Integer, Fattura> cache = new ConcurrentHashMap<>();
     protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
+    // Il flag persistent indica se il provider è persistente (DB/FS) o in-memory
+    // In caso di provider persistente, i raw* devono essere implementati e usati come fallback I/O
+
     private final boolean persistent;
-
+    
+    // Costruttore di default: IN_MEMORY
     public BaseFatturaDAO() { this(false); }
-
+    // Costruttore per provider persistente (DB/FS)
     protected BaseFatturaDAO(boolean persistent) { this.persistent = persistent; }
 
     // -----------------------
@@ -76,7 +80,7 @@ public class BaseFatturaDAO implements FatturaDAO {
         }
         return f;
     }
-
+    // store/delete/exist/create/findLastByUtente implementati in cache-first, raw* usati solo se persistent
     @Override
     public void store(Fattura entity) {
         if (entity == null) return;
@@ -221,7 +225,9 @@ public class BaseFatturaDAO implements FatturaDAO {
     }
 
     /** Utility per test/cleanup
-     *  
+     *  serve a svuotare la cache (non cancella dati persistenti, ma forzerà reload da raw al prossimo accesso)
+     *  potrei usare mock per testare solo la cache, ma questa è una soluzione semplice per testare anche il fallback raw
+     *  senza dover creare un provider specifico di test.
      */
     public void clear() {
         lock.writeLock().lock();

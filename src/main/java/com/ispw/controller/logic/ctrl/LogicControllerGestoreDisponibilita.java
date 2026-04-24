@@ -45,6 +45,8 @@ public class LogicControllerGestoreDisponibilita
      * - persiste il Campo.
      * Non cambia lo stato della prenotazione (delegalo al caso dâ€™uso Disdetta).
      */
+
+    //il metodo liberaslot effettua la logica di sblocco slot, ma non cambia lo stato della prenotazione (delegalo al caso d'uso Disdetta).
     @Override
     public void liberaSlot(int idPrenotazione) {
         Prenotazione p = prenotazioneDAO().load(idPrenotazione);
@@ -77,7 +79,7 @@ public class LogicControllerGestoreDisponibilita
     }
 
     /**
-     * Attiva la disponibilitÃ  del campo (prenotabile).
+     * Attiva la disponibilità  del campo (prenotabile).
      * Non avendo parametri temporali, restituiamo lista vuota (snello).
      */
     @Override
@@ -97,7 +99,7 @@ public class LogicControllerGestoreDisponibilita
 
     /**
      * Verifica disponibilitÃ :
-     * - Se idCampo Ã¨ presente, verifica solo quel campo, altrimenti su tutti i campi;
+     * - Se idCampo presente, verifica solo quel campo, altrimenti su tutti i campi;
      * - Calcola oraFine = oraInizio + durataMin (default 60 se null);
      * - Usa Campo.isDisponibile(Date, Time, Time) e lo stato operativo;
      * - Costruisce DatiDisponibilitaBean con data/ore in stringa e costo pro-rata.
