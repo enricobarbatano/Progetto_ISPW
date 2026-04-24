@@ -8,9 +8,9 @@ import com.ispw.dao.impl.base.BasePagamentoDAO;
 import com.ispw.dao.impl.base.BasePenalitaDAO;
 import com.ispw.dao.impl.base.BasePrenotazioneDAO;
 import com.ispw.dao.impl.base.BaseRegolePenalitaDAO;
+import com.ispw.dao.impl.base.BaseRegoleTempisticheDAO;
 import com.ispw.dao.impl.base.BaseUtenteFinaleDAO;
 import com.ispw.dao.impl.memory.concrete.InMemoryGestoreDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryRegoleTempisticheDAO;
 import com.ispw.dao.interfaces.CampoDAO;
 import com.ispw.dao.interfaces.FatturaDAO;
 import com.ispw.dao.interfaces.GeneralUserDAO;
@@ -111,7 +111,7 @@ public final class MemoryDAOFactory extends DAOFactory {
 
     @Override
     public synchronized RegoleTempisticheDAO getRegoleTempisticheDAO() {
-        if (regoleTempisticheDAO == null) regoleTempisticheDAO = new InMemoryRegoleTempisticheDAO();
+        if (regoleTempisticheDAO == null) regoleTempisticheDAO = new BaseRegoleTempisticheDAO();
         return regoleTempisticheDAO;
     }
 }

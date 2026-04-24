@@ -5,13 +5,13 @@ import java.nio.file.Path;
 import com.ispw.dao.impl.filesystem.concrete.CampoDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.FatturaDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.FileSystemGestoreDAO;
-import com.ispw.dao.impl.filesystem.concrete.FileSystemRegoleTempisticheDAO;
 import com.ispw.dao.impl.filesystem.concrete.GeneralUserDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.LogDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.PagamentoDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.PenalitaDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.PrenotazioneDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.RegolePenalitaDAOFileSystem;
+import com.ispw.dao.impl.filesystem.concrete.RegoleTempisticheDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.UtenteFinaleDAOFileSystem;
 import com.ispw.dao.interfaces.CampoDAO;
 import com.ispw.dao.interfaces.FatturaDAO;
@@ -115,7 +115,7 @@ public final class FileSystemDAOFactory extends DAOFactory {
 
     @Override
     public synchronized RegoleTempisticheDAO getRegoleTempisticheDAO() {
-        if (regoleTempisticheDAO == null) regoleTempisticheDAO = new FileSystemRegoleTempisticheDAO(root);
+        if (regoleTempisticheDAO == null) regoleTempisticheDAO = new RegoleTempisticheDAOFileSystem(root);
         return regoleTempisticheDAO;
     }
 }

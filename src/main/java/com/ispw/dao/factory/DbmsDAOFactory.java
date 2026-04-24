@@ -2,7 +2,7 @@ package com.ispw.dao.factory;
 
 import com.ispw.dao.impl.dbms.concrete.CampoDAODbms;
 import com.ispw.dao.impl.dbms.concrete.DbmsGestoreDAO;
-import com.ispw.dao.impl.dbms.concrete.DbmsRegoleTempisticheDAO;
+import com.ispw.dao.impl.dbms.concrete.RegoleTempisticheDAODbms;
 import com.ispw.dao.impl.dbms.concrete.FatturaDAODbms;
 import com.ispw.dao.impl.dbms.concrete.GeneralUserDAODbms;
 import com.ispw.dao.impl.dbms.concrete.LogDAODbms;
@@ -108,7 +108,7 @@ public final class DbmsDAOFactory extends DAOFactory {
 
     @Override
     public synchronized RegoleTempisticheDAO getRegoleTempisticheDAO() {
-        if (regoleTempisticheDAO == null) regoleTempisticheDAO = new DbmsRegoleTempisticheDAO(cf);
+        if (regoleTempisticheDAO == null) regoleTempisticheDAO = new RegoleTempisticheDAODbms(cf);
         return regoleTempisticheDAO;
     }
 
