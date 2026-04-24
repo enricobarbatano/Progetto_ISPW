@@ -4,8 +4,8 @@ import java.nio.file.Path;
 
 import com.ispw.dao.impl.filesystem.concrete.CampoDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.FatturaDAOFileSystem;
-import com.ispw.dao.impl.filesystem.concrete.FileSystemGestoreDAO;
 import com.ispw.dao.impl.filesystem.concrete.GeneralUserDAOFileSystem;
+import com.ispw.dao.impl.filesystem.concrete.GestoreDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.LogDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.PagamentoDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.PenalitaDAOFileSystem;
@@ -73,7 +73,7 @@ public final class FileSystemDAOFactory extends DAOFactory {
 
     @Override
     public synchronized GestoreDAO getGestoreDAO() {
-        if (gestoreDAO == null) gestoreDAO = new FileSystemGestoreDAO(root);
+        if (gestoreDAO == null) gestoreDAO = new GestoreDAOFileSystem(root);
         return gestoreDAO;
     }
 

@@ -3,6 +3,7 @@ package com.ispw.dao.factory;
 import com.ispw.dao.impl.base.BaseCampoDAO;
 import com.ispw.dao.impl.base.BaseFatturaDAO;
 import com.ispw.dao.impl.base.BaseGeneralUserDAO;
+import com.ispw.dao.impl.base.BaseGestoreDAO;
 import com.ispw.dao.impl.base.BaseLogDAO;
 import com.ispw.dao.impl.base.BasePagamentoDAO;
 import com.ispw.dao.impl.base.BasePenalitaDAO;
@@ -10,7 +11,6 @@ import com.ispw.dao.impl.base.BasePrenotazioneDAO;
 import com.ispw.dao.impl.base.BaseRegolePenalitaDAO;
 import com.ispw.dao.impl.base.BaseRegoleTempisticheDAO;
 import com.ispw.dao.impl.base.BaseUtenteFinaleDAO;
-import com.ispw.dao.impl.memory.concrete.InMemoryGestoreDAO;
 import com.ispw.dao.interfaces.CampoDAO;
 import com.ispw.dao.interfaces.FatturaDAO;
 import com.ispw.dao.interfaces.GeneralUserDAO;
@@ -69,7 +69,7 @@ public final class MemoryDAOFactory extends DAOFactory {
 
     @Override
     public synchronized GestoreDAO getGestoreDAO() {
-        if (gestoreDAO == null) gestoreDAO = new InMemoryGestoreDAO();
+        if (gestoreDAO == null) gestoreDAO = new BaseGestoreDAO();
         return gestoreDAO;
     }
 
