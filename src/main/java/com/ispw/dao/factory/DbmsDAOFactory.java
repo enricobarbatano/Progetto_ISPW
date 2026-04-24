@@ -2,7 +2,6 @@ package com.ispw.dao.factory;
 
 import com.ispw.dao.impl.dbms.concrete.CampoDAODbms;
 import com.ispw.dao.impl.dbms.concrete.DbmsGestoreDAO;
-import com.ispw.dao.impl.dbms.concrete.DbmsRegolePenalitaDAO;
 import com.ispw.dao.impl.dbms.concrete.DbmsRegoleTempisticheDAO;
 import com.ispw.dao.impl.dbms.concrete.FatturaDAODbms;
 import com.ispw.dao.impl.dbms.concrete.GeneralUserDAODbms;
@@ -10,6 +9,7 @@ import com.ispw.dao.impl.dbms.concrete.LogDAODbms;
 import com.ispw.dao.impl.dbms.concrete.PagamentoDAODbms;
 import com.ispw.dao.impl.dbms.concrete.PenalitaDAODbms;
 import com.ispw.dao.impl.dbms.concrete.PrenotazioneDAODbms;
+import com.ispw.dao.impl.dbms.concrete.RegolePenalitaDAODbms;
 import com.ispw.dao.impl.dbms.concrete.UtenteFinaleDAODbms;
 import com.ispw.dao.impl.dbms.connection.DbmsConnectionFactory;
 import com.ispw.dao.interfaces.CampoDAO;
@@ -114,7 +114,7 @@ public final class DbmsDAOFactory extends DAOFactory {
 
     @Override
     public synchronized RegolePenalitaDAO getRegolePenalitaDAO() {
-        if (regolePenalitaDAO == null) regolePenalitaDAO = new DbmsRegolePenalitaDAO(cf);
+        if (regolePenalitaDAO == null) regolePenalitaDAO = new RegolePenalitaDAODbms(cf);
         return regolePenalitaDAO;
     }
 

@@ -7,22 +7,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import com.ispw.dao.impl.dbms.base.DbmsDAO;
+import com.ispw.dao.impl.base.BaseRegolePenalitaDAO;
 import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
-import com.ispw.dao.interfaces.RegolePenalitaDAO;
 import com.ispw.model.entity.RegolePenalita;
 
 /**
- * SEZIONE ARCHITETTURALE
- * Ruolo: DAO DBMS per RegolePenalita.
- * Responsabilita': gestire accesso al DB tramite SQL e mapping.
- *
- * SEZIONE LOGICA
- * Gestisce una singola riga (id fisso) con transazione di aggiornamento.
+ * Provider DBMS per RegolePenalita.
+ * Gestisce UNA SOLA configurazione (id fisso = 1).
  */
-public final class DbmsRegolePenalitaDAO
-        extends DbmsDAO<Integer, RegolePenalita>
-        implements RegolePenalitaDAO {
+public class RegolePenalitaDAODbms extends BaseRegolePenalitaDAO {
 
     private static final String SQL_SELECT_ONE =
         "SELECT valore_penalita, preavviso_minimo FROM regole_penalita WHERE id = 1";
@@ -33,27 +26,41 @@ public final class DbmsRegolePenalitaDAO
     private static final String SQL_INSERT_ONE =
         "INSERT INTO regole_penalita (id, valore_penalita, preavviso_minimo) VALUES (1, ?, ?)";
 
-    public DbmsRegolePenalitaDAO(ConnectionFactory cf) { super(cf); }
+    private final ConnectionFactory cf;
 
-    @Override
-    public RegolePenalita get() {
-        return queryOne(SQL_SELECT_ONE, null, (ResultSet rs) -> {
-            RegolePenalita rp = new RegolePenalita();
-            // Entity vuole BigDecimal:
-            rp.setValorePenalita(rs.getBigDecimal("valore_penalita"));
-            rp.setPreavvisoMinimo(rs.getInt("preavviso_minimo"));
-            return rp;
-        }).orElse(null);
+    public RegolePenalitaDAODbms(ConnectionFactory cf) {
+        super(true); // persistent
+        this.cf = cf;
     }
 
     @Override
-    public void save(RegolePenalita regole) {
-        if (regole == null) return;
-        try (Connection c = openConnection()) {
+    protected RegolePenalita rawLoad() {
+        try (Connection c = cf.getConnection();
+             PreparedStatement ps = c.prepareStatement(SQL_SELECT_ONE);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (!rs.next()) return null;
+
+            RegolePenalita rp = new RegolePenalita();
+            rp.setIdConfig(1);
+            rp.setValorePenalita(rs.getBigDecimal("valore_penalita"));
+            rp.setPreavvisoMinimo(rs.getInt("preavviso_minimo"));
+            return rp;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Errore DBMS RegolePenalita rawLoad", e);
+        }
+    }
+
+    @Override
+    protected void rawSave(RegolePenalita regole) {
+        try (Connection c = cf.getConnection()) {
             c.setAutoCommit(false);
+
             try (PreparedStatement del = c.prepareStatement(SQL_DELETE_ONE)) {
                 del.executeUpdate();
             }
+
             try (PreparedStatement ins = c.prepareStatement(SQL_INSERT_ONE)) {
                 BigDecimal v = regole.getValorePenalita();
                 if (v != null) ins.setBigDecimal(1, v);
@@ -62,16 +69,10 @@ public final class DbmsRegolePenalitaDAO
                 ins.setInt(2, regole.getPreavvisoMinimo());
                 ins.executeUpdate();
             }
+
             c.commit();
         } catch (SQLException e) {
-            throw wrap(e);
+            throw new RuntimeException("Errore DBMS RegolePenalita rawSave", e);
         }
     }
-
-    // Non usati per lo scenario "singleton row"
-    @Override public RegolePenalita load(Integer id)                 { throw new UnsupportedOperationException(); }
-    @Override public void store(RegolePenalita entity)               { throw new UnsupportedOperationException(); }
-    @Override public void delete(Integer id)                         { throw new UnsupportedOperationException(); }
-    @Override public boolean exists(Integer id)                      { throw new UnsupportedOperationException(); }
-    @Override public RegolePenalita create(Integer id)               { throw new UnsupportedOperationException(); }
 }
