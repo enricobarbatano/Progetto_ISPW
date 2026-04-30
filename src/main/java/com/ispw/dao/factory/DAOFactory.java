@@ -17,28 +17,39 @@ import com.ispw.model.enums.PersistencyProvider;
 
 public abstract class DAOFactory {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: factory astratta per DAO, seleziona provider.
-    // A2) Stato: provider, instance e root FS.
-
     private static PersistencyProvider provider;
     private static DAOFactory instance;
 
     private static Path fileSystemRoot;
 
+    // ✅ IN_MEMORY seed root (solo lettura; non persiste)
+    private static Path seedRoot;
+
+    /**
+     * Seed root per provider IN_MEMORY.
+     * - se non impostata, fallback su cartella "seed" relativa al working dir.
+     *
+     * NOTA: deve essere public perché i BaseDAO (in package diverso) devono leggerla.
+     */
+    public static Path getSeedRootOrDefault() {
+        return (seedRoot != null) ? seedRoot : Path.of("seed");
+    }
+
     protected static Path getFileSystemRootOrThrow() {
         if (fileSystemRoot == null) {
-            throw new IllegalStateException("FileSystem root non impostata (chiama initialize(PersistencyProvider, Path) nel bootstrap).");
+            throw new IllegalStateException(
+                "FileSystem root non impostata (chiama initialize(PersistencyProvider, Path) nel bootstrap)."
+            );
         }
         return fileSystemRoot;
     }
 
-    // SEZIONE LOGICA
-    // Legenda logica:
-    // L1) initialize/getInstance: selezione provider e singleton.
-    // L2) resetForTests: reset stato per test.
-    // L3) get*DAO: factory methods.
+    /**
+     * initialize:
+     * - FILE_SYSTEM: root = filesystem root obbligatoria
+     * - IN_MEMORY:   root = seed root (opzionale; se null -> Path.of(\"seed\"))
+     * - DBMS:        root ignorata
+     */
     public static synchronized void initialize(PersistencyProvider p, Path root) {
         if (provider != null) {
             throw new IllegalStateException("DAOFactory gia inizializzata.");
@@ -46,12 +57,19 @@ public abstract class DAOFactory {
         if (p == null) {
             throw new IllegalArgumentException("PersistencyProvider non puo essere null");
         }
+
         if (p == PersistencyProvider.FILE_SYSTEM) {
             if (root == null) {
                 throw new IllegalArgumentException("FileSystem root richiesta per FILE_SYSTEM");
             }
             fileSystemRoot = root;
         }
+
+        if (p == PersistencyProvider.IN_MEMORY) {
+            // root qui rappresenta la seed root (solo lettura)
+            seedRoot = root; // può essere null -> fallback su Path.of("seed")
+        }
+
         provider = p;
         instance = switch (provider) {
             case IN_MEMORY   -> new MemoryDAOFactory();
@@ -64,12 +82,15 @@ public abstract class DAOFactory {
     static synchronized void resetForTests() {
         provider = null;
         fileSystemRoot = null;
+        seedRoot = null; // ✅ importantissimo per test ripetibili
         instance = null;
     }
 
     public static synchronized DAOFactory getInstance() {
         if (provider == null) {
-            throw new IllegalStateException("DAOFactory non configurata. Chiama initialize(PersistencyProvider, Path) prima.");
+            throw new IllegalStateException(
+                "DAOFactory non configurata. Chiama initialize(PersistencyProvider, Path) prima."
+            );
         }
         if (instance == null) {
             instance = switch (provider) {
@@ -95,6 +116,4 @@ public abstract class DAOFactory {
 
     public abstract RegolePenalitaDAO getRegolePenalitaDAO();
     public abstract RegoleTempisticheDAO getRegoleTempisticheDAO();
-
-
 }

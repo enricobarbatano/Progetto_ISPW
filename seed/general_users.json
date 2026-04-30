@@ -1,0 +1,11 @@
+[ {
+  "idUtente" : 1,
+  "nome" : "enrico",
+  "cognome" : "barbatano",
+  "email" : "enrico.barbatano@gmail.com",
+  "password" : "password",
+  "statoAccount" : "DA_CONFERMARE",
+  "ruolo" : "UTENTE",
+  "penalita" : null,
+  "storicoPrenotazioni" : [ ]
+} ]

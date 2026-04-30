@@ -1,0 +1,49 @@
+[ {
+  "idLog" : 1,
+  "timestamp" : "2026-04-24T18:30:27.3499931",
+  "tipoOperazione" : "ACCESSO_ESEGUITO",
+  "idUtenteCoinvolto" : 100,
+  "descrizione" : "Login effettuato per utente admin@test.it"
+}, {
+  "idLog" : 2,
+  "timestamp" : "2026-04-24T18:31:15.0232814",
+  "tipoOperazione" : "ACCESSO_ESEGUITO",
+  "idUtenteCoinvolto" : 1,
+  "descrizione" : "Login effettuato per utente mario.rossi@test.it"
+}, {
+  "idLog" : 3,
+  "timestamp" : "2026-04-24T18:31:49.2435102",
+  "tipoOperazione" : "REGISTRAZIONE_ACCOUNT",
+  "idUtenteCoinvolto" : 1,
+  "descrizione" : "Registrazione avviata; richiesta conferma inviata"
+}, {
+  "idLog" : 4,
+  "timestamp" : "2026-04-29T18:53:19.9963472",
+  "tipoOperazione" : "ACCESSO_ESEGUITO",
+  "idUtenteCoinvolto" : 100,
+  "descrizione" : "Login effettuato per utente admin@test.it"
+}, {
+  "idLog" : 5,
+  "timestamp" : "2026-04-29T18:53:48.7879378",
+  "tipoOperazione" : "ACCESSO_ESEGUITO",
+  "idUtenteCoinvolto" : 1,
+  "descrizione" : "Login effettuato per utente mario.rossi@test.it"
+}, {
+  "idLog" : 6,
+  "timestamp" : "2026-04-29T19:02:00.0783743",
+  "tipoOperazione" : "REGISTRAZIONE_ACCOUNT",
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "Registrazione avviata; richiesta conferma inviata"
+}, {
+  "idLog" : 7,
+  "timestamp" : "2026-04-29T19:02:00.0883573",
+  "tipoOperazione" : "ACCOUNT_ATTIVATO",
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "Conferma registrazione completata (simulata)"
+}, {
+  "idLog" : 8,
+  "timestamp" : "2026-04-29T19:02:49.2015177",
+  "tipoOperazione" : "ACCESSO_ESEGUITO",
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "Login effettuato per utente enrico.barbatano@gmail.com"
+} ]

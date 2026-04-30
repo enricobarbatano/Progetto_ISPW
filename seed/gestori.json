@@ -1,0 +1,10 @@
+[ {
+  "idUtente" : 100,
+  "nome" : "Admin",
+  "cognome" : "Sistema",
+  "email" : "admin@test.it",
+  "password" : "admin",
+  "statoAccount" : "ATTIVO",
+  "ruolo" : "GESTORE",
+  "permessi" : [ "CAMPO", "PENALITA", "TEMPISTICHE" ]
+} ]

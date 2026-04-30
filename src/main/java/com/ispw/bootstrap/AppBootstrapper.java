@@ -20,7 +20,7 @@ public final class AppBootstrapper {
         // 2) Config DBMS (solo se DBMS)
         if (config.persistency() == PersistencyProvider.DBMS) {
             DbmsConnectionFactory.init(
-                // NOTA: niente HTML entities nellâ€™URL
+                // FIX: niente &amp; nel codice Java
                 "jdbc:mysql://localhost:3306/centro_sportivo?useSSL=false&serverTimezone=Europe/Rome",
                 "ispw_user",
                 "ispw_user"
@@ -55,22 +55,44 @@ public final class AppBootstrapper {
             System.out.println("FILE_SYSTEM root impostata su: " + root.toAbsolutePath());
         }
 
+        // 2c) Config IN_MEMORY seed root (solo se IN_MEMORY)
+        Path seedRoot = null;
+        if (config.persistency() == PersistencyProvider.IN_MEMORY) {
+            // la tua cartella seed (solo lettura per pre-caricare cache)
+            seedRoot = Paths.get("C:\\Users\\User\\ISPW_Project\\Progetto_ISPW\\seed");
+            if (!Files.exists(seedRoot)) {
+                System.err.println("Cartella seed non trovata: " + seedRoot.toAbsolutePath());
+                return;
+            }
+            System.out.println("IN_MEMORY seed root impostata su: " + seedRoot.toAbsolutePath());
+        }
+
         // 3) Configura persistenza (DAOFactory guidata dal provider)
-        DAOFactory.initialize(config.persistency(), fsRoot);
-        
+        //    - FILE_SYSTEM: root = fsRoot
+        //    - IN_MEMORY:   root = seedRoot (seed-only, non persistente)
+        //    - DBMS:        root = null
+        Path rootForProvider = switch (config.persistency()) {
+            case FILE_SYSTEM -> fsRoot;
+            case IN_MEMORY   -> seedRoot;
+            case DBMS        -> null;
+        };
+
+        DAOFactory.initialize(config.persistency(), rootForProvider);
+
+        // Se il tuo SetupBootstrapper fa cose diverse per provider, puoi passargli rootForProvider.
+        // (Non cambia nulla se internamente controlla il provider.)
         SetupBootstrapper.bootstrapIfNeeded(
-        config.persistency(),
-        fsRoot
+            config.persistency(),
+            rootForProvider
         );
 
-        // Messaggio parametrico: MessageFormat
         System.out.println("Persistency provider: " + config.persistency());
 
         // 4) Configura frontend
         FrontendControllerFactory.setFrontendProvider(config.frontend());
         System.out.println("Frontend provider: " + config.frontend());
 
-        // 5) Avvio UI (nessun parametro -> ok Supplier o stringa diretta)
+        // 5) Avvio UI
         System.out.println("Avvio applicazione...");
         FrontendControllerFactory.getInstance().startApplication();
     }

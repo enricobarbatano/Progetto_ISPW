@@ -1,0 +1,21 @@
+[ {
+  "idUtente" : 1,
+  "nome" : "Mario",
+  "cognome" : "Rossi",
+  "email" : "mario.rossi@test.it",
+  "password" : "password",
+  "statoAccount" : "ATTIVO",
+  "ruolo" : "UTENTE",
+  "penalita" : null,
+  "storicoPrenotazioni" : [ ]
+}, {
+  "idUtente" : 2,
+  "nome" : "enrico",
+  "cognome" : "barbatano",
+  "email" : "enrico.barbatano@gmail.com",
+  "password" : "password",
+  "statoAccount" : "ATTIVO",
+  "ruolo" : "UTENTE",
+  "penalita" : null,
+  "storicoPrenotazioni" : [ ]
+} ]

@@ -1,7 +1,14 @@
 package com.ispw.dao.impl.base;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.ispw.dao.factory.DAOFactory;
 import com.ispw.dao.interfaces.RegolePenalitaDAO;
 import com.ispw.model.entity.RegolePenalita;
 
@@ -11,74 +18,106 @@ import com.ispw.model.entity.RegolePenalita;
  * Semantica:
  * - ESISTE UNA SOLA configurazione nel sistema (singleton logico)
  * - cache-first
- * - IN_MEMORY se persistent=false
- * - DBMS/FS se persistent=true
+ *
+ * Tri-state persistence flag:
+ * - persistent == TRUE  : DBMS/FS (rawLoad/rawSave)
+ * - persistent == FALSE : IN_MEMORY puro (no seed)
+ * - persistent == NULL  : IN_MEMORY seeded (load once from seed/regole_penalita.json; never persist back)
  */
 public class BaseRegolePenalitaDAO implements RegolePenalitaDAO {
 
-    /** Cache della configurazione unica */
     protected final AtomicReference<RegolePenalita> cache = new AtomicReference<>();
 
-    /**
-     * Indica se il provider è persistente (DB/FS) oppure IN_MEMORY.
-     */
-    private final boolean persistent;
+    private final Boolean persistent;
 
+    private volatile boolean seeded = false;
+
+    /** Default: IN_MEMORY seeded (persistent == null) */
     public BaseRegolePenalitaDAO() {
-        this(false);
+        this(null);
     }
 
-    protected BaseRegolePenalitaDAO(boolean persistent) {
+    protected BaseRegolePenalitaDAO(Boolean persistent) {
         this.persistent = persistent;
     }
 
     // -----------------------
     // RAW HOOKS (I/O)
-    // Subclass DBMS/FS devono implementare questi metodi
     // -----------------------
+    protected RegolePenalita rawLoad() { return null; }
+    protected void rawSave(RegolePenalita regole) { /* no-op per base */ }
 
-    /**
-     * Carica la configurazione dal provider persistente.
-     * Deve restituire:
-     * - l'istanza di RegolePenalita
-     * - oppure null se non ancora configurata
-     */
-    protected RegolePenalita rawLoad() {
-        return null;
+    // -----------------------
+    // Seed logic (ONLY when persistent == null)
+    // -----------------------
+    private void ensureSeeded() {
+        if (persistent != null) return;
+        if (seeded) return;
+
+        synchronized (this) {
+            if (seeded) return;
+
+            // ✅ prima controlla cache
+            if (cache.get() != null) {
+                seeded = true;
+                return;
+            }
+
+            RegolePenalita seed = readSeedRegolePenalita();
+            if (seed != null) {
+                seed.setIdConfig(1);
+                cache.set(seed);
+            }
+
+            seeded = true;
+        }
     }
 
-    /**
-     * Salva la configurazione nel provider persistente.
-     * Deve sovrascrivere l'eventuale configurazione esistente.
-     */
-    protected void rawSave(RegolePenalita regole) {
-        // no-op per IN_MEMORY
+    private RegolePenalita readSeedRegolePenalita() {
+        try {
+            Path root = DAOFactory.getSeedRootOrDefault();
+            Path file = root.resolve("regole_penalita.json");
+            if (!Files.exists(file)) return null;
+
+            ObjectMapper om = new ObjectMapper();
+            om.registerModule(new JavaTimeModule());
+
+            // 1) prova come oggetto singolo
+            try {
+                return om.readValue(file.toFile(), RegolePenalita.class);
+            } catch (Exception ignore) {
+                // 2) fallback: prova come lista e prendi il primo
+                CollectionType listType = om.getTypeFactory()
+                        .constructCollectionType(List.class, RegolePenalita.class);
+                List<RegolePenalita> list = om.readValue(file.toFile(), listType);
+                return (list == null || list.isEmpty()) ? null : list.get(0);
+            }
+        } catch (Exception ex) {
+            return null; // best-effort
+        }
     }
 
     // -----------------------
     // API RegolePenalitaDAO
     // -----------------------
-
     @Override
     public RegolePenalita get() {
-        // 1) cache-first
+        ensureSeeded();
+
         RegolePenalita cached = cache.get();
         if (cached != null) {
             return cached;
         }
 
-        // 2) fallback al provider persistente
-        if (persistent) {
+        if (Boolean.TRUE.equals(persistent)) {
             RegolePenalita loaded = rawLoad();
             if (loaded != null) {
-                // forziamo idConfig=1 per coerenza architetturale
                 loaded.setIdConfig(1);
                 cache.set(loaded);
             }
             return loaded;
         }
 
-        // IN_MEMORY e cache vuota
         return null;
     }
 
@@ -88,23 +127,18 @@ public class BaseRegolePenalitaDAO implements RegolePenalitaDAO {
             throw new IllegalArgumentException("regole non possono essere null");
         }
 
-        // Forziamo l'identificativo unico
-        regole.setIdConfig(1);
+        ensureSeeded();
 
-        // 1) aggiorna cache
+        regole.setIdConfig(1);
         cache.set(regole);
 
-        // 2) persistenza se configurata
-        if (persistent) {
+        if (Boolean.TRUE.equals(persistent)) {
             rawSave(regole);
         }
     }
 
-    /**
-     * Utility per test: pulisce la cache.
-     * Non cancella la configurazione persistente.
-     */
     public void clear() {
         cache.set(null);
+        seeded = false;
     }
 }
