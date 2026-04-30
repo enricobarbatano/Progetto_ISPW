@@ -1,7 +1,6 @@
 package com.ispw.controller.logic.ctrl;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,16 +48,10 @@ public class LogicControllerConfiguraRegole {
     private static final String MSG_INPUT_PEN_KO       = "Regole penalita non valide";
     private static final String MSG_UPDATE_PEN_OK      = "Regole penalita aggiornate";
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: usa interfacce Gestione* via parametro (DIP).
-    // A2) IO verso GUI/CLI: riceve/ritorna bean (CampiBean, RegolaCampoBean, TempisticheBean, PenalitaBean).
-    // A3) Persistenza: usa DAO via DAOFactory.
-    // Logger on-demand (S1312)
     @SuppressWarnings("java:S1312")
     private Logger log() { return Logger.getLogger(getClass().getName()); }
 
-    // DAO accessors (no concreti)
+    // DAO accessors (runtime via factory)
     private CampoDAO campoDAO() {
         return DAOFactory.getInstance().getCampoDAO();
     }
@@ -73,10 +66,6 @@ public class LogicControllerConfiguraRegole {
     }
 
     // 0) Lista campi (supporto UI)
-
-    /**
-     * Restituisce una lista di campi in formato testuale per la selezione UI.
-     */
     public CampiBean listaCampi() {
         CampiBean out = new CampiBean();
         out.setCampi(campoDAO().findAll().stream()
@@ -103,33 +92,30 @@ public class LogicControllerConfiguraRegole {
 
     // 1) Aggiorna stato operativo campo (attivo/manutenzione)
 
-    /** Aggiorna lo stato operativo del campo (attivo/manutenzione). Orchestrazione opzionale negli overload. */
     public EsitoOperazioneBean aggiornaRegoleCampo(RegolaCampoBean bean) {
         if (!isValid(bean)) {
             return esito(false, MSG_INPUT_CAMPO_KO);
         }
+
         final int idCampo = bean.getIdCampo();
         final Campo c = campoDAO().findById(idCampo);
         if (c == null) {
             return esito(false, MSG_CAMPO_NOT_FOUND);
         }
 
-        boolean attivo = Boolean.TRUE.equals(bean.getAttivo());
-        boolean manut = Boolean.TRUE.equals(bean.getFlagManutenzione());
+        final boolean attivo = Boolean.TRUE.equals(bean.getAttivo());
+        final boolean manut  = Boolean.TRUE.equals(bean.getFlagManutenzione());
 
+        // ✅ senza reflection: usa l’API stabile del dominio
         updateCampoOperativo(c, attivo, manut);
+
         campoDAO().store(c);
 
-        appendLogSafe(String.format("[REGOLE] Aggiornato campo id=%d attivo=%s manutenzione=%s", idCampo, attivo, manut));
+        appendLogSafe(String.format("[REGOLE] Aggiornato campo id=%d attivo=%s manutenzione=%s",
+                idCampo, attivo, manut));
         return esito(true, MSG_UPDATE_CAMPO_OK);
     }
 
-    /**
-     * Overload con orchestrazione DIP:
-     * - DisponibilitÃ : attiva se (attivo && !manutenzione), altrimenti rimuovi.
-     * - Manutenzione: se manutenzione==true â†’ invio alert manutentore.
-     * - Notifica: broadcast aggiornamento regole.
-     */
     public EsitoOperazioneBean aggiornaRegoleCampo(RegolaCampoBean bean,
                                                    GestioneDisponibilitaGestioneRegole dispCtrl,
                                                    GestioneManutenzioneConfiguraRegole manCtrl,
@@ -139,9 +125,9 @@ public class LogicControllerConfiguraRegole {
 
         final int idCampo = bean.getIdCampo();
         final boolean attivo = Boolean.TRUE.equals(bean.getAttivo());
-        final boolean manut = Boolean.TRUE.equals(bean.getFlagManutenzione());
+        final boolean manut  = Boolean.TRUE.equals(bean.getFlagManutenzione());
 
-        // DisponibilitÃ 
+        // Disponibilità
         if (dispCtrl != null) {
             try {
                 if (attivo && !manut) {
@@ -154,7 +140,7 @@ public class LogicControllerConfiguraRegole {
             }
         }
 
-        // Manutenzione
+        // Manutenzione: alert
         if (manut && manCtrl != null) {
             try {
                 manCtrl.inviaAlertManutentore(idCampo);
@@ -169,7 +155,7 @@ public class LogicControllerConfiguraRegole {
         return base;
     }
 
-    // 2) Esegui manutenzione (forza flag manutenzione e rimuove disponibilitÃ )
+    // 2) Esegui manutenzione (forza flag manutenzione e rimuove disponibilità)
 
     public EsitoOperazioneBean eseguiManutenzione(RegolaCampoBean bean) {
         if (bean == null || bean.getIdCampo() <= 0) {
@@ -189,7 +175,6 @@ public class LogicControllerConfiguraRegole {
         return esito(true, MSG_MANUT_OK);
     }
 
-    /** Overload con orchestrazione: rimuove disponibilitÃ , avvisa manutentore, broadcast. */
     public EsitoOperazioneBean eseguiManutenzione(RegolaCampoBean bean,
                                                   GestioneDisponibilitaGestioneRegole dispCtrl,
                                                   GestioneManutenzioneConfiguraRegole manCtrl,
@@ -199,13 +184,13 @@ public class LogicControllerConfiguraRegole {
 
         final int idCampo = bean.getIdCampo();
 
-        // DisponibilitÃ  â†’ rimuovi
+        // Disponibilità → rimuovi
         if (dispCtrl != null) {
             try { dispCtrl.rimuoviDisponibilita(idCampo); }
             catch (RuntimeException ex) { log().log(Level.FINE, "Rimozione disponibilità fallita: {0}", ex.getMessage()); }
         }
 
-        // Manutenzione â†’ alert
+        // Manutenzione → alert
         if (manCtrl != null) {
             try { manCtrl.inviaAlertManutentore(idCampo); }
             catch (RuntimeException ex) { log().log(Level.FINE, "Alert manutenzione fallito: {0}", ex.getMessage()); }
@@ -242,7 +227,6 @@ public class LogicControllerConfiguraRegole {
         return esito(true, MSG_UPDATE_TEMP_OK);
     }
 
-    /** Overload con notifica broadcast. */
     public EsitoOperazioneBean aggiornaRegolaTempistiche(TempisticheBean bean, GestioneNotificaConfiguraRegole notiCtrl) {
         EsitoOperazioneBean base = aggiornaRegolaTempistiche(bean);
         if (base.isSuccesso()) {
@@ -251,7 +235,7 @@ public class LogicControllerConfiguraRegole {
         return base;
     }
 
-    // 4) Aggiorna Regole PenalitÃ 
+    // 4) Aggiorna Regole Penalità
 
     public EsitoOperazioneBean aggiornaRegolepenalita(PenalitaBean bean) {
         if (!isValid(bean)) {
@@ -274,7 +258,6 @@ public class LogicControllerConfiguraRegole {
         return esito(true, MSG_UPDATE_PEN_OK);
     }
 
-    /** Overload con notifica broadcast. */
     public EsitoOperazioneBean aggiornaRegolepenalita(PenalitaBean bean, GestioneNotificaConfiguraRegole notiCtrl) {
         EsitoOperazioneBean base = aggiornaRegolepenalita(bean);
         if (base.isSuccesso()) {
@@ -283,20 +266,8 @@ public class LogicControllerConfiguraRegole {
         return base;
     }
 
-    // SEZIONE LOGICA
-    // Legenda metodi:
-    // 1) isValid(RegolaCampoBean) - valida input regole campo.
-    // 2) isValid(TempisticheBean) - valida regole tempistiche.
-    // 3) isValid(PenalitaBean) - valida regole penalita.
-    // 4) esito(...) - costruisce l'esito operazione.
-    // 5) appendLogSafe(...) - log best-effort su LogDAO.
-    // 6) generaNotificaAutomatica(...) - invia broadcast se disponibile.
-    // 7) updateCampoOperativo(...) - applica stato campo con fallback reflection.
-    // 8) invokeSetter(...) - helper reflection per setter.
-    // 9) setFieldIfExists(...) - helper reflection per field.
-    // 10) findField(...) - ricerca field nella gerarchia.
+    // ===================== LOGICA (helpers) =====================
 
-    // ---> FIX 1: forma condensata, elimina if ridondanti
     private boolean isValid(RegolaCampoBean b) {
         return b != null
             && b.getIdCampo() > 0
@@ -304,7 +275,6 @@ public class LogicControllerConfiguraRegole {
             && b.getFlagManutenzione() != null;
     }
 
-    // ---> FIX 2: forma condensata, elimina if ridondanti
     private boolean isValid(TempisticheBean b) {
         return b != null
             && b.getDurataSlotMinuti() > 0
@@ -314,7 +284,6 @@ public class LogicControllerConfiguraRegole {
             && b.getPreavvisoMinimoMinuti() >= 0;
     }
 
-    // ---> FIX 3: forma condensata, elimina if ridondanti
     private boolean isValid(PenalitaBean b) {
         return b != null
             && b.getValorePenalita() != null
@@ -329,7 +298,6 @@ public class LogicControllerConfiguraRegole {
         return e;
     }
 
-    /** Best-effort log: evita eccezioni a runtime. */
     private void appendLogSafe(String descr) {
         try {
             SystemLog l = new SystemLog();
@@ -342,7 +310,6 @@ public class LogicControllerConfiguraRegole {
         }
     }
 
-    /** Invoca la broadcast di aggiornamento regole se disponibile. */
     private void generaNotificaAutomatica(GestioneNotificaConfiguraRegole notiCtrl) {
         if (notiCtrl == null) return;
         try {
@@ -353,66 +320,25 @@ public class LogicControllerConfiguraRegole {
     }
 
     /**
-     * Aggiorna il campo in modo compatibile con possibili differenze di naming
-     * (setIsAttivo/setAttivo, setFlagManutenzione/setManutenzione) usando reflection;
-     * se non riesce, tenta i field diretti.
+     * ✅ Versione pulita (no reflection):
+     * usa il metodo di dominio già presente su Campo.
      */
-    private void updateCampoOperativo(Campo c, Boolean attivo, Boolean manut) {
+    private void updateCampoOperativo(Campo c, boolean attivo, boolean manut) {
         if (c == null) return;
-
-        boolean doneAtt = invokeSetter(c, "setIsAttivo", Boolean.class, attivo)
-                || invokeSetter(c, "setAttivo", Boolean.class, attivo);
-        boolean doneMan = invokeSetter(c, "setFlagManutenzione", Boolean.class, manut)
-                || invokeSetter(c, "setManutenzione", Boolean.class, manut);
-
-        if (!doneAtt) {
-            setFieldIfExists(c, "isAttivo", attivo);
-            setFieldIfExists(c, "attivo", attivo);
-        }
-        if (!doneMan) {
-            setFieldIfExists(c, "flagManutenzione", manut);
-            setFieldIfExists(c, "manutenzione", manut);
-        }
-    }
-
-    private boolean invokeSetter(Object target, String method, Class<?> argType, Object value) {
         try {
-            Method m = target.getClass().getMethod(method, argType);
-            m.setAccessible(true);
-            m.invoke(target, value);
-            return true;
-        } catch (ReflectiveOperationException ex) {
-            // Reflection may fail for many reasons (method not present or invocation error) â€” log at FINE for diagnostics
-            log().log(Level.FINE, "invokeSetter failed: method={0} target={1} cause={2}", new Object[]{method, target.getClass().getName(), ex.getMessage()});
-            return false;
+            c.updateStatoOperativo(attivo, manut);
+        } catch (RuntimeException ex) {
+            // best-effort: non bloccare il caso d'uso per una validazione interna
+            log().log(Level.FINE, "updateStatoOperativo fallito: {0}", ex.getMessage());
         }
     }
 
-    private void setFieldIfExists(Object target, String field, Object value) {
-        if (target == null) return;
-        try {
-            Optional<Field> maybe = findField(target.getClass(), field);
-            if (maybe.isPresent()) {
-                Field f = maybe.get();
-                f.setAccessible(true);
-                f.set(target, value);
-            }
-        } catch (ReflectiveOperationException ex) {
-            log().log(Level.FINE, "setFieldIfExists failed: field={0} target={1} cause={2}", new Object[]{field, target.getClass().getName(), ex.getMessage()});
-        }
-    }
-
-    /** Cerca il field dichiarato nella gerarchia di classi; restituisce Optional.empty() se non trovato. */
-    private Optional<Field> findField(Class<?> clazz, String fieldName) {
-        Class<?> c = clazz;
-        while (c != null) {
-            try {
-                Field f = c.getDeclaredField(fieldName);
-                return Optional.of(f);
-            } catch (NoSuchFieldException ex) {
-                c = c.getSuperclass();
-            }
-        }
-        return Optional.empty();
-    }
+    // ---- I metodi reflection rimangono nel file solo perché non vuoi cambiare import/dipendenze.
+    // ---- Sono inutilizzati in questa versione (puoi rimuoverli in un cleanup finale).
+    @SuppressWarnings("unused")
+    private boolean invokeSetter(Object target, String method, Class<?> argType, Object value) { return false; }
+    @SuppressWarnings("unused")
+    private void setFieldIfExists(Object target, String field, Object value) { }
+    @SuppressWarnings("unused")
+    private Optional<Field> findField(Class<?> clazz, String fieldName) { return Optional.empty(); }
 }

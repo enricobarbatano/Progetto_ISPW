@@ -12,7 +12,6 @@ import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaPenalita;
 import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaPrenotazione;
 import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaRegistrazione;
 
-
 public class LogicControllerGestioneNotifica implements
         GestioneNotificaConfiguraRegole,
         GestioneNotificaPrenotazione,
@@ -21,18 +20,12 @@ public class LogicControllerGestioneNotifica implements
         GestioneNotificaGestioneAccount,
         GestioneNotificaPenalita {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: implementa interfacce GestioneNotifica* (DIP).
-    // A2) IO verso GUI/CLI: riceve UtenteBean e dati di contesto.
-    // A3) Persistenza: non usa DAO in questa classe.
+    private static final String UTENTE_NULL = "utente=null";
 
-    //  NOTIFICHE DISDETTA
-        private static final String UTENTE_NULL = "utente=null";
-    /** Invia (simulato) conferma cancellazione prenotazione. */
+    // ===================== DISDETTA =====================
+
     @Override
     public void inviaConfermaCancellazione(UtenteBean utente, String dettaglio) {
-        
         if (utente == null) {
             warn("Conferma cancellazione", UTENTE_NULL, dettaglio);
             return;
@@ -40,9 +33,8 @@ public class LogicControllerGestioneNotifica implements
         info("Conferma cancellazione", destinatario(utente), dettaglio);
     }
 
-    //  NOTIFICHE REGISTRAZIONE
+    // ===================== REGISTRAZIONE =====================
 
-    /** Invia (simulato) conferma registrazione account. */
     @Override
     public void inviaConfermaRegistrazione(UtenteBean utente) {
         if (utente == null) {
@@ -52,9 +44,8 @@ public class LogicControllerGestioneNotifica implements
         info("Conferma registrazione", destinatario(utente), null);
     }
 
-    //  NOTIFICHE ACCOUNT
+    // ===================== ACCOUNT =====================
 
-    /** Invia (simulato) conferma aggiornamento dati account. */
     @Override
     public void inviaConfermaAggiornamentoAccount(UtenteBean utente) {
         if (utente == null) {
@@ -64,9 +55,8 @@ public class LogicControllerGestioneNotifica implements
         info("Aggiornamento account", destinatario(utente), null);
     }
 
-    //  NOTIFICHE PENALITÃ€
+    // ===================== PENALITA =====================
 
-    /** Invia (simulato) notifica penalitÃ  all'utente indicato (id in String). */
     @Override
     public void inviaNotificaPenalita(String idUtente) {
         final String dest = (idUtente == null || idUtente.trim().isEmpty())
@@ -75,9 +65,8 @@ public class LogicControllerGestioneNotifica implements
         info("Notifica penalita", dest, null);
     }
 
-    //  NOTIFICHE PRENOTAZIONE
+    // ===================== PRENOTAZIONE =====================
 
-    /** Invia (simulato) conferma prenotazione con eventuale dettaglio. */
     @Override
     public void inviaConfermaPrenotazione(UtenteBean utente, String dettaglio) {
         if (utente == null) {
@@ -87,10 +76,6 @@ public class LogicControllerGestioneNotifica implements
         info("Conferma prenotazione", destinatario(utente), dettaglio);
     }
 
-    /**
-     * Imposta (simulato) un promemoria X minuti prima della prenotazione.
-     * Stampa su log una riga di scheduling (nessun job reale).
-     */
     @Override
     public void impostaPromemoria(int idPrenotazione, int minutiAnticipo) {
         if (idPrenotazione <= 0) {
@@ -106,36 +91,28 @@ public class LogicControllerGestioneNotifica implements
             new Object[]{idPrenotazione, minutiAnticipo});
     }
 
-    //  NOTIFICHE REGOLE
+    // ===================== REGOLE =====================
 
-    /** Invia (simulato) broadcast di aggiornamento regolamenti. */
     @Override
     public void inviaNotificaAggiornamentoRegole() {
         info("Aggiornamento regole", "BROADCAST: utenti interessati", null);
     }
 
-    // SEZIONE LOGICA
-    // Legenda metodi:
-    // 1) info(...) - log informativo.
-    // 2) warn(...) - log warning.
-    // 3) compose(...) - compone messaggio.
-    // 4) destinatario(...) - descrive destinatario.
-    // 5) log() - logger on-demand.
+    // ===================== LOGICA =====================
 
     /** Log INFO standardizzato. */
     private void info(String tipo, String destinatario, String dettaglio) {
-        final String msg = compose("[NOTIFICA]", tipo, destinatario, dettaglio);
-        log().fine(msg);
+        final String msg = composeInfo("[NOTIFICA]", tipo, destinatario, dettaglio);
+        log().log(Level.INFO, msg);
     }
 
     /** Log WARNING standardizzato. */
     private void warn(String contesto, String problema, String dettaglio) {
-        final String msg = compose("[NOTIFICA][WARN]", contesto, problema, dettaglio);
-        log().warning(msg);
+        final String msg = composeWarn("[NOTIFICA][WARN]", contesto, problema, dettaglio);
+        log().log(Level.WARNING, msg);
     }
 
-    /** Costruisce il messaggio evitando stringhe duplicate (S1192). */
-    private String compose(String prefix, String a, String b, String maybeDettaglio) {
+    private String composeInfo(String prefix, String a, String b, String maybeDettaglio) {
         final StringBuilder sb = new StringBuilder(96)
                 .append(prefix).append(' ')
                 .append(Objects.toString(a, ""))
@@ -144,15 +121,39 @@ public class LogicControllerGestioneNotifica implements
         if (maybeDettaglio != null && !maybeDettaglio.isBlank()) {
             sb.append(" | dettaglio=\"").append(maybeDettaglio).append('"');
         }
-        sb.append(" ... riuscito");
+        sb.append(" ... inviato");
         return sb.toString();
     }
 
-    /** Descrittore leggibile del destinatario a partire dal bean utente. */
+    private String composeWarn(String prefix, String a, String b, String maybeDettaglio) {
+        final StringBuilder sb = new StringBuilder(96)
+                .append(prefix).append(' ')
+                .append(Objects.toString(a, ""))
+                .append(" -> ")
+                .append(Objects.toString(b, ""));
+        if (maybeDettaglio != null && !maybeDettaglio.isBlank()) {
+            sb.append(" | dettaglio=\"").append(maybeDettaglio).append('"');
+        }
+        // niente "riuscito" sui warning
+        return sb.toString();
+    }
+
+    /** Descrittore leggibile del destinatario dal bean utente. */
     private String destinatario(UtenteBean utente) {
-        // Se UtenteBean espone getEmail()/getNome(), puoi raffinare:
-        
-        return (utente != null) ? utente.toString() : UTENTE_NULL;
+        if (utente == null) return UTENTE_NULL;
+
+        // Se UtenteBean ha getter standard, li usiamo (senza cambiare dipendenze).
+        // In caso contrario, fallback su toString().
+        try {
+            String email = utente.getEmail();
+            if (email != null && !email.isBlank()) {
+                return "email=" + email.trim();
+            }
+        } catch (RuntimeException ignore) {
+            // fallback sotto
+        }
+
+        return utente.toString();
     }
 
     @SuppressWarnings("java:S1312")

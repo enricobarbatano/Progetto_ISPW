@@ -1,3 +1,4 @@
+
 package com.ispw.controller.logic.ctrl;
 
 import java.time.LocalDateTime;
@@ -19,19 +20,8 @@ import com.ispw.model.enums.Ruolo;
 import com.ispw.model.enums.StatoAccount;
 import com.ispw.model.enums.TipoOperazione;
 
-
 public class LogicControllerRegistrazione {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: usa interfaccia GestioneNotificaRegistrazione via parametro (DIP).
-    // A2) IO verso GUI/CLI: riceve DatiRegistrazioneBean, ritorna EsitoOperazioneBean/UtenteBean.
-    // A3) Persistenza: usa DAO via DAOFactory.
-
-    /**
-     * Registra un nuovo utente in stato DA_CONFERMARE e invia la richiesta di conferma registrazione.
-     * La dipendenza dal controller di notifica Ã¨ passata via parametro (controller stateless).
-     */
     public EsitoOperazioneBean registraNuovoUtente(DatiRegistrazioneBean datiInput) {
         return registraNuovoUtente(datiInput, new LogicControllerGestioneNotifica());
     }
@@ -40,7 +30,6 @@ public class LogicControllerRegistrazione {
                                             GestioneNotificaRegistrazione notificaCtrl) {
         final EsitoOperazioneBean esito = new EsitoOperazioneBean();
 
-        // Validazione "scolastica"
         if (!isValid(datiInput) || notificaCtrl == null) {
             esito.setSuccesso(false);
             esito.setMessaggio("Dati registrazione o servizio notifica non validi");
@@ -48,37 +37,43 @@ public class LogicControllerRegistrazione {
             return esito;
         }
 
-        // 1) UnicitÃ  email via DAO (no SQL qui)
+        // ✅ normalizzazione email (senza cambiare import)
+        final String emailNorm = datiInput.getEmail().trim().toLowerCase();
+
+        // 1) Unicità email via DAO (facade aggregatrice)
         final GeneralUserDAO userDAO = generalUserDAO();
-        final GeneralUser existing = userDAO.findByEmail(datiInput.getEmail());
+        final GeneralUser existing = userDAO.findByEmail(emailNorm);
         if (existing != null) {
             esito.setSuccesso(false);
             esito.setMessaggio("Email gia registrata");
-            log().log(Level.WARNING, "[REG] Email gia presente: {0}", datiInput.getEmail());
+            log().log(Level.WARNING, "[REG] Email gia presente: {0}", emailNorm);
             return esito;
         }
 
-        // 2) Creazione utente (GeneralUser Ã¨ abstract â†’ uso UtenteFinale)
+        // 2) Creazione utente finale
         final UtenteFinale nuovo = new UtenteFinale();
         nuovo.setNome(datiInput.getNome());
         nuovo.setCognome(datiInput.getCognome());
-        nuovo.setEmail(datiInput.getEmail());
-        nuovo.setPassword(datiInput.getPassword()); // accademico: nessun hashing qui
+        nuovo.setEmail(emailNorm);                 // ✅ salva normalizzata
+        nuovo.setPassword(datiInput.getPassword());
         nuovo.setStatoAccount(StatoAccount.DA_CONFERMARE);
         nuovo.setRuolo(Ruolo.UTENTE);
-        userDAO.store(nuovo); // id assegnato dal DAO concreto
 
-        // 3) Log "REGISTRAZIONE_ACCOUNT" (append-only)
+        // store instradato dalla facade verso UtenteFinaleDAO
+        userDAO.store(nuovo);
+
+        // 3) Log registrazione
         appendLog(nuovo.getIdUtente(),
                 TipoOperazione.REGISTRAZIONE_ACCOUNT,
                 "Registrazione avviata; richiesta conferma inviata");
 
-        // 4) Notifica richiesta conferma registrazione (controller secondario passato per input)
+        // 4) Notifica
         notificaCtrl.inviaConfermaRegistrazione(toBean(nuovo));
 
-        // 4b) Simula conferma immediata (gestore reale)
+        // 4b) Simula conferma immediata
         nuovo.setStatoAccount(StatoAccount.ATTIVO);
         userDAO.store(nuovo);
+
         appendLog(nuovo.getIdUtente(),
             TipoOperazione.ACCOUNT_ATTIVATO,
             "Conferma registrazione completata (simulata)");
@@ -91,19 +86,18 @@ public class LogicControllerRegistrazione {
         return esito;
     }
 
-    /**
-     * Conferma un account (lookup via email) â†’ stato ATTIVO + log ACCOUNT_ATTIVATO.
-     * Il controller di notifica non serve qui, quindi non Ã¨ richiesto come parametro.
-     */
     public void confermaNuovoAccount(UtenteBean utente) {
         if (utente == null || !hasText(utente.getEmail())) {
             log().warning("[REG-CONF] UtenteBean nullo o email vuota");
             return;
         }
+
+        final String emailNorm = utente.getEmail().trim().toLowerCase();
+
         final GeneralUserDAO userDAO = generalUserDAO();
-        final GeneralUser u = userDAO.findByEmail(utente.getEmail());
+        final GeneralUser u = userDAO.findByEmail(emailNorm);
         if (u == null) {
-            log().log(Level.WARNING, "[REG-CONF] Nessun utente per email: {0}", utente.getEmail());
+            log().log(Level.WARNING, "[REG-CONF] Nessun utente per email: {0}", emailNorm);
             return;
         }
 
@@ -116,14 +110,12 @@ public class LogicControllerRegistrazione {
         log().log(Level.INFO, "[REG-CONF] Account confermato per utente #{0}", u.getIdUtente());
     }
 
-    /**
-     * Finalizza lâ€™attivazione via id utente â†’ stato ATTIVO + log ACCOUNT_ATTIVATO.
-     */
     public void finalizzaAttivazioneAccount(int idUtente) {
         if (idUtente <= 0) {
             log().warning("[REG-FINAL] idUtente non valido");
             return;
         }
+
         final GeneralUserDAO userDAO = generalUserDAO();
         final GeneralUser u = userDAO.findById(idUtente);
         if (u == null) {
@@ -155,20 +147,20 @@ public class LogicControllerRegistrazione {
     @SuppressWarnings("java:S1312")
     private Logger log() { return Logger.getLogger(getClass().getName()); }
 
-    // SEZIONE LOGICA
-    // Legenda metodi:
-    // 1) isValid(...) - valida input registrazione.
-    // 2) hasText(...) - verifica stringhe.
-    // 3) toBean(...) - conversione entity->bean.
-
     private boolean isValid(DatiRegistrazioneBean b) {
-        return b != null && hasText(b.getNome()) && hasText(b.getCognome()) 
+        return b != null && hasText(b.getNome()) && hasText(b.getCognome())
                 && hasText(b.getEmail()) && hasText(b.getPassword());
     }
+
     private boolean hasText(String s) { return s != null && !s.trim().isEmpty(); }
 
+    //Fix: include cognome (senza cambiare import)
     private UtenteBean toBean(GeneralUser u) {
-        return new UtenteBean(Objects.toString(u.getNome(), null), null, u.getEmail(), u.getRuolo());
+        return new UtenteBean(
+                Objects.toString(u.getNome(), null),
+                Objects.toString(u.getCognome(), null),
+                u.getEmail(),
+                u.getRuolo()
+        );
     }
-
 }

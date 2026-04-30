@@ -1,0 +1,15 @@
+[ {
+  "idCampo" : 1,
+  "nome" : "Campo Calcetto",
+  "tipoSport" : "CALCIO",
+  "costoOrario" : 25.0,
+  "flagManutenzione" : false,
+  "attivo" : true
+}, {
+  "idCampo" : 2,
+  "nome" : "Campo Tennis",
+  "tipoSport" : "TENNIS",
+  "costoOrario" : 20.0,
+  "flagManutenzione" : false,
+  "attivo" : true
+} ]

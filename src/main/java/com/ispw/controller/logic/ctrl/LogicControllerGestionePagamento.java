@@ -15,121 +15,112 @@ import com.ispw.model.enums.MetodoPagamento;
 import com.ispw.model.enums.StatoPagamento;
 
 /**
- * Controller secondario "Gestione Pagamento" (STATeless).
- * - Dipende SOLO da PagamentoDAO (come da tua specifica).
- * - Logica minimale e commentata, nessun SQL qui dentro.
+ * Controller secondario "Gestione Pagamento" (STATELESS).
+ * - Persistenza via DAOFactory (runtime).
+ * - Nessun SQL qui.
  */
 public class LogicControllerGestionePagamento
         implements GestionePagamentoPrenotazione, GestionePagamentoRimborso, GestionePagamentoPenalita {
 
-    private static final String FALLITO= "FALLITO";
-    private static final String RIFIUTATO= "RIFIUTATO";
-    private static final String NEGATO= "NEGATO";
-    private static final String KO= "KO";
-
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: implementa interfacce GestionePagamento* (DIP).
-    // A2) IO verso GUI/CLI: riceve DatiPagamentoBean, ritorna StatoPagamento/StatoPagamentoBean.
-    // A3) Persistenza: usa DAO via DAOFactory.
+    private static final String FALLITO   = "FALLITO";
+    private static final String RIFIUTATO = "RIFIUTATO";
+    private static final String NEGATO    = "NEGATO";
+    private static final String KO        = "KO";
 
     /* =========================================================
        1) Pagamento PRENOTAZIONE
-       Firma interfaccia: StatoPagamento richiediPagamentoPrenotazione(DatiPagamentoBean,int)
+       Firma: StatoPagamento richiediPagamentoPrenotazione(DatiPagamentoBean,int)
        ========================================================= */
     @Override
     public StatoPagamento richiediPagamentoPrenotazione(DatiPagamentoBean dati, int idPrenotazione) {
-        // Validazioni semplici dâ€™input
-        if (dati == null) return pickStato(FALLITO, RIFIUTATO, NEGATO, KO);
+
+        if (dati == null) return statoKo();
+
         MetodoPagamento metodo = parseMetodo(dati.getMetodo());
-        if (metodo == null) return pickStato(FALLITO, RIFIUTATO, NEGATO, KO);
-        
-        // Se esiste giÃ  un pagamento registrato, riuso lâ€™entity; altrimenti ne creo una nuova
+        if (metodo == null) return statoKo();
+
+        // Recupera eventuale pagamento già presente (ultimo pagamento per prenotazione)
         Pagamento pay = pagamentoDAO().findByPrenotazione(idPrenotazione);
         if (pay == null) {
             pay = new Pagamento();
             pay.setIdPrenotazione(idPrenotazione);
         }
 
-        // Popolo i dati minimi del pagamento
-        pay.setImportoFinale(BigDecimal.valueOf(Math.max(0f, dati.getImporto())));
+        // Popola dati minimi
+        float imp = Math.max(0f, dati.getImporto());
+        pay.setImportoFinale(BigDecimal.valueOf(imp));
         pay.setMetodo(metodo);
         pay.setDataPagamento(LocalDateTime.now());
 
-        // Gateway fittizio: importo > 0 => esito positivo
-        boolean ok = dati.getImporto() > 0f;
-        StatoPagamento stato = ok
-            ? pickStato("OK", "ESEGUITO", "APPROVATO", "PAGATO", "SUCCESSO", "COMPLETATO")
-            : pickStato(FALLITO, RIFIUTATO, NEGATO, KO);
+        // Gateway fittizio: importo > 0 => ok
+        boolean ok = imp > 0f;
+        StatoPagamento stato = ok ? statoOk() : statoKo();
 
         pay.setStato(stato);
-        // Persisto tramite DAO (nessun SQL qui)
         pagamentoDAO().store(pay);
 
-        // Ritorno il valore enum richiesto dallâ€™interfaccia
         return stato;
     }
 
+    /* =========================================================
+       2) Rimborso PRENOTAZIONE
+       Firma: void eseguiRimborso(int,float)
+       ========================================================= */
     @Override
     public void eseguiRimborso(int idPrenotazione, float importo) {
-        // Cerco un pagamento collegato alla prenotazione
         Pagamento pay = pagamentoDAO().findByPrenotazione(idPrenotazione);
-        if (pay == null) {
-            // Non esiste pagamento -> niente da fare (scelta semplice)
-            return;
-        }
-        if (importo <= 0f) {
-            // Importo non valido -> non registro rimborso
-            return;
-        }
+        if (pay == null) return;
+        if (importo <= 0f) return;
 
-        pay.setStato(pickStato("RIMBORSATO", "REFUNDED"));
+        // Stato rimborso: prova alias comuni, altrimenti fallback
+        StatoPagamento statoRimborso = pickStato("RIMBORSATO", "REFUNDED");
+
+        pay.setStato(statoRimborso);
         pay.setDataPagamento(LocalDateTime.now());
         pagamentoDAO().store(pay);
-
-        
     }
 
+    /* =========================================================
+       3) Pagamento PENALITA'
+       Firma: StatoPagamentoBean richiediPagamentoPenalita(DatiPagamentoBean,int)
+       ========================================================= */
     @Override
     public StatoPagamentoBean richiediPagamentoPenalita(DatiPagamentoBean dati, int idPenalita) {
-        // Validazioni semplici
-        if (dati == null) return esito(false, pickStato(FALLITO, RIFIUTATO, NEGATO, KO).name(), null, "Dati pagamento mancanti");
-        MetodoPagamento metodo = parseMetodo(dati.getMetodo());
-        if (metodo == null) return esito(false, pickStato(FALLITO, RIFIUTATO, NEGATO, KO).name(), null, "Metodo pagamento non valido");
 
-        // Soluzione â€œscolasticaâ€: traccio un Pagamento legato alla penalitÃ  usando idPrenotazione negativo
+        if (dati == null) {
+            return esito(false, statoKo().name(), null, "Dati pagamento mancanti");
+        }
+
+        MetodoPagamento metodo = parseMetodo(dati.getMetodo());
+        if (metodo == null) {
+            return esito(false, statoKo().name(), null, "Metodo pagamento non valido");
+        }
+
+        // Soluzione “scolastica”: pagamento legato alla penalità usando idPrenotazione negativo
         Pagamento pay = new Pagamento();
         pay.setIdPrenotazione(-Math.abs(idPenalita));
-        pay.setImportoFinale(BigDecimal.valueOf(Math.max(0f, dati.getImporto())));
+
+        float imp = Math.max(0f, dati.getImporto());
+        pay.setImportoFinale(BigDecimal.valueOf(imp));
         pay.setMetodo(metodo);
         pay.setDataPagamento(LocalDateTime.now());
 
-        boolean ok = dati.getImporto() > 0f;
-        String stato = (ok
-            ? pickStato("OK", "ESEGUITO", "APPROVATO", "PAGATO", "SUCCESSO", "COMPLETATO")
-            : pickStato(FALLITO, RIFIUTATO, NEGATO, KO)
-        ).name();
+        boolean ok = imp > 0f;
+        StatoPagamento stato = ok ? statoOk() : statoKo();
 
-        pay.setStato(StatoPagamento.valueOf(stato)); // coerente con l'enum reale
+        pay.setStato(stato);
         pagamentoDAO().store(pay);
 
-        // Ritorno il DTO richiesto dall'interfaccia
-        return esito(ok, stato, newTxId("PX"), ok ? "Pagamento penalita eseguito" : "Pagamento penalita rifiutato");
+        return esito(ok, stato.name(), newTxId("PX"),
+                ok ? "Pagamento penalita eseguito" : "Pagamento penalita rifiutato");
     }
 
-    // SEZIONE LOGICA
-    // Legenda metodi:
-    // 1) pagamentoDAO() - accesso DAO.
-    // 2) parseMetodo(...) - converte stringa in MetodoPagamento.
-    // 3) pickStato(...) - risolve StatoPagamento da alias.
-    // 4) newTxId(...) - genera id transazione.
-    // 5) esito(...) - costruisce StatoPagamentoBean.
+    /* ===================== HELPERS ===================== */
 
     private PagamentoDAO pagamentoDAO() {
         return DAOFactory.getInstance().getPagamentoDAO();
     }
 
-    // Converte la stringa del bean in MetodoPagamento (SATISPAY / PAYPAL / BONIFICO)
     private MetodoPagamento parseMetodo(String nome) {
         if (nome == null) return null;
         try { return MetodoPagamento.valueOf(nome.trim().toUpperCase()); }
@@ -137,17 +128,28 @@ public class LogicControllerGestionePagamento
     }
 
     /**
-     * Prova una lista di alias per ricavare uno StatoPagamento dell'enum reale;
-     * se non trova corrispondenze, fa fallback al primo valore definito nell'enum
-     * (scelta "scolastica" per evitare errori di compilazione in caso di nomi diversi).
+     * Prova alias per ricavare uno StatoPagamento reale; se nessuno matcha,
+     * fallback al primo valore dell'enum (scelta “scolastica” per robustezza).
      */
     private StatoPagamento pickStato(String... preferiti) {
         for (String s : preferiti) {
             try { return StatoPagamento.valueOf(s); }
-            catch (IllegalArgumentException ignore) { /* ignored: alias not matching enum constant, try next */ }
+            catch (IllegalArgumentException ignore) { /* try next */ }
         }
         StatoPagamento[] vals = StatoPagamento.values();
         return vals.length > 0 ? vals[0] : null;
+    }
+
+    private StatoPagamento statoOk() {
+        // prova alias più comuni: in base al tuo enum reale ne matcha almeno uno
+        StatoPagamento s = pickStato("OK", "ESEGUITO", "APPROVATO", "PAGATO", "SUCCESSO", "COMPLETATO");
+        // in caso limite pickStato può tornare null se enum vuoto: fallback hard
+        return s != null ? s : StatoPagamento.values()[0];
+    }
+
+    private StatoPagamento statoKo() {
+        StatoPagamento s = pickStato(FALLITO, RIFIUTATO, NEGATO, KO);
+        return s != null ? s : StatoPagamento.values()[0];
     }
 
     private String newTxId(String prefix) {
@@ -157,7 +159,7 @@ public class LogicControllerGestionePagamento
     private StatoPagamentoBean esito(boolean successo, String stato, String idTx, String msg) {
         StatoPagamentoBean bean = new StatoPagamentoBean();
         bean.setSuccesso(successo);
-        bean.setStato(stato);                 // String allineata a enum.name()
+        bean.setStato(stato);
         bean.setIdTransazione(idTx != null ? idTx : newTxId("TX"));
         bean.setDataPagamento(LocalDateTime.now());
         bean.setMessaggio(msg);

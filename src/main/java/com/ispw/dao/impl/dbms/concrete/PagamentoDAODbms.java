@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 
 import com.ispw.dao.impl.base.BasePagamentoDAO;
 import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
-import com.ispw.dao.interfaces.PagamentoDAO;
 import com.ispw.model.entity.Pagamento;
 import com.ispw.model.enums.MetodoPagamento;
 import com.ispw.model.enums.StatoPagamento;
@@ -20,7 +19,7 @@ import com.ispw.model.enums.StatoPagamento;
  * Pagamento DAO for DBMS as subclass of BasePagamentoDAO.
  * Implements only raw I/O (JDBC) while leveraging BasePagamentoDAO cache/template.
  */
-public class PagamentoDAODbms extends BasePagamentoDAO implements PagamentoDAO {
+public class PagamentoDAODbms extends BasePagamentoDAO  {
 
     private static final String SQL_FIND_BY_ID =
         "SELECT id_pagamento, id_prenotazione, importo_finale, metodo, stato, data_pagamento " +

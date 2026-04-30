@@ -10,69 +10,80 @@ import com.ispw.bean.DatiLoginBean;
 import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.bean.UtenteBean;
 import com.ispw.dao.factory.DAOFactory;
-import com.ispw.dao.interfaces.GeneralUserDAO;
 import com.ispw.dao.interfaces.LogDAO;
 import com.ispw.model.entity.GeneralUser;
 import com.ispw.model.entity.SystemLog;
 import com.ispw.model.enums.StatoAccount;
 import com.ispw.model.enums.TipoOperazione;
 
+/**
+ * Logic controller per la gestione dell'accesso.
+ *
+ * Regola architetturale:
+ * - la logica di risoluzione (Gestore -> UtenteFinale) è demandata alla Facade GeneralUserDAO
+ *   (che a runtime è AggregatingGeneralUserDAO via DAOFactory).
+ */
 public class LogicControllerGestioneAccesso {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: usa interfacce DAO via DAOFactory (DIP).
-    // A2) IO verso GUI/CLI: riceve DatiLoginBean, ritorna SessioneUtenteBean.
-    // A3) Persistenza: usa DAO per utenti e log.
-
     /**
-     * Verifica credenziali e, se valide, costruisce una SessioneUtenteBean (stateless).
-     * Requisiti:
-     *  - email/password non vuote
-     *  - utente esistente
-     *  - password coincidente (in questa fase plain, in seguito con hashing)
-     *  - stato account == ATTIVO
+     * Verifica le credenziali e, se valide, crea una SessioneUtenteBean.
+     *
+     * @return SessioneUtenteBean se credenziali valide, null altrimenti
      */
     public SessioneUtenteBean verificaCredenziali(DatiLoginBean datiLogin) {
         if (datiLogin == null) return null;
 
         final String email = datiLogin.getEmail();
         final String password = datiLogin.getPassword();
-        if (email == null || email.isBlank() || password == null || password.isBlank()) {
+
+        if (email == null || email.isBlank() ||
+            password == null || password.isBlank()) {
             return null;
         }
 
-        // Convenzione: normalizziamo l'email a lowercase e trimmiamo
-        final GeneralUser user = userDAO().findByEmail(email.trim().toLowerCase());
+        final String normEmail = email.trim().toLowerCase();
+
+        // Risoluzione utente demandata alla Facade (AggregatingGeneralUserDAO)
+        // NB: uso var per non cambiare/importare GeneralUserDAO
+        var userDAO = DAOFactory.getInstance().getGeneralUserDAO();
+        final GeneralUser user = userDAO.findByEmail(normEmail);
         if (user == null) return null;
 
-        // Password (fase 1: plain compare; fase security: hashing e costante-time compare)
+        // Password (fase 1: plain compare; fase security: hashing)
         if (!Objects.equals(user.getPassword(), password)) return null;
 
         // Consentito solo se attivo
         if (user.getStatoAccount() != StatoAccount.ATTIVO) {
-            throw new IllegalStateException("Non puoi accedere percha¨ sei sospeso");
+            throw new IllegalStateException("Non puoi accedere perché il tuo account non è attivo");
         }
 
-        // Costruzione UtenteBean (cognome assente nel modello â†’ stringa vuota)
-        final UtenteBean ub = new UtenteBean(
+        return creaSessione(user);
+    }
+
+    /**
+     * Crea la sessione per un utente autenticato.
+     */
+    private SessioneUtenteBean creaSessione(GeneralUser user) {
+        UtenteBean ub = new UtenteBean(
                 user.getNome(),
                 user.getCognome(),
                 user.getEmail(),
                 user.getRuolo()
         );
 
-        final SessioneUtenteBean sessione =
-                new SessioneUtenteBean(UUID.randomUUID().toString(), ub, new Date());
+        SessioneUtenteBean sessione =
+                new SessioneUtenteBean(
+                        UUID.randomUUID().toString(),
+                        ub,
+                        new Date()
+                );
 
-        log().fine(() -> "[LOGIN] Sessione creata per " + user.getEmail());
+        log().fine("[LOGIN] Sessione creata per " + user.getEmail());
         return sessione;
     }
 
     /**
      * Salva il log di accesso per l'utente in sessione.
-     * Non modifica stato, nessun I/O esterno reale â†’ stateless friendly.
-     * Se l'utente non Ã¨ risolvibile via email, la funzione Ã¨ no-op.
      */
     public void saveLog(SessioneUtenteBean sessione) {
         if (sessione == null || sessione.getUtente() == null) return;
@@ -80,37 +91,29 @@ public class LogicControllerGestioneAccesso {
         final String email = sessione.getUtente().getEmail();
         if (email == null || email.isBlank()) return;
 
-        // Recuperiamo l'id utente (UtenteBean non contiene l'id)
-        final GeneralUser user = userDAO().findByEmail(email.trim().toLowerCase());
+        final String normEmail = email.trim().toLowerCase();
+
+        // Anche qui risoluzione demandata alla Facade
+        var userDAO = DAOFactory.getInstance().getGeneralUserDAO();
+        final GeneralUser user = userDAO.findByEmail(normEmail);
         if (user == null) return;
 
-        final LogDAO logDAO = DAOFactory.getInstance().getLogDAO();
+        LogDAO logDAO = DAOFactory.getInstance().getLogDAO();
 
-        final SystemLog sl = new SystemLog();
+        SystemLog sl = new SystemLog();
         sl.setTimestamp(LocalDateTime.now());
-
         sl.setTipoOperazione(TipoOperazione.ACCESSO_ESEGUITO);
-
         sl.setIdUtenteCoinvolto(user.getIdUtente());
         sl.setDescrizione("Login effettuato per utente " + email);
 
         logDAO.append(sl);
-        log().fine(() -> "[LOGIN-LOG] Log di accesso salvato per utenteId=" + user.getIdUtente());
+
+        // niente lambda -> nessun problema di "effectively final"
+        log().fine("[LOGIN-LOG] Log di accesso salvato per utenteId=" + user.getIdUtente());
     }
 
-    // SEZIONE LOGICA
-    // Legenda metodi:
-    // 1) log() - logger on-demand.
-    // 2) userDAO() - accesso DAO.
-
-    // Logger on-demand (niente campo statico) â€” SonarCloud: soppressione locale S1312
     @SuppressWarnings("java:S1312")
     private Logger log() {
         return Logger.getLogger(getClass().getName());
-    }
-
-    // DAO on-demand (no SQL nei controller)
-    private GeneralUserDAO userDAO() {
-        return DAOFactory.getInstance().getGeneralUserDAO();
     }
 }

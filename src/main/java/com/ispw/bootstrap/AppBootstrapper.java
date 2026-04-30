@@ -44,7 +44,7 @@ public final class AppBootstrapper {
         // 2b) Config FILE_SYSTEM (solo se FILE_SYSTEM)
         Path fsRoot = null;
         if (config.persistency() == PersistencyProvider.FILE_SYSTEM) {
-            Path root = Paths.get("C:\\Users\\User\\OneDrive\\Desktop\\Progetti_Uni\\Progetto_ISPW\\FileSystem");
+            Path root = Paths.get("C:\\Users\\User\\ISPW_Project\\Progetto_ISPW\\filesystem");
             try {
                 Files.createDirectories(root);
             } catch (java.io.IOException | SecurityException e) {
@@ -57,6 +57,12 @@ public final class AppBootstrapper {
 
         // 3) Configura persistenza (DAOFactory guidata dal provider)
         DAOFactory.initialize(config.persistency(), fsRoot);
+        
+        SetupBootstrapper.bootstrapIfNeeded(
+        config.persistency(),
+        fsRoot
+        );
+
         // Messaggio parametrico: MessageFormat
         System.out.println("Persistency provider: " + config.persistency());
 

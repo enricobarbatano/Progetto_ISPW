@@ -30,6 +30,12 @@ public class GestoreDAOFileSystem extends BaseGestoreDAO {
         );
     }
 
+    // ================= RAW IMPLEMENTATION =================
+    @Override
+    protected List<Gestore> rawFindAll() {
+        return new ArrayList<>(store.readAll());
+    }
+
     @Override
     protected Gestore rawLoad(Integer id) {
         return store.readAll().stream()

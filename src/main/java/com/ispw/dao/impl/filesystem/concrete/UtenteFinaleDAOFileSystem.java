@@ -31,6 +31,13 @@ public class UtenteFinaleDAOFileSystem extends BaseUtenteFinaleDAO {
         );
     }
 
+    
+    @Override
+    protected List<UtenteFinale> rawFindAll() {
+        return new ArrayList<>(store.readAll());
+    }
+
+
     @Override
     protected UtenteFinale rawLoad(Integer id) {
         if (id == null || id <= 0) return null;

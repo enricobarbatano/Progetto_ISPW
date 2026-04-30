@@ -4,7 +4,6 @@ import java.nio.file.Path;
 
 import com.ispw.dao.impl.filesystem.concrete.CampoDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.FatturaDAOFileSystem;
-import com.ispw.dao.impl.filesystem.concrete.GeneralUserDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.GestoreDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.LogDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.PagamentoDAOFileSystem;
@@ -65,9 +64,17 @@ public final class FileSystemDAOFactory extends DAOFactory {
         return fatturaDAO;
     }
 
+    // non passiamo root perché AggregatingGeneralUserDAO è una facade che usa i DAO di Gestore e UtenteFinale,
+    // che a loro volta usano root
     @Override
     public synchronized GeneralUserDAO getGeneralUserDAO() {
-        if (generalUserDAO == null) generalUserDAO = new GeneralUserDAOFileSystem(root);
+        if (generalUserDAO == null) {
+        generalUserDAO = new com.ispw.dao.impl.aggregate.AggregatingGeneralUserDAO(
+                getGestoreDAO(),
+                getUtenteFinaleDAO()
+        );
+    }
+
         return generalUserDAO;
     }
 

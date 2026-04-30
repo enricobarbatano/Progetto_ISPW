@@ -1,5 +1,7 @@
 package com.ispw.dao.impl.base;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -24,11 +26,13 @@ public class BaseUtenteFinaleDAO implements UtenteFinaleDAO {
 
     protected BaseUtenteFinaleDAO(boolean persistent) { this.persistent = persistent; }
 
-    // raw hooks for subclasses
+    //i metodi raw sono quelli che devono essere implementati dai dao persistenti per accedere al database o al filesystem,
+    //  mentre i metodi load/store/delete/findByEmail/findAll implementano la logica di caching e delegano ai raw quando necessario
     protected UtenteFinale rawLoad(Integer id) { return null; }
     protected void rawStore(UtenteFinale entity) { }
     protected void rawDelete(Integer id) { }
     protected UtenteFinale rawFindByEmail(String email) { return null; }
+    protected List<UtenteFinale> rawFindAll() { return null; }
 
     @Override
     public UtenteFinale load(Integer id) {
@@ -49,6 +53,33 @@ public class BaseUtenteFinaleDAO implements UtenteFinaleDAO {
         }
         return null;
     }
+
+
+    // findAll è metodo che serve per esportare tutti gli utenti finali
+    @Override
+    public List<UtenteFinale> findAll() {
+    if (persistent) {
+        List<UtenteFinale> res = rawFindAll();
+        if (res == null) return new ArrayList<>();
+
+        lock.writeLock().lock();
+        try {
+            for (UtenteFinale u : res) {
+                if (u != null && u.getIdUtente() > 0) {
+                    cache.put(u.getIdUtente(), u);
+                }
+            }
+        } finally { lock.writeLock().unlock(); }
+
+        return res;
+    }
+
+    lock.readLock().lock();
+    try {
+        return new ArrayList<>(cache.values());
+    } finally { lock.readLock().unlock(); }
+    }
+
 
     @Override
     public void store(UtenteFinale entity) {

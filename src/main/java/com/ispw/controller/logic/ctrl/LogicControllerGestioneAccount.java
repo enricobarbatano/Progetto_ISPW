@@ -22,6 +22,7 @@ import com.ispw.model.enums.StatoAccount;
 import com.ispw.model.enums.TipoOperazione;
 
 /**
+ * 
  * Controller applicativo principale per la "Gestione Account".
  * - Stateless; nessun riferimento a concreti.
  * - DIP by-parameter per la notifica (overload).

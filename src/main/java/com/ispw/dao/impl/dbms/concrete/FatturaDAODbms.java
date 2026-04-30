@@ -17,7 +17,7 @@ import com.ispw.model.entity.Fattura;
  */
 public class FatturaDAODbms extends BaseFatturaDAO {
 
-    private static final String TBL  = "fattura";
+    private static final String TBL  = "fatture";
     private static final String COLS = "id_fattura, id_prenotazione, id_utente, codice_fiscale_cliente, data_emissione, link_pdf";
 
     private static final String SQL_SELECT_ONE =

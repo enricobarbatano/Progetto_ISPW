@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import com.ispw.dao.impl.base.BaseUtenteFinaleDAO;
@@ -15,7 +17,6 @@ import com.ispw.model.enums.StatoAccount;
 
 /**
  * Provider DBMS per UtenteFinale.
- * JDBC diretto, raw-only.
  */
 public class UtenteFinaleDAODbms extends BaseUtenteFinaleDAO {
 
@@ -24,24 +25,34 @@ public class UtenteFinaleDAODbms extends BaseUtenteFinaleDAO {
         "id_utente, nome, cognome, email, password, stato_account, ruolo";
 
     private static final String SQL_SELECT_ONE =
-        "SELECT " + COLS + " FROM " + TBL + " WHERE id_utente=?";
+        "SELECT " + COLS + " FROM " + TBL +
+        " WHERE id_utente=? AND ruolo='UTENTE'";
 
     private static final String SQL_SELECT_BY_EMAIL =
-        "SELECT " + COLS + " FROM " + TBL + " WHERE LOWER(email)=?";
+        "SELECT " + COLS + " FROM " + TBL +
+        " WHERE LOWER(email)=? AND ruolo='UTENTE'";
+
+    private static final String SQL_SELECT_ALL =
+        "SELECT " + COLS + " FROM " + TBL +
+        " WHERE ruolo='UTENTE' ORDER BY id_utente";
 
     private static final String SQL_EXISTS =
-        "SELECT 1 FROM " + TBL + " WHERE id_utente=?";
+        "SELECT 1 FROM " + TBL +
+        " WHERE id_utente=? AND ruolo='UTENTE'";
 
     private static final String SQL_INSERT =
         "INSERT INTO " + TBL +
-        " (nome, cognome, email, password, stato_account, ruolo) VALUES (?, ?, ?, ?, ?, ?)";
+        " (nome, cognome, email, password, stato_account, ruolo) " +
+        "VALUES (?, ?, ?, ?, ?, 'UTENTE')";
 
     private static final String SQL_UPDATE =
         "UPDATE " + TBL +
-        " SET nome=?, cognome=?, email=?, password=?, stato_account=?, ruolo=? WHERE id_utente=?";
+        " SET nome=?, cognome=?, email=?, password=?, stato_account=? " +
+        "WHERE id_utente=? AND ruolo='UTENTE'";
 
     private static final String SQL_DELETE =
-        "DELETE FROM " + TBL + " WHERE id_utente=?";
+        "DELETE FROM " + TBL +
+        " WHERE id_utente=? AND ruolo='UTENTE'";
 
     private final ConnectionFactory cf;
 
@@ -88,6 +99,22 @@ public class UtenteFinaleDAODbms extends BaseUtenteFinaleDAO {
     }
 
     @Override
+    protected List<UtenteFinale> rawFindAll() {
+        List<UtenteFinale> out = new ArrayList<>();
+
+        try (Connection c = cf.getConnection();
+             PreparedStatement ps = c.prepareStatement(SQL_SELECT_ALL);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) out.add(map(rs));
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Errore DBMS UtenteFinale rawFindAll", e);
+        }
+        return out;
+    }
+
+    @Override
     protected void rawStore(UtenteFinale u) {
         if (u == null) return;
 
@@ -95,18 +122,18 @@ public class UtenteFinaleDAODbms extends BaseUtenteFinaleDAO {
 
             if (u.getIdUtente() > 0 && existsDb(c, u.getIdUtente())) {
                 try (PreparedStatement ps = c.prepareStatement(SQL_UPDATE)) {
-                    bind(ps, u);
-                    ps.setInt(7, u.getIdUtente());
+                    bindUpdate(ps, u);
+                    ps.setInt(6, u.getIdUtente());
                     ps.executeUpdate();
                 }
             } else {
-                try (PreparedStatement ps = c.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
-                    bind(ps, u);
+                try (PreparedStatement ps =
+                        c.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
+
+                    bindInsert(ps, u);
                     ps.executeUpdate();
                     try (ResultSet gk = ps.getGeneratedKeys()) {
-                        if (gk.next()) {
-                            u.setIdUtente(gk.getInt(1));
-                        }
+                        if (gk.next()) u.setIdUtente(gk.getInt(1));
                     }
                 }
             }
@@ -151,13 +178,20 @@ public class UtenteFinaleDAODbms extends BaseUtenteFinaleDAO {
         catch (IllegalArgumentException e) { return def; }
     }
 
-    private static void bind(PreparedStatement ps, UtenteFinale u) throws SQLException {
+    private static void bindInsert(PreparedStatement ps, UtenteFinale u) throws SQLException {
         ps.setString(1, u.getNome());
         ps.setString(2, u.getCognome());
         ps.setString(3, u.getEmail());
         ps.setString(4, u.getPassword());
         ps.setString(5, u.getStatoAccount() != null ? u.getStatoAccount().name() : null);
-        ps.setString(6, u.getRuolo() != null ? u.getRuolo().name() : null);
+    }
+
+    private static void bindUpdate(PreparedStatement ps, UtenteFinale u) throws SQLException {
+        ps.setString(1, u.getNome());
+        ps.setString(2, u.getCognome());
+        ps.setString(3, u.getEmail());
+        ps.setString(4, u.getPassword());
+        ps.setString(5, u.getStatoAccount() != null ? u.getStatoAccount().name() : null);
     }
 
     private static String normalizeEmail(String email) {
@@ -167,9 +201,7 @@ public class UtenteFinaleDAODbms extends BaseUtenteFinaleDAO {
     private static boolean existsDb(Connection c, int id) throws SQLException {
         try (PreparedStatement ps = c.prepareStatement(SQL_EXISTS)) {
             ps.setInt(1, id);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next();
-            }
+            try (ResultSet rs = ps.executeQuery()) { return rs.next(); }
         }
     }
 }

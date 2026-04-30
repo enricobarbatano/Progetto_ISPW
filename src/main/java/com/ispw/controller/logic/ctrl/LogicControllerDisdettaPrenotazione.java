@@ -46,7 +46,6 @@ public class LogicControllerDisdettaPrenotazione {
     private static final String MSG_DISDETTA_OK        = "Disdetta eseguita";
     private static final String MSG_DISDETTA_KO        = "Disdetta non consentita";
 
-    // Logger on-demand (niente campo statico) â€“ S1312
     @SuppressWarnings("java:S1312")
     private Logger log() { return Logger.getLogger(getClass().getName()); }
 
@@ -58,18 +57,17 @@ public class LogicControllerDisdettaPrenotazione {
     private RegoleTempisticheDAO tempisticheDAO()      { return DAOFactory.getInstance().getRegoleTempisticheDAO(); }
     private RegolePenalitaDAO    penalitaDAO()         { return DAOFactory.getInstance().getRegolePenalitaDAO(); }
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: usa interfacce Gestione* via parametro (DIP).
-    // A2) IO verso GUI/CLI: riceve/ritorna bean (EsitoDisdettaBean, EsitoOperazioneBean, RiepilogoPrenotazioneBean).
-    // A3) Persistenza: usa DAO via DAOFactory.
-    // + ottieniPrenotazioniCancellabili(UtenteBean): List<RiepilogoPrenotazioneBean>
-    //   - Restituisce prenotazioni future e non ANNULLATE dellâ€™utente (riepilogo con importo pagato se disponibile).
+    /**
+     * Restituisce prenotazioni future e non ANNULLATE dell’utente (riepilogo con importo pagato se disponibile).
+     */
     public List<RiepilogoPrenotazioneBean> ottieniPrenotazioniCancellabili(UtenteBean utente) {
         if (utente == null || isBlank(utente.getEmail())) return List.of();
 
         final var user = userDAO().findByEmail(normalizeEmail(utente.getEmail()));
         if (user == null) return List.of();
+
+        // ✅ policy applicativa: solo UTENTE può disdire
+        if (user.getRuolo() != com.ispw.model.enums.Ruolo.UTENTE) return List.of();
 
         final List<Prenotazione> tutte = prenotazioneDAO().findByUtente(user.getIdUtente());
         final LocalDateTime now = LocalDateTime.now();
@@ -78,7 +76,6 @@ public class LogicControllerDisdettaPrenotazione {
         for (Prenotazione p : tutte) {
             if (!isCancellablePrenotazione(p, now)) continue;
 
-            // Importo: se esiste pagamento, usa importoFinale; altrimenti 0 (pren. non pagata)
             float importo = 0f;
             var pag = pagamentoDAO().findByPrenotazione(p.getIdPrenotazione());
             if (pag != null && pag.getImportoFinale() != null) {
@@ -95,15 +92,13 @@ public class LogicControllerDisdettaPrenotazione {
         return out;
     }
 
-    // + anteprimaDisdetta(int, SessioneUtenteBean): EsitoDisdettaBean
-    //   - Wrapper della validazione (possibile + penale stimata).
     public EsitoDisdettaBean anteprimaDisdetta(int idPrenotazione, SessioneUtenteBean sessione) {
         return validaDisdetta(idPrenotazione, sessione);
     }
 
-    // + eseguiAnnullamento(int, SessioneUtenteBean): EsitoOperazioneBean
-    //   - Esegue il flusso: valida â†’ (eventuale rimborso) â†’ update stato â†’ libera slot â†’ notifica â†’ log.
-    //   - DIP via parametri per evitare accoppiamenti e favorire i test.
+    /**
+     * Esegue: valida → (eventuale rimborso) → delete prenotazione → libera slot → notifica → log.
+     */
     public EsitoOperazioneBean eseguiAnnullamento(
             int idPrenotazione,
             SessioneUtenteBean sessione,
@@ -120,10 +115,14 @@ public class LogicControllerDisdettaPrenotazione {
         final EsitoDisdettaBean preview = validaDisdetta(idPrenotazione, sessione);
         if (preview == null || !preview.isPossibile()) return esito(false, MSG_DISDETTA_KO);
 
-        final var user = userDAO().findByEmail(normalizeEmail(sessione.getUtente().getEmail()));
-        final Prenotazione p = prenotazioneDAO().load(idPrenotazione);
+        final var user = resolveUserFromSession(sessione);
         if (user == null) return esito(false, MSG_UTENTE_INESISTENTE);
-        if (p == null)    return esito(false, MSG_PREN_INESISTENTE);
+
+        // ✅ policy applicativa: solo UTENTE può disdire
+        if (user.getRuolo() != com.ispw.model.enums.Ruolo.UTENTE) return esito(false, MSG_DISDETTA_KO);
+
+        final Prenotazione p = prenotazioneDAO().load(idPrenotazione);
+        if (p == null) return esito(false, MSG_PREN_INESISTENTE);
         if (p.getStato() == StatoPrenotazione.ANNULLATA) return esito(false, MSG_GIA_ANNULLATA);
 
         final float penale = Math.max(0f, preview.getPenale());
@@ -141,9 +140,6 @@ public class LogicControllerDisdettaPrenotazione {
         return esito(true, MSG_DISDETTA_OK);
     }
 
-    /**
-     * Overload semplice: crea internamente i controller secondari e li passa al metodo interno.
-     */
     public EsitoOperazioneBean eseguiAnnullamento(int idPrenotazione, SessioneUtenteBean sessione) {
         return eseguiAnnullamento(
                 idPrenotazione,
@@ -154,46 +150,44 @@ public class LogicControllerDisdettaPrenotazione {
                 new LogicControllerGestoreDisponibilita());
     }
 
-    // - validaDisdetta(int, SessioneUtenteBean): EsitoDisdettaBean
-    //   - TitolaritÃ , stato e finestra temporale; calcolo penale da regole singleton.
+    /**
+     * Validazione disdetta: titolarità, stato, finestra temporale; penale da regole singleton.
+     */
     EsitoDisdettaBean validaDisdetta(int idPrenotazione, SessioneUtenteBean sessione) {
-        EsitoDisdettaBean out = new EsitoDisdettaBean();
-
         if (sessione == null || sessione.getUtente() == null || isBlank(sessione.getUtente().getEmail())) {
             return invalidoEsito();
         }
-        final var user = userDAO().findByEmail(normalizeEmail(sessione.getUtente().getEmail()));
-        if (user == null) {
-            return invalidoEsito();
-        }
+
+        final var user = resolveUserFromSession(sessione);
+        if (user == null) return invalidoEsito();
+
+        // ✅ policy applicativa: solo UTENTE può disdire
+        if (user.getRuolo() != com.ispw.model.enums.Ruolo.UTENTE) return invalidoEsito();
 
         final Prenotazione p = prenotazioneDAO().load(idPrenotazione);
-        if (p == null) {
-            return invalidoEsito();
-        }
-        if (p.getIdUtente() != user.getIdUtente()) {
-            return invalidoEsito();
-        }
-        if (p.getStato() == StatoPrenotazione.ANNULLATA) {
-            return invalidoEsito();
-        }
+        if (p == null) return invalidoEsito();
+
+        if (p.getIdUtente() != user.getIdUtente()) return invalidoEsito();
+        if (p.getStato() == StatoPrenotazione.ANNULLATA) return invalidoEsito();
 
         final LocalDateTime now = LocalDateTime.now();
         final LocalDateTime start = LocalDateTime.of(p.getData(), p.getOraInizio());
-        if (!start.isAfter(now)) {
-            return invalidoEsito(); // nel passato
-        }
+        if (!start.isAfter(now)) return invalidoEsito(); // nel passato
 
-        final RegoleTempistiche rt = tempisticheDAO().get(); // preavvisoMinimo (minuti)
-        final RegolePenalita   rp = penalitaDAO().get();     // valorePenalita (BigDecimal) + preavvisoMinimo (minuti)
+        // ✅ best-effort su regole (possono essere null o lanciare eccezioni)
+        RegoleTempistiche rt = null;
+        RegolePenalita rp = null;
+        try { rt = tempisticheDAO().get(); } catch (RuntimeException ex) { /* best effort */ }
+        try { rp = penalitaDAO().get(); } catch (RuntimeException ex) { /* best effort */ }
+
         final float penale = calcolaPenale(p, rt, rp);
 
+        EsitoDisdettaBean out = new EsitoDisdettaBean();
         out.setPossibile(true);
         out.setPenale(penale);
         return out;
     }
 
-    /** Helper per validazione fallita: ritorna EsitoDisdettaBean con possibile=false, penale=0f */
     private EsitoDisdettaBean invalidoEsito() {
         EsitoDisdettaBean out = new EsitoDisdettaBean();
         out.setPossibile(false);
@@ -201,8 +195,9 @@ public class LogicControllerDisdettaPrenotazione {
         return out;
     }
 
-    // - calcolaPenale(Prenotazione, RegoleTempistiche, RegolePenalita): float
-    //   - Se il preavviso residuo >= minimo, penale 0; altrimenti penale fissa da regole.
+    /**
+     * Se preavviso residuo >= minimo => 0; altrimenti penale fissa.
+     */
     float calcolaPenale(Prenotazione p, RegoleTempistiche rt, RegolePenalita rp) {
         if (p == null) return 0f;
 
@@ -222,27 +217,26 @@ public class LogicControllerDisdettaPrenotazione {
         return Math.max(0f, penale);
     }
 
-    // - liberaRisorsa(int): void   (DIP: riceve il collaboratore in input)
     void liberaRisorsa(int idPrenotazione, GestioneDisponibilitaDisdetta dispCtrl) {
         if (dispCtrl == null) return;
         try {
             dispCtrl.liberaSlot(idPrenotazione);
             log().fine(() -> "[DISDETTA] Slot liberato per prenotazione #" + idPrenotazione);
         } catch (RuntimeException ex) {
-            // Best effort: il rilascio slot non deve bloccare la disdetta
             log().log(Level.FINE, "Rilascio slot fallito: {0}", new Object[]{ex.getMessage()});
         }
     }
 
     private void processRefundIfConfirmed(Prenotazione p, int idPrenotazione, float penale,
-                                           GestionePagamentoRimborso payRimborso,
-                                           GestioneFatturaRimborso fattRimborro) {
+                                          GestionePagamentoRimborso payRimborso,
+                                          GestioneFatturaRimborso fattRimborro) {
         if (p == null) return;
         if (p.getStato() != StatoPrenotazione.CONFERMATA) return;
 
         final var pag = pagamentoDAO().findByPrenotazione(idPrenotazione);
         final float importoPagato = (pag != null && pag.getImportoFinale() != null)
                 ? pag.getImportoFinale().floatValue() : 0f;
+
         final float rimborso = Math.max(0f, importoPagato - penale);
         if (rimborso <= 0f) return;
 
@@ -250,7 +244,6 @@ public class LogicControllerDisdettaPrenotazione {
             payRimborso.eseguiRimborso(idPrenotazione, rimborso);
             fattRimborro.emettiNotaDiCredito(idPrenotazione);
         } catch (RuntimeException ex) {
-            // Best-effort: errori refund non bloccano la disdetta
             log().log(Level.FINE, "Rimborso fallito: {0}", new Object[]{ex.getMessage()});
         }
     }
@@ -264,30 +257,19 @@ public class LogicControllerDisdettaPrenotazione {
             noti.inviaConfermaCancellazione(sessione.getUtente(),
                     "Prenotazione #" + idPrenotazione + " annullata (penale " + penale + " EUR)");
         } catch (RuntimeException ex) {
-            // best-effort
             log().log(Level.FINE, "Notifica disdetta fallita: {0}", new Object[]{ex.getMessage()});
         }
 
         appendLogSafe(idUtente, "DISDETTA_PRENOTAZIONE #" + idPrenotazione + " - penale " + penale + " EUR");
     }
 
-    // SEZIONE LOGICA
-    // Legenda metodi:
-    // 1) isCancellablePrenotazione(...) - verifica prenotazione cancellabile.
-    // 2) isBlank(...) - verifica stringhe vuote.
-    // 3) normalizeEmail(...) - normalizza email.
-    // 4) esito(...) - costruisce esito operazione.
-    // 5) appendLogSafe(...) - log best-effort su LogDAO.
-    /**
-     * Verifica se una prenotazione Ã¨ cancellabile (futura e non annullata).
-     */
     private boolean isCancellablePrenotazione(Prenotazione p, LocalDateTime now) {
         if (p == null) return false;
         if (p.getStato() == StatoPrenotazione.ANNULLATA) return false;
         if (p.getData() == null || p.getOraInizio() == null) return false;
 
         LocalDateTime inizio = LocalDateTime.of(p.getData(), p.getOraInizio());
-        return inizio.isAfter(now); // solo future
+        return inizio.isAfter(now);
     }
 
     private boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
@@ -311,9 +293,17 @@ public class LogicControllerDisdettaPrenotazione {
             log.setTimestamp(LocalDateTime.now());
             log.setIdUtenteCoinvolto(idUtente);
             log.setDescrizione(descr);
-            logDAO().append(log); // append-only
+            logDAO().append(log);
         } catch (RuntimeException ex) {
             log().log(Level.FINE, "Append log disdetta fallito: {0}", new Object[]{ex.getMessage()});
         }
+    }
+
+    /**
+     * Helper unico: risolve l'utente dalla sessione usando GeneralUserDAO (facade runtime).
+     */
+    private com.ispw.model.entity.GeneralUser resolveUserFromSession(SessioneUtenteBean sessione) {
+        if (sessione == null || sessione.getUtente() == null || isBlank(sessione.getUtente().getEmail())) return null;
+        return userDAO().findByEmail(normalizeEmail(sessione.getUtente().getEmail()));
     }
 }

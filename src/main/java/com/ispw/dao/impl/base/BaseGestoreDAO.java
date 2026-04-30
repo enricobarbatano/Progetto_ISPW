@@ -1,5 +1,7 @@
 package com.ispw.dao.impl.base;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -31,6 +33,7 @@ public class BaseGestoreDAO implements GestoreDAO {
     protected void rawStore(Gestore entity) { }
     protected void rawDelete(Integer id) { }
     protected Gestore rawFindByEmail(String email) { return null; }
+    protected List<Gestore> rawFindAll() { return null; }
 
     // -------- DAO API --------
 
@@ -56,6 +59,30 @@ public class BaseGestoreDAO implements GestoreDAO {
             return g;
         }
         return null;
+    }
+     // findAll è metodo che serve per esportare tutti i gestori(implementato ma non utilizzato nel concreto)
+    @Override
+    public List<Gestore> findAll() {
+    if (persistent) {
+        List<Gestore> res = rawFindAll();
+        if (res == null) return new ArrayList<>();
+
+        lock.writeLock().lock();
+        try {
+            for (Gestore g : res) {
+                if (g != null && g.getIdUtente() > 0) {
+                    cache.put(g.getIdUtente(), g);
+                }
+            }
+        } finally { lock.writeLock().unlock(); }
+
+        return res;
+    }
+
+        lock.readLock().lock();
+        try {
+            return new ArrayList<>(cache.values());
+        } finally { lock.readLock().unlock(); }
     }
 
     @Override

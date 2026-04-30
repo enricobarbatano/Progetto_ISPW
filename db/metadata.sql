@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS app_metadata (
+    k VARCHAR(64) PRIMARY KEY,
+    v VARCHAR(255) NOT NULL
+);

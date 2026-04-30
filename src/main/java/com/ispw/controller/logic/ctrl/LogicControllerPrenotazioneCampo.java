@@ -34,32 +34,30 @@ import com.ispw.dao.interfaces.PrenotazioneDAO;
 import com.ispw.model.entity.Campo;
 import com.ispw.model.entity.Pagamento;
 import com.ispw.model.entity.Prenotazione;
+import com.ispw.model.enums.Ruolo;
 import com.ispw.model.enums.StatoPagamento;
 import com.ispw.model.enums.StatoPrenotazione;
 
 public class LogicControllerPrenotazioneCampo {
-    private static final String PAGATO= "PAGATO";
-    // Costanti di servizio
+
+    private static final String PAGATO = "PAGATO";
+
     private static final int DEFAULT_DURATA_MIN = 60;
+
     private static final String MSG_SLOT_NON_DISP    = "[PRENOT] Slot non disponibile: campo={0} {1} {2}-{3}";
     private static final String MSG_NO_PREN_DA_PAG   = "Nessuna prenotazione da pagare";
     private static final String MSG_INPUT_NON_VALIDO = "Input non valido";
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: usa interfacce Gestione* via parametro (DIP).
-    // A2) IO verso GUI/CLI: riceve/ritorna bean (CampiBean, DatiPagamentoBean, ecc.).
-    // A3) Persistenza: usa DAO via DAOFactory.
     @SuppressWarnings("java:S1312")
     private Logger log() { return Logger.getLogger(getClass().getName()); }
 
-    // DAO on-demand (no SQL nei controller)
+    // DAO on-demand (runtime via factory)
     private PrenotazioneDAO prenotazioneDAO() { return DAOFactory.getInstance().getPrenotazioneDAO(); }
     private CampoDAO        campoDAO()        { return DAOFactory.getInstance().getCampoDAO(); }
     private GeneralUserDAO  userDAO()         { return DAOFactory.getInstance().getGeneralUserDAO(); }
     private PagamentoDAO    pagamentoDAO()    { return DAOFactory.getInstance().getPagamentoDAO(); }
 
-    // 0) Lista campi (supporto UI prenotazione)
+    // 0) Lista campi
     public CampiBean listaCampi() {
         CampiBean out = new CampiBean();
         out.setCampi(campoDAO().findAll().stream()
@@ -79,7 +77,7 @@ public class LogicControllerPrenotazioneCampo {
         return dispCtrl.verificaDisponibilita(param);
     }
 
-    // 2) NUOVA PRENOTAZIONE (crea DA_PAGARE + blocca slot) â†’ Riepilogo
+    // 2) NUOVA PRENOTAZIONE (crea DA_PAGARE + blocca slot) → Riepilogo
     public RiepilogoPrenotazioneBean nuovaPrenotazione(DatiInputPrenotazioneBean input,
                                                        SessioneUtenteBean sessione) {
         return nuovaPrenotazione(input, sessione, new LogicControllerGestoreDisponibilita());
@@ -100,10 +98,12 @@ public class LogicControllerPrenotazioneCampo {
         final LocalDate data;
         final LocalTime inizio;
         final LocalTime fine;
+
         try {
             data   = LocalDate.parse(sData.trim()); // yyyy-MM-dd
             inizio = LocalTime.parse(sIniz.trim()); // HH:mm
-            fine   = !isBlank(sFine) ? LocalTime.parse(sFine.trim()) : inizio.plusMinutes(DEFAULT_DURATA_MIN);
+            fine   = !isBlank(sFine) ? LocalTime.parse(sFine.trim())
+                                     : inizio.plusMinutes(DEFAULT_DURATA_MIN);
         } catch (DateTimeParseException ex) {
             log().log(Level.WARNING, "[PRENOT] Formato data/ora non valido", ex);
             return null;
@@ -112,13 +112,15 @@ public class LogicControllerPrenotazioneCampo {
         final int durataMin = (int) Duration.between(inizio, fine).toMinutes();
         if (durataMin <= 0) return null;
 
-        final String email = normalizeEmail(sessione.getUtente().getEmail());
-        if (email == null) return null;
-
-        final var user = userDAO().findByEmail(email);
+        // Risoluzione utente demandata alla Facade GeneralUserDAO (runtime)
+        final var user = resolveUserFromSession(sessione);
         if (user == null) return null;
 
-        // 1) (ri)verifica disponibilitÃ 
+        //  (da esame) prenotazione consentita solo a UTENTE
+        // Se vuoi permetterla anche al gestore, dimmelo e tolgo questo check.
+        if (user.getRuolo() != Ruolo.UTENTE) return null;
+
+        // 1) (ri)verifica disponibilità
         ParametriVerificaBean pv = new ParametriVerificaBean();
         pv.setIdCampo(idCampo);
         pv.setData(data.toString());
@@ -129,8 +131,9 @@ public class LogicControllerPrenotazioneCampo {
         boolean disponibile = slots.stream().anyMatch(d ->
                 Objects.equals(d.getData(),     data.toString())
              && Objects.equals(d.getOraInizio(), inizio.toString())
-             && Objects.equals(d.getOraFine(),   inizio.plusMinutes(durataMin).toString())
+             && Objects.equals(d.getOraFine(),   fine.toString())
         );
+
         if (!disponibile) {
             log().log(Level.WARNING, MSG_SLOT_NON_DISP, new Object[]{idCampo, data, inizio, fine});
             return null;
@@ -139,6 +142,7 @@ public class LogicControllerPrenotazioneCampo {
         // 2) blocca slot su Campo
         Campo c = campoDAO().findById(idCampo);
         if (c == null) return null;
+
         c.bloccoSlot(Date.valueOf(data), Time.valueOf(inizio), Time.valueOf(fine));
         campoDAO().store(c);
 
@@ -150,16 +154,16 @@ public class LogicControllerPrenotazioneCampo {
         p.setOraInizio(inizio);
         p.setOraFine(fine);
         p.setStato(StatoPrenotazione.DA_PAGARE);
+
         prenotazioneDAO().store(p);
 
-        log().fine(() -> "[PRENOT] Creata prenotazione id=" + p.getIdPrenotazione() + " per utente=" + email);
+        log().fine(() -> "[PRENOT] Creata prenotazione id=" + p.getIdPrenotazione() + " per utente=" + user.getEmail());
 
         // 4) riepilogo
         return buildRiepilogo(p, c, sessione.getUtente(), durataMin);
     }
 
-    // 3) COMPLETA PRENOTAZIONE (pagamento â†’ conferma â†’ fattura â†’ notifica)
-    //    Rifattorizzato per ridurre la complessitÃ  cognitiva, senza cambiare la logica.
+    // 3) COMPLETA PRENOTAZIONE (pagamento → conferma → fattura → notifica)
     public StatoPagamentoBean completaPrenotazione(DatiPagamentoBean dati,
                                                    SessioneUtenteBean sessione) {
         return completaPrenotazione(
@@ -175,53 +179,42 @@ public class LogicControllerPrenotazioneCampo {
                                             GestionePagamentoPrenotazione payCtrl,
                                             GestioneFatturaPrenotazione   fattCtrl,
                                             GestioneNotificaPrenotazione  notiCtrl) {
-        // 1) Validazioni iniziali (early return)
+
         if (!isCheckoutInputValid(dati, sessione, payCtrl, fattCtrl, notiCtrl)) {
             return esitoPagamento(false, "KO", MSG_INPUT_NON_VALIDO);
         }
 
-        // 2) Identificazione utente da sessione
-        final String email = normalizeEmail(sessione.getUtente().getEmail());
-        if (email == null) {
-            return esitoPagamento(false, "KO", "Sessione senza email");
-        }
-        final var user = userDAO().findByEmail(email);
+        //  Risoluzione utente demandata alla Facade (runtime)
+        final var user = resolveUserFromSession(sessione);
         if (user == null) {
             return esitoPagamento(false, "KO", "Utente inesistente");
         }
 
-        // 3) Prenotazione da pagare
+        //  checkout consentito solo a UTENTE
+        if (user.getRuolo() != Ruolo.UTENTE) {
+            return esitoPagamento(false, "KO", "Operazione non consentita");
+        }
+
+        // Prenotazione da pagare
         final Prenotazione p = getFirstDaPagare(user.getIdUtente());
         if (p == null) {
             return esitoPagamento(false, "KO", MSG_NO_PREN_DA_PAG);
         }
 
-        // 4) Pagamento
+        // Pagamento
         final StatoPagamento statoEnum = payCtrl.richiediPagamentoPrenotazione(dati, p.getIdPrenotazione());
         final boolean success = isPagamentoOk(statoEnum);
 
-        // 5) Post-pagamento (solo se successo): conferma â†’ fattura â†’ notifica
+        // Post-pagamento (solo se successo): conferma → fattura → notifica
         if (success) {
-            postPagamentoActions(p, email, fattCtrl, notiCtrl, sessione);
+            postPagamentoActions(p, user.getEmail(), fattCtrl, notiCtrl, sessione);
         }
 
-        // 6) Esito: preferisci quanto persistito dal PagamentoDAO; altrimenti fallback
+        // Esito: preferisci quanto persistito dal DAO
         return composeEsito(p, success, statoEnum);
     }
 
-    // SEZIONE LOGICA
-    // Legenda metodi:
-    // 1) isCheckoutInputValid(...) - valida input pagamento.
-    // 2) getFirstDaPagare(...) - seleziona prenotazione da pagare.
-    // 3) postPagamentoActions(...) - conferma, fattura, notifica.
-    // 4) composeEsito(...) - ricompone esito pagamento.
-    // 5) toBean(...) - converte entity in bean.
-    // 6) isBlank(...) - verifica stringhe vuote.
-    // 7) buildRiepilogo(...) - costruisce riepilogo prenotazione.
-    // 8) normalizeEmail(...) - normalizza email.
-    // 9) isPagamentoOk(...) - interpreta StatoPagamento.
-    // 10) newTxId(...) - genera id transazione.
-    // 11) esitoPagamento(...) - costruisce esito pagamento.
+    // ===================== HELPERS =====================
 
     private boolean isCheckoutInputValid(DatiPagamentoBean dati,
                                          SessioneUtenteBean sessione,
@@ -241,10 +234,6 @@ public class LogicControllerPrenotazioneCampo {
         return daPagare.isEmpty() ? null : daPagare.get(0);
     }
 
-    /**
-     * Conferma prenotazione + emette fattura + invia notifica (solo in caso di successo).
-     * Non cambia i messaggi nÃ© le modalitÃ  di invocazione.
-     */
     private void postPagamentoActions(Prenotazione p,
                                       String email,
                                       GestioneFatturaPrenotazione fattCtrl,
@@ -253,7 +242,6 @@ public class LogicControllerPrenotazioneCampo {
         prenotazioneDAO().updateStato(p.getIdPrenotazione(), StatoPrenotazione.CONFERMATA);
 
         DatiFatturaBean fatt = new DatiFatturaBean();
-        // NB: rimane invariato il placeholder giÃ  presente
         fatt.setCodiceFiscaleCliente(email);
         fattCtrl.generaFatturaPrenotazione(fatt, p.getIdPrenotazione());
 
@@ -261,10 +249,6 @@ public class LogicControllerPrenotazioneCampo {
                 "Prenotazione #" + p.getIdPrenotazione() + " confermata");
     }
 
-    /**
-     * Ricompone lo stato di pagamento preferendo quanto scritto dal DAO;
-     * se assente, usa il fallback identico allâ€™implementazione originale.
-     */
     private StatoPagamentoBean composeEsito(Prenotazione p, boolean success, StatoPagamento statoEnum) {
         Pagamento pag = pagamentoDAO().findByPrenotazione(p.getIdPrenotazione());
         if (pag != null) {
@@ -275,26 +259,20 @@ public class LogicControllerPrenotazioneCampo {
             } else {
                 bean.setStato(success ? PAGATO : "KO");
             }
-            bean.setIdTransazione(newTxId("PX")); // invariato
+            bean.setIdTransazione(newTxId("PX"));
             bean.setDataPagamento(pag.getDataPagamento());
             bean.setMessaggio(success ? "Pagamento eseguito" : "Pagamento rifiutato");
             return bean;
         }
-        // Fallback minimale (invariato)
-        final String stato;
-        if (statoEnum != null) {
-            stato = statoEnum.name();
-        } else {
-            stato = success ? PAGATO : "KO";
-        }
+
+        final String stato = (statoEnum != null) ? statoEnum.name() : (success ? PAGATO : "KO");
         return esitoPagamento(success, stato, success ? "Pagamento eseguito" : "Pagamento rifiutato");
     }
 
     private CampoBean toBean(Campo campo) {
         CampoBean bean = new CampoBean();
-        if (campo == null) {
-            return bean;
-        }
+        if (campo == null) return bean;
+
         bean.setIdCampo(campo.getIdCampo());
         bean.setNome(campo.getNome());
         bean.setTipoSport(campo.getTipoSport());
@@ -315,7 +293,7 @@ public class LogicControllerPrenotazioneCampo {
 
         float importo = 0f;
         if (c != null && c.getCostoOrario() != null) {
-            importo = c.getCostoOrario() * (durataMin / 60f); // pro-rata
+            importo = c.getCostoOrario() * (durataMin / 60f);
         }
         r.setImportoTotale(importo);
         r.setDatiFiscali(null);
@@ -328,10 +306,9 @@ public class LogicControllerPrenotazioneCampo {
         return t.isEmpty() ? null : t.toLowerCase();
     }
 
-    // âœ“ riconosce anche StatoPagamento.OK
     private boolean isPagamentoOk(StatoPagamento stato) {
         if (stato == null) return false;
-        if (stato == StatoPagamento.OK) return true; // esplicito
+        if (stato == StatoPagamento.OK) return true;
         final String s = stato.name();
         return s.contains("ESEGUITO")
             || s.contains("APPROVATO")
@@ -345,14 +322,20 @@ public class LogicControllerPrenotazioneCampo {
     private StatoPagamentoBean esitoPagamento(boolean ok, String stato, String msg) {
         StatoPagamentoBean bean = new StatoPagamentoBean();
         bean.setSuccesso(ok);
-        if (stato != null) {
-            bean.setStato(stato);
-        } else {
-            bean.setStato(ok ? PAGATO : "KO");
-        }
+        bean.setStato(stato != null ? stato : (ok ? PAGATO : "KO"));
         bean.setIdTransazione(newTxId("TX"));
         bean.setDataPagamento(java.time.LocalDateTime.now());
         bean.setMessaggio(msg);
         return bean;
+    }
+
+    /**
+     * Helper unico: risolve utente dalla sessione usando GeneralUserDAO (facade runtime).
+     */
+    private com.ispw.model.entity.GeneralUser resolveUserFromSession(SessioneUtenteBean sessione) {
+        if (sessione == null || sessione.getUtente() == null) return null;
+        final String email = normalizeEmail(sessione.getUtente().getEmail());
+        if (email == null) return null;
+        return userDAO().findByEmail(email);
     }
 }

@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS campi (
+    id_campo INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    tipo_sport VARCHAR(50) NOT NULL,
+    costo_orario DECIMAL(10,2),
+    is_attivo BOOLEAN NOT NULL DEFAULT TRUE,
+    flag_manutenzione BOOLEAN NOT NULL DEFAULT FALSE
+);

@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import com.ispw.bean.DatiDisponibilitaBean;
 import com.ispw.bean.ParametriVerificaBean;
@@ -24,103 +23,140 @@ public class LogicControllerGestoreDisponibilita
                    GestioneDisponibilitaGestioneRegole,
                    GestioneDisponibilitaPrenotazione {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: implementa interfacce GestioneDisponibilita* (DIP).
-    // A2) IO verso GUI/CLI: riceve/ritorna bean DatiDisponibilitaBean/ParametriVerificaBean.
-    // A3) Persistenza: usa DAO via DAOFactory.
     private CampoDAO campoDAO() {
         return DAOFactory.getInstance().getCampoDAO();
     }
+
     private PrenotazioneDAO prenotazioneDAO() {
         return DAOFactory.getInstance().getPrenotazioneDAO();
     }
 
-
     /**
      * Libera lo slot occupato da una prenotazione:
-     * - recupera la prenotazione;
-     * - recupera/ottiene il Campo associato (diretto o via idCampo);
-     * - invoca Campo.sbloccaSlot(data, oraInizio);
-     * - persiste il Campo.
-     * Non cambia lo stato della prenotazione (delegalo al caso dâ€™uso Disdetta).
+     * - recupera prenotazione
+     * - recupera campo
+     * - sblocca slot
+     * - salva campo
+     * Best-effort: non solleva eccezioni al chiamante.
      */
-
-    //il metodo liberaslot effettua la logica di sblocco slot, ma non cambia lo stato della prenotazione (delegalo al caso d'uso Disdetta).
     @Override
     public void liberaSlot(int idPrenotazione) {
-        Prenotazione p = prenotazioneDAO().load(idPrenotazione);
+        if (idPrenotazione <= 0) return;
+
+        Prenotazione p;
+        try {
+            p = prenotazioneDAO().load(idPrenotazione);
+        } catch (RuntimeException ex) {
+            return; // best-effort
+        }
         if (p == null) return;
 
-        Campo c = (p.getCampo() != null) ? p.getCampo() : campoDAO().findById(p.getIdCampo());
-        if (c == null || p.getData() == null || p.getOraInizio() == null) return;
+        if (p.getData() == null || p.getOraInizio() == null) return;
 
-        c.sbloccaSlot(Date.valueOf(p.getData()), Time.valueOf(p.getOraInizio()));
-        campoDAO().store(c);
+        Campo c = null;
+        try {
+            c = (p.getCampo() != null) ? p.getCampo() : campoDAO().findById(p.getIdCampo());
+        } catch (RuntimeException ex) {
+            return; // best-effort
+        }
+        if (c == null) return;
+
+        try {
+            c.sbloccaSlot(Date.valueOf(p.getData()), Time.valueOf(p.getOraInizio()));
+            campoDAO().store(c);
+        } catch (RuntimeException ex) {
+            // best-effort: non propagare
+        }
     }
 
     /**
-     * Rimuove la disponibilitÃ  del campo (lo rende non prenotabile).
-     * Ritorna TRUE se lâ€™operazione va a buon fine.
+     * Rimuove la disponibilità del campo (lo rende non prenotabile).
+     * Ritorna TRUE se operazione riuscita.
      */
     @Override
     public Boolean rimuoviDisponibilita(int idCampo) {
-        Campo c = campoDAO().findById(idCampo);
+        if (idCampo <= 0) return false;
+
+        Campo c;
+        try {
+            c = campoDAO().findById(idCampo);
+        } catch (RuntimeException ex) {
+            return false;
+        }
         if (c == null) return false;
 
         try {
-            c.updateStatoOperativo(/*isAttivo*/ false, c.isFlagManutenzione());
+            c.updateStatoOperativo(false, c.isFlagManutenzione());
             campoDAO().store(c);
             return true;
         } catch (RuntimeException e) {
-            // RuntimeException is the expected superset for validation/DAO problems; do not catch Errors
             return false;
         }
     }
 
     /**
-     * Attiva la disponibilità  del campo (prenotabile).
+     * Attiva la disponibilità del campo (prenotabile).
      * Non avendo parametri temporali, restituiamo lista vuota (snello).
      */
     @Override
     public List<DatiDisponibilitaBean> attivaDisponibilita(int idCampo) {
-        Campo c = campoDAO().findById(idCampo);
+        if (idCampo <= 0) return List.of();
+
+        Campo c;
+        try {
+            c = campoDAO().findById(idCampo);
+        } catch (RuntimeException ex) {
+            return List.of();
+        }
         if (c == null) return List.of();
 
         try {
-            c.updateStatoOperativo(/*isAttivo*/ true, c.isFlagManutenzione());
+            c.updateStatoOperativo(true, c.isFlagManutenzione());
             campoDAO().store(c);
             return List.of();
         } catch (RuntimeException e) {
-            // RuntimeException is the expected superset for validation/DAO problems; do not catch Errors
             return List.of();
         }
     }
 
     /**
-     * Verifica disponibilitÃ :
+     * Verifica disponibilità:
      * - Se idCampo presente, verifica solo quel campo, altrimenti su tutti i campi;
-     * - Calcola oraFine = oraInizio + durataMin (default 60 se null);
-     * - Usa Campo.isDisponibile(Date, Time, Time) e lo stato operativo;
-     * - Costruisce DatiDisponibilitaBean con data/ore in stringa e costo pro-rata.
+     * - Calcola oraFine = oraInizio + durataMin (default 60 se <=0);
+     * - Usa Campo.isDisponibile(Date, Time, Time) e stato operativo;
+     * - Costruisce DatiDisponibilitaBean.
      */
     @Override
     public List<DatiDisponibilitaBean> verificaDisponibilita(ParametriVerificaBean param) {
-        Objects.requireNonNull(param, "ParametriVerificaBean non puÃ² essere null");
+        if (param == null) return List.of();
 
-        // Parse dei parametri STRING in tipi temporali
-        LocalDate data = LocalDate.parse(param.getData());          // yyyy-MM-dd
-        LocalTime oraInizio = LocalTime.parse(param.getOraInizio()); // HH:mm
+        final String sData = param.getData();
+        final String sOra  = param.getOraInizio();
+        if (sData == null || sOra == null) return List.of();
+
+        final LocalDate data;
+        final LocalTime oraInizio;
+        try {
+            data = LocalDate.parse(sData.trim());
+            oraInizio = LocalTime.parse(sOra.trim());
+        } catch (RuntimeException ex) {
+            return List.of();
+        }
+
         int durata = (param.getDurataMin() <= 0) ? 60 : param.getDurataMin();
         LocalTime oraFine = oraInizio.plusMinutes(durata);
 
         List<Campo> campi;
         CampoDAO cDAO = campoDAO();
-        if (param.getIdCampo() > 0) {
-            Campo unico = cDAO.findById(param.getIdCampo());
-            campi = (unico != null) ? List.of(unico) : List.of();
-        } else {
-            campi = cDAO.findAll();
+        try {
+            if (param.getIdCampo() > 0) {
+                Campo unico = cDAO.findById(param.getIdCampo());
+                campi = (unico != null) ? List.of(unico) : List.of();
+            } else {
+                campi = cDAO.findAll();
+            }
+        } catch (RuntimeException ex) {
+            return List.of();
         }
 
         List<DatiDisponibilitaBean> out = new ArrayList<>();
@@ -129,16 +165,23 @@ public class LogicControllerGestoreDisponibilita
         Time sqlFine   = Time.valueOf(oraFine);
 
         for (Campo c : campi) {
-            boolean ok = c.isDisponibile(sqlDate, sqlInizio, sqlFine)
-                      && c.isAttivo()
-                      && !c.isFlagManutenzione();
+            if (c == null) continue;
+
+            boolean ok;
+            try {
+                ok = c.isDisponibile(sqlDate, sqlInizio, sqlFine)
+                  && c.isAttivo()
+                  && !c.isFlagManutenzione();
+            } catch (RuntimeException ex) {
+                ok = false;
+            }
 
             if (ok) {
                 DatiDisponibilitaBean bean = new DatiDisponibilitaBean();
-                bean.setData(param.getData());
-                bean.setOraInizio(param.getOraInizio());
+                bean.setData(data.toString());
+                bean.setOraInizio(oraInizio.toString());
                 bean.setOraFine(oraFine.toString());
-                // costo pro-rata (costoOrario * durata/60). Gestiamo null-safety.
+
                 Float costoOrarioObj = c.getCostoOrario();
                 float costoOrario = (costoOrarioObj != null) ? costoOrarioObj : 0f;
                 bean.setCosto(costoOrario * (durata / 60f));
@@ -148,6 +191,4 @@ public class LogicControllerGestoreDisponibilita
         }
         return out;
     }
-
-    
 }

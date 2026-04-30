@@ -28,30 +28,20 @@ import com.ispw.model.entity.SystemLog;
 import com.ispw.model.enums.Ruolo;
 import com.ispw.model.enums.StatoAccount;
 
-/**
- * Controller applicativo per la gestione delle penalità/sanzioni.
- * Stateless, Sonar-friendly: early-return, DIP by-parameter, best-effort sui collaboratori.
- */
 public final class LogicControllerApplicaPenalita {
 
-    // === Messaggi centralizzati ===
     private static final String MSG_OK                 = "Operazione completata";
     private static final String MSG_INPUT_NON_VALIDO   = "Dati penalità non validi";
     private static final String MSG_UTENTE_INESISTENTE = "Utente inesistente";
     private static final String MSG_IMPORTO_NON_VALIDO = "Importo penalità non valido";
 
-    // === Logger (soppressione mirata regola S1312) ===
+    // ✅ nuovo (solo messaggio, nessuna dipendenza/import)
+    private static final String MSG_UTENTE_NON_VALIDO  = "Utente non valido per penalita";
+
     @SuppressWarnings("java:S1312")
     private static final Logger LOGGER =
             Logger.getLogger(LogicControllerApplicaPenalita.class.getName());
 
-    
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: usa interfacce Gestione* via parametro (DIP).
-    // A2) IO verso GUI/CLI: riceve/ritorna bean (DatiPenalitaBean, DatiPagamentoBean, DatiFatturaBean, UtentiBean).
-    // A3) Persistenza: usa DAO via DAOFactory.
-    
     private GeneralUserDAO userDAO() {
         return DAOFactory.getInstance().getGeneralUserDAO();
     }
@@ -62,8 +52,6 @@ public final class LogicControllerApplicaPenalita {
         return DAOFactory.getInstance().getRegolePenalitaDAO();
     }
 
-    
-    //  Metodo pubblico (rifattorizzato: bassa complessità cognitiva)
     public UtentiBean listaUtentiPerPenalita() {
         UtentiBean out = new UtentiBean();
         out.setUtenti(userDAO().findAll().stream()
@@ -80,7 +68,6 @@ public final class LogicControllerApplicaPenalita {
                                                GestioneFatturaPenalita   fattCtrl,
                                                GestioneNotificaPenalita  notiCtrl) {
 
-        // 1) Guard-clauses: input e precondizioni
         if (!isDatiPenalitaValidi(dati)) {
             return esito(false, MSG_INPUT_NON_VALIDO);
         }
@@ -91,23 +78,24 @@ public final class LogicControllerApplicaPenalita {
             return esito(false, MSG_UTENTE_INESISTENTE);
         }
 
+        //blindatura: penalità applicabili solo agli utenti finali
+        if (user.getRuolo() != Ruolo.UTENTE) {
+            return esito(false, MSG_UTENTE_NON_VALIDO);
+        }
+
         final BigDecimal importo = resolveImportoOrDefault(dati);
         if (!isImportoValido(importo)) {
             return esito(false, MSG_IMPORTO_NON_VALIDO);
         }
 
-        // 2) Persistenza best-effort su PenalitaDAO (con fallback deterministico)
         final int idPenalita = persistOrComputeId(dati, importo);
 
-        // 3) Orchestrazione opzionale (best-effort)
         handleNotifica(notiCtrl, idUtente);
         handlePagamento(payCtrl, datiPagamento, idPenalita, importo);
         handleFattura(fattCtrl, datiFattura, idPenalita);
 
-        // 3bis) Blocco account (best-effort)
         blockAccountSafe(user);
 
-        // 4) Log finale (audit)
         appendLogSafe(
             idUtente,
             "[PENALITA] id=" + idPenalita +
@@ -115,46 +103,19 @@ public final class LogicControllerApplicaPenalita {
             " motivo=" + safe(dati.getMotivazione())
         );
 
-        // 5) Esito OK
         return esito(true, MSG_OK);
     }
-
-    
-    // SEZIONE LOGICA
-    // Legenda metodi:
-    // 1) isDatiPenalitaValidi(...) - valida input.
-    // 2) isImportoValido(...) - valida importo.
-    // 3) resolveImportoOrDefault(...) - calcola importo.
-    // 4) handleNotifica(...) - invio notifica.
-    // 5) handlePagamento(...) - invio pagamento.
-    // 6) handleFattura(...) - invio fattura.
-    // 7) normalizePagamento(...) - default dati pagamento.
-    // 8) normalizeFattura(...) - default dati fattura.
-    // 9) persistOrComputeId(...) - persiste o calcola id.
-    // 10) appendLogSafe(...) - log best-effort su LogDAO.
-    // 11) runBestEffort(...) - wrapper best-effort.
-    // 12) blockAccountSafe(...) - sospensione account.
-    // 13) isBlank(...) - verifica stringhe vuote.
-    // 14) safe(...) - normalizza stringhe.
-    // 15) log() - logger on-demand.
-    // 16) toBean(...) - conversione entity->bean.
-    // 17) esito(...) - costruisce esito operazione.
-    
 
     private boolean isDatiPenalitaValidi(DatiPenalitaBean d) {
         return d != null
             && d.getIdUtente() > 0
-            && !isBlank(d.getMotivazione()); // coerente con i test: motivazione non blank
+            && !isBlank(d.getMotivazione());
     }
 
     private boolean isImportoValido(BigDecimal imp) {
         return imp != null && imp.compareTo(BigDecimal.ZERO) > 0;
     }
 
-    /**
-     * Calcola l'importo: prima dal bean, altrimenti dalle regole (se presenti).
-     * Se null/<=0, tornerà null e verrà bocciato dal check a monte.
-    */
     private BigDecimal resolveImportoOrDefault(DatiPenalitaBean d) {
         BigDecimal imp = d.getImporto();
         if (isImportoValido(imp)) return imp;
@@ -172,9 +133,6 @@ public final class LogicControllerApplicaPenalita {
         return imp;
     }
 
-    //  Collaborazioni best-effort (notifica/pagamento/fattura)
-    
-
     private void handleNotifica(GestioneNotificaPenalita notiCtrl, int idUtente) {
         if (notiCtrl == null) return;
         runBestEffort("Notifica penalità",
@@ -188,7 +146,6 @@ public final class LogicControllerApplicaPenalita {
         if (payCtrl == null || datiPagamento == null) return;
         normalizePagamento(datiPagamento, importoPenalita);
         runBestEffort("Pagamento penalità",
-            // NB: la tua interfaccia usa l’accento nel nome del metodo
             () -> payCtrl.richiediPagamentoPenalita(datiPagamento, idPenalita));
     }
 
@@ -200,10 +157,6 @@ public final class LogicControllerApplicaPenalita {
         runBestEffort("Fattura penalità",
             () -> fattCtrl.generaFatturaPenalita(datiFattura, idPenalita));
     }
-
-    // ========================================================================
-    //  Normalizzazioni DTO (centralizzazione dei default)
-    // ========================================================================
 
     private void normalizePagamento(DatiPagamentoBean pay, BigDecimal importoPenalita) {
         if (pay == null) return;
@@ -222,21 +175,18 @@ public final class LogicControllerApplicaPenalita {
         }
     }
 
-    //  Persistenza penalità (best-effort + fallback deterministico)
-
     private int persistOrComputeId(DatiPenalitaBean d, BigDecimal importo) {
         try {
             Penalita p = new Penalita();
             p.setIdUtente(d.getIdUtente());
             p.setMotivazione(d.getMotivazione());
             p.setImporto(importo);
-            penalitaDAO().store(p); // si assume assegni l'ID all'istanza
+            penalitaDAO().store(p);
             if (p.getIdPenalita() > 0) return p.getIdPenalita();
         } catch (RuntimeException ex) {
             log().log(Level.FINE, "Persistenza Penalita fallita: {0}", new Object[]{ex.getMessage()});
         }
 
-        // Fallback deterministico (evita 0/negativi)
         int hash = Math.abs(Objects.hash(
                 d.getIdUtente(),
                 safe(d.getMotivazione()),
@@ -246,17 +196,9 @@ public final class LogicControllerApplicaPenalita {
         return (hash == 0 ? 1 : hash);
     }
 
-    //  Infrastruttura: logging best-effort, utilità, esito, accesso DAO
-
-    /**
-     * Logga sempre via JUL e, se disponibile, persiste su LogDAO in best-effort.
-     * Rifattorizzata per bassa complessità: passaggi lineari e responsabilità chiare.
-     */
     private void appendLogSafe(int idUtente, String descrizione) {
-        // 1) Log via JUL (sempre)
         log().log(Level.INFO, () -> "UTENTE=" + idUtente + " " + descrizione);
 
-        // 2) Best-effort: persistenza su LogDAO
         try {
             LogDAO ldao = DAOFactory.getInstance().getLogDAO();
             if (ldao == null) return;
@@ -267,7 +209,6 @@ public final class LogicControllerApplicaPenalita {
             sl.setTimestamp(LocalDateTime.now());
             ldao.append(sl);
         } catch (RuntimeException ex) {
-            // best-effort: non deve far fallire l'operazione principale
             log().log(Level.FINE, "Scrittura LogDAO fallita: {0}", new Object[]{ex.getMessage()});
         }
     }
@@ -282,6 +223,10 @@ public final class LogicControllerApplicaPenalita {
 
     private void blockAccountSafe(GeneralUser user) {
         if (user == null) return;
+
+        // ✅ extra difensivo: non sospendere mai un gestore
+        if (user.getRuolo() != Ruolo.UTENTE) return;
+
         try {
             user.setStatoAccount(StatoAccount.SOSPESO);
             userDAO().store(user);
@@ -304,16 +249,14 @@ public final class LogicControllerApplicaPenalita {
 
     private UtenteSelezioneBean toBean(GeneralUser u) {
         UtenteSelezioneBean bean = new UtenteSelezioneBean();
-        if (u == null) {
-            return bean;
-        }
+        if (u == null) return bean;
+
         bean.setIdUtente(u.getIdUtente());
         bean.setEmail(u.getEmail());
         bean.setRuolo(u.getRuolo());
         return bean;
     }
 
-    /** Costruisce l'esito (no reflection: usiamo direttamente i setter reali). */
     private EsitoOperazioneBean esito(boolean ok, String msg) {
         EsitoOperazioneBean e = new EsitoOperazioneBean();
         e.setSuccesso(ok);

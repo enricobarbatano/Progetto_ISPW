@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS general_user (
+    id_utente INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cognome VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    stato_account VARCHAR(50) NOT NULL,
+    ruolo VARCHAR(50) NOT NULL
+);

@@ -17,15 +17,8 @@ import com.ispw.model.entity.Fattura;
 import com.ispw.model.entity.GeneralUser;
 import com.ispw.model.entity.Prenotazione;
 
-
 public class LogicControllerGestioneFattura
         implements GestioneFatturaPrenotazione, GestioneFatturaPenalita, GestioneFatturaRimborso {
-
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: implementa le interfacce GestioneFattura* (DIP).
-    // A2) IO verso GUI/CLI: riceve DatiFatturaBean, ritorna Fattura.
-    // A3) Persistenza: usa DAO via DAOFactory.
 
     /** DAO on-demand (nessun campo, nessuna dipendenza da concreti). */
     private FatturaDAO fatturaDAO() {
@@ -46,12 +39,14 @@ public class LogicControllerGestioneFattura
         return Logger.getLogger(getClass().getName());
     }
 
-  
-    //Genera una fattura per una prenotazione (validazione essenziale + store via DAO). */
+    // =========================
+    // FATTURA PRENOTAZIONE
+    // =========================
+
     @Override
     public Fattura generaFatturaPrenotazione(DatiFatturaBean dati, int idPrenotazione) {
         if (!isValidDati(dati)) {
-            log().warning("[FATTURA][WARN] DatiFatturaBean non validi per prenotazione");
+            log().warning("[FATTURA][WARN] DatiFatturaBean non validi per prenotazione (email mancante)");
             return null;
         }
         if (idPrenotazione <= 0) {
@@ -63,33 +58,34 @@ public class LogicControllerGestioneFattura
 
         final int idUtente = resolveIdUtente(dati);
         if (idUtente <= 0) {
-            log().warning("[FATTURA][WARN] Utente non trovato per email/codice fiscale");
+            log().warning("[FATTURA][WARN] Utente non trovato per email");
             return null;
         }
 
         Fattura f = new Fattura();
         f.setIdPrenotazione(idPrenotazione);
         f.setIdUtente(idUtente);
+
+        // Campo CF: lo salviamo se presente (ma NON lo usiamo per la risoluzione utente)
         f.setCodiceFiscaleCliente(trimOrNull(dati.getCodiceFiscaleCliente()));
+
         f.setDataEmissione(emissione);
         f.setLinkPdf(buildPdfLink("FATT", idPrenotazione, emissione));
 
-        fatturaDAO().store(f); // upsert delegato al DAO concreto
+        fatturaDAO().store(f);
         log().log(Level.FINE, "[FATTURA] Emessa fattura prenotazione #{0} -> {1}",
                 new Object[]{idPrenotazione, f.getLinkPdf()});
         return f;
     }
 
-    //  FATTURA PENALITÃ€
+    // =========================
+    // FATTURA PENALITA'
+    // =========================
 
-    /**
-     * Genera una fattura per penalitÃ  (convenzione: ref prenotazione = -idPenalita).
-     * NB: nome del metodo SENZA accento, come nellâ€™interfaccia.
-     */
     @Override
     public Fattura generaFatturaPenalita(DatiFatturaBean dati, int idPenalita) {
         if (!isValidDati(dati)) {
-            log().warning("[FATTURA][WARN] DatiFatturaBean non validi per penalita");
+            log().warning("[FATTURA][WARN] DatiFatturaBean non validi per penalita (email mancante)");
             return null;
         }
         if (idPenalita <= 0) {
@@ -102,7 +98,7 @@ public class LogicControllerGestioneFattura
 
         final int idUtente = resolveIdUtente(dati);
         if (idUtente <= 0) {
-            log().warning("[FATTURA][WARN] Utente non trovato per email/codice fiscale (penalita)");
+            log().warning("[FATTURA][WARN] Utente non trovato per email (penalita)");
             return null;
         }
 
@@ -119,9 +115,10 @@ public class LogicControllerGestioneFattura
         return f;
     }
 
-    //  NOTA DI CREDITO (RIMBORSO)
+    // =========================
+    // NOTA DI CREDITO (RIMBORSO)
+    // =========================
 
-    /** Emette una nota di credito per la prenotazione indicata (id int, come da interfaccia). */
     @Override
     public void emettiNotaDiCredito(int idPrenotazione) {
         if (idPrenotazione <= 0) {
@@ -130,15 +127,17 @@ public class LogicControllerGestioneFattura
         }
 
         final LocalDate oggi = LocalDate.now();
-        Prenotazione p = prenotazioneDAO().findById(idPrenotazione);
+
+        // Uso API standard del DAO (evita dipendere da metodi non garantiti)
+        Prenotazione p = prenotazioneDAO().load(idPrenotazione);
         if (p == null) {
             log().log(Level.WARNING, "[FATTURA][WARN] Prenotazione non trovata per NC: {0}", idPrenotazione);
             return;
         }
+
         Fattura nc = new Fattura();
         nc.setIdPrenotazione(idPrenotazione);
         nc.setIdUtente(p.getIdUtente());
-        // Il CF puÃ² essere popolato da un orchestratore principale, se necessario.
         nc.setDataEmissione(oggi);
         nc.setLinkPdf(buildPdfLink("NC", idPrenotazione, oggi));
 
@@ -147,18 +146,13 @@ public class LogicControllerGestioneFattura
                 new Object[]{idPrenotazione, nc.getLinkPdf()});
     }
 
-    // SEZIONE LOGICA
-    // Legenda metodi:
-    // 1) isValidDati(...) - valida dati fattura.
-    // 2) hasText(...) - verifica stringhe.
-    // 3) trimOrNull(...) - normalizza stringhe.
-    // 4) buildPdfLink(...) - crea link pdf fittizio.
-    // 5) resolveIdUtente(...) - risolve id utente da dati.
-    // 6) firstNonBlank(...) - primo valore non vuoto.
+    // =========================
+    // HELPERS
+    // =========================
 
-    /** Validazione "scolastica": bean non nullo e CF presente. */
+    /** Validazione semplificata (progetto universitario): serve solo l'email. */
     private boolean isValidDati(DatiFatturaBean dati) {
-        return dati != null && hasText(dati.getCodiceFiscaleCliente());
+        return dati != null && hasText(dati.getEmail());
     }
 
     private boolean hasText(String s) {
@@ -171,31 +165,18 @@ public class LogicControllerGestioneFattura
         return t.isEmpty() ? null : t;
     }
 
-    /** Link PDF fittizio e deterministico (evita duplicazioni di stringhe in linea). */
+    /** Link PDF fittizio e deterministico. */
     private String buildPdfLink(String prefix, int ref, LocalDate date) {
         final String d = date.format(DateTimeFormatter.BASIC_ISO_DATE); // yyyyMMdd
         return prefix + "-" + Math.abs(ref) + "-" + d + ".pdf";
     }
 
+    /** Risolve id utente SOLO da email (semplificazione progetto). */
     private int resolveIdUtente(DatiFatturaBean dati) {
-        if (dati == null) {
-            return 0;
-        }
-        String email = firstNonBlank(dati.getEmail(), dati.getCodiceFiscaleCliente());
-        if (email == null) {
-            return 0;
-        }
-        GeneralUser user = userDAO().findByEmail(email.trim().toLowerCase());
-        return user != null ? user.getIdUtente() : 0;
-    }
+        if (dati == null || !hasText(dati.getEmail())) return 0;
 
-    private String firstNonBlank(String a, String b) {
-        if (hasText(a)) {
-            return a;
-        }
-        if (hasText(b)) {
-            return b;
-        }
-        return null;
+        final String email = dati.getEmail().trim().toLowerCase();
+        GeneralUser user = userDAO().findByEmail(email);
+        return user != null ? user.getIdUtente() : 0;
     }
 }

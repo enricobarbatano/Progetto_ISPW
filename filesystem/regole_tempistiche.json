@@ -1,0 +1,7 @@
+[ {
+  "idConfig" : 1,
+  "durataSlot" : 60,
+  "oraApertura" : "08:00:00",
+  "oraChiusura" : "22:00:00",
+  "preavvisoMinimo" : 120
+} ]

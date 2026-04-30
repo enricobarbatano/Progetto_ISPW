@@ -1,15 +1,14 @@
 package com.ispw.dao.factory;
 
 import com.ispw.dao.impl.dbms.concrete.CampoDAODbms;
-import com.ispw.dao.impl.dbms.concrete.GestoreDAODbms;
-import com.ispw.dao.impl.dbms.concrete.RegoleTempisticheDAODbms;
 import com.ispw.dao.impl.dbms.concrete.FatturaDAODbms;
-import com.ispw.dao.impl.dbms.concrete.GeneralUserDAODbms;
+import com.ispw.dao.impl.dbms.concrete.GestoreDAODbms;
 import com.ispw.dao.impl.dbms.concrete.LogDAODbms;
 import com.ispw.dao.impl.dbms.concrete.PagamentoDAODbms;
 import com.ispw.dao.impl.dbms.concrete.PenalitaDAODbms;
 import com.ispw.dao.impl.dbms.concrete.PrenotazioneDAODbms;
 import com.ispw.dao.impl.dbms.concrete.RegolePenalitaDAODbms;
+import com.ispw.dao.impl.dbms.concrete.RegoleTempisticheDAODbms;
 import com.ispw.dao.impl.dbms.concrete.UtenteFinaleDAODbms;
 import com.ispw.dao.impl.dbms.connection.DbmsConnectionFactory;
 import com.ispw.dao.interfaces.CampoDAO;
@@ -66,7 +65,13 @@ public final class DbmsDAOFactory extends DAOFactory {
 
     @Override
     public synchronized GeneralUserDAO getGeneralUserDAO() {
-        if (generalUserDAO == null) generalUserDAO = new GeneralUserDAODbms(cf);
+        if (generalUserDAO == null) {
+        generalUserDAO = new com.ispw.dao.impl.aggregate.AggregatingGeneralUserDAO(
+                getGestoreDAO(),
+                getUtenteFinaleDAO()
+        );
+    }
+
         return generalUserDAO;
     }
 
