@@ -1,3 +1,13 @@
+
+/*“Nel progetto coesistono entity anemiche e entity con comportamento:
+le entity che modellano vincoli di dominio 
+(es. Campo con gestione degli slot) includono metodi per mantenere invarianti;
+per altre entity la logica applicativa è orchestrata dai logic controller,
+mantenendo i DAO come layer di persistenza e preservando DIP/SRP.” */
+
+
+
+
 package com.ispw.model.entity;
 
 import java.io.Serializable;

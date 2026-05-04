@@ -1,5 +1,6 @@
 package com.ispw.dao.factory;
 
+
 import com.ispw.dao.impl.base.BaseCampoDAO;
 import com.ispw.dao.impl.base.BaseFatturaDAO;
 import com.ispw.dao.impl.base.BaseGestoreDAO;
@@ -9,6 +10,7 @@ import com.ispw.dao.impl.base.BasePenalitaDAO;
 import com.ispw.dao.impl.base.BasePrenotazioneDAO;
 import com.ispw.dao.impl.base.BaseRegolePenalitaDAO;
 import com.ispw.dao.impl.base.BaseRegoleTempisticheDAO;
+import com.ispw.dao.impl.base.BaseRichiestaDisdettaDAO;
 import com.ispw.dao.impl.base.BaseUtenteFinaleDAO;
 import com.ispw.dao.interfaces.CampoDAO;
 import com.ispw.dao.interfaces.FatturaDAO;
@@ -20,6 +22,7 @@ import com.ispw.dao.interfaces.PenalitaDAO;
 import com.ispw.dao.interfaces.PrenotazioneDAO;
 import com.ispw.dao.interfaces.RegolePenalitaDAO;
 import com.ispw.dao.interfaces.RegoleTempisticheDAO;
+import com.ispw.dao.interfaces.RichiestaDisdettaDAO;
 import com.ispw.dao.interfaces.UtenteFinaleDAO;
 
 public final class MemoryDAOFactory extends DAOFactory {
@@ -40,6 +43,7 @@ public final class MemoryDAOFactory extends DAOFactory {
     private PagamentoDAO pagamentoDAO;
     private PenalitaDAO penalitaDAO;
     private PrenotazioneDAO prenotazioneDAO;
+    private RichiestaDisdettaDAO richiestaDisdettaDAO;
 
     private RegolePenalitaDAO regolePenalitaDAO;
     private RegoleTempisticheDAO regoleTempisticheDAO;
@@ -119,4 +123,13 @@ public final class MemoryDAOFactory extends DAOFactory {
         if (regoleTempisticheDAO == null) regoleTempisticheDAO = new BaseRegoleTempisticheDAO();
         return regoleTempisticheDAO;
     }
+
+    @Override
+    public synchronized RichiestaDisdettaDAO getRichiestaDisdettaDAO() {
+    if (richiestaDisdettaDAO == null) {
+        richiestaDisdettaDAO = new BaseRichiestaDisdettaDAO();
+    }
+    return richiestaDisdettaDAO;
+}
+
 }

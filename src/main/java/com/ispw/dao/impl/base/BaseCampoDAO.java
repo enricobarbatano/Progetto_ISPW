@@ -31,7 +31,7 @@ public class BaseCampoDAO implements CampoDAO {
     protected final Map<Integer, Campo> cache = new ConcurrentHashMap<>();
     protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    // ✅ Tri-state: null => seed-enabled in-memory
+    //  Tri-state: null => seed-enabled in-memory
     private final Boolean persistent;
 
     // Seed-on-first-use state (only used when persistent == null)
@@ -149,7 +149,7 @@ public class BaseCampoDAO implements CampoDAO {
     @Override
     public void store(Campo entity) {
         if (entity == null) return;
-
+            //ensureSeeded è richiamato dentro i metodi pubblici
         ensureSeeded();
 
         // If persistent provider: delegate id generation to rawStore if id==0

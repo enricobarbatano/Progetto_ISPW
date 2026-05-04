@@ -9,6 +9,7 @@ import com.ispw.dao.impl.dbms.concrete.PenalitaDAODbms;
 import com.ispw.dao.impl.dbms.concrete.PrenotazioneDAODbms;
 import com.ispw.dao.impl.dbms.concrete.RegolePenalitaDAODbms;
 import com.ispw.dao.impl.dbms.concrete.RegoleTempisticheDAODbms;
+import com.ispw.dao.impl.dbms.concrete.RichiestaDisdettaDAODbms;
 import com.ispw.dao.impl.dbms.concrete.UtenteFinaleDAODbms;
 import com.ispw.dao.impl.dbms.connection.DbmsConnectionFactory;
 import com.ispw.dao.interfaces.CampoDAO;
@@ -21,6 +22,7 @@ import com.ispw.dao.interfaces.PenalitaDAO;
 import com.ispw.dao.interfaces.PrenotazioneDAO;
 import com.ispw.dao.interfaces.RegolePenalitaDAO;
 import com.ispw.dao.interfaces.RegoleTempisticheDAO;
+import com.ispw.dao.interfaces.RichiestaDisdettaDAO;
 import com.ispw.dao.interfaces.UtenteFinaleDAO;
 
 public final class DbmsDAOFactory extends DAOFactory {
@@ -34,7 +36,7 @@ public final class DbmsDAOFactory extends DAOFactory {
 
     private CampoDAO campoDAO;
     private FatturaDAO fatturaDAO;
-
+    private RichiestaDisdettaDAO richiestaDisdettaDAO;
     private GeneralUserDAO generalUserDAO;
     private GestoreDAO gestoreDAO;
     private UtenteFinaleDAO utenteFinaleDAO;
@@ -121,6 +123,13 @@ public final class DbmsDAOFactory extends DAOFactory {
     public synchronized RegolePenalitaDAO getRegolePenalitaDAO() {
         if (regolePenalitaDAO == null) regolePenalitaDAO = new RegolePenalitaDAODbms(cf);
         return regolePenalitaDAO;
+    }
+    @Override
+    public synchronized RichiestaDisdettaDAO getRichiestaDisdettaDAO() {
+    if (richiestaDisdettaDAO == null) {
+        richiestaDisdettaDAO = new RichiestaDisdettaDAODbms(cf);
+    }
+    return richiestaDisdettaDAO;
     }
 
 }

@@ -11,7 +11,10 @@ import com.ispw.dao.impl.filesystem.concrete.PenalitaDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.PrenotazioneDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.RegolePenalitaDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.RegoleTempisticheDAOFileSystem;
+import com.ispw.dao.impl.filesystem.concrete.RichiestaDisdettaDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.UtenteFinaleDAOFileSystem;
+
+
 import com.ispw.dao.interfaces.CampoDAO;
 import com.ispw.dao.interfaces.FatturaDAO;
 import com.ispw.dao.interfaces.GeneralUserDAO;
@@ -22,6 +25,7 @@ import com.ispw.dao.interfaces.PenalitaDAO;
 import com.ispw.dao.interfaces.PrenotazioneDAO;
 import com.ispw.dao.interfaces.RegolePenalitaDAO;
 import com.ispw.dao.interfaces.RegoleTempisticheDAO;
+import com.ispw.dao.interfaces.RichiestaDisdettaDAO;
 import com.ispw.dao.interfaces.UtenteFinaleDAO;
 
 public final class FileSystemDAOFactory extends DAOFactory {
@@ -35,6 +39,7 @@ public final class FileSystemDAOFactory extends DAOFactory {
 
     private CampoDAO campoDAO;
     private FatturaDAO fatturaDAO;
+    private RichiestaDisdettaDAO richiestaDisdettaDAO;
 
     private GeneralUserDAO generalUserDAO;
     private GestoreDAO gestoreDAO;
@@ -125,4 +130,12 @@ public final class FileSystemDAOFactory extends DAOFactory {
         if (regoleTempisticheDAO == null) regoleTempisticheDAO = new RegoleTempisticheDAOFileSystem(root);
         return regoleTempisticheDAO;
     }
+    
+    @Override
+    public synchronized  RichiestaDisdettaDAO getRichiestaDisdettaDAO() {
+    if (richiestaDisdettaDAO == null) {
+        richiestaDisdettaDAO = new RichiestaDisdettaDAOFileSystem(root);
+    }
+    return richiestaDisdettaDAO;
+}
 }

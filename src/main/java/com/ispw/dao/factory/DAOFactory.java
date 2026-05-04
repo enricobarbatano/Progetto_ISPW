@@ -12,6 +12,7 @@ import com.ispw.dao.interfaces.PenalitaDAO;
 import com.ispw.dao.interfaces.PrenotazioneDAO;
 import com.ispw.dao.interfaces.RegolePenalitaDAO;
 import com.ispw.dao.interfaces.RegoleTempisticheDAO;
+import com.ispw.dao.interfaces.RichiestaDisdettaDAO;
 import com.ispw.dao.interfaces.UtenteFinaleDAO;
 import com.ispw.model.enums.PersistencyProvider;
 
@@ -82,7 +83,7 @@ public abstract class DAOFactory {
     static synchronized void resetForTests() {
         provider = null;
         fileSystemRoot = null;
-        seedRoot = null; // ✅ importantissimo per test ripetibili
+        seedRoot = null; //  importantissimo per test ripetibili
         instance = null;
     }
 
@@ -108,6 +109,7 @@ public abstract class DAOFactory {
     public abstract GeneralUserDAO getGeneralUserDAO();
     public abstract GestoreDAO getGestoreDAO();
     public abstract UtenteFinaleDAO getUtenteFinaleDAO();
+    public abstract RichiestaDisdettaDAO getRichiestaDisdettaDAO();
 
     public abstract LogDAO getLogDAO();
     public abstract PagamentoDAO getPagamentoDAO();
