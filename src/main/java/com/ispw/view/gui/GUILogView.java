@@ -1,31 +1,22 @@
 package com.ispw.view.gui;
 
-import java.util.List;
 import java.util.Map;
 
 import com.ispw.controller.graphic.gui.GUIGraphicControllerLog;
 import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.graphic.interfaces.NavigableController;
+import com.ispw.view.gui.fxml.LogFXMLController;
 import com.ispw.view.interfaces.ViewLog;
 import com.ispw.view.shared.LogViewUtils;
 
-import javafx.scene.control.Button;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 
 public class GUILogView extends GenericViewGUI implements ViewLog, NavigableController {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: view GUI log, usa controller grafico.
-    // A2) IO: componenti JavaFX e params log.
-
     private final GUIGraphicControllerLog controller;
-
-    // SEZIONE LOGICA
-    // Legenda logica:
-    // L1) onShow: verifica ruolo e render logs.
 
     public GUILogView(GUIGraphicControllerLog controller) {
         this.controller = controller;
@@ -40,33 +31,39 @@ public class GUILogView extends GenericViewGUI implements ViewLog, NavigableCont
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
+        // ✅ Mantieni vincolo: accesso ai log solo per gestore
         if (!LogViewUtils.isGestore(sessione)) {
             VBox root = GuiViewUtils.createRoot();
             root.getChildren().add(new Label("Accesso ai log riservato al gestore"));
-            Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome());
-            root.getChildren().add(home);
+            root.getChildren().add(GuiViewUtils.buildHomeButton(controller::tornaAllaHome));
             GuiLauncher.setRoot(root);
             return;
         }
 
-        List<String> logs = LogViewUtils.readLogs(lastParams);
-        if (logs == null) {
-            controller.richiediLog(20);
-            return;
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/log.fxml"));
+            Parent root = loader.load();
+
+            LogFXMLController fx = loader.getController();
+            fx.init(controller, sessione);
+            fx.render(getLastParams());
+
+            GuiLauncher.setRoot(root);
+
+            // Best-effort: se non ho logs e non ho errori, li richiedo
+            boolean hasError = getLastParams().get(GraphicControllerUtils.KEY_ERROR) != null;
+            boolean hasLogs  = getLastParams().get(GraphicControllerUtils.KEY_LOGS) != null;
+
+            if (!hasError && !hasLogs) {
+                controller.richiediLog(20);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            VBox fallback = GuiViewUtils.createRoot();
+            fallback.getChildren().add(new Label("Errore caricamento schermata Log"));
+            fallback.getChildren().add(GuiViewUtils.buildHomeButton(controller::tornaAllaHome));
+            GuiLauncher.setRoot(fallback);
         }
-
-        VBox root = GuiViewUtils.createRoot();
-        root.getChildren().add(new Label("Log di sistema"));
-
-        ListView<String> list = new ListView<>();
-        GuiViewUtils.fillList(list, logs);
-
-        Button refresh = new Button("Aggiorna");
-        refresh.setOnAction(e -> controller.richiediLog(20));
-
-        Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome());
-
-        root.getChildren().addAll(list, refresh, home);
-        GuiLauncher.setRoot(root);
     }
 }

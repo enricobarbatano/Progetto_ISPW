@@ -5,27 +5,17 @@ import java.util.Map;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerRegistrazione;
 import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.graphic.interfaces.NavigableController;
+import com.ispw.view.gui.fxml.RegistrazioneFXMLController;
 import com.ispw.view.interfaces.ViewRegistrazione;
-import com.ispw.view.shared.RegistrazioneViewUtils;
 
-import javafx.scene.control.Button;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 public class GUIRegistrazioneView extends GenericViewGUI implements ViewRegistrazione, NavigableController {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: view GUI registrazione, usa controller grafico.
-    // A2) IO: componenti JavaFX e Map di registrazione.
-
     private final GUIGraphicControllerRegistrazione controller;
-
-    // SEZIONE LOGICA
-    // Legenda logica:
-    // L1) onShow: costruzione UI e submit.
 
     public GUIRegistrazioneView(GUIGraphicControllerRegistrazione controller) {
         this.controller = controller;
@@ -39,33 +29,25 @@ public class GUIRegistrazioneView extends GenericViewGUI implements ViewRegistra
     @Override
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
+
+        // Registrazione non deve portarsi dietro sessione
         sessione = null;
 
-        VBox root = GuiViewUtils.createRoot();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/registrazione.fxml"));
+            Parent root = loader.load();
 
-        Label title = new Label("Registrazione");
-        Label error = GuiViewUtils.buildErrorLabel(getLastError());
+            RegistrazioneFXMLController fx = loader.getController();
+            fx.init(controller);
+            fx.render(getLastParams());
 
-        TextField nome = new TextField();
-        nome.setPromptText("Nome");
-        TextField cognome = new TextField();
-        cognome.setPromptText("Cognome");
-        TextField email = new TextField();
-        email.setPromptText("Email");
-        PasswordField password = new PasswordField();
-        password.setPromptText("Password");
+            GuiLauncher.setRoot(root);
 
-        Button submit = new Button("Registra");
-        submit.setOnAction(e -> controller.inviaDatiRegistrazione(
-            RegistrazioneViewUtils.buildForm(
-                nome.getText(),
-                cognome.getText(),
-                email.getText(),
-                password.getText()
-            )
-        ));
-
-        root.getChildren().addAll(title, error, nome, cognome, email, password, submit);
-        GuiLauncher.setRoot(root);
+        } catch (Exception e) {
+            e.printStackTrace();
+            VBox fallback = GuiViewUtils.createRoot();
+            fallback.getChildren().add(new Label("Errore caricamento schermata Registrazione"));
+            GuiLauncher.setRoot(fallback);
+        }
     }
 }

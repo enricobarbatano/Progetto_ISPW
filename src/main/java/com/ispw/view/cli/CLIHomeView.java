@@ -12,17 +12,8 @@ import com.ispw.view.interfaces.ViewHomeProfilo;
 
 public class CLIHomeView extends GenericViewCLI implements ViewHomeProfilo, NavigableController {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: view CLI home, usa navigator.
-    // A2) IO: input console e sessione.
     private final Scanner in = new Scanner(System.in);
     private final GraphicControllerNavigation navigator;
-
-    // SEZIONE LOGICA
-    // Legenda logica:
-    // L1) onShow: menu in base al ruolo.
-    // L2) goTo: navigazione con sessione.
 
     public CLIHomeView(GraphicControllerNavigation navigator) {
         this.navigator = navigator;
@@ -37,49 +28,86 @@ public class CLIHomeView extends GenericViewCLI implements ViewHomeProfilo, Navi
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
-        SessioneUtenteBean s = sessione;
-        Ruolo ruolo = (s != null && s.getUtente() != null) ? s.getUtente().getRuolo() : null;
+        final SessioneUtenteBean s = sessione;
+        final Ruolo ruolo = (s != null && s.getUtente() != null) ? s.getUtente().getRuolo() : null;
 
         System.out.println("\n=== HOME ===");
         if (ruolo != null) {
             System.out.println("Ruolo: " + ruolo);
+        } else {
+            System.out.println("(ruolo non disponibile)");
         }
 
+        // Menu comune
         System.out.println("1) Account");
+
+        // Menu per ruolo
         if (ruolo == Ruolo.UTENTE) {
             System.out.println("2) Prenotazione");
-            System.out.println("3) Disdetta");
+            System.out.println("3) Disdetta (richiesta)");
         } else if (ruolo == Ruolo.GESTORE) {
             System.out.println("2) Regole");
             System.out.println("3) Penalita");
             System.out.println("4) Log");
+            System.out.println("5) Richieste disdetta"); // ✅ nuovo UC complesso (step gestore)
         }
+
         System.out.println("0) Logout");
         System.out.print("Scelta: ");
-        String scelta = in.nextLine().trim();
+        final String scelta = in.nextLine().trim();
 
         switch (scelta) {
             case "1" -> goTo(GraphicControllerUtils.ROUTE_ACCOUNT);
-            case "2" -> goTo(ruolo == Ruolo.GESTORE ? GraphicControllerUtils.ROUTE_REGOLE
-                                                    : GraphicControllerUtils.ROUTE_PRENOTAZIONE);
-            case "3" -> goTo(ruolo == Ruolo.GESTORE ? GraphicControllerUtils.ROUTE_PENALITA
-                                                    : GraphicControllerUtils.ROUTE_DISDETTA);
+
+            case "2" -> {
+                if (ruolo == Ruolo.GESTORE) {
+                    goTo(GraphicControllerUtils.ROUTE_REGOLE);
+                } else if (ruolo == Ruolo.UTENTE) {
+                    goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE);
+                } else {
+                    sceltaNonValida();
+                }
+            }
+
+            case "3" -> {
+                if (ruolo == Ruolo.GESTORE) {
+                    goTo(GraphicControllerUtils.ROUTE_PENALITA);
+                } else if (ruolo == Ruolo.UTENTE) {
+                    goTo(GraphicControllerUtils.ROUTE_DISDETTA);
+                } else {
+                    sceltaNonValida();
+                }
+            }
+
             case "4" -> {
                 if (ruolo == Ruolo.GESTORE) {
                     goTo(GraphicControllerUtils.ROUTE_LOGS);
                 } else {
-                    System.out.println("Scelta non valida");
+                    sceltaNonValida();
                 }
             }
+
+            case "5" -> {
+                if (ruolo == Ruolo.GESTORE) {
+                    goTo(GraphicControllerUtils.ROUTE_RICHIESTE_DISDETTA);
+                } else {
+                    sceltaNonValida();
+                }
+            }
+
             case "0" -> goTo(GraphicControllerUtils.ROUTE_LOGIN);
-            default -> System.out.println("Scelta non valida");
+
+            default -> sceltaNonValida();
         }
     }
 
+    private void sceltaNonValida() {
+        System.out.println("Scelta non valida");
+    }
+
     private void goTo(String route) {
-        if (navigator == null) {
-            return;
-        }
+        if (navigator == null) return;
+
         if (sessione != null) {
             navigator.goTo(route, Map.of(GraphicControllerUtils.KEY_SESSIONE, sessione));
         } else {

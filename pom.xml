@@ -13,11 +13,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <!-- Java 17 -->
         <maven.compiler.release>17</maven.compiler.release>
-
-        <!-- JavaFX versione -->
         <javafx.version>21.0.2</javafx.version>
     </properties>
 
@@ -51,14 +47,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- ✅ Mockito -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
             <version>5.2.0</version>
-             <scope>test</scope>
+            <scope>test</scope>
         </dependency>
 
-        <!-- ✅ Mockito -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
@@ -73,15 +69,17 @@
             <version>9.5.0</version>
         </dependency>
 
-        <!-- ✅ JavaFX -->
+        <!-- ✅ JavaFX (necessario per GUI) -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>${javafx.version}</version>
         </dependency>
+
+        <!-- ✅ JavaFX FXML (necessario per FXMLLoader e @FXML) -->
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
+            <artifactId>javafx-fxml</artifactId>
             <version>${javafx.version}</version>
         </dependency>
 
@@ -92,26 +90,26 @@
             <version>1.18.42</version>
             <scope>provided</scope>
         </dependency>
-        <!-- ✅ Jackson per serializzazione JSON (usato in FileSystemDAO) -->
+
+        <!-- ✅ Jackson per serializzazione JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>2.17.1</version>
         </dependency>
-        
+
         <dependency>
-          <groupId>com.fasterxml.jackson.datatype</groupId>
-          <artifactId>jackson-datatype-jsr310</artifactId>
-          <version>2.17.1</version>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.17.1</version>
         </dependency>
 
-        
     </dependencies>
 
     <build>
         <plugins>
 
-            <!-- ✅ Shade Plugin (FAT-JAR autonomo) -->
+            <!-- ✅ Shade Plugin (FAT-JAR) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -134,7 +132,7 @@
                 </executions>
             </plugin>
 
-            <!-- ✅ Compiler plugin + Lombok -->
+            <!-- ✅ Compiler + Lombok -->
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
@@ -150,7 +148,7 @@
                 </configuration>
             </plugin>
 
-            <!-- ✅ Surefire (test unitari JUnit 5) -->
+            <!-- ✅ Surefire (JUnit 5) -->
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.3.0</version>
@@ -159,7 +157,7 @@
                 </configuration>
             </plugin>
 
-            <!-- ✅ Failsafe (integration test) -->
+            <!-- ✅ Failsafe -->
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>3.3.0</version>
@@ -179,30 +177,32 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
+                    <!-- tieni App come entrypoint: selezione CLI/GUI -->
                     <mainClass>com.ispw.App</mainClass>
                 </configuration>
             </plugin>
+
+            <!-- ✅ jpackage -->
             <plugin>
-    <groupId>com.github.wiverson</groupId>
-    <artifactId>jpackage-maven-plugin</artifactId>
-    <version>1.8.0</version>
+                <groupId>com.github.wiverson</groupId>
+                <artifactId>jpackage-maven-plugin</artifactId>
+                <version>1.8.0</version>
 
-    <configuration>
-        <installerName>Progetto_ISPW</installerName>
-        <appName>Progetto_ISPW</appName>
-        <vendor>ISP W</vendor>
+                <configuration>
+                    <installerName>Progetto_ISPW</installerName>
+                    <appName>Progetto_ISPW</appName>
+                    <vendor>ISP W</vendor>
 
-        <!-- ✅ Classe principale -->
-        <mainClass>com.ispw.App</mainClass>
+                    <mainClass>com.ispw.App</mainClass>
 
-        <!-- ✅ Percorso fat‑jar -->
-        <input>${project.build.directory}</input>
-        <mainJar>${project.build.finalName}-shaded.jar</mainJar>
+                    <input>${project.build.directory}</input>
+                    <mainJar>${project.build.finalName}-shaded.jar</mainJar>
 
-        <type>exe</type>
-        <winConsole>false</winConsole>
-    </configuration>
-</plugin>
+                    <type>exe</type>
+                    <winConsole>false</winConsole>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 

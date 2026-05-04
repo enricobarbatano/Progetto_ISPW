@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.ispw.view.gui.fxml.AccountFXMLController"
+      styleClass="root" stylesheets="/css/app.css"
+      spacing="10" alignment="TOP_CENTER">
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
+    
+    <Label text="👤 Account" styleClass="title"/>
+    
+    <Label fx:id="lblError" styleClass="error"/>
+    
+    <Label fx:id="lblSuccess" styleClass="muted"/>
+    
+    <TextField fx:id="txtNome" promptText="Nome"/>
+    
+    <TextField fx:id="txtCognome" promptText="Cognome"/>
+    
+    <TextField fx:id="txtEmail" promptText="Email"/>
+    
+    <Button text="Ricarica dati" onAction="#onLoad" styleClass="secondary"/>
+    
+    <Button text="Aggiorna" onAction="#onUpdate" styleClass="primary"/>
+    
+    <Separator/>
+    
+    <PasswordField fx:id="oldPwd" promptText="Vecchia password"/>
+    
+    <PasswordField fx:id="newPwd" promptText="Nuova password (min 6 caratteri)"/>
+    
+    <Button text="Cambia password" onAction="#onChangePwd" styleClass="primary"/>
+    
+    <Separator/>
+    
+    <Button text="Home" onAction="#onHome" styleClass="secondary"/>
+    
+    <Button text="Logout" onAction="#onLogout" styleClass="danger"/>
+</VBox>

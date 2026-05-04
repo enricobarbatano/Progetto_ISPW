@@ -1,32 +1,28 @@
 package com.ispw.view.gui;
 
-import java.util.List;
 import java.util.Map;
 
 import com.ispw.controller.graphic.gui.GUIGraphicControllerDisdetta;
 import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.graphic.interfaces.NavigableController;
+import com.ispw.view.gui.fxml.DisdettaFXMLController;
 import com.ispw.view.interfaces.ViewDisdettaPrenotazione;
 
-import javafx.scene.control.Button;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 public class GUIDisdettaView extends GenericViewGUI implements ViewDisdettaPrenotazione, NavigableController {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: view GUI disdetta, usa controller grafico.
-    // A2) IO: componenti JavaFX e params di disdetta.
-
     private final GUIGraphicControllerDisdetta controller;
 
-    // SEZIONE LOGICA
-    // Legenda logica:
-    // L1) onShow: routing in base ai payload.
-    // L2) handle*/renderMessage: gestione step.
+    // ✅ cache (fondamentale per non perdere stato ad ogni goTo)
+    private Parent cachedRoot;
+    private DisdettaFXMLController cachedFx;
+
+    // evita richieste ripetute a vuoto
+    private boolean elencoRequested = false;
 
     public GUIDisdettaView(GUIGraphicControllerDisdetta controller) {
         this.controller = controller;
@@ -41,88 +37,37 @@ public class GUIDisdettaView extends GenericViewGUI implements ViewDisdettaPreno
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
-        String err = getLastError();
-        if (err != null && !err.isBlank()) {
-            renderMessage("Errore: " + err);
-            return;
+        try {
+            if (cachedRoot == null || cachedFx == null) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/disdetta.fxml"));
+                cachedRoot = loader.load();
+                cachedFx = loader.getController();
+            }
+
+            cachedFx.init(controller, sessione);
+            cachedFx.render(getLastParams());
+
+            GuiLauncher.setRoot(cachedRoot);
+
+            // Best-effort: se non ho elenco/anteprima/success e non ho error, chiedo elenco UNA volta
+            boolean hasError = getLastParams().get(GraphicControllerUtils.KEY_ERROR) != null;
+            boolean hasElenco = getLastParams().get(GraphicControllerUtils.KEY_PRENOTAZIONI) != null;
+            boolean hasAnteprima = getLastParams().get(GraphicControllerUtils.KEY_ANTEPRIMA) != null;
+            boolean hasSuccess = getLastParams().get(GraphicControllerUtils.KEY_SUCCESSO) != null
+                    || getLastParams().get(GraphicControllerUtils.KEY_MESSAGE) != null;
+
+            if (hasElenco) elencoRequested = false;
+
+            if (!hasError && !hasElenco && !hasAnteprima && !hasSuccess && !elencoRequested) {
+                elencoRequested = true;
+                controller.richiediPrenotazioniCancellabili(sessione);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            VBox fallback = GuiViewUtils.createRoot();
+            fallback.getChildren().add(new Label("Errore caricamento schermata Disdetta"));
+            GuiLauncher.setRoot(fallback);
         }
-
-        if (handleSuccess()) return;
-        if (handleAnteprima()) return;
-        if (handleElenco()) return;
-
-        controller.richiediPrenotazioniCancellabili(sessione);
-    }
-
-    private void renderMessage(String msg) {
-        VBox root = GuiViewUtils.createRoot();
-        root.getChildren().add(new Label(msg));
-        Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome());
-        root.getChildren().add(home);
-        GuiLauncher.setRoot(root);
-    }
-
-    private boolean handleElenco() {
-        Object raw = lastParams.get(GraphicControllerUtils.KEY_PRENOTAZIONI);
-        if (!(raw instanceof List<?> elenco)) return false;
-        @SuppressWarnings("unchecked")
-        List<String> list = (List<String>) elenco;
-
-        VBox root = GuiViewUtils.createRoot();
-        root.getChildren().add(new Label("Prenotazioni cancellabili"));
-
-        ListView<String> listView = new ListView<>();
-        listView.getItems().addAll(list);
-
-        TextField idField = new TextField();
-        idField.setPromptText("Id prenotazione");
-
-        Button anteprima = new Button("Anteprima disdetta");
-        anteprima.setOnAction(e -> {
-            int id = Integer.parseInt(idField.getText().trim());
-            controller.richiediAnteprimaDisdetta(id, sessione);
-        });
-
-        Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome());
-
-        root.getChildren().addAll(listView, idField, anteprima, home);
-        GuiLauncher.setRoot(root);
-        return true;
-    }
-
-    private boolean handleAnteprima() {
-        Object raw = lastParams.get(GraphicControllerUtils.KEY_ANTEPRIMA);
-        if (!(raw instanceof Map<?, ?> anteprima)) return false;
-
-        Object possibile = anteprima.get(GraphicControllerUtils.KEY_POSSIBILE);
-        Object penale = anteprima.get(GraphicControllerUtils.KEY_PENALE);
-        boolean poss = possibile instanceof Boolean b && b;
-        float pen = penale instanceof Number n ? n.floatValue() : 0f;
-
-        VBox root = GuiViewUtils.createRoot();
-        root.getChildren().add(new Label("Anteprima disdetta"));
-        root.getChildren().add(new Label("Possibile: " + poss + " - penale: " + pen + " EUR"));
-
-        TextField idField = new TextField();
-        idField.setPromptText("Id prenotazione");
-
-        Button conferma = new Button("Conferma disdetta");
-        conferma.setOnAction(e -> {
-            int id = Integer.parseInt(idField.getText().trim());
-            controller.confermaDisdetta(id, sessione);
-        });
-
-        Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome());
-
-        root.getChildren().addAll(idField, conferma, home);
-        GuiLauncher.setRoot(root);
-        return true;
-    }
-
-    private boolean handleSuccess() {
-        Object raw = lastParams.get(GraphicControllerUtils.KEY_SUCCESSO);
-        if (raw == null) return false;
-        renderMessage(String.valueOf(raw));
-        return true;
     }
 }

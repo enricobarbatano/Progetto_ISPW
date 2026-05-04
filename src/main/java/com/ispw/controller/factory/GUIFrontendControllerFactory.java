@@ -10,7 +10,9 @@ import com.ispw.controller.graphic.gui.GUIGraphicControllerPenalita;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerPrenotazione;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerRegistrazione;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerRegole;
+import com.ispw.controller.graphic.gui.GUIGraphicControllerRichiesteDisdetta;
 import com.ispw.controller.graphic.gui.GUIGraphicLoginController;
+
 import com.ispw.controller.graphic.interfaces.GraphicControllerAccount;
 import com.ispw.controller.graphic.interfaces.GraphicControllerDisdetta;
 import com.ispw.controller.graphic.interfaces.GraphicControllerLog;
@@ -19,7 +21,10 @@ import com.ispw.controller.graphic.interfaces.GraphicControllerPenalita;
 import com.ispw.controller.graphic.interfaces.GraphicControllerPrenotazione;
 import com.ispw.controller.graphic.interfaces.GraphicControllerRegistrazione;
 import com.ispw.controller.graphic.interfaces.GraphicControllerRegole;
+import com.ispw.controller.graphic.interfaces.GraphicControllerRichiesteDisdetta;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.graphic.interfaces.GraphicLoginController;
+
 import com.ispw.view.gui.GUIAccountView;
 import com.ispw.view.gui.GUIDisdettaView;
 import com.ispw.view.gui.GUIHomeView;
@@ -29,20 +34,24 @@ import com.ispw.view.gui.GUIPenalitaView;
 import com.ispw.view.gui.GUIPrenotazioneView;
 import com.ispw.view.gui.GUIRegistrazioneView;
 import com.ispw.view.gui.GUIRegoleView;
+import com.ispw.view.gui.GUIRichiesteDisdettaView;
 import com.ispw.view.gui.GuiLauncher;
 
 public final class GUIFrontendControllerFactory extends FrontendControllerFactory {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: crea controller/view GUI concreti.
-    // A2) Stato: mantiene istanze per riuso e routing.
-
     private static final Logger logger = Logger.getLogger(GUIFrontendControllerFactory.class.getName());
+
+    // Navigation (router)
     private GUIGraphicControllerNavigation navigationController;
+
+    // Login
     private GUIGraphicLoginController loginController;
     private GUILoginView loginView;
+
+    // Home
     private GUIHomeView homeView;
+
+    // Views
     private GUIRegistrazioneView registrazioneView;
     private GUIAccountView accountView;
     private GUIPrenotazioneView prenotazioneView;
@@ -50,6 +59,11 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
     private GUIRegoleView regoleView;
     private GUIPenalitaView penalitaView;
     private GUILogView logView;
+
+    // ✅ Nuova view (gestore: richieste disdetta)
+    private GUIRichiesteDisdettaView richiesteDisdettaView;
+
+    // Controller (interfacce, DIP)
     private GraphicControllerAccount accountController;
     private GraphicControllerRegistrazione registrazioneController;
     private GraphicControllerPrenotazione prenotazioneController;
@@ -58,11 +72,16 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
     private GraphicControllerPenalita penalitaController;
     private GraphicControllerLog logController;
 
+    // ✅ Nuovo controller
+    private GraphicControllerRichiesteDisdetta richiesteDisdettaController;
+
     @Override
     public void startApplication() {
         logger.info("Avvio GUI...");
-        GuiLauncher.launchApp(() -> getNavigationController().goTo(com.ispw.controller.graphic.interfaces.GraphicControllerUtils.ROUTE_LOGIN));
+        GuiLauncher.launchApp(() -> getNavigationController().goTo(GraphicControllerUtils.ROUTE_LOGIN));
     }
+
+    // ===================== Controllers =====================
 
     @Override
     public GraphicLoginController createLoginController() {
@@ -72,6 +91,94 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
         }
         return loginController;
     }
+
+    @Override
+    public GraphicControllerAccount createAccountController() {
+        if (accountController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            accountController = new GUIGraphicControllerAccount(navigator);
+        }
+        return accountController;
+    }
+
+    @Override
+    public GraphicControllerRegistrazione createRegistrazioneController() {
+        if (registrazioneController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            registrazioneController = new GUIGraphicControllerRegistrazione(navigator);
+        }
+        return registrazioneController;
+    }
+
+    @Override
+    public GraphicControllerPrenotazione createPrenotazioneController() {
+        if (prenotazioneController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            prenotazioneController = new GUIGraphicControllerPrenotazione(navigator);
+        }
+        return prenotazioneController;
+    }
+
+    @Override
+    public GraphicControllerDisdetta createDisdettaController() {
+        if (disdettaController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            disdettaController = new GUIGraphicControllerDisdetta(navigator);
+        }
+        return disdettaController;
+    }
+
+    @Override
+    public GraphicControllerRegole createRegoleController() {
+        if (regoleController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            regoleController = new GUIGraphicControllerRegole(navigator);
+        }
+        return regoleController;
+    }
+
+    @Override
+    public GraphicControllerPenalita createPenalitaController() {
+        if (penalitaController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            penalitaController = new GUIGraphicControllerPenalita(navigator);
+        }
+        return penalitaController;
+    }
+
+    @Override
+    public GraphicControllerLog createLogController() {
+        if (logController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            logController = new GUIGraphicControllerLog(navigator);
+        }
+        return logController;
+    }
+
+    // ✅ Nuovo: richieste disdetta (gestore)
+    @Override
+    public GraphicControllerRichiesteDisdetta createRichiesteDisdettaController() {
+        if (richiesteDisdettaController == null) {
+            GraphicControllerNavigation navigator = getNavigationController();
+            richiesteDisdettaController = new GUIGraphicControllerRichiesteDisdetta(navigator);
+        }
+        return richiesteDisdettaController;
+    }
+
+    @Override
+    public GraphicControllerNavigation createNavigationController() {
+        if (navigationController == null) {
+            navigationController = new GUIGraphicControllerNavigation();
+            registerRoutes();
+        }
+        return navigationController;
+    }
+
+    private GraphicControllerNavigation getNavigationController() {
+        return createNavigationController();
+    }
+
+    // ===================== Views =====================
 
     public GUILoginView createLoginView() {
         if (loginView == null) {
@@ -145,87 +252,17 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
         return logView;
     }
 
-    @Override
-    public GraphicControllerAccount createAccountController() {
-        if (accountController == null) {
-            GraphicControllerNavigation navigator = getNavigationController();
-            accountController = new GUIGraphicControllerAccount(navigator);
+    // ✅ Nuova view (gestore)
+    public GUIRichiesteDisdettaView createRichiesteDisdettaView() {
+        if (richiesteDisdettaView == null) {
+            richiesteDisdettaView = new GUIRichiesteDisdettaView(
+                (GUIGraphicControllerRichiesteDisdetta) createRichiesteDisdettaController()
+            );
         }
-        return accountController;
+        return richiesteDisdettaView;
     }
 
-    @Override
-    public GraphicControllerRegistrazione createRegistrazioneController() {
-        if (registrazioneController == null) {
-            GraphicControllerNavigation navigator = getNavigationController();
-            registrazioneController = new GUIGraphicControllerRegistrazione(navigator);
-        }
-        return registrazioneController;
-    }
-
-    @Override
-    public GraphicControllerPrenotazione createPrenotazioneController() {
-        if (prenotazioneController == null) {
-            GraphicControllerNavigation navigator = getNavigationController();
-            prenotazioneController = new GUIGraphicControllerPrenotazione(navigator);
-        }
-        return prenotazioneController;
-    }
-
-    @Override
-    public GraphicControllerDisdetta createDisdettaController() {
-        if (disdettaController == null) {
-            GraphicControllerNavigation navigator = getNavigationController();
-            disdettaController = new GUIGraphicControllerDisdetta(navigator);
-        }
-        return disdettaController;
-    }
-
-    @Override
-    public GraphicControllerRegole createRegoleController() {
-        if (regoleController == null) {
-            GraphicControllerNavigation navigator = getNavigationController();
-            regoleController = new GUIGraphicControllerRegole(navigator);
-        }
-        return regoleController;
-    }
-
-    @Override
-    public GraphicControllerPenalita createPenalitaController() {
-        if (penalitaController == null) {
-            GraphicControllerNavigation navigator = getNavigationController();
-            penalitaController = new GUIGraphicControllerPenalita(navigator);
-        }
-        return penalitaController;
-    }
-
-    @Override
-    public GraphicControllerLog createLogController() {
-        if (logController == null) {
-            GraphicControllerNavigation navigator = getNavigationController();
-            logController = new GUIGraphicControllerLog(navigator);
-        }
-        return logController;
-    }
-
-    @Override
-    public GraphicControllerNavigation createNavigationController() {
-        if (navigationController == null) {
-            navigationController = new GUIGraphicControllerNavigation();
-            registerRoutes();
-        }
-        return navigationController;
-    }
-
-    private GraphicControllerNavigation getNavigationController() {
-        return createNavigationController();
-    }
-
-    // SEZIONE LOGICA
-    // Legenda logica:
-    // L1) create*View: crea e memoizza le view GUI.
-    // L2) create*Controller: crea e memoizza i controller GUI.
-    // L3) registerRoutes: registra route -> view.
+    // ===================== Routes registration =====================
 
     private void registerRoutes() {
         navigationController.registerRoute(createLoginView().getRouteName(), createLoginView());
@@ -237,6 +274,8 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
         navigationController.registerRoute(createRegoleView().getRouteName(), createRegoleView());
         navigationController.registerRoute(createPenalitaView().getRouteName(), createPenalitaView());
         navigationController.registerRoute(createLogView().getRouteName(), createLogView());
-    }
-} 
 
+        // ✅ Nuova route gestore
+        navigationController.registerRoute(createRichiesteDisdettaView().getRouteName(), createRichiesteDisdettaView());
+    }
+}

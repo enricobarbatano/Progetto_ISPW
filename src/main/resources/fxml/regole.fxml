@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.ispw.view.gui.fxml.RegoleFXMLController"
+      styleClass="root" stylesheets="css/app.css"
+      spacing="20" alignment="TOP_CENTER">
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
+    
+    <Label text="⚙️ GESTIONE REGOLE CAMPO" styleClass="page-title"/>
+    
+    <Label fx:id="lblError" styleClass="error" wrapText="true" maxWidth="600"/>
+    
+    <Label fx:id="lblSuccess" styleClass="success" wrapText="true" maxWidth="600"/>
+    
+    <VBox spacing="15" alignment="CENTER" styleClass="card">
+        <Label text="SELEZIONA CAMPO" styleClass="section-title"/>
+        
+        <ListView fx:id="listCampi" styleClass="list-view-sport" prefHeight="180" maxWidth="600"/>
+        
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="📋 Lista campi" onAction="#onListaCampi" styleClass="btn-outline"/>
+            <TextField fx:id="txtIdCampo" promptText="ID Campo" styleClass="input-field-small" prefWidth="120"/>
+            <Button text="✅ Seleziona" onAction="#onSelezionaCampo" styleClass="btn-primary"/>
+        </HBox>
+    </VBox>
+    
+    <Separator styleClass="divider-green"/>
+    
+    <VBox spacing="15" alignment="CENTER" styleClass="card">
+        <Label text="STATO CAMPO" styleClass="section-title"/>
+        
+        <HBox spacing="20" alignment="CENTER">
+            <CheckBox fx:id="chkAttivo" text="✅ Campo Attivo" styleClass="checkbox-sport"/>
+            <CheckBox fx:id="chkManutenzione" text="🔧 In Manutenzione" styleClass="checkbox-sport"/>
+        </HBox>
+        
+        <Button text="💾 Aggiorna stato" onAction="#onAggiornaStato" styleClass="btn-primary"/>
+    </VBox>
+    
+    <Separator styleClass="divider-green"/>
+    
+    <VBox spacing="15" alignment="CENTER" styleClass="card">
+        <Label text="TEMPISTICHE" styleClass="section-title"/>
+        
+        <HBox spacing="10" alignment="CENTER">
+            <TextField fx:id="txtDurata" promptText="Durata slot (min)" styleClass="input-field-small" prefWidth="150"/>
+            <TextField fx:id="txtPreavviso" promptText="Preavviso (min)" styleClass="input-field-small" prefWidth="150"/>
+        </HBox>
+        
+        <HBox spacing="10" alignment="CENTER">
+            <TextField fx:id="txtApertura" promptText="Apertura (HH:mm)" styleClass="input-field-small" prefWidth="150"/>
+            <TextField fx:id="txtChiusura" promptText="Chiusura (HH:mm)" styleClass="input-field-small" prefWidth="150"/>
+        </HBox>
+        
+        <Button text="⏰ Aggiorna tempistiche" onAction="#onAggiornaTempistiche" styleClass="btn-primary"/>
+    </VBox>
+    
+    <Separator styleClass="divider-green"/>
+    
+    <VBox spacing="15" alignment="CENTER" styleClass="card">
+        <Label text="PENALITÀ" styleClass="section-title"/>
+        
+        <HBox spacing="10" alignment="CENTER">
+            <TextField fx:id="txtValorePenalita" promptText="Valore penalità (%)" styleClass="input-field-small" prefWidth="150"/>
+            <TextField fx:id="txtPreavvisoPenalita" promptText="Preavviso (min, opz.)" styleClass="input-field-small" prefWidth="180"/>
+        </HBox>
+        
+        <Button text="💰 Aggiorna penalità" onAction="#onAggiornaPenalita" styleClass="btn-warning"/>
+    </VBox>
+    
+    <Separator styleClass="divider-green"/>
+    
+    <Button text="🏠 Torna alla Home" onAction="#onHome" styleClass="btn-secondary"/>
+</VBox>

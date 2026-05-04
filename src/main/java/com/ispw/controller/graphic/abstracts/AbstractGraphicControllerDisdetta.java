@@ -118,7 +118,7 @@ public abstract class AbstractGraphicControllerDisdetta implements GraphicContro
         }
 
         try {
-            // ✅ UC complesso: UTENTE invia richiesta PENDING (non annulla immediatamente)
+            //  UTENTE invia richiesta PENDING (non annulla immediatamente)
             EsitoOperazioneBean esito = logicController().richiediDisdetta(idPrenotazione, null, sessione);
 
             if (esito == null || !esito.isSuccesso()) {

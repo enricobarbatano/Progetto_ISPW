@@ -8,16 +8,13 @@ import com.ispw.controller.graphic.interfaces.GraphicControllerPenalita;
 import com.ispw.controller.graphic.interfaces.GraphicControllerPrenotazione;
 import com.ispw.controller.graphic.interfaces.GraphicControllerRegistrazione;
 import com.ispw.controller.graphic.interfaces.GraphicControllerRegole;
+import com.ispw.controller.graphic.interfaces.GraphicControllerRichiesteDisdetta;
 import com.ispw.controller.graphic.interfaces.GraphicLoginController;
 import com.ispw.model.enums.FrontendProvider;
 
 public abstract class FrontendControllerFactory {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: factory astratta per controller grafici (CLI/GUI).
-    // A2) Stato: provider scelto a bootstrap e istanza singleton.
-
+    // Stato: provider scelto a bootstrap e istanza singleton
     private static FrontendProvider provider;
     private static FrontendControllerFactory instance;
 
@@ -42,13 +39,10 @@ public abstract class FrontendControllerFactory {
         return instance;
     }
 
-    // SEZIONE LOGICA
-    // Legenda logica:
-    // L1) startApplication: avvio UI.
-    // L2) create*Controller: factory dei controller grafici.
-
+    // Avvio UI
     public abstract void startApplication();
 
+    // Factory controller grafici (CLI/GUI)
     public abstract GraphicLoginController createLoginController();
     public abstract GraphicControllerAccount createAccountController();
     public abstract GraphicControllerRegistrazione createRegistrazioneController();
@@ -57,8 +51,9 @@ public abstract class FrontendControllerFactory {
     public abstract GraphicControllerRegole createRegoleController();
     public abstract GraphicControllerPenalita createPenalitaController();
     public abstract GraphicControllerLog createLogController();
+
+    // ✅ Nuovo: richieste disdetta (gestore)
+    public abstract GraphicControllerRichiesteDisdetta createRichiesteDisdettaController();
+
     public abstract GraphicControllerNavigation createNavigationController();
 }
-
-
-

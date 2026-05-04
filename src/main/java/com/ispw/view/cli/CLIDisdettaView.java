@@ -14,23 +14,15 @@ import com.ispw.view.interfaces.ViewDisdettaPrenotazione;
 
 public class CLIDisdettaView extends GenericViewCLI implements ViewDisdettaPrenotazione, NavigableController {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: view CLI disdetta, usa controller grafico e console view.
-    // A2) IO: input console e params di disdetta.
-
     private final CLIGraphicControllerDisdetta controller;
+
     private final ConsoleDisdettaElencoView elencoView = new ConsoleDisdettaElencoView();
     private final ConsoleDisdettaAnteprimaView anteprimaView = new ConsoleDisdettaAnteprimaView();
     private final ConsoleDisdettaEsitoView esitoView = new ConsoleDisdettaEsitoView();
+
     private final Scanner in = new Scanner(System.in);
 
     private Integer selectedId;
-
-    // SEZIONE LOGICA
-    // Legenda logica:
-    // L1) onShow: routing in base ai payload.
-    // L2) handleElenco/handleAnteprima/handleSuccess: gestione step.
 
     public CLIDisdettaView(CLIGraphicControllerDisdetta controller) {
         this.controller = controller;
@@ -45,34 +37,59 @@ public class CLIDisdettaView extends GenericViewCLI implements ViewDisdettaPreno
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
-        CliViewUtils.printMessages(getLastError(), getLastSuccess());
+        renderHeader();
 
-        if (handleSuccess()) {
-            return;
-        }
-        if (handleAnteprima()) {
-            return;
-        }
-        if (handleElenco()) {
-            return;
-        }
+        // 1) se ho successo, mostro esito e propongo home
+        if (handleSuccess()) return;
 
+        // 2) se ho anteprima, gestisco conferma (invio richiesta)
+        if (handleAnteprima()) return;
+
+        // 3) se ho elenco, gestisco selezione prenotazione
+        if (handleElenco()) return;
+
+        // 4) altrimenti richiedo elenco prenotazioni cancellabili
         controller.richiediPrenotazioniCancellabili(sessione);
+    }
+
+    private void renderHeader() {
+        // Intestazione + messaggi standard
+        System.out.println("\n=== DISDETTA (RICHIESTA) ===");
+        CliViewUtils.printMessages(getLastError(), getLastSuccess());
     }
 
     private boolean handleElenco() {
         Object raw = lastParams.get(GraphicControllerUtils.KEY_PRENOTAZIONI);
-        if (!(raw instanceof List<?> elenco)) {
+        if (!(raw instanceof List<?> elencoObj)) {
             return false;
         }
+
         @SuppressWarnings("unchecked")
-        List<String> lista = (List<String>) elenco;
+        List<String> lista = (List<String>) elencoObj;
+
         elencoView.show(lista);
-        System.out.print("Id prenotazione da disdire (0 = annulla): ");
-        int id = Integer.parseInt(in.nextLine());
-        if (id <= 0) {
+
+        // Se vuoto: torna alla home (o chiedi conferma)
+        if (lista == null || lista.isEmpty()) {
+            CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
             return true;
         }
+
+        System.out.print("Id prenotazione da disdire (0 = home): ");
+        Integer id = readPositiveIntOrZero();
+
+        if (id == null) {
+            System.out.println("[ERRORE] Id non valido");
+            // ricarica elenco (round-trip)
+            controller.richiediPrenotazioniCancellabili(sessione);
+            return true;
+        }
+
+        if (id == 0) {
+            controller.tornaAllaHome();
+            return true;
+        }
+
         selectedId = id;
         controller.richiediAnteprimaDisdetta(id, sessione);
         return true;
@@ -83,16 +100,30 @@ public class CLIDisdettaView extends GenericViewCLI implements ViewDisdettaPreno
         if (!(raw instanceof Map<?, ?> anteprima)) {
             return false;
         }
+
         Object possibile = anteprima.get(GraphicControllerUtils.KEY_POSSIBILE);
         Object penale = anteprima.get(GraphicControllerUtils.KEY_PENALE);
+
         boolean poss = possibile instanceof Boolean b && b;
         float pen = penale instanceof Number n ? n.floatValue() : 0f;
+
         anteprimaView.show(poss, pen);
 
-        System.out.print("Confermare disdetta? [s/N]: ");
+        if (!poss) {
+            System.out.println("Disdetta non consentita.");
+            CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
+            return true;
+        }
+
+        // ✅ UC complesso: qui NON annulliamo subito, inviamo richiesta
+        System.out.print("Inviare richiesta di disdetta? [s/N]: ");
         String ans = in.nextLine().trim();
+
         if ("s".equalsIgnoreCase(ans) && selectedId != null) {
             controller.confermaDisdetta(selectedId, sessione);
+        } else {
+            // se non conferma: torna elenco (o home). Scelgo elenco per UX.
+            controller.richiediPrenotazioniCancellabili(sessione);
         }
         return true;
     }
@@ -102,8 +133,26 @@ public class CLIDisdettaView extends GenericViewCLI implements ViewDisdettaPreno
         if (raw == null) {
             return false;
         }
+
         esitoView.showMessage(String.valueOf(raw));
         CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
         return true;
+    }
+
+    /**
+     * Legge un intero da console:
+     * - ritorna 0 se l'utente inserisce 0
+     * - ritorna >0 se valido
+     * - ritorna null se input non numerico
+     */
+    private Integer readPositiveIntOrZero() {
+        String s = in.nextLine().trim();
+        if (s.isEmpty()) return null;
+        try {
+            int v = Integer.parseInt(s);
+            return (v >= 0) ? v : null;
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 }

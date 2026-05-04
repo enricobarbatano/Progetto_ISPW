@@ -2,6 +2,7 @@ package com.ispw.view.cli;
 
 import com.ispw.view.common.GenericViewBase;
 
+//è una classe base per tutte le view cli, che è una specializzazione di generic viewBase
 public abstract class GenericViewCLI extends GenericViewBase {
 
 	// SEZIONE ARCHITETTURALE

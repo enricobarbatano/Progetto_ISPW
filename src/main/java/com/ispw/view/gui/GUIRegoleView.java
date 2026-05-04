@@ -1,37 +1,24 @@
 package com.ispw.view.gui;
 
-import java.math.BigDecimal;
-import java.time.LocalTime;
-import java.util.List;
 import java.util.Map;
 
 import com.ispw.controller.graphic.gui.GUIGraphicControllerRegole;
 import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.graphic.interfaces.NavigableController;
+import com.ispw.view.gui.fxml.RegoleFXMLController;
 import com.ispw.view.interfaces.ViewGestioneRegole;
 
-import javafx.application.Platform;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
 public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole, NavigableController {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: view GUI regole, usa controller grafico.
-    // A2) IO: componenti JavaFX e lista campi.
-
     private final GUIGraphicControllerRegole controller;
-    private boolean campiRequested;
 
-    // SEZIONE LOGICA
-    // Legenda logica:
-    // L1) onShow: costruzione UI e wiring eventi.
-    // L2) parseInt/parseIntOrDefault: parsing sicuro input.
+    // Evita di richiedere lista campi ad ogni onShow senza payload
+    private boolean campiRequested = false;
 
     public GUIRegoleView(GUIGraphicControllerRegole controller) {
         this.controller = controller;
@@ -46,105 +33,35 @@ public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole,
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
-        VBox root = GuiViewUtils.createRoot();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/regole.fxml"));
+            Parent root = loader.load();
 
-        Label title = new Label("Regole");
-        Label error = GuiViewUtils.buildErrorLabel(getLastError());
-        Label ok = GuiViewUtils.buildSuccessLabel(getLastSuccess());
+            RegoleFXMLController fx = loader.getController();
+            fx.init(controller, sessione);
+            fx.render(getLastParams());
 
-        ListView<String> campiList = new ListView<>();
-        Object rawCampi = lastParams.get(GraphicControllerUtils.KEY_CAMPI);
-        if (rawCampi == null) {
-            GuiViewUtils.fillList(campiList, List.of("Caricamento lista campi..."));
-        } else if (rawCampi instanceof List<?> campi) {
-            campiRequested = false;
-            GuiViewUtils.fillList(campiList, campi);
-        }
+            GuiLauncher.setRoot(root);
 
-        TextField idCampo = new TextField();
-        idCampo.setPromptText("Id campo");
+            // Best-effort: se non ho campi e non ho errori, richiedo lista campi UNA sola volta
+            boolean hasCampi = getLastParams().get(GraphicControllerUtils.KEY_CAMPI) != null;
+            boolean hasError = getLastParams().get(GraphicControllerUtils.KEY_ERROR) != null;
 
-        Button lista = new Button("Lista campi");
-        lista.setOnAction(e -> controller.richiediListaCampi());
-
-        Button seleziona = new Button("Seleziona campo");
-        seleziona.setOnAction(e -> controller.selezionaCampo(parseInt(idCampo.getText())));
-
-        CheckBox attivo = new CheckBox("Attivo");
-        CheckBox manut = new CheckBox("Manutenzione");
-        Button aggiornaStato = new Button("Aggiorna stato campo");
-        aggiornaStato.setOnAction(e -> {
-            Map<String, Object> payload = new java.util.HashMap<>();
-            payload.put(GraphicControllerUtils.KEY_ID_CAMPO, parseInt(idCampo.getText()));
-            payload.put(GraphicControllerUtils.KEY_ATTIVO, attivo.isSelected());
-            payload.put(GraphicControllerUtils.KEY_FLAG_MANUTENZIONE, manut.isSelected());
-            controller.aggiornaStatoCampo(payload);
-        });
-
-        TextField durata = new TextField();
-        durata.setPromptText("Durata slot (min)");
-        TextField apertura = new TextField();
-        apertura.setPromptText("Ora apertura (HH:mm)");
-        TextField chiusura = new TextField();
-        chiusura.setPromptText("Ora chiusura (HH:mm)");
-        TextField preavviso = new TextField();
-        preavviso.setPromptText("Preavviso minimo (min)");
-        Button aggiornaTemp = new Button("Aggiorna tempistiche");
-        aggiornaTemp.setOnAction(e -> {
-            try {
-                Map<String, Object> payload = new java.util.HashMap<>();
-                payload.put(GraphicControllerUtils.KEY_DURATA_SLOT_MINUTI, parseInt(durata.getText()));
-                payload.put(GraphicControllerUtils.KEY_ORA_APERTURA, LocalTime.parse(apertura.getText().trim()));
-                payload.put(GraphicControllerUtils.KEY_ORA_CHIUSURA, LocalTime.parse(chiusura.getText().trim()));
-                payload.put(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI, parseInt(preavviso.getText()));
-                controller.aggiornaTempistiche(payload);
-            } catch (RuntimeException ex) {
-                error.setText("Dati tempistiche non validi");
+            if (!hasCampi && !hasError && !campiRequested) {
+                campiRequested = true;
+                controller.richiediListaCampi();
             }
-        });
 
-        TextField valorePen = new TextField();
-        valorePen.setPromptText("Valore penalità");
-
-        Button aggiornaPen = new Button("Aggiorna penalità");
-        aggiornaPen.setOnAction(e -> {
-            try {
-                Map<String, Object> payload = new java.util.HashMap<>();
-                payload.put(GraphicControllerUtils.KEY_VALORE_PENALITA, new BigDecimal(valorePen.getText().trim()));
-                payload.put(GraphicControllerUtils.KEY_PREAVVISO_MINIMO_MINUTI, parseIntOrDefault(preavviso.getText(), 0));
-                controller.aggiornaPenalita(payload);
-            } catch (RuntimeException ex) {
-                error.setText("Dati penalità non validi");
+            // se arrivano i campi, resetto il flag
+            if (hasCampi) {
+                campiRequested = false;
             }
-        });
 
-        Button home = GuiViewUtils.buildHomeButton(() -> controller.tornaAllaHome());
-
-        root.getChildren().addAll(title, error, ok, campiList, idCampo, lista, seleziona, attivo, manut,
-            aggiornaStato, durata, apertura, chiusura, preavviso, aggiornaTemp, valorePen, aggiornaPen, home);
-        GuiLauncher.setRoot(root);
-
-        if (rawCampi == null && !campiRequested) {
-            campiRequested = true;
-            Platform.runLater(() -> controller.richiediListaCampi());
+        } catch (Exception e) {
+            e.printStackTrace();
+            VBox fallback = GuiViewUtils.createRoot();
+            fallback.getChildren().add(new Label("Errore caricamento schermata Regole"));
+            GuiLauncher.setRoot(fallback);
         }
-    }
-
-    private Integer parseInt(String value) {
-        if (value == null) return null;
-        String trimmed = value.trim();
-        if (trimmed.isEmpty()) return null;
-        int result = 0;
-        for (int i = 0; i < trimmed.length(); i++) {
-            int digit = Character.digit(trimmed.charAt(i), 10);
-            if (digit < 0) return null;
-            result = result * 10 + digit;
-        }
-        return result;
-    }
-
-    private Integer parseIntOrDefault(String value, int defaultValue) {
-        Integer parsed = parseInt(value);
-        return parsed != null ? parsed : defaultValue;
     }
 }

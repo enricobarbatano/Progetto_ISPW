@@ -5,29 +5,15 @@ import java.util.Map;
 import com.ispw.controller.graphic.gui.GUIGraphicLoginController;
 import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.graphic.interfaces.NavigableController;
+import com.ispw.view.gui.fxml.LoginFXMLController;
 import com.ispw.view.interfaces.ViewLogin;
 
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 
 public class GUILoginView extends GenericViewGUI implements ViewLogin, NavigableController {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: view GUI login, usa controller grafico.
-    // A2) IO: componenti JavaFX per credenziali.
-
     private final GUIGraphicLoginController controller;
-    private Label errorLabel;
-    private TextField emailField;
-    private PasswordField passwordField;
-
-    // SEZIONE LOGICA
-    // Legenda logica:
-    // L1) onShow: costruzione UI e wiring eventi.
 
     public GUILoginView(GUIGraphicLoginController controller) {
         this.controller = controller;
@@ -43,27 +29,20 @@ public class GUILoginView extends GenericViewGUI implements ViewLogin, Navigable
         super.onShow(params);
         sessione = null;
 
-        VBox root = GuiViewUtils.createRoot();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
+            Parent root = loader.load();
 
-        Label title = new Label("Login");
-        errorLabel = GuiViewUtils.buildErrorLabel(getLastError());
+            LoginFXMLController fx = loader.getController();
+            fx.setGraphicController(controller);
+            fx.render(getLastParams());
 
-        emailField = new TextField();
-        emailField.setPromptText("Email");
-        passwordField = new PasswordField();
-        passwordField.setPromptText("Password");
+            GuiLauncher.setRoot(root);
 
-        Button loginBtn = new Button("Login");
-        loginBtn.setOnAction(e -> controller.effettuaLoginRaw(emailField.getText(), passwordField.getText()));
-
-        Button regBtn = new Button("Registrazione");
-        regBtn.setOnAction(e -> controller.vaiARegistrazione());
-
-        if (errorLabel.getText() == null) {
-            errorLabel.setText("");
+        } catch (Exception e) {
+            e.printStackTrace();
+            // fallback minimo
+            GuiLauncher.setRoot(GuiViewUtils.createRoot());
         }
-
-        root.getChildren().addAll(title, errorLabel, emailField, passwordField, loginBtn, regBtn);
-        GuiLauncher.setRoot(root);
     }
 }

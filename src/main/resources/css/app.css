@@ -1,0 +1,931 @@
+/* ===== ROOT & GLOBAL ===== */
+.root {
+  -fx-font-family: "Segoe UI";
+  -fx-font-size: 13px;
+  -fx-base: #F7F5EF;
+  -fx-background-color: #F7F5EF;
+  -fx-text-fill: #0B3B2E;
+  -fx-accent: #C9A227;
+  -fx-focus-color: #C9A227;
+  -fx-faint-focus-color: rgba(201, 162, 39, 0.12);
+}
+
+/* ===== TYPOGRAPHY ===== */
+.title {
+  -fx-font-size: 22px;
+  -fx-font-weight: 800;
+  -fx-text-fill: #0B3B2E;
+}
+
+.muted {
+  -fx-text-fill: #5E6B63;
+  -fx-font-size: 12px;
+}
+
+/* ===== ERROR STATE ===== */
+.error {
+  -fx-text-fill: #7F3A41;
+  -fx-background-color: #FCE8EB;
+  -fx-border-color: #E8B8C0;
+  -fx-border-width: 1;
+  -fx-padding: 8 12 8 12;
+  -fx-border-radius: 6;
+}
+
+/* ===== LABELS ===== */
+Label {
+  -fx-text-fill: #0B3B2E;
+  -fx-font-family: "Segoe UI";
+  -fx-font-size: 13px;
+}
+
+Label.title {
+  -fx-font-size: 22px;
+  -fx-font-weight: 800;
+  -fx-text-fill: #0B3B2E;
+}
+
+Label.muted {
+  -fx-text-fill: #5E6B63;
+  -fx-font-size: 12px;
+}
+
+/* ===== BUTTONS ===== */
+Button {
+  -fx-padding: 10 20 10 20;
+  -fx-border-radius: 6;
+  -fx-font-size: 13px;
+  -fx-font-weight: 700;
+  -fx-cursor: hand;
+  -fx-text-fill: white;
+  -fx-focus-traversable: true;
+}
+
+Button:default {
+  -fx-background-color: #0B3B2E;
+  -fx-border-color: #C9A227;
+  -fx-border-width: 1.5;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 6, 0, 0, 2);
+}
+
+Button:hover:default {
+  -fx-background-color: #0E4A39;
+  -fx-border-color: #D4B240;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0, 0, 3);
+}
+
+Button:pressed:default {
+  -fx-background-color: #082E23;
+  -fx-border-color: #B8922E;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 4, 0, 0, 1);
+}
+
+Button:focused:default {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 2;
+}
+
+Button:disabled {
+  -fx-opacity: 0.6;
+  -fx-cursor: default;
+}
+
+Button.primary {
+  -fx-background-color: #0B3B2E;
+  -fx-border-color: #C9A227;
+  -fx-border-width: 1.5;
+  -fx-text-fill: white;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 6, 0, 0, 2);
+}
+
+Button.primary:hover {
+  -fx-background-color: #0E4A39;
+  -fx-border-color: #D4B240;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0, 0, 3);
+}
+
+Button.primary:pressed {
+  -fx-background-color: #082E23;
+  -fx-border-color: #B8922E;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 4, 0, 0, 1);
+}
+
+Button.primary:focused {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 2;
+}
+
+Button.secondary {
+  -fx-background-color: #E8E5DC;
+  -fx-border-color: #C9C5BB;
+  -fx-border-width: 1;
+  -fx-text-fill: #0B3B2E;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 4, 0, 0, 1);
+}
+
+Button.secondary:hover {
+  -fx-background-color: #DDD9CE;
+  -fx-border-color: #B8B4A8;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 6, 0, 0, 2);
+}
+
+Button.secondary:pressed {
+  -fx-background-color: #D1CCC1;
+  -fx-border-color: #A8A39A;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 3, 0, 0, 1);
+}
+
+Button.secondary:focused {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 1.5;
+}
+
+Button.danger {
+  -fx-background-color: #A84C55;
+  -fx-border-color: #A84C55;
+  -fx-border-width: 1;
+  -fx-text-fill: white;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 6, 0, 0, 2);
+}
+
+Button.danger:hover {
+  -fx-background-color: #935C66;
+  -fx-border-color: #935C66;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0, 0, 3);
+}
+
+Button.danger:pressed {
+  -fx-background-color: #7E4C55;
+  -fx-border-color: #7E4C55;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 4, 0, 0, 1);
+}
+
+Button.danger:focused {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 1.5;
+}
+
+/* ===== TEXT INPUT FIELDS ===== */
+TextField {
+  -fx-background-color: white;
+  -fx-text-fill: #0B3B2E;
+  -fx-control-inner-background: white;
+  -fx-padding: 10 12 10 12;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1.5;
+  -fx-border-radius: 6;
+  -fx-font-family: "Segoe UI";
+  -fx-font-size: 13px;
+}
+
+TextField:focused {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 2;
+  -fx-effect: dropshadow(gaussian, rgba(201, 162, 39, 0.2), 6, 0, 0, 0);
+}
+
+TextField:disabled {
+  -fx-opacity: 0.6;
+  -fx-background-color: #F1EDE5;
+}
+
+TextField:readonly {
+  -fx-background-color: #F9F7F3;
+  -fx-border-color: #E8E5DC;
+}
+
+PasswordField {
+  -fx-background-color: white;
+  -fx-text-fill: #0B3B2E;
+  -fx-control-inner-background: white;
+  -fx-padding: 10 12 10 12;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1.5;
+  -fx-border-radius: 6;
+  -fx-font-family: "Segoe UI";
+  -fx-font-size: 13px;
+}
+
+PasswordField:focused {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 2;
+  -fx-effect: dropshadow(gaussian, rgba(201, 162, 39, 0.2), 6, 0, 0, 0);
+}
+
+PasswordField:disabled {
+  -fx-opacity: 0.6;
+  -fx-background-color: #F1EDE5;
+}
+
+TextArea {
+  -fx-background-color: white;
+  -fx-text-fill: #0B3B2E;
+  -fx-control-inner-background: white;
+  -fx-padding: 10 12 10 12;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1.5;
+  -fx-border-radius: 6;
+  -fx-font-family: "Segoe UI";
+  -fx-font-size: 13px;
+  -fx-wrap-text: true;
+  -fx-focus-traversable: true;
+}
+
+TextArea:focused {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 2;
+  -fx-effect: dropshadow(gaussian, rgba(201, 162, 39, 0.2), 6, 0, 0, 0);
+}
+
+TextArea:disabled {
+  -fx-opacity: 0.6;
+  -fx-background-color: #F1EDE5;
+}
+
+TextArea .text {
+  -fx-fill: #0B3B2E;
+}
+
+.text-input:prompt-text {
+  -fx-text-fill: #9B9890;
+  -fx-font-style: italic;
+}
+
+/* ===== COMBOBOX ===== */
+ComboBox {
+  -fx-background-color: white;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1.5;
+  -fx-border-radius: 6;
+  -fx-padding: 8 12 8 12;
+  -fx-text-fill: #0B3B2E;
+  -fx-font-size: 13px;
+}
+
+ComboBox:focused {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 2;
+  -fx-effect: dropshadow(gaussian, rgba(201, 162, 39, 0.2), 6, 0, 0, 0);
+}
+
+ComboBox:disabled {
+  -fx-opacity: 0.6;
+  -fx-background-color: #F1EDE5;
+}
+
+ComboBox .list-cell {
+  -fx-padding: 8 12 8 12;
+  -fx-text-fill: #0B3B2E;
+  -fx-background-color: white;
+  -fx-font-size: 13px;
+}
+
+ComboBox .list-cell:filled:selected {
+  -fx-background-color: #0B3B2E;
+  -fx-text-fill: white;
+  -fx-font-weight: 700;
+  -fx-border-color: #C9A227;
+  -fx-border-width: 0 0 0 3;
+}
+
+ComboBox .list-cell:filled:selected:focused {
+  -fx-background-color: #0E4A39;
+}
+
+ComboBox .list-cell:hover {
+  -fx-background-color: #F7F5EF;
+}
+
+ComboBox .list-cell:empty {
+  -fx-background-color: white;
+  -fx-border-width: 0;
+}
+
+ComboBox .arrow-button {
+  -fx-background-color: transparent;
+  -fx-padding: 0;
+}
+
+ComboBox .arrow {
+  -fx-background-color: #0B3B2E;
+  -fx-padding: 0;
+}
+
+ComboBox:showing .arrow-button {
+  -fx-background-color: #F1EDE5;
+}
+
+/* ===== DATEPICKER ===== */
+DatePicker {
+  -fx-background-color: white;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1.5;
+  -fx-border-radius: 6;
+  -fx-padding: 8 12 8 12;
+  -fx-text-fill: #0B3B2E;
+  -fx-font-size: 13px;
+}
+
+DatePicker:focused {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 2;
+  -fx-effect: dropshadow(gaussian, rgba(201, 162, 39, 0.2), 6, 0, 0, 0);
+}
+
+DatePicker:disabled {
+  -fx-opacity: 0.6;
+  -fx-background-color: #F1EDE5;
+}
+
+DatePicker .arrow-button {
+  -fx-background-color: transparent;
+  -fx-padding: 0;
+}
+
+DatePicker .arrow {
+  -fx-background-color: #0B3B2E;
+  -fx-padding: 0;
+}
+
+DatePicker:showing .arrow-button {
+  -fx-background-color: #F1EDE5;
+}
+
+/* ===== LISTVIEW & CELLS ===== */
+ListView {
+  -fx-background-color: white;
+  -fx-control-inner-background: white;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1;
+  -fx-border-radius: 6;
+  -fx-padding: 0;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 4, 0, 0, 1);
+}
+
+ListView:focused {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 1.5;
+}
+
+ListView:disabled {
+  -fx-opacity: 0.6;
+}
+
+ListView .list-cell {
+  -fx-padding: 12 12 12 12;
+  -fx-text-fill: #0B3B2E;
+  -fx-background-color: white;
+  -fx-border-color: transparent;
+  -fx-border-width: 0 0 1 0;
+  -fx-font-size: 13px;
+}
+
+ListView .list-cell:odd {
+  -fx-background-color: #FAFAF8;
+}
+
+ListView .list-cell:filled:selected {
+  -fx-background-color: #0B3B2E;
+  -fx-text-fill: white;
+  -fx-font-weight: 700;
+  -fx-border-color: #C9A227;
+  -fx-border-width: 0 0 0 3;
+}
+
+ListView .list-cell:filled:selected:focused {
+  -fx-background-color: #0E4A39;
+}
+
+ListView .list-cell:hover {
+  -fx-background-color: #F0EDEA;
+}
+
+ListView .list-cell:empty {
+  -fx-background-color: white;
+  -fx-border-width: 0;
+}
+
+/* ===== SEPARATOR ===== */
+Separator {
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 0.5;
+}
+
+Separator:vertical {
+  -fx-border-width: 0.5 0 0.5 0;
+}
+
+/* ===== SCROLLPANE ===== */
+ScrollPane {
+  -fx-background-color: transparent;
+  -fx-control-inner-background: transparent;
+  -fx-padding: 0;
+  -fx-border-color: transparent;
+  -fx-focus-color: transparent;
+  -fx-faint-focus-color: transparent;
+}
+
+ScrollPane .viewport {
+  -fx-background-color: transparent;
+}
+
+ScrollPane .scroll-bar {
+  -fx-background-color: transparent;
+}
+
+ScrollPane .scroll-bar:vertical .thumb {
+  -fx-background-color: #D4D0C7;
+  -fx-background-radius: 5;
+}
+
+ScrollPane .scroll-bar:vertical .thumb:hover {
+  -fx-background-color: #C0BAB1;
+}
+
+ScrollPane .scroll-bar:vertical .thumb:pressed {
+  -fx-background-color: #C9A227;
+}
+
+ScrollPane .scroll-bar:horizontal .thumb {
+  -fx-background-color: #D4D0C7;
+  -fx-background-radius: 5;
+}
+
+ScrollPane .scroll-bar:horizontal .thumb:hover {
+  -fx-background-color: #C0BAB1;
+}
+
+ScrollPane .scroll-bar:horizontal .thumb:pressed {
+  -fx-background-color: #C9A227;
+}
+
+ScrollPane .increment-button,
+ScrollPane .decrement-button {
+  -fx-padding: 0;
+  -fx-background-color: transparent;
+}
+
+/* ===== HYPERLINK ===== */
+Hyperlink {
+  -fx-text-fill: #0B3B2E;
+  -fx-font-weight: 700;
+  -fx-underline: false;
+  -fx-cursor: hand;
+}
+
+Hyperlink:visited {
+  -fx-text-fill: #0B3B2E;
+}
+
+Hyperlink:hover {
+  -fx-text-fill: #C9A227;
+  -fx-underline: true;
+}
+
+Hyperlink:focused {
+  -fx-text-fill: #C9A227;
+}
+
+/* ===== SPINNER ===== */
+Spinner {
+  -fx-background-color: white;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1.5;
+  -fx-border-radius: 6;
+  -fx-padding: 8 12 8 12;
+  -fx-font-size: 13px;
+}
+
+Spinner:focused {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 2;
+  -fx-effect: dropshadow(gaussian, rgba(201, 162, 39, 0.2), 6, 0, 0, 0);
+}
+
+Spinner:disabled {
+  -fx-opacity: 0.6;
+  -fx-background-color: #F1EDE5;
+}
+
+Spinner .text-field {
+  -fx-background-color: transparent;
+  -fx-border-color: transparent;
+  -fx-text-fill: #0B3B2E;
+  -fx-padding: 0;
+  -fx-font-size: 13px;
+}
+
+Spinner .increment-arrow-button,
+Spinner .decrement-arrow-button {
+  -fx-background-color: #F1EDE5;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 0.5;
+}
+
+Spinner .increment-arrow-button:hover,
+Spinner .decrement-arrow-button:hover {
+  -fx-background-color: #E8E5DC;
+}
+
+Spinner .increment-arrow-button:pressed,
+Spinner .decrement-arrow-button:pressed {
+  -fx-background-color: #DDD9CE;
+}
+
+Spinner .increment-arrow,
+Spinner .decrement-arrow {
+  -fx-background-color: #0B3B2E;
+}
+
+/* ===== CHOICE BOX ===== */
+ChoiceBox {
+  -fx-background-color: white;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1.5;
+  -fx-border-radius: 6;
+  -fx-padding: 8 12 8 12;
+  -fx-text-fill: #0B3B2E;
+  -fx-font-size: 13px;
+}
+
+ChoiceBox:focused {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 2;
+  -fx-effect: dropshadow(gaussian, rgba(201, 162, 39, 0.2), 6, 0, 0, 0);
+}
+
+ChoiceBox:disabled {
+  -fx-opacity: 0.6;
+  -fx-background-color: #F1EDE5;
+}
+
+ChoiceBox .menu-item {
+  -fx-padding: 8 12 8 12;
+  -fx-text-fill: #0B3B2E;
+}
+
+ChoiceBox .menu-item:focused {
+  -fx-background-color: #F7F5EF;
+}
+
+/* ===== CHECKBOX & RADIO ===== */
+CheckBox {
+  -fx-text-fill: #0B3B2E;
+  -fx-font-family: "Segoe UI";
+  -fx-font-size: 13px;
+  -fx-cursor: hand;
+}
+
+RadioButton {
+  -fx-text-fill: #0B3B2E;
+  -fx-font-family: "Segoe UI";
+  -fx-font-size: 13px;
+  -fx-cursor: hand;
+}
+
+CheckBox .box {
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1.5;
+  -fx-background-color: white;
+  -fx-padding: 3;
+}
+
+CheckBox:selected .box {
+  -fx-border-color: #C9A227;
+  -fx-background-color: #0B3B2E;
+}
+
+CheckBox:focused .box {
+  -fx-border-color: #C9A227;
+  -fx-effect: dropshadow(gaussian, rgba(201, 162, 39, 0.2), 4, 0, 0, 0);
+}
+
+CheckBox:disabled {
+  -fx-opacity: 0.6;
+}
+
+CheckBox:disabled .box {
+  -fx-background-color: #F1EDE5;
+}
+
+CheckBox .mark {
+  -fx-text-fill: white;
+}
+
+RadioButton .radio {
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1.5;
+  -fx-background-color: white;
+  -fx-padding: 3;
+}
+
+RadioButton:selected .radio {
+  -fx-border-color: #C9A227;
+  -fx-background-color: #0B3B2E;
+}
+
+RadioButton:focused .radio {
+  -fx-border-color: #C9A227;
+  -fx-effect: dropshadow(gaussian, rgba(201, 162, 39, 0.2), 4, 0, 0, 0);
+}
+
+RadioButton:disabled {
+  -fx-opacity: 0.6;
+}
+
+RadioButton:disabled .radio {
+  -fx-background-color: #F1EDE5;
+}
+
+RadioButton .dot {
+  -fx-background-color: white;
+}
+
+/* ===== TOGGLE BUTTON ===== */
+ToggleButton {
+  -fx-padding: 10 20 10 20;
+  -fx-border-radius: 6;
+  -fx-font-size: 13px;
+  -fx-font-weight: 700;
+  -fx-cursor: hand;
+  -fx-background-color: #E8E5DC;
+  -fx-border-color: #C9C5BB;
+  -fx-border-width: 1;
+  -fx-text-fill: #0B3B2E;
+}
+
+ToggleButton:hover {
+  -fx-background-color: #DDD9CE;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 6, 0, 0, 2);
+}
+
+ToggleButton:selected {
+  -fx-background-color: #0B3B2E;
+  -fx-border-color: #C9A227;
+  -fx-border-width: 1.5;
+  -fx-text-fill: white;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 6, 0, 0, 2);
+}
+
+ToggleButton:selected:hover {
+  -fx-background-color: #0E4A39;
+  -fx-border-color: #D4B240;
+}
+
+ToggleButton:focused {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 1.5;
+}
+
+ToggleButton:disabled {
+  -fx-opacity: 0.6;
+}
+
+/* ===== PROGRESS BAR ===== */
+ProgressBar {
+  -fx-padding: 4;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1;
+  -fx-border-radius: 8;
+  -fx-background-color: #F1EDE5;
+}
+
+ProgressBar .bar {
+  -fx-background-color: linear-gradient(to right, #0B3B2E, #0E4A39);
+  -fx-background-radius: 8;
+  -fx-padding: 0;
+}
+
+ProgressBar:disabled {
+  -fx-opacity: 0.6;
+}
+
+/* ===== PROGRESS INDICATOR ===== */
+ProgressIndicator {
+  -fx-progress-color: #0B3B2E;
+  -fx-padding: 4;
+}
+
+ProgressIndicator:disabled {
+  -fx-opacity: 0.6;
+}
+
+/* ===== TOOLTIP ===== */
+Tooltip {
+  -fx-text-fill: white;
+  -fx-background-color: #0B3B2E;
+  -fx-border-color: #C9A227;
+  -fx-border-width: 1;
+  -fx-border-radius: 4;
+  -fx-padding: 8 12 8 12;
+  -fx-font-size: 12px;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 6, 0, 0, 2);
+}
+
+/* ===== TABPANE ===== */
+TabPane {
+  -fx-background-color: #F7F5EF;
+  -fx-border-color: transparent;
+  -fx-open-tab-animation: GROW;
+}
+
+TabPane .tab-header-background {
+  -fx-background-color: #F7F5EF;
+}
+
+TabPane .tab {
+  -fx-background-color: #E8E5DC;
+  -fx-border-color: #C9C5BB;
+  -fx-border-width: 0 1 1 1;
+  -fx-text-fill: #0B3B2E;
+  -fx-padding: 12 24 12 24;
+  -fx-font-weight: 700;
+  -fx-font-size: 13px;
+}
+
+TabPane .tab:selected {
+  -fx-background-color: white;
+  -fx-border-color: #C9A227;
+  -fx-border-width: 0 1 0 1;
+  -fx-text-fill: #0B3B2E;
+}
+
+TabPane .tab:hover:not(:selected) {
+  -fx-background-color: #DDD9CE;
+}
+
+TabPane .tab:focused {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 0 1 1 1;
+}
+
+TabPane .content {
+  -fx-background-color: white;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1;
+  -fx-padding: 12;
+}
+
+/* ===== CONTEXT MENU ===== */
+ContextMenu {
+  -fx-background-color: white;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1;
+  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 2);
+}
+
+ContextMenu .menu-item {
+  -fx-padding: 8 12 8 12;
+  -fx-text-fill: #0B3B2E;
+  -fx-font-size: 13px;
+}
+
+ContextMenu .menu-item:focused {
+  -fx-background-color: #F7F5EF;
+}
+
+ContextMenu .menu-item:pressed {
+  -fx-background-color: #0B3B2E;
+  -fx-text-fill: white;
+}
+
+ContextMenu .separator {
+  -fx-padding: 4 0 4 0;
+}
+
+/* ===== ACCORDION ===== */
+Accordion {
+  -fx-background-color: white;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1;
+}
+
+Accordion .titled-pane {
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 0 0 1 0;
+}
+
+Accordion .titled-pane:last-child {
+  -fx-border-width: 0;
+}
+
+Accordion .titled-pane > .title {
+  -fx-background-color: #F9F7F3;
+  -fx-padding: 12;
+  -fx-font-weight: 700;
+  -fx-text-fill: #0B3B2E;
+}
+
+Accordion .titled-pane:selected > .title {
+  -fx-background-color: #F1EDE5;
+  -fx-text-fill: #0B3B2E;
+}
+
+Accordion .titled-pane > .title:hover {
+  -fx-background-color: #F1EDE5;
+}
+
+Accordion .titled-pane > .content {
+  -fx-background-color: white;
+  -fx-padding: 12;
+}
+
+/* ===== TREE VIEW ===== */
+TreeView {
+  -fx-background-color: white;
+  -fx-control-inner-background: white;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1;
+  -fx-padding: 0;
+}
+
+TreeView:focused {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 1.5;
+}
+
+TreeView .tree-cell {
+  -fx-padding: 8 12 8 12;
+  -fx-text-fill: #0B3B2E;
+  -fx-background-color: white;
+  -fx-font-size: 13px;
+}
+
+TreeView .tree-cell:filled:selected {
+  -fx-background-color: #0B3B2E;
+  -fx-text-fill: white;
+  -fx-font-weight: 700;
+}
+
+TreeView .tree-cell:hover {
+  -fx-background-color: #F0EDEA;
+}
+
+TreeView .tree-cell:empty {
+  -fx-background-color: white;
+}
+
+/* ===== TABLE VIEW ===== */
+TableView {
+  -fx-background-color: white;
+  -fx-control-inner-background: white;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 1;
+  -fx-padding: 0;
+}
+
+TableView:focused {
+  -fx-border-color: #C9A227;
+  -fx-border-width: 1.5;
+}
+
+TableView .column-header {
+  -fx-background-color: #F9F7F3;
+  -fx-border-color: #D4D0C7;
+  -fx-border-width: 0 1 1 0;
+  -fx-padding: 12;
+  -fx-text-fill: #0B3B2E;
+  -fx-font-weight: 700;
+  -fx-font-size: 13px;
+}
+
+TableView .column-header:last-child {
+  -fx-border-width: 0 0 1 0;
+}
+
+TableView .table-cell {
+  -fx-padding: 8 12 8 12;
+  -fx-text-fill: #0B3B2E;
+  -fx-background-color: white;
+  -fx-border-color: #F0EDEA;
+  -fx-border-width: 0 0 1 0;
+  -fx-font-size: 13px;
+}
+
+TableView .table-row-cell {
+  -fx-padding: 0;
+}
+
+TableView .table-row-cell:selected {
+  -fx-background-color: #0B3B2E;
+  -fx-text-fill: white;
+}
+
+TableView .table-row-cell:selected .table-cell {
+  -fx-text-fill: white;
+  -fx-background-color: #0B3B2E;
+}
+
+TableView .table-row-cell:hover {
+  -fx-background-color: #F0EDEA;
+}
+
+TableView .table-row-cell:odd {
+  -fx-background-color: #FAFAF8;
+}
+
+TableView .table-row-cell:odd:hover {
+  -fx-background-color: #F0EDEA;
+}
+
+

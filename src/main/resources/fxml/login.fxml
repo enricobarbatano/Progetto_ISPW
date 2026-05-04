@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.ispw.view.gui.fxml.LoginFXMLController"
+      styleClass="root" stylesheets="/css/app.css"
+      spacing="10" alignment="CENTER">
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
+    
+    <Label text="⚽ Login" styleClass="title"/>
+    
+    <Label fx:id="lblError" styleClass="error"/>
+    
+    <TextField fx:id="txtEmail" promptText="Email"/>
+    
+    <PasswordField fx:id="txtPassword" promptText="Password"/>
+    
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Login" onAction="#onLogin" styleClass="primary"/>
+        <Button text="Registrazione" onAction="#onRegistrazione" styleClass="secondary"/>
+    </HBox>
+</VBox>

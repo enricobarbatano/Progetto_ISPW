@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.ispw.view.gui.fxml.HomeFXMLController"
+      styleClass="root" stylesheets="/css/app.css"
+      spacing="10" alignment="TOP_CENTER">
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
+    
+    <Label text="⚽ Home" styleClass="title"/>
+    
+    <Label fx:id="lblRuolo" styleClass="muted"/>
+    
+    <Button text="Account" onAction="#onAccount" styleClass="secondary"/>
+    
+    <Button fx:id="btnOp1" onAction="#onOp1" styleClass="primary"/>
+    
+    <Button fx:id="btnOp2" onAction="#onOp2" styleClass="primary"/>
+    
+    <Button fx:id="btnLog" onAction="#onLog" styleClass="secondary"/>
+    
+    <Button fx:id="btnRichiesteDisdetta" onAction="#onRichiesteDisdetta" styleClass="secondary"/>
+    
+    <Button text="Logout" onAction="#onLogout" styleClass="danger"/>
+</VBox>
