@@ -2,9 +2,9 @@ package com.ispw.controller.graphic.cli;
 
 import java.util.logging.Logger;
 
-import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerDisdetta;
+import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 
 public class CLIGraphicControllerDisdetta extends AbstractGraphicControllerDisdetta {
 

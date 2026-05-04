@@ -5,9 +5,9 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
-import com.ispw.controller.graphic.GraphicControllerUtils;
-import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerRegole;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.NavigableController;
 import com.ispw.view.interfaces.ViewGestioneRegole;
 
 import javafx.application.Platform;

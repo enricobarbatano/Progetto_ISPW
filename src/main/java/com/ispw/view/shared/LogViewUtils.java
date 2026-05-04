@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.ispw.bean.SessioneUtenteBean;
-import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.model.enums.Ruolo;
 
 public final class LogViewUtils {

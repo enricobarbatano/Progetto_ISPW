@@ -1,4 +1,4 @@
-package com.ispw.controller.graphic;
+package com.ispw.controller.graphic.interfaces;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;

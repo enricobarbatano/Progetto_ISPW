@@ -1,16 +1,6 @@
 package com.ispw.controller.factory;
 
 
-import com.ispw.controller.graphic.GraphicControllerAccount;
-import com.ispw.controller.graphic.GraphicControllerDisdetta;
-import com.ispw.controller.graphic.GraphicControllerLog;
-import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.graphic.GraphicControllerPenalita;
-import com.ispw.controller.graphic.GraphicControllerPrenotazione;
-import com.ispw.controller.graphic.GraphicControllerRegistrazione;
-import com.ispw.controller.graphic.GraphicControllerRegole;
-import com.ispw.controller.graphic.GraphicControllerUtils;
-import com.ispw.controller.graphic.GraphicLoginController;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerAccount;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerDisdetta;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerLog;
@@ -20,6 +10,16 @@ import com.ispw.controller.graphic.cli.CLIGraphicControllerPrenotazione;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerRegistrazione;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerRegole;
 import com.ispw.controller.graphic.cli.CLIGraphicLoginController;
+import com.ispw.controller.graphic.interfaces.GraphicControllerAccount;
+import com.ispw.controller.graphic.interfaces.GraphicControllerDisdetta;
+import com.ispw.controller.graphic.interfaces.GraphicControllerLog;
+import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
+import com.ispw.controller.graphic.interfaces.GraphicControllerPenalita;
+import com.ispw.controller.graphic.interfaces.GraphicControllerPrenotazione;
+import com.ispw.controller.graphic.interfaces.GraphicControllerRegistrazione;
+import com.ispw.controller.graphic.interfaces.GraphicControllerRegole;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.GraphicLoginController;
 import com.ispw.view.cli.CLIAccountView;
 import com.ispw.view.cli.CLIDisdettaView;
 import com.ispw.view.cli.CLIHomeView;

@@ -1,14 +1,14 @@
 package com.ispw.controller.factory;
 
-import com.ispw.controller.graphic.GraphicControllerAccount;
-import com.ispw.controller.graphic.GraphicControllerDisdetta;
-import com.ispw.controller.graphic.GraphicControllerLog;
-import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.graphic.GraphicControllerPenalita;
-import com.ispw.controller.graphic.GraphicControllerPrenotazione;
-import com.ispw.controller.graphic.GraphicControllerRegistrazione;
-import com.ispw.controller.graphic.GraphicControllerRegole;
-import com.ispw.controller.graphic.GraphicLoginController;
+import com.ispw.controller.graphic.interfaces.GraphicControllerAccount;
+import com.ispw.controller.graphic.interfaces.GraphicControllerDisdetta;
+import com.ispw.controller.graphic.interfaces.GraphicControllerLog;
+import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
+import com.ispw.controller.graphic.interfaces.GraphicControllerPenalita;
+import com.ispw.controller.graphic.interfaces.GraphicControllerPrenotazione;
+import com.ispw.controller.graphic.interfaces.GraphicControllerRegistrazione;
+import com.ispw.controller.graphic.interfaces.GraphicControllerRegole;
+import com.ispw.controller.graphic.interfaces.GraphicLoginController;
 import com.ispw.model.enums.FrontendProvider;
 
 public abstract class FrontendControllerFactory {

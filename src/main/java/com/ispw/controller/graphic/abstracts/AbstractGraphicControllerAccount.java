@@ -8,9 +8,9 @@ import java.util.logging.Logger;
 import com.ispw.bean.DatiAccountBean;
 import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.bean.SessioneUtenteBean;
-import com.ispw.controller.graphic.GraphicControllerAccount;
-import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.GraphicControllerAccount;
+import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 
 public abstract class AbstractGraphicControllerAccount implements GraphicControllerAccount {
 

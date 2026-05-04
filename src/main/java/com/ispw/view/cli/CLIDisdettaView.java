@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import com.ispw.controller.graphic.GraphicControllerUtils;
-import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerDisdetta;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.NavigableController;
 import com.ispw.view.cli.console.ConsoleDisdettaAnteprimaView;
 import com.ispw.view.cli.console.ConsoleDisdettaElencoView;
 import com.ispw.view.cli.console.ConsoleDisdettaEsitoView;

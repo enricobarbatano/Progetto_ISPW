@@ -10,18 +10,12 @@ import com.ispw.bean.EsitoDisdettaBean;
 import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.bean.RiepilogoPrenotazioneBean;
 import com.ispw.bean.SessioneUtenteBean;
-import com.ispw.controller.graphic.GraphicControllerDisdetta;
-import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.GraphicControllerDisdetta;
+import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerDisdettaPrenotazione;
 
 public abstract class AbstractGraphicControllerDisdetta implements GraphicControllerDisdetta {
-
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: implementa GraphicControllerDisdetta (interfaccia) e usa GraphicControllerNavigation.
-    // A2) IO verso GUI/CLI: riceve/ritorna bean (SessioneUtenteBean, RiepilogoPrenotazioneBean, EsitoDisdettaBean).
-    // A3) Logica delegata: usa LogicControllerDisdettaPrenotazione.
 
     protected final GraphicControllerNavigation navigator;
 
@@ -30,7 +24,6 @@ public abstract class AbstractGraphicControllerDisdetta implements GraphicContro
     }
 
     protected abstract Logger log();
-
     protected abstract void goToHome();
 
     protected LogicControllerDisdettaPrenotazione logicController() {
@@ -44,6 +37,7 @@ public abstract class AbstractGraphicControllerDisdetta implements GraphicContro
 
     @Override
     public void onShow(Map<String, Object> params) {
+        GraphicControllerUtils.handleOnShow(log(), params, GraphicControllerUtils.PREFIX_DISDETTA);
     }
 
     @Override
@@ -61,11 +55,14 @@ public abstract class AbstractGraphicControllerDisdetta implements GraphicContro
                 .toList();
 
             if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_DISDETTA,
-                    Map.of(GraphicControllerUtils.KEY_PRENOTAZIONI, elenco));
+                navigator.goTo(
+                    GraphicControllerUtils.ROUTE_DISDETTA,
+                    Map.of(GraphicControllerUtils.KEY_PRENOTAZIONI, elenco)
+                );
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore richiesta prenotazioni cancellabili", e);
+            notifyDisdettaError(GraphicControllerUtils.MSG_OPERAZIONE_NON_RIUSCITA);
         }
     }
 
@@ -75,8 +72,10 @@ public abstract class AbstractGraphicControllerDisdetta implements GraphicContro
             return;
         }
         if (navigator != null) {
-            navigator.goTo(GraphicControllerUtils.ROUTE_DISDETTA,
-                Map.of(GraphicControllerUtils.KEY_ID_PRENOTAZIONE, idPrenotazione));
+            navigator.goTo(
+                GraphicControllerUtils.ROUTE_DISDETTA,
+                Map.of(GraphicControllerUtils.KEY_ID_PRENOTAZIONE, idPrenotazione)
+            );
         }
     }
 
@@ -100,11 +99,14 @@ public abstract class AbstractGraphicControllerDisdetta implements GraphicContro
             payload.put(GraphicControllerUtils.KEY_PENALE, esito.getPenale());
 
             if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_DISDETTA,
-                    Map.of(GraphicControllerUtils.KEY_ANTEPRIMA, payload));
+                navigator.goTo(
+                    GraphicControllerUtils.ROUTE_DISDETTA,
+                    Map.of(GraphicControllerUtils.KEY_ANTEPRIMA, payload)
+                );
             }
         } catch (Exception e) {
             log().log(Level.SEVERE, "Errore anteprima disdetta", e);
+            notifyDisdettaError(GraphicControllerUtils.MSG_OPERAZIONE_NON_RIUSCITA);
         }
     }
 
@@ -116,7 +118,8 @@ public abstract class AbstractGraphicControllerDisdetta implements GraphicContro
         }
 
         try {
-            EsitoOperazioneBean esito = logicController().eseguiAnnullamento(idPrenotazione, sessione);
+            // ✅ UC complesso: UTENTE invia richiesta PENDING (non annulla immediatamente)
+            EsitoOperazioneBean esito = logicController().richiediDisdetta(idPrenotazione, null, sessione);
 
             if (esito == null || !esito.isSuccesso()) {
                 notifyDisdettaError(esito != null ? esito.getMessaggio()
@@ -125,11 +128,14 @@ public abstract class AbstractGraphicControllerDisdetta implements GraphicContro
             }
 
             if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_DISDETTA,
-                    Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
+                navigator.goTo(
+                    GraphicControllerUtils.ROUTE_DISDETTA,
+                    Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio())
+                );
             }
         } catch (Exception e) {
-            log().log(Level.SEVERE, "Errore conferma disdetta", e);
+            log().log(Level.SEVERE, "Errore invio richiesta disdetta", e);
+            notifyDisdettaError(GraphicControllerUtils.MSG_OPERAZIONE_NON_RIUSCITA);
         }
     }
 
@@ -138,14 +144,16 @@ public abstract class AbstractGraphicControllerDisdetta implements GraphicContro
         goToHome();
     }
 
-    // SEZIONE LOGICA
-    // Legenda metodi:
-    // 1) notifyDisdettaError(...) - notifica errore e naviga.
-    // 2) isSessioneNonValida(...) - valida sessione.
-    // 3) isIdNonValido(...) - valida id prenotazione.
+    // ===== helper =====
+
     private void notifyDisdettaError(String message) {
-        GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_DISDETTA,
-            GraphicControllerUtils.PREFIX_DISDETTA, message);
+        GraphicControllerUtils.notifyError(
+            log(),
+            navigator,
+            GraphicControllerUtils.ROUTE_DISDETTA,
+            GraphicControllerUtils.PREFIX_DISDETTA,
+            message
+        );
     }
 
     private boolean isSessioneNonValida(SessioneUtenteBean sessione, String message) {

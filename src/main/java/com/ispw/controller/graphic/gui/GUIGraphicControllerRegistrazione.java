@@ -2,9 +2,9 @@ package com.ispw.controller.graphic.gui;
 
 import java.util.Map;
 
-import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.graphic.GraphicControllerUtils;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerRegistrazione;
+import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerRegistrazione;
 
 public class GUIGraphicControllerRegistrazione extends AbstractGraphicControllerRegistrazione {

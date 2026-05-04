@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import com.ispw.controller.graphic.GraphicControllerUtils;
-import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerRegole;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.NavigableController;
 import com.ispw.view.interfaces.ViewGestioneRegole;
 
 public class CLIRegoleView extends GenericViewCLI implements ViewGestioneRegole, NavigableController {

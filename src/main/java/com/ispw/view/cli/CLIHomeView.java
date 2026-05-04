@@ -4,9 +4,9 @@ import java.util.Map;
 import java.util.Scanner;
 
 import com.ispw.bean.SessioneUtenteBean;
-import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.graphic.GraphicControllerUtils;
-import com.ispw.controller.graphic.NavigableController;
+import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.NavigableController;
 import com.ispw.model.enums.Ruolo;
 import com.ispw.view.interfaces.ViewHomeProfilo;
 

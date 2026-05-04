@@ -3,7 +3,7 @@ package com.ispw.view.shared;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 
 public final class RegistrazioneViewUtils {
 

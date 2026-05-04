@@ -1,18 +1,18 @@
-package com.ispw.controller.graphic;
+package com.ispw.controller.graphic.interfaces;
 
 import java.util.Map;
 import java.util.logging.Logger;
 
 public final class GraphicControllerUtils {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: utility del layer graphic (stateless).
-    // A2) IO verso GUI/CLI: chiavi standard e routing error/successo.
+    // ===================== KEYS (payload navigation) =====================
 
+    // Standard
     public static final String KEY_ERROR = "error";
-    public static final String KEY_MESSAGE = "message";
-    public static final String KEY_SUCCESSO = "successo";
+    public static final String KEY_MESSAGE = "message";   // messaggio generico
+    public static final String KEY_SUCCESSO = "successo"; // messaggio successo (già usato nei controller)
+    public static final String KEY_MESSAGGIO = "messaggio"; // legacy/compatibilità se qualche view lo usa
+
     public static final String KEY_RIEPILOGO = "riepilogo";
     public static final String KEY_PAGAMENTO = "pagamento";
     public static final String KEY_ID_PRENOTAZIONE = "idPrenotazione";
@@ -37,7 +37,6 @@ public final class GraphicControllerUtils {
     public static final String KEY_ORA_CHIUSURA = "oraChiusura";
     public static final String KEY_VALORE_PENALITA = "valorePenalita";
     public static final String KEY_STATO = "stato";
-    public static final String KEY_MESSAGGIO = "messaggio";
     public static final String KEY_ID_TRANSAZIONE = "idTransazione";
     public static final String KEY_DATA_PAGAMENTO = "dataPagamento";
     public static final String KEY_SLOT_DISPONIBILI = "slotDisponibili";
@@ -45,6 +44,10 @@ public final class GraphicControllerUtils {
     public static final String KEY_UTENTI = "utenti";
     public static final String KEY_LOGS = "logs";
 
+    // ✅ Nuovo: richieste disdetta (gestore)
+    public static final String KEY_RICHIESTE = "richieste";
+
+    // ===================== ROUTES =====================
     public static final String ROUTE_LOGIN = "login";
     public static final String ROUTE_HOME = "home";
     public static final String ROUTE_REGISTRAZIONE = "registrazione";
@@ -55,6 +58,10 @@ public final class GraphicControllerUtils {
     public static final String ROUTE_PENALITA = "penalita";
     public static final String ROUTE_LOGS = "logs";
 
+    // ✅ Nuova route per UC complesso (gestore)
+    public static final String ROUTE_RICHIESTE_DISDETTA = "richieste_disdetta";
+
+    // ===================== PREFIX =====================
     public static final String PREFIX_LOGIN = "[LOGIN]";
     public static final String PREFIX_REGISTRAZIONE = "[REGISTRAZIONE]";
     public static final String PREFIX_ACCOUNT = "[ACCOUNT]";
@@ -62,7 +69,9 @@ public final class GraphicControllerUtils {
     public static final String PREFIX_DISDETTA = "[DISDETTA]";
     public static final String PREFIX_PENALITA = "[PENALITA]";
     public static final String PREFIX_REGOLE = "[REGOLE]";
+    public static final String PREFIX_RICHIESTE_DISDETTA = "[RICHIESTE_DISDETTA]";
 
+    // ===================== MESSAGES =====================
     public static final String MSG_SESSIONE_NON_VALIDA = "Sessione non valida";
     public static final String MSG_SESSIONE_UTENTE_MANCANTE = "Sessione utente mancante";
     public static final String MSG_ID_UTENTE_NON_VALIDO = "Id utente non valido";
@@ -92,13 +101,9 @@ public final class GraphicControllerUtils {
     public static final String MSG_SESSIONE_MANCANTE_PAGAMENTO = "Sessione utente mancante per pagamento";
     public static final String MSG_PAGAMENTO_NON_COMPLETATO = "Pagamento non completato";
 
-    private GraphicControllerUtils() {
-    }
+    private GraphicControllerUtils() { }
 
-    // SEZIONE LOGICA
-    // Legenda logica:
-    // L1) notifyError: logga e naviga alla route con errore.
-    // L2) handleOnShow: interpreta parametri e logga messaggi.
+    // ===================== HELPERS =====================
 
     public static void notifyError(Logger log,
                                    GraphicControllerNavigation navigator,
@@ -130,6 +135,9 @@ public final class GraphicControllerUtils {
         Object rawMessage = params.get(KEY_MESSAGE);
         if (rawMessage == null) {
             rawMessage = params.get(KEY_SUCCESSO);
+        }
+        if (rawMessage == null) {
+            rawMessage = params.get(KEY_MESSAGGIO); // legacy fallback
         }
         if (rawMessage != null && log != null) {
             final String msg = String.valueOf(rawMessage);

@@ -3,9 +3,9 @@ package com.ispw.view.gui;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ispw.controller.graphic.GraphicControllerUtils;
-import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerAccount;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.NavigableController;
 import com.ispw.view.interfaces.ViewGestioneAccount;
 
 import javafx.scene.control.Button;

@@ -2,9 +2,9 @@ package com.ispw.view.cli;
 
 import java.util.Map;
 
-import com.ispw.controller.graphic.GraphicControllerUtils;
-import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.cli.CLIGraphicLoginController;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.NavigableController;
 import com.ispw.view.cli.console.ConsoleLoginView;
 import com.ispw.view.interfaces.ViewLogin;
 

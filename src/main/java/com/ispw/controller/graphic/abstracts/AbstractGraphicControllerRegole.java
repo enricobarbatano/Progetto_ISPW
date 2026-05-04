@@ -12,9 +12,9 @@ import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.bean.PenalitaBean;
 import com.ispw.bean.RegolaCampoBean;
 import com.ispw.bean.TempisticheBean;
-import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.graphic.GraphicControllerRegole;
-import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
+import com.ispw.controller.graphic.interfaces.GraphicControllerRegole;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerConfiguraRegole;
 
 public abstract class AbstractGraphicControllerRegole implements GraphicControllerRegole {

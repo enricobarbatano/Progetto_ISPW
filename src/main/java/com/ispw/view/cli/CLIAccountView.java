@@ -3,9 +3,9 @@ package com.ispw.view.cli;
 import java.util.Map;
 import java.util.Scanner;
 
-import com.ispw.controller.graphic.GraphicControllerUtils;
-import com.ispw.controller.graphic.NavigableController;
 import com.ispw.controller.graphic.cli.CLIGraphicControllerAccount;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.NavigableController;
 import com.ispw.view.interfaces.ViewGestioneAccount;
 
 public class CLIAccountView extends GenericViewCLI implements ViewGestioneAccount, NavigableController {

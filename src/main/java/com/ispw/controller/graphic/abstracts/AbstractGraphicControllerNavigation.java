@@ -5,8 +5,8 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.graphic.NavigableController;
+import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
+import com.ispw.controller.graphic.interfaces.NavigableController;
 
 public abstract class AbstractGraphicControllerNavigation implements GraphicControllerNavigation {
 

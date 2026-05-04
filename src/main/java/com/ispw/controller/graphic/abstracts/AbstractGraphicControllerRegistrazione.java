@@ -3,9 +3,9 @@ package com.ispw.controller.graphic.abstracts;
 import java.util.Map;
 
 import com.ispw.bean.DatiRegistrazioneBean;
-import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.graphic.GraphicControllerRegistrazione;
-import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
+import com.ispw.controller.graphic.interfaces.GraphicControllerRegistrazione;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 
 public abstract class AbstractGraphicControllerRegistrazione implements GraphicControllerRegistrazione {
 

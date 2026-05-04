@@ -13,10 +13,10 @@ import com.ispw.bean.ParametriVerificaBean;
 import com.ispw.bean.RiepilogoPrenotazioneBean;
 import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.bean.StatoPagamentoBean;
-import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.graphic.GraphicControllerPrenotazione;
-import com.ispw.controller.graphic.GraphicControllerPrenotazioneUtils;
-import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
+import com.ispw.controller.graphic.interfaces.GraphicControllerPrenotazione;
+import com.ispw.controller.graphic.interfaces.GraphicControllerPrenotazioneUtils;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerPrenotazioneCampo;
 
 public abstract class AbstractGraphicControllerPrenotazione implements GraphicControllerPrenotazione {

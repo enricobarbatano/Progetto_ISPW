@@ -10,9 +10,9 @@ import com.ispw.bean.DatiPenalitaBean;
 import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.bean.UtenteSelezioneBean;
 import com.ispw.bean.UtentiBean;
-import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.graphic.GraphicControllerPenalita;
-import com.ispw.controller.graphic.GraphicControllerUtils;
+import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
+import com.ispw.controller.graphic.interfaces.GraphicControllerPenalita;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.logic.ctrl.LogicControllerApplicaPenalita;
 
 public abstract class AbstractGraphicControllerPenalita implements GraphicControllerPenalita {

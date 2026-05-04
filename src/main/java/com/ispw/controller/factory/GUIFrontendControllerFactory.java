@@ -2,15 +2,6 @@ package com.ispw.controller.factory;
 
 import java.util.logging.Logger;
 
-import com.ispw.controller.graphic.GraphicControllerAccount;
-import com.ispw.controller.graphic.GraphicControllerDisdetta;
-import com.ispw.controller.graphic.GraphicControllerLog;
-import com.ispw.controller.graphic.GraphicControllerNavigation;
-import com.ispw.controller.graphic.GraphicControllerPenalita;
-import com.ispw.controller.graphic.GraphicControllerPrenotazione;
-import com.ispw.controller.graphic.GraphicControllerRegistrazione;
-import com.ispw.controller.graphic.GraphicControllerRegole;
-import com.ispw.controller.graphic.GraphicLoginController;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerAccount;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerDisdetta;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerLog;
@@ -20,6 +11,15 @@ import com.ispw.controller.graphic.gui.GUIGraphicControllerPrenotazione;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerRegistrazione;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerRegole;
 import com.ispw.controller.graphic.gui.GUIGraphicLoginController;
+import com.ispw.controller.graphic.interfaces.GraphicControllerAccount;
+import com.ispw.controller.graphic.interfaces.GraphicControllerDisdetta;
+import com.ispw.controller.graphic.interfaces.GraphicControllerLog;
+import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
+import com.ispw.controller.graphic.interfaces.GraphicControllerPenalita;
+import com.ispw.controller.graphic.interfaces.GraphicControllerPrenotazione;
+import com.ispw.controller.graphic.interfaces.GraphicControllerRegistrazione;
+import com.ispw.controller.graphic.interfaces.GraphicControllerRegole;
+import com.ispw.controller.graphic.interfaces.GraphicLoginController;
 import com.ispw.view.gui.GUIAccountView;
 import com.ispw.view.gui.GUIDisdettaView;
 import com.ispw.view.gui.GUIHomeView;
@@ -61,7 +61,7 @@ public final class GUIFrontendControllerFactory extends FrontendControllerFactor
     @Override
     public void startApplication() {
         logger.info("Avvio GUI...");
-        GuiLauncher.launchApp(() -> getNavigationController().goTo(com.ispw.controller.graphic.GraphicControllerUtils.ROUTE_LOGIN));
+        GuiLauncher.launchApp(() -> getNavigationController().goTo(com.ispw.controller.graphic.interfaces.GraphicControllerUtils.ROUTE_LOGIN));
     }
 
     @Override
