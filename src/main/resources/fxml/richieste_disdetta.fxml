@@ -9,41 +9,46 @@
             fx:controller="com.ispw.view.gui.fxml.RichiesteDisdettaFXMLController"
             fitToWidth="true"
             stylesheets="/css/app.css"
-            styleClass="root">
+            styleClass="scroll-pane">
 
     <content>
-        <VBox alignment="TOP_CENTER" spacing="15" styleClass="root">
+        <VBox alignment="TOP_CENTER" spacing="25" styleClass="root">
             <padding>
-                <Insets top="30" right="30" bottom="30" left="30"/>
+                <Insets top="40" right="40" bottom="40" left="40"/>
             </padding>
 
-            <VBox spacing="12" maxWidth="800" alignment="TOP_CENTER">
-                <Label text="📩 Richieste di Disdetta" styleClass="title"/>
+            <VBox spacing="20" maxWidth="850" alignment="TOP_CENTER">
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label text="Richieste di Disdetta" styleClass="title"/>
+                    <Label text="Approva o rifiuta le richieste inviate dagli utenti" style="-fx-text-fill: -fx-text-muted;"/>
+                </VBox>
                 
                 <HBox spacing="10" alignment="CENTER_RIGHT">
                     <Label fx:id="lblError" text="" styleClass="error" HBox.hgrow="ALWAYS"/>
                     <Label fx:id="lblSuccess" text="" styleClass="success-label"/>
-                    <Button text="🔄 Ricarica" onAction="#onRicarica" styleClass="secondary-small"/>
+                    <Button text="🔄 Ricarica" onAction="#onRicarica" styleClass="secondary" style="-fx-padding: 5 15;"/>
                 </HBox>
 
-                <ListView fx:id="listRichieste" prefHeight="250" maxWidth="Infinity"/>
+                <VBox styleClass="card">
+                    <ListView fx:id="listRichieste" prefHeight="250" styleClass="list-view"/>
+                </VBox>
 
-                <Separator/>
-
-                <VBox spacing="10" alignment="TOP_LEFT" styleClass="card">
+                <VBox spacing="20" styleClass="card">
                     <Label text="Gestione Richiesta Selezionata" styleClass="subtitle"/>
                     
-                    <HBox spacing="10" alignment="CENTER_LEFT">
-                        <Label text="ID Richiesta:"/>
-                        <TextField fx:id="txtIdRichiesta" prefWidth="80" disable="true"/>
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <Label text="ID Richiesta:" style="-fx-font-weight: bold;"/>
+                        <TextField fx:id="txtIdRichiesta" prefWidth="100" disable="true" style="-fx-opacity: 0.8;"/>
                     </HBox>
 
-                    <Label text="Nota per l'utente (opzionale):"/>
-                    <TextArea fx:id="txtNotaGestore" promptText="Inserisci qui il motivo dell'approvazione o del rifiuto..." prefHeight="80" wrapText="true"/>
+                    <VBox spacing="8">
+                        <Label text="Nota per l'utente (mostrata nella conferma):" style="-fx-font-weight: bold;"/>
+                        <TextArea fx:id="txtNotaGestore" promptText="Inserisci qui il motivo della decisione..." prefHeight="100" wrapText="true"/>
+                    </VBox>
 
-                    <HBox spacing="15" alignment="CENTER">
-                        <Button text="✅ Approva Disdetta" onAction="#onApprova" styleClass="primary" prefWidth="180"/>
-                        <Button text="❌ Rifiuta Richiesta" onAction="#onRifiuta" styleClass="danger" prefWidth="180"/>
+                    <HBox spacing="20" alignment="CENTER">
+                        <Button text="✅ Approva Disdetta" onAction="#onApprova" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="primary" style="-fx-background-color: -fx-success-color;"/>
+                        <Button text="❌ Rifiuta Richiesta" onAction="#onRifiuta" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="danger"/>
                     </HBox>
                 </VBox>
 

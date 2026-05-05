@@ -9,64 +9,71 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
 
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.ispw.view.gui.fxml.DisdettaFXMLController"
             fitToWidth="true"
             stylesheets="/css/app.css"
-            styleClass="root">
+            styleClass="scroll-pane">
 
     <content>
-        <VBox alignment="TOP_CENTER" spacing="16" styleClass="root">
+        <VBox alignment="TOP_CENTER" spacing="25" styleClass="root">
             <padding>
-                <Insets top="36" right="36" bottom="36" left="36"/>
+                <Insets top="40" right="40" bottom="40" left="40"/>
             </padding>
 
-            <VBox spacing="12" maxWidth="720" alignment="TOP_CENTER">
+            <VBox spacing="20" maxWidth="800" alignment="TOP_CENTER">
                 
-                <Label text="❌ Disdetta Prenotazione" styleClass="title"/>
-                
-                <Label fx:id="lblError" text="" styleClass="error" wrapText="true"/>
-                <Label fx:id="lblSuccess" text="" styleClass="muted" wrapText="true"/>
-
-                <Separator/>
-
-                <!-- Lista delle prenotazioni -->
-                <VBox spacing="10" alignment="TOP_LEFT">
-                    <HBox spacing="10" alignment="CENTER_LEFT">
-                        <Label text="Seleziona una prenotazione cancellabile" styleClass="muted"/>
-                        <Button text="🔄 Aggiorna Lista" onAction="#onRicarica" styleClass="secondary"/>
-                    </HBox>
-                    
-                    <ListView fx:id="listPrenotazioni" prefHeight="250" maxWidth="Infinity"/>
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label text="Gestione Disdette" styleClass="title"/>
+                    <Label text="Seleziona una prenotazione per procedere con la cancellazione" styleClass="subtitle" style="-fx-text-fill: -fx-text-muted; -fx-font-weight: normal;"/>
                 </VBox>
 
-                <Separator/>
+                <VBox spacing="10" alignment="CENTER">
+                    <Label fx:id="lblError" text="" styleClass="error" wrapText="true"/>
+                    <Label fx:id="lblSuccess" text="" styleClass="success-label" wrapText="true"/>
+                </VBox>
 
-                <!-- Azioni di Disdetta -->
-                <VBox spacing="12" alignment="CENTER" maxWidth="500">
-                    <Label text="Dettagli Cancellazione" styleClass="muted"/>
-                    
-                    <HBox spacing="10" alignment="CENTER">
-                        <Label text="ID Prenotazione:"/>
-                        <TextField fx:id="txtIdPrenotazione" promptText="Seleziona o inserisci ID" prefWidth="150"/>
+                <!-- SEZIONE LISTA -->
+                <VBox spacing="15" styleClass="card">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Prenotazioni Attive" styleClass="subtitle"/>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button text="🔄 Aggiorna Lista" onAction="#onRicarica" styleClass="secondary" style="-fx-padding: 5 15;"/>
                     </HBox>
+                    
+                    <ListView fx:id="listPrenotazioni" prefHeight="300" maxWidth="Infinity" styleClass="list-view"/>
+                </VBox>
 
-                    <!-- Area Anteprima Penale -->
-                    <VBox spacing="8" alignment="CENTER" style="-fx-background-color: rgba(0,0,0,0.05); -fx-background-radius: 8; -fx-padding: 10;">
-                        <Label fx:id="lblAnteprima" text="Richiedi anteprima per vedere le penali" styleClass="muted"/>
-                        <Button text="Calcola Penale" onAction="#onAnteprima" styleClass="secondary"/>
+                <!-- SEZIONE AZIONI E PENALI -->
+                <HBox spacing="20">
+                    <!-- Dettagli ID -->
+                    <VBox spacing="15" styleClass="card" HBox.hgrow="ALWAYS">
+                        <Label text="Dettagli Selezione" styleClass="subtitle"/>
+                        <VBox spacing="8">
+                            <Label text="ID Prenotazione selezionato" style="-fx-font-weight: bold;"/>
+                            <TextField fx:id="txtIdPrenotazione" promptText="Seleziona dalla lista sopra" />
+                        </VBox>
+                        <Button text="Richiedi Disdetta" onAction="#onInviaRichiesta" maxWidth="Infinity" styleClass="primary"/>
                     </VBox>
 
-                    <HBox spacing="15" alignment="CENTER">
-                        <Button text="Invia Richiesta Disdetta" onAction="#onInviaRichiesta" styleClass="primary"/>
-                    </HBox>
-                </VBox>
+                    <!-- Anteprima Penale -->
+                    <VBox spacing="15" styleClass="info-box" HBox.hgrow="ALWAYS" alignment="TOP_CENTER">
+                        <Label text="Calcolo Penale" styleClass="subtitle" style="-fx-text-fill: -fx-primary-color;"/>
+                        <Label fx:id="lblAnteprima" text="Seleziona un ID per calcolare i costi di cancellazione" 
+                               wrapText="true" textAlignment="CENTER" style="-fx-text-fill: -fx-text-main;"/>
+                        <Region VBox.vgrow="ALWAYS" />
+                        <Button text="Calcola Ora" onAction="#onAnteprima" styleClass="secondary" maxWidth="Infinity"/>
+                    </VBox>
+                </HBox>
 
                 <Separator/>
 
-                <Button text="Torna alla Home" onAction="#onHome" styleClass="secondary"/>
+                <HBox alignment="CENTER_LEFT">
+                    <Button text="← Torna alla Dashboard" onAction="#onHome" styleClass="secondary"/>
+                </HBox>
 
             </VBox>
         </VBox>

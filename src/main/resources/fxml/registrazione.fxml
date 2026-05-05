@@ -11,30 +11,58 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.ispw.view.gui.fxml.RegistrazioneFXMLController"
-      alignment="CENTER" spacing="15" 
+      alignment="CENTER" 
+      spacing="0"
       stylesheets="/css/app.css"
       styleClass="root">
     
     <padding>
-        <Insets top="30" right="40" bottom="30" left="40"/>
+        <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
 
-    <VBox spacing="10" maxWidth="350" alignment="CENTER">
-        <Label text="📝 Registrazione" styleClass="title"/>
+    <VBox spacing="30" maxWidth="450" alignment="CENTER" styleClass="card">
+        <padding>
+            <Insets top="40" right="40" bottom="40" left="40"/>
+        </padding>
+
+        <VBox spacing="8" alignment="CENTER">
+            <Label text="Crea Account" styleClass="title"/>
+            <Label text="Unisciti alla nostra community sportiva" styleClass="subtitle" style="-fx-text-fill: -fx-text-muted; -fx-font-weight: normal;"/>
+        </VBox>
+        
         <Label fx:id="lblError" text="" styleClass="error" wrapText="true" alignment="CENTER"/>
 
-        <VBox spacing="8" alignment="CENTER_LEFT">
-            <TextField fx:id="txtNome" promptText="Nome"/>
-            <TextField fx:id="txtCognome" promptText="Cognome"/>
-            <TextField fx:id="txtEmail" promptText="Email (user@example.com)"/>
-            <PasswordField fx:id="txtPassword" promptText="Scegli una password"/>
+        <VBox spacing="15" alignment="CENTER_LEFT" maxWidth="350">
+            <HBox spacing="10">
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Nome" style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="txtNome" promptText="Mario" />
+                </VBox>
+                <VBox spacing="5" HBox.hgrow="ALWAYS">
+                    <Label text="Cognome" style="-fx-font-weight: bold;"/>
+                    <TextField fx:id="txtCognome" promptText="Rossi" />
+                </VBox>
+            </HBox>
+
+            <VBox spacing="5">
+                <Label text="Email" style="-fx-font-weight: bold;"/>
+                <TextField fx:id="txtEmail" promptText="mario.rossi@esempio.com" />
+            </VBox>
+            
+            <VBox spacing="5">
+                <Label text="Password" style="-fx-font-weight: bold;"/>
+                <PasswordField fx:id="txtPassword" promptText="••••••••" />
+                <Label text="Minimo 6 caratteri" style="-fx-font-size: 11px; -fx-text-fill: -fx-text-muted;"/>
+            </VBox>
         </VBox>
 
-        <Button text="Crea Account" onAction="#onRegistra" maxWidth="Infinity" styleClass="primary"/>
-        
-        <HBox spacing="5" alignment="CENTER">
-            <Label text="Hai già un account?" styleClass="muted"/>
-            <Button text="Accedi qui" onAction="#onLogin" styleClass="link-button"/>
-        </HBox>
+        <VBox spacing="20" alignment="CENTER" maxWidth="350">
+            <Button text="Registrati Ora" onAction="#onRegistra" maxWidth="Infinity" styleClass="primary"/>
+            
+            <HBox spacing="5" alignment="CENTER">
+                <Label text="Hai già un profilo?" style="-fx-text-fill: -fx-text-muted;"/>
+                <Button text="Accedi" onAction="#onLogin" styleClass="secondary" style="-fx-border-width: 0; -fx-background-color: transparent; -fx-text-fill: -fx-primary-color; -fx-font-weight: bold;"/>
+            </HBox>
+        </VBox>
     </VBox>
 </VBox>

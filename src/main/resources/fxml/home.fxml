@@ -7,47 +7,63 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
 
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.ispw.view.gui.fxml.HomeFXMLController"
             fitToWidth="true"
             stylesheets="/css/app.css"
-            styleClass="root">
+            styleClass="scroll-pane">
 
     <content>
-        <VBox alignment="TOP_CENTER" spacing="20" styleClass="root">
+        <VBox alignment="TOP_CENTER" spacing="30" styleClass="root">
             <padding>
-                <Insets top="40" right="40" bottom="40" left="40"/>
+                <Insets top="40" right="60" bottom="40" left="60"/>
             </padding>
 
-            <VBox spacing="10" alignment="CENTER" maxWidth="600">
-                <Label text="🏠 Dashboard principale" styleClass="title"/>
-                <Label fx:id="lblRuolo" text="Ruolo: -" styleClass="muted"/>
-                
-                <Separator/>
-
-                <!-- Griglia pulsanti principali -->
-                <VBox spacing="15" alignment="CENTER">
-                    <HBox spacing="15" alignment="CENTER">
-                        <Button fx:id="btnOp1" text="..." onAction="#onOp1" prefWidth="220" prefHeight="80" styleClass="primary"/>
-                        <Button fx:id="btnOp2" text="..." onAction="#onOp2" prefWidth="220" prefHeight="80" styleClass="primary"/>
-                    </HBox>
-
-                    <HBox spacing="15" alignment="CENTER">
-                        <!-- Questi bottoni sono gestiti dinamicamente per Ruolo.GESTORE -->
-                        <Button fx:id="btnLog" text="Log" onAction="#onLog" prefWidth="220" styleClass="secondary"/>
-                        <Button fx:id="btnRichiesteDisdetta" text="Richieste disdetta" onAction="#onRichiesteDisdetta" prefWidth="220" styleClass="secondary"/>
+            <!-- Header Dashboard -->
+            <HBox alignment="CENTER_LEFT" maxWidth="900" spacing="20">
+                <VBox spacing="5">
+                    <Label text="Dashboard principale" styleClass="title"/>
+                    <HBox alignment="CENTER_LEFT" spacing="10" styleClass="info-box">
+                        <Label fx:id="lblRuolo" text="Sessione attiva come: -" style="-fx-font-weight: 600;"/>
                     </HBox>
                 </VBox>
-
-                <Separator/>
-
-                <!-- Azioni Account -->
-                <HBox spacing="15" alignment="CENTER">
+                <Region HBox.hgrow="ALWAYS" />
+                <HBox spacing="10" alignment="CENTER">
                     <Button text="👤 Account" onAction="#onAccount" styleClass="secondary"/>
-                    <Button text="🚪 Logout" onAction="#onLogout" styleClass="danger"/>
+                    <Button text="Logout" onAction="#onLogout" styleClass="danger"/>
                 </HBox>
+            </HBox>
+
+            <VBox maxWidth="900" spacing="25">
+                <Separator/>
+                
+                <Label text="Operazioni Disponibili" styleClass="subtitle"/>
+
+                <!-- Grid di Azioni (Card style) -->
+                <HBox spacing="20">
+                    <VBox HBox.hgrow="ALWAYS" styleClass="card" alignment="CENTER" spacing="15">
+                        <Label fx:id="lblTitoloOp1" text="Operazione 1" style="-fx-font-weight: bold;"/>
+                        <Button fx:id="btnOp1" text="Accedi" onAction="#onOp1" maxWidth="Infinity" styleClass="primary"/>
+                    </VBox>
+                    <VBox HBox.hgrow="ALWAYS" styleClass="card" alignment="CENTER" spacing="15">
+                        <Label fx:id="lblTitoloOp2" text="Operazione 2" style="-fx-font-weight: bold;"/>
+                        <Button fx:id="btnOp2" text="Accedi" onAction="#onOp2" maxWidth="Infinity" styleClass="primary"/>
+                    </VBox>
+                </HBox>
+
+                <!-- Pannello Amministrazione (Visibile solo per GESTORE) -->
+                <VBox fx:id="boxGestore" spacing="15" styleClass="card" 
+                      style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 12;"
+                      visible="false" managed="false">
+                    <Label text="Strumenti Gestore" style="-fx-font-weight: bold; -fx-text-fill: -fx-secondary-color;"/>
+                    <HBox spacing="15">
+                        <Button fx:id="btnLog" text="📄 Registro Log" onAction="#onLog" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="secondary"/>
+                        <Button fx:id="btnRichiesteDisdetta" text="📩 Richieste Disdetta" onAction="#onRichiesteDisdetta" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="secondary"/>
+                    </HBox>
+                </VBox>
             </VBox>
         </VBox>
     </content>

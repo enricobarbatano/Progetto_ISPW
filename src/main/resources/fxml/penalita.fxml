@@ -15,64 +15,57 @@
             fx:controller="com.ispw.view.gui.fxml.PenalitaFXMLController"
             fitToWidth="true"
             stylesheets="/css/app.css"
-            styleClass="root">
+            styleClass="scroll-pane">
 
     <content>
-        <VBox alignment="TOP_CENTER" spacing="16" styleClass="root">
+        <VBox alignment="TOP_CENTER" spacing="30" styleClass="root">
             <padding>
-                <Insets top="36" right="36" bottom="36" left="36"/>
+                <Insets top="40" right="40" bottom="40" left="40"/>
             </padding>
 
-            <VBox spacing="12" maxWidth="720" alignment="TOP_CENTER">
+            <VBox spacing="25" maxWidth="750" alignment="TOP_CENTER">
+                <Label text="Gestione Penalità" styleClass="title"/>
                 
-                <Label text="⚖️ Gestione Penalità" styleClass="title"/>
-                
-                <Label fx:id="lblError" text="" styleClass="error" wrapText="true"/>
-                <Label fx:id="lblSuccess" text="" styleClass="muted" wrapText="true"/>
+                <VBox spacing="10" alignment="CENTER">
+                    <Label fx:id="lblError" text="" styleClass="error" wrapText="true"/>
+                    <Label fx:id="lblSuccess" text="" styleClass="success-label" wrapText="true"/>
+                </VBox>
 
-                <Separator/>
-
-                <!-- Sezione Selezione Utente -->
-                <VBox spacing="10" alignment="TOP_LEFT">
-                    <HBox spacing="10" alignment="CENTER_LEFT">
-                        <Label text="Seleziona l'utente da sanzionare" styleClass="muted"/>
-                        <Button text="🔍 Carica Utenti" onAction="#onListaUtenti" styleClass="secondary"/>
+                <!-- Card Selezione -->
+                <VBox spacing="15" styleClass="card">
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <Label text="1. Selezione Utente" styleClass="subtitle"/>
+                        <Button text="🔍 Carica Lista" onAction="#onListaUtenti" styleClass="secondary" style="-fx-padding: 5 15;"/>
                     </HBox>
+                    <ListView fx:id="listUtenti" prefHeight="200" styleClass="list-view"/>
+                </VBox>
+
+                <!-- Card Form -->
+                <VBox spacing="20" styleClass="card" maxWidth="600">
+                    <Label text="2. Dati della Sanzione" styleClass="subtitle"/>
                     
-                    <ListView fx:id="listUtenti" prefHeight="200" maxWidth="Infinity"/>
+                    <VBox spacing="15">
+                        <VBox spacing="5">
+                            <Label text="ID Utente" style="-fx-font-weight: bold;"/>
+                            <TextField fx:id="txtIdUtente" disable="true" style="-fx-opacity: 0.7;"/>
+                        </VBox>
+                        
+                        <HBox spacing="15">
+                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                <Label text="Importo (€)" style="-fx-font-weight: bold;"/>
+                                <TextField fx:id="txtImporto" promptText="Es: 15.00"/>
+                            </VBox>
+                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                <Label text="Motivazione" style="-fx-font-weight: bold;"/>
+                                <TextField fx:id="txtMotivazione" promptText="Inserisci motivo..."/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                    
+                    <Button text="Applica Sanzione" onAction="#onApplica" maxWidth="Infinity" styleClass="primary"/>
                 </VBox>
 
-                <Separator/>
-
-                <!-- Form di applicazione penalità -->
-                <VBox spacing="15" alignment="TOP_CENTER" maxWidth="500">
-                    <Label text="Dati Penalità" styleClass="muted"/>
-
-                    <VBox spacing="8" alignment="TOP_LEFT">
-                        <Label text="ID Utente (selezionato):"/>
-                        <TextField fx:id="txtIdUtente" promptText="ID Utente" disable="true"/>
-                    </VBox>
-
-                    <VBox spacing="8" alignment="TOP_LEFT">
-                        <Label text="Importo (€):"/>
-                        <TextField fx:id="txtImporto" promptText="Es: 15.50"/>
-                    </VBox>
-
-                    <VBox spacing="8" alignment="TOP_LEFT">
-                        <Label text="Motivazione:"/>
-                        <TextField fx:id="txtMotivazione" promptText="Specificare il motivo della sanzione"/>
-                    </VBox>
-
-                    <HBox spacing="15" alignment="CENTER">
-                        <Button text="Applica Penalità" onAction="#onApplica" styleClass="primary"/>
-                    </HBox>
-                </VBox>
-
-                <Separator/>
-
-                <!-- Navigazione -->
-                <Button text="Torna alla Home" onAction="#onHome" styleClass="secondary"/>
-
+                <Button text="← Torna alla Home" onAction="#onHome" styleClass="secondary"/>
             </VBox>
         </VBox>
     </content>

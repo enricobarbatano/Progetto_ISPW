@@ -9,61 +9,83 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.Region?>
 
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.ispw.view.gui.fxml.AccountFXMLController"
             fitToWidth="true"
             stylesheets="/css/app.css"
-            styleClass="root">
+            styleClass="scroll-pane">
 
     <content>
-        <VBox alignment="TOP_CENTER" spacing="16" styleClass="root">
+        <VBox alignment="TOP_CENTER" spacing="25" styleClass="root">
             <padding>
-                <Insets top="36" right="36" bottom="36" left="36"/>
+                <Insets top="40" right="40" bottom="40" left="40"/>
             </padding>
 
-            <VBox spacing="12" maxWidth="600" alignment="TOP_CENTER">
+            <VBox spacing="20" maxWidth="650" alignment="TOP_CENTER">
                 
-                <Label text="👤 Il mio Account" styleClass="title"/>
-                
-                <Label fx:id="lblError" text="" styleClass="error" wrapText="true"/>
-                <Label fx:id="lblSuccess" text="" styleClass="muted" wrapText="true"/>
+                <HBox alignment="CENTER_LEFT" spacing="15">
+                    <VBox>
+                        <Label text="Impostazioni Account" styleClass="title"/>
+                        <Label text="Gestisci le tue informazioni personali e la sicurezza" styleClass="subtitle" style="-fx-text-fill: -fx-text-muted; -fx-font-weight: normal;"/>
+                    </VBox>
+                </HBox>
 
-                <Separator/>
+                <VBox spacing="10" alignment="CENTER">
+                    <Label fx:id="lblError" text="" styleClass="error" wrapText="true"/>
+                    <Label fx:id="lblSuccess" text="" styleClass="success-label" wrapText="true"/>
+                </VBox>
 
-                <!-- Sezione Dati Anagrafici -->
-                <VBox spacing="10" alignment="TOP_LEFT">
-                    <Label text="Dati Profilo" styleClass="muted"/>
-                    <TextField fx:id="txtNome" promptText="Nome"/>
-                    <TextField fx:id="txtCognome" promptText="Cognome"/>
-                    <TextField fx:id="txtEmail" promptText="Email"/>
-                    
+                <!-- CARD: DATI ANAGRAFICI -->
+                <VBox spacing="20" styleClass="card">
+                    <Label text="Dati Profilo" styleClass="subtitle"/>
+                    <VBox spacing="15">
+                        <HBox spacing="15">
+                            <VBox HBox.hgrow="ALWAYS" spacing="5">
+                                <Label text="Nome" style="-fx-font-weight: bold;"/>
+                                <TextField fx:id="txtNome" promptText="Nome"/>
+                            </VBox>
+                            <VBox HBox.hgrow="ALWAYS" spacing="5">
+                                <Label text="Cognome" style="-fx-font-weight: bold;"/>
+                                <TextField fx:id="txtCognome" promptText="Cognome"/>
+                            </VBox>
+                        </HBox>
+                        <VBox spacing="5">
+                            <Label text="Indirizzo Email" style="-fx-font-weight: bold;"/>
+                            <TextField fx:id="txtEmail" promptText="Email"/>
+                        </VBox>
+                    </VBox>
                     <HBox spacing="12" alignment="CENTER_RIGHT">
                         <Button text="Ricarica Dati" onAction="#onLoad" styleClass="secondary"/>
-                        <Button text="Aggiorna Profilo" onAction="#onUpdate" styleClass="primary"/>
+                        <Button text="Salva Modifiche" onAction="#onUpdate" styleClass="primary"/>
                     </HBox>
                 </VBox>
 
-                <Separator/>
-
-                <!-- Sezione Password -->
-                <VBox spacing="10" alignment="TOP_LEFT">
-                    <Label text="Sicurezza" styleClass="muted"/>
-                    <PasswordField fx:id="oldPwd" promptText="Vecchia Password"/>
-                    <PasswordField fx:id="newPwd" promptText="Nuova Password (min 6 caratteri)"/>
-                    
-                    <HBox spacing="12" alignment="CENTER_RIGHT">
-                        <Button text="Cambia Password" onAction="#onChangePwd" styleClass="primary"/>
+                <!-- CARD: SICUREZZA -->
+                <VBox spacing="20" styleClass="card">
+                    <Label text="Sicurezza" styleClass="subtitle"/>
+                    <VBox spacing="15">
+                        <VBox spacing="5">
+                            <Label text="Vecchia Password" style="-fx-font-weight: bold;"/>
+                            <PasswordField fx:id="oldPwd" promptText="••••••••"/>
+                        </VBox>
+                        <VBox spacing="5">
+                            <Label text="Nuova Password" style="-fx-font-weight: bold;"/>
+                            <PasswordField fx:id="newPwd" promptText="Minimo 6 caratteri"/>
+                        </VBox>
+                    </VBox>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button text="Aggiorna Password" onAction="#onChangePwd" styleClass="primary"/>
                     </HBox>
                 </VBox>
 
-                <Separator/>
-
-                <!-- Pulsanti Navigazione -->
+                <!-- FOOTER NAVIGAZIONE -->
                 <HBox spacing="15" alignment="CENTER">
                     <Button text="Torna alla Home" onAction="#onHome" styleClass="secondary"/>
-                    <Button text="Logout" onAction="#onLogout" styleClass="danger"/>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button text="Effettua Logout" onAction="#onLogout" styleClass="danger"/>
                 </HBox>
 
             </VBox>

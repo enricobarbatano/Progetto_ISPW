@@ -11,32 +11,45 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.ispw.view.gui.fxml.LoginFXMLController"
-      alignment="CENTER" spacing="20" 
+      alignment="CENTER" 
+      spacing="0"
       stylesheets="/css/app.css"
       styleClass="root">
     
     <padding>
-        <Insets top="40" right="40" bottom="40" left="40"/>
+        <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
 
-    <VBox spacing="15" maxWidth="350" alignment="CENTER">
-        <Label text="🔑 Accesso" styleClass="title"/>
+    <VBox spacing="30" maxWidth="400" alignment="CENTER" styleClass="card">
+        <padding>
+            <Insets top="40" right="40" bottom="40" left="40"/>
+        </padding>
+
+        <VBox spacing="8" alignment="CENTER">
+            <Label text="Bentornato" styleClass="title"/>
+            <Label text="Inserisci le tue credenziali per accedere" styleClass="subtitle" style="-fx-text-fill: -fx-text-muted; -fx-font-weight: normal;"/>
+        </VBox>
         
         <Label fx:id="lblError" text="" styleClass="error" wrapText="true" alignment="CENTER"/>
 
-        <VBox spacing="10" alignment="CENTER_LEFT">
-            <Label text="Email" styleClass="muted"/>
-            <TextField fx:id="txtEmail" promptText="esempio@email.com"/>
+        <VBox spacing="15" alignment="CENTER_LEFT" maxWidth="320">
+            <VBox spacing="5">
+                <Label text="Email" style="-fx-font-weight: bold;"/>
+                <TextField fx:id="txtEmail" promptText="esempio@email.com" />
+            </VBox>
             
-            <Label text="Password" styleClass="muted"/>
-            <PasswordField fx:id="txtPassword" promptText="Tua password"/>
+            <VBox spacing="5">
+                <Label text="Password" style="-fx-font-weight: bold;"/>
+                <PasswordField fx:id="txtPassword" promptText="••••••••" />
+            </VBox>
         </VBox>
 
-        <VBox spacing="10" alignment="CENTER">
+        <VBox spacing="20" alignment="CENTER" maxWidth="320">
             <Button text="Accedi" onAction="#onLogin" maxWidth="Infinity" styleClass="primary"/>
+            
             <HBox spacing="5" alignment="CENTER">
-                <Label text="Non hai un account?" styleClass="muted"/>
-                <Button text="Registrati" onAction="#onRegistrazione" styleClass="link-button"/>
+                <Label text="Nuovo utente?" style="-fx-text-fill: -fx-text-muted;"/>
+                <Button text="Crea un account" onAction="#onRegistrazione" styleClass="secondary" style="-fx-border-width: 0; -fx-background-color: transparent; -fx-text-fill: -fx-primary-color;"/>
             </HBox>
         </VBox>
     </VBox>

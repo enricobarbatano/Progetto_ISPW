@@ -13,23 +13,29 @@
             fx:controller="com.ispw.view.gui.fxml.LogFXMLController"
             fitToWidth="true"
             stylesheets="/css/app.css"
-            styleClass="root">
+            styleClass="scroll-pane">
 
     <content>
-        <VBox alignment="TOP_CENTER" spacing="15" styleClass="root">
+        <VBox alignment="TOP_CENTER" spacing="25" styleClass="root">
             <padding>
-                <Insets top="30" right="30" bottom="30" left="30"/>
+                <Insets top="40" right="40" bottom="40" left="40"/>
             </padding>
 
-            <VBox spacing="12" maxWidth="800" alignment="TOP_CENTER">
-                <Label text="📜 Log di Sistema" styleClass="title"/>
+            <VBox spacing="20" maxWidth="900" alignment="TOP_CENTER">
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label text="Log di Sistema" styleClass="title"/>
+                    <Label text="Registro cronologico delle attività e degli errori" style="-fx-text-fill: -fx-text-muted;"/>
+                </VBox>
+
                 <Label fx:id="lblError" text="" styleClass="error" wrapText="true"/>
 
-                <ListView fx:id="listLogs" prefHeight="400" maxWidth="Infinity"/>
+                <VBox styleClass="card" VBox.vgrow="ALWAYS">
+                    <ListView fx:id="listLogs" prefHeight="450" styleClass="list-view"/>
+                </VBox>
 
-                <HBox spacing="12" alignment="CENTER">
-                    <Button text="🔄 Aggiorna" onAction="#onRefresh" styleClass="primary"/>
-                    <Button text="Home" onAction="#onHome" styleClass="secondary"/>
+                <HBox spacing="15" alignment="CENTER">
+                    <Button text="Aggiorna Registro" onAction="#onRefresh" styleClass="primary"/>
+                    <Button text="Torna alla Home" onAction="#onHome" styleClass="secondary"/>
                 </HBox>
             </VBox>
         </VBox>

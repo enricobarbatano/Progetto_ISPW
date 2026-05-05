@@ -9,79 +9,97 @@
             fx:controller="com.ispw.view.gui.fxml.RegoleFXMLController"
             fitToWidth="true"
             stylesheets="/css/app.css"
-            styleClass="root">
+            styleClass="scroll-pane">
 
     <content>
-        <VBox spacing="20" alignment="TOP_CENTER">
+        <VBox alignment="TOP_CENTER" spacing="25" styleClass="root">
             <padding>
-                <Insets top="30" right="30" bottom="30" left="30"/>
+                <Insets top="40" right="40" bottom="40" left="40"/>
             </padding>
 
-            <Label text="⚙️ Configurazione Campi e Regole" styleClass="title"/>
-            <Label fx:id="lblError" text="" styleClass="error"/>
-            <Label fx:id="lblSuccess" text="" styleClass="success-label"/>
+            <VBox spacing="20" maxWidth="850" alignment="TOP_CENTER">
+                
+                <VBox spacing="5" alignment="CENTER_LEFT">
+                    <Label text="Configurazione Campi" styleClass="title"/>
+                    <Label text="Gestisci disponibilità, orari e tariffe delle penali" styleClass="subtitle" style="-fx-text-fill: -fx-text-muted; -fx-font-weight: normal;"/>
+                </VBox>
 
-            <!-- SEZIONE 1: SELEZIONE CAMPO (UI Pulita) -->
-            <VBox spacing="10" maxWidth="600" styleClass="card">
-                <Label text="1. Seleziona un Campo dalla lista" styleClass="subtitle"/>
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Button text="🔄 Carica/Aggiorna Lista" onAction="#onListaCampi" styleClass="secondary"/>
-                    <Region HBox.hgrow="ALWAYS" />
-                    <Label text="ID Selezionato:" styleClass="muted"/>
-                    <TextField fx:id="txtIdCampo" prefWidth="60" editable="false" style="-fx-background-color: #f1f5f9;"/>
+                <VBox spacing="10" alignment="CENTER">
+                    <Label fx:id="lblError" text="" styleClass="error" wrapText="true"/>
+                    <Label fx:id="lblSuccess" text="" styleClass="success-label" wrapText="true"/>
+                </VBox>
+
+                <!-- CARD 1: SELEZIONE E STATO -->
+                <VBox spacing="20" styleClass="card">
+                    <Label text="1. Selezione e Stato Operativo" styleClass="subtitle"/>
+                    <HBox spacing="20">
+                        <VBox spacing="10" HBox.hgrow="ALWAYS">
+                            <HBox alignment="CENTER_LEFT">
+                                <Label text="Lista Campi" style="-fx-font-weight: bold;"/>
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Button text="🔄 Carica" onAction="#onListaCampi" styleClass="secondary-small"/>
+                            </HBox>
+                            <ListView fx:id="listCampi" prefHeight="120" onMouseClicked="#onSelezionaCampo" styleClass="list-view"/>
+                        </VBox>
+                        
+                        <VBox spacing="15" prefWidth="250" alignment="CENTER_LEFT">
+                            <Label text="Azioni Rapide" style="-fx-font-weight: bold;"/>
+                            <CheckBox fx:id="chkAttivo" text="Campo Attivo"/>
+                            <CheckBox fx:id="chkManutenzione" text="In Manutenzione"/>
+                            <TextField fx:id="txtIdCampo" promptText="ID Campo" editable="false" style="-fx-background-color: -fx-sky-ghost;"/>
+                            <Button text="Aggiorna Stato" onAction="#onAggiornaStato" maxWidth="Infinity" styleClass="primary"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+                <!-- CARD 2: ORARI E REGOLE TEMPORALI -->
+                <VBox spacing="20" styleClass="card">
+                    <Label text="2. Orari e Tempistiche Slot" styleClass="subtitle"/>
+                    <GridPane hgap="30" vgap="15">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50"/><ColumnConstraints percentWidth="50"/>
+                        </columnConstraints>
+
+                        <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <Label text="Orario Apertura" style="-fx-font-weight: bold;"/>
+                            <TextField fx:id="txtApertura" promptText="08:00"/>
+                        </VBox>
+                        <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <Label text="Orario Chiusura" style="-fx-font-weight: bold;"/>
+                            <TextField fx:id="txtChiusura" promptText="22:00"/>
+                        </VBox>
+                        <VBox spacing="5" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                            <Label text="Durata Slot (Minuti)" style="-fx-font-weight: bold;"/>
+                            <TextField fx:id="txtDurata" promptText="60"/>
+                        </VBox>
+                        <VBox spacing="5" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <Label text="Preavviso Minimo (Minuti)" style="-fx-font-weight: bold;"/>
+                            <TextField fx:id="txtPreavviso" promptText="30"/>
+                        </VBox>
+                    </GridPane>
+                    <Button text="Salva Tempistiche" onAction="#onAggiornaTempistiche" maxWidth="Infinity" styleClass="primary"/>
+                </VBox>
+
+                <!-- CARD 3: PENALITÀ -->
+                <VBox spacing="20" styleClass="card">
+                    <Label text="3. Regole Disdetta e Penalità" styleClass="subtitle"/>
+                    <HBox spacing="20" alignment="BOTTOM_CENTER">
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Valore Sanzione (€)" style="-fx-font-weight: bold;"/>
+                            <TextField fx:id="txtValorePenalita" promptText="10.00"/>
+                        </VBox>
+                        <VBox spacing="5" HBox.hgrow="ALWAYS">
+                            <Label text="Limite Preavviso Penale (Minuti)" style="-fx-font-weight: bold;"/>
+                            <TextField fx:id="txtPreavvisoPenalita" promptText="120"/>
+                        </VBox>
+                        <Button text="Applica Regole" onAction="#onAggiornaPenalita" prefWidth="200" styleClass="primary"/>
+                    </HBox>
+                </VBox>
+
+                <HBox alignment="CENTER_LEFT">
+                    <Button text="← Torna alla Dashboard" onAction="#onHome" styleClass="secondary"/>
                 </HBox>
-                <!-- Aggregato onMouseClicked per evitare il doppio passaggio -->
-                <ListView fx:id="listCampi" prefHeight="120" onMouseClicked="#onSelezionaCampo"/>
             </VBox>
-
-            <!-- SEZIONE 2: STATO E MANUTENZIONE -->
-            <VBox spacing="15" maxWidth="600" styleClass="card">
-                <Label text="2. Stato Operativo" styleClass="subtitle"/>
-                <HBox spacing="30" alignment="CENTER_LEFT">
-                    <CheckBox fx:id="chkAttivo" text="Campo Disponibile"/>
-                    <CheckBox fx:id="chkManutenzione" text="In Manutenzione"/>
-                </HBox>
-                <Button text="Salva Stato Campo" onAction="#onAggiornaStato" styleClass="primary" maxWidth="Infinity"/>
-            </VBox>
-
-            <!-- SEZIONE 3: ORARI E DURATA -->
-            <VBox spacing="15" maxWidth="600" styleClass="card">
-                <Label text="3. Tempistiche Slot" styleClass="subtitle"/>
-                <GridPane hgap="20" vgap="15">
-                    <columnConstraints>
-                        <ColumnConstraints hgrow="SOMETIMES" minWidth="150" />
-                        <ColumnConstraints hgrow="ALWAYS" />
-                    </columnConstraints>
-                    
-                    <Label text="Apertura (HH:mm):" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtApertura" promptText="08:00" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                    
-                    <Label text="Chiusura (HH:mm):" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtChiusura" promptText="22:00" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-                    
-                    <Label text="Durata Slot (min):" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtDurata" promptText="60" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-
-                    <Label text="Preavviso (min):" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtPreavviso" promptText="30" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-                </GridPane>
-                <Button text="Aggiorna Tempistiche" onAction="#onAggiornaTempistiche" styleClass="primary" maxWidth="Infinity"/>
-            </VBox>
-
-            <!-- SEZIONE 4: PENALITA -->
-            <VBox spacing="15" maxWidth="600" styleClass="card">
-                <Label text="4. Regole Penalità" styleClass="subtitle"/>
-                <GridPane hgap="15">
-                    <Label text="Valore Sanzione (€):" GridPane.columnIndex="0"/>
-                    <TextField fx:id="txtValorePenalita" promptText="10.00" prefWidth="100" GridPane.columnIndex="1"/>
-                    <Region prefWidth="20" GridPane.columnIndex="2"/>
-                    <Label text="Limite Preavviso (min):" GridPane.columnIndex="3"/>
-                    <TextField fx:id="txtPreavvisoPenalita" promptText="120" prefWidth="100" GridPane.columnIndex="4"/>
-                </GridPane>
-                <Button text="Applica Nuove Regole" onAction="#onAggiornaPenalita" styleClass="primary" maxWidth="Infinity"/>
-            </VBox>
-
-            <Button text="← Torna alla Dashboard" onAction="#onHome" styleClass="secondary"/>
         </VBox>
     </content>
 </ScrollPane>
