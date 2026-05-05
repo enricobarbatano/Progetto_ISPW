@@ -1,6 +1,9 @@
 package com.ispw.view.gui;
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.ispw.controller.graphic.gui.GUIGraphicLoginController;
 import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
@@ -14,6 +17,9 @@ import javafx.scene.Parent;
 public class GUILoginView extends GenericViewGUI implements ViewLogin, NavigableController {
 
     private final GUIGraphicLoginController controller;
+    
+    // Dichiarazione del logger per la classe
+    private static final Logger LOGGER = Logger.getLogger(GUILoginView.class.getName());
 
     public GUILoginView(GUIGraphicLoginController controller) {
         this.controller = controller;
@@ -27,21 +33,25 @@ public class GUILoginView extends GenericViewGUI implements ViewLogin, Navigable
     @Override
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
-        sessione = null;
+        this.sessione = null;
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/login.fxml"));
             Parent root = loader.load();
 
             LoginFXMLController fx = loader.getController();
-            fx.setGraphicController(controller);
+            
+            // Metodo init uniformato correttamente
+            fx.init(controller);
             fx.render(getLastParams());
 
             GuiLauncher.setRoot(root);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            // fallback minimo
+        } catch (IOException e) {
+            // Utilizzo del logger dichiarato sopra
+            LOGGER.log(Level.SEVERE, "Errore nel caricamento del file FXML per il Login", e);
+            
+            // Fallback per non interrompere l'esecuzione dell'app
             GuiLauncher.setRoot(GuiViewUtils.createRoot());
         }
     }

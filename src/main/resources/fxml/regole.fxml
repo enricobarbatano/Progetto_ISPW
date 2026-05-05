@@ -21,59 +21,67 @@
             <Label fx:id="lblError" text="" styleClass="error"/>
             <Label fx:id="lblSuccess" text="" styleClass="success-label"/>
 
-            <!-- SEZIONE 1: SELEZIONE CAMPO -->
+            <!-- SEZIONE 1: SELEZIONE CAMPO (UI Pulita) -->
             <VBox spacing="10" maxWidth="600" styleClass="card">
-                <Label text="1. Selezione Campo" styleClass="subtitle"/>
+                <Label text="1. Seleziona un Campo dalla lista" styleClass="subtitle"/>
                 <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Button text="Carica Campi" onAction="#onListaCampi" styleClass="secondary-small"/>
-                    <TextField fx:id="txtIdCampo" promptText="ID Campo"/>
-                    <Button text="Seleziona" onAction="#onSelezionaCampo" styleClass="primary-small"/>
+                    <Button text="🔄 Carica/Aggiorna Lista" onAction="#onListaCampi" styleClass="secondary"/>
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label text="ID Selezionato:" styleClass="muted"/>
+                    <TextField fx:id="txtIdCampo" prefWidth="60" editable="false" style="-fx-background-color: #f1f5f9;"/>
                 </HBox>
-                <ListView fx:id="listCampi" prefHeight="100"/>
+                <!-- Aggregato onMouseClicked per evitare il doppio passaggio -->
+                <ListView fx:id="listCampi" prefHeight="120" onMouseClicked="#onSelezionaCampo"/>
             </VBox>
 
             <!-- SEZIONE 2: STATO E MANUTENZIONE -->
-            <VBox spacing="10" maxWidth="600" styleClass="card">
+            <VBox spacing="15" maxWidth="600" styleClass="card">
                 <Label text="2. Stato Operativo" styleClass="subtitle"/>
-                <HBox spacing="20">
-                    <CheckBox fx:id="chkAttivo" text="Campo Attivo"/>
-                    <CheckBox fx:id="chkManutenzione" text="Sotto Manutenzione"/>
+                <HBox spacing="30" alignment="CENTER_LEFT">
+                    <CheckBox fx:id="chkAttivo" text="Campo Disponibile"/>
+                    <CheckBox fx:id="chkManutenzione" text="In Manutenzione"/>
                 </HBox>
-                <Button text="Aggiorna Stato" onAction="#onAggiornaStato" styleClass="primary"/>
+                <Button text="Salva Stato Campo" onAction="#onAggiornaStato" styleClass="primary" maxWidth="Infinity"/>
             </VBox>
 
             <!-- SEZIONE 3: ORARI E DURATA -->
-            <VBox spacing="10" maxWidth="600" styleClass="card">
+            <VBox spacing="15" maxWidth="600" styleClass="card">
                 <Label text="3. Tempistiche Slot" styleClass="subtitle"/>
-                <GridPane hgap="10" vgap="10">
+                <GridPane hgap="20" vgap="15">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="150" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                    </columnConstraints>
+                    
                     <Label text="Apertura (HH:mm):" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                     <TextField fx:id="txtApertura" promptText="08:00" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
                     
                     <Label text="Chiusura (HH:mm):" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                     <TextField fx:id="txtChiusura" promptText="22:00" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
                     
-                    <Label text="Durata (min):" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                    <Label text="Durata Slot (min):" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
                     <TextField fx:id="txtDurata" promptText="60" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
                     <Label text="Preavviso (min):" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
                     <TextField fx:id="txtPreavviso" promptText="30" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
                 </GridPane>
-                <Button text="Aggiorna Orari" onAction="#onAggiornaTempistiche" styleClass="primary"/>
+                <Button text="Aggiorna Tempistiche" onAction="#onAggiornaTempistiche" styleClass="primary" maxWidth="Infinity"/>
             </VBox>
 
             <!-- SEZIONE 4: PENALITA -->
-            <VBox spacing="10" maxWidth="600" styleClass="card">
+            <VBox spacing="15" maxWidth="600" styleClass="card">
                 <Label text="4. Regole Penalità" styleClass="subtitle"/>
-                <HBox spacing="10" alignment="CENTER_LEFT">
-                    <Label text="Valore €:"/>
-                    <TextField fx:id="txtValorePenalita" promptText="10.00" prefWidth="80"/>
-                    <Label text="Preavviso min:"/>
-                    <TextField fx:id="txtPreavvisoPenalita" promptText="120" prefWidth="80"/>
-                </HBox>
-                <Button text="Aggiorna Penalità" onAction="#onAggiornaPenalita" styleClass="primary"/>
+                <GridPane hgap="15">
+                    <Label text="Valore Sanzione (€):" GridPane.columnIndex="0"/>
+                    <TextField fx:id="txtValorePenalita" promptText="10.00" prefWidth="100" GridPane.columnIndex="1"/>
+                    <Region prefWidth="20" GridPane.columnIndex="2"/>
+                    <Label text="Limite Preavviso (min):" GridPane.columnIndex="3"/>
+                    <TextField fx:id="txtPreavvisoPenalita" promptText="120" prefWidth="100" GridPane.columnIndex="4"/>
+                </GridPane>
+                <Button text="Applica Nuove Regole" onAction="#onAggiornaPenalita" styleClass="primary" maxWidth="Infinity"/>
             </VBox>
 
-            <Button text="Torna alla Home" onAction="#onHome" styleClass="secondary"/>
+            <Button text="← Torna alla Dashboard" onAction="#onHome" styleClass="secondary"/>
         </VBox>
     </content>
 </ScrollPane>

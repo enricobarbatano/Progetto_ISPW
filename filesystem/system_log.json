@@ -46,4 +46,34 @@
   "tipoOperazione" : "ACCESSO_ESEGUITO",
   "idUtenteCoinvolto" : 2,
   "descrizione" : "Login effettuato per utente enrico.barbatano@gmail.com"
+}, {
+  "idLog" : 9,
+  "timestamp" : "2026-05-05T18:47:58.252341",
+  "tipoOperazione" : "ACCESSO_ESEGUITO",
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "Login effettuato per utente enrico.barbatano@gmail.com"
+}, {
+  "idLog" : 10,
+  "timestamp" : "2026-05-05T18:49:20.6048618",
+  "tipoOperazione" : null,
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "RICHIESTA_DISDETTA #1 pren=1 penaleStimata=0.0 rimborsoStimato=25.0"
+}, {
+  "idLog" : 11,
+  "timestamp" : "2026-05-05T18:50:28.3305991",
+  "tipoOperazione" : "ACCESSO_ESEGUITO",
+  "idUtenteCoinvolto" : 100,
+  "descrizione" : "Login effettuato per utente admin@test.it"
+}, {
+  "idLog" : 12,
+  "timestamp" : "2026-05-05T18:50:32.5081949",
+  "tipoOperazione" : null,
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "DISDETTA_PRENOTAZIONE #1 - penale 0.0 EUR"
+}, {
+  "idLog" : 13,
+  "timestamp" : "2026-05-05T18:50:32.5171947",
+  "tipoOperazione" : null,
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "RICHIESTA_DISDETTA ESEGUITA #1"
 } ]

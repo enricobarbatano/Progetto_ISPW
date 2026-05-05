@@ -1,0 +1,13 @@
+[ {
+  "idRichiesta" : 1,
+  "idPrenotazione" : 1,
+  "idUtente" : 2,
+  "timestampRichiesta" : "2026-05-05T18:49:20.5973365",
+  "timestampDecisione" : "2026-05-05T18:50:32.5141953",
+  "penaleStimata" : 0.0,
+  "rimborsoStimato" : 25.0,
+  "stato" : "ESEGUITA",
+  "notaUtente" : null,
+  "notaGestore" : "",
+  "idGestoreDecisione" : 100
+} ]

@@ -1,123 +1,183 @@
 /* 
- * FOOTBALL APP - MODERN DASHBOARD UI
- * Base: Light Neutral Grey / Accents: Deep Forest Green & Gold
+ * APP MODERN UI - Enterprise Edition (Refactored)
+ * Focus: Leggibilità, Feedback di stato e Transizioni fluide.
  */
 
-/* ===== ROOT & BACKGROUND ===== */
 .root {
-    -fx-font-family: "Inter", "Segoe UI", sans-serif;
+    /* Palette Colori Professionale */
+    -fx-primary-color: #2563eb;       /* Blue Bolt */
+    -fx-primary-hover: #1d4ed8;
+    -fx-secondary-color: #64748b;     /* Slate */
+    -fx-danger-color: #ef4444;        /* Rose */
+    -fx-success-color: #10b981;       /* Emerald */
+    -fx-bg-color: #f8fafc;            /* Sky Ghost */
+    -fx-text-main: #0f172a;           /* Deep Slate (Quasi Nero) */
+    -fx-text-muted: #64748b;
+    
+    -fx-background-color: -fx-bg-color;
+    -fx-font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
     -fx-font-size: 14px;
-    /* Sfondo moderno: un grigio molto chiaro con una punta di verde/azzurro */
-    -fx-background-color: #F4F7F6; 
-    -fx-text-fill: #1A2E26;
 }
 
-/* ===== IL SEGRETO: LE CARD ===== */
-/* Applica questa classe a VBox o HBox nel tuo FXML per creare i blocchi di contenuto */
-.card {
-    -fx-background-color: #FFFFFF;
-    -fx-background-radius: 16; /* Angoli molto arrotondati */
-    -fx-padding: 25;
-    /* Ombra "soft" per dare profondità senza sporcare il design */
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.06), 20, 0, 0, 8);
+/* --- FIX VISIBILITÀ LISTE (Risolve il problema delle prenotazioni "invisibili") --- */
+.list-view {
+    -fx-background-color: white;
+    -fx-background-radius: 12;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 12;
+    -fx-padding: 5;
 }
 
-/* ===== TYPOGRAPHY ===== */
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: -fx-text-main; /* Forza il colore scuro del testo */
+    -fx-padding: 12 16;
+    -fx-background-radius: 8;
+    -fx-font-weight: normal;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: #f1f5f9;
+}
+
+.list-cell:filled:selected {
+    -fx-background-color: #eff6ff;
+    -fx-text-fill: -fx-primary-color;
+    -fx-font-weight: bold;
+    -fx-border-color: -fx-primary-color;
+    -fx-border-width: 0 0 0 4; /* Indicatore laterale di selezione */
+}
+
+/* Messaggio "Nessun dato" nella lista */
+.list-view .placeholder .label {
+    -fx-text-fill: -fx-text-muted;
+    -fx-font-style: italic;
+}
+
+/* --- TITOLI E TESTI --- */
 .title {
-    -fx-font-size: 28px;
+    -fx-font-size: 30px;
     -fx-font-weight: 800;
-    -fx-text-fill: #0B3B2E;
+    -fx-text-fill: -fx-text-main;
     -fx-letter-spacing: -0.5px;
 }
 
 .subtitle {
-    -fx-font-size: 16px;
+    -fx-font-size: 17px;
     -fx-font-weight: 700;
-    -fx-text-fill: #2D4F43;
+    -fx-text-fill: -fx-text-main;
 }
 
-/* ===== INPUT FIELDS (PULITI) ===== */
-.text-field, .password-field, .text-area {
-    -fx-background-color: #F9FAFB; /* Campo leggermente grigio */
-    -fx-background-radius: 10;
-    -fx-border-color: #E5E7EB;
-    -fx-border-radius: 10;
-    -fx-border-width: 1;
-    -fx-padding: 12;
-    -fx-transition: all 0.2s;
-}
-
-.text-field:focused, .password-field:focused, .text-area:focused {
-    -fx-background-color: #FFFFFF;
-    -fx-border-color: #0B3B2E;
-    -fx-border-width: 2;
-    -fx-effect: dropshadow(three-pass-box, rgba(11, 59, 46, 0.1), 10, 0, 0, 0);
-}
-
-/* ===== BUTTONS (PREMIUM LOOK) ===== */
-.button {
-    -fx-padding: 12 28;
-    -fx-background-radius: 10;
+.error {
+    -fx-text-fill: -fx-danger-color;
     -fx-font-weight: bold;
-    -fx-cursor: hand;
-}
-
-/* Bottone Principale - Deep Green */
-.button.primary, .button:default {
-    -fx-background-color: #0B3B2E;
-    -fx-text-fill: white;
-}
-
-.button.primary:hover, .button:default:hover {
-    -fx-background-color: #145241;
-}
-
-/* Bottone Secondario - Outline */
-.button.secondary {
-    -fx-background-color: transparent;
-    -fx-border-color: #D1D5DB;
-    -fx-border-width: 1;
-    -fx-text-fill: #4B5563;
-}
-
-.button.secondary:hover {
-    -fx-background-color: #F9FAFB;
-    -fx-border-color: #9CA3AF;
-}
-
-/* Bottone Azione Oro (Accento) */
-.button.accent {
-    -fx-background-color: #C9A227;
-    -fx-text-fill: white;
-}
-
-/* ===== LIST VIEW (MODERNA) ===== */
-.list-view {
-    -fx-background-color: transparent; /* Fa trasparire il bianco della card */
-    -fx-background-insets: 0;
     -fx-padding: 5;
 }
 
-.list-view .list-cell {
+.success-label {
+    -fx-text-fill: -fx-success-color;
+    -fx-font-weight: bold;
+    -fx-padding: 5;
+}
+
+/* --- INPUT FIELDS (Look Moderno) --- */
+.text-field, .password-field, .combo-box, .date-picker, .text-area {
     -fx-background-color: white;
-    -fx-padding: 15;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 8;
     -fx-background-radius: 8;
-    -fx-margin: 2;
+    -fx-padding: 10 14;
+    -fx-text-fill: -fx-text-main;
+    -fx-prompt-text-fill: #94a3b8;
 }
 
-.list-view .list-cell:filled:selected {
-    -fx-background-color: #F0FDF4;
-    -fx-text-fill: #166534;
-    -fx-border-color: #166534;
-    -fx-border-width: 0 0 0 4; /* Barra laterale stile dashboard */
+.text-field:focused, .password-field:focused {
+    -fx-border-color: -fx-primary-color;
+    -fx-border-width: 1.5;
+    -fx-effect: dropshadow(three-pass-box, rgba(37, 99, 235, 0.1), 8, 0, 0, 0);
 }
 
-/* ===== SCROLLBARS (MINIMALI) ===== */
-.scroll-bar:vertical .thumb, .scroll-bar:horizontal .thumb {
-    -fx-background-color: #E5E7EB;
-    -fx-background-radius: 10;
+/* --- BOTTONI --- */
+.button {
+    -fx-cursor: hand;
+    -fx-padding: 10 24;
+    -fx-font-weight: 600;
+    -fx-background-radius: 8;
 }
 
-.scroll-bar:vertical .thumb:hover, .scroll-bar:horizontal .thumb:hover {
-    -fx-background-color: #D1D5DB;
+.primary {
+    -fx-background-color: -fx-primary-color;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(three-pass-box, rgba(37, 99, 235, 0.25), 10, 0, 0, 4);
+}
+.primary:hover { 
+    -fx-background-color: -fx-primary-hover; 
+    -fx-translate-y: -1; 
+}
+
+.secondary {
+    -fx-background-color: white;
+    -fx-text-fill: -fx-text-main;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
+}
+.secondary:hover { 
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #cbd5e1;
+}
+
+.danger {
+    -fx-background-color: #fee2e2;
+    -fx-text-fill: -fx-danger-color;
+}
+.danger:hover {
+    -fx-background-color: -fx-danger-color;
+    -fx-text-fill: white;
+}
+
+/* --- CARD E CONTENITORI --- */
+.card {
+    -fx-background-color: white;
+    -fx-padding: 25;
+    -fx-background-radius: 16;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.04), 15, 0, 0, 8);
+}
+
+.info-box {
+    -fx-background-color: #f0f7ff;
+    -fx-padding: 15;
+    -fx-background-radius: 12;
+    -fx-border-color: #dbeafe;
+}
+
+/* --- CHECKBOX MODERNI --- */
+.check-box .box {
+    -fx-background-radius: 4;
+    -fx-background-color: white;
+    -fx-border-color: #e2e8f0;
+    -fx-border-radius: 4;
+}
+.check-box:selected .box {
+    -fx-background-color: -fx-primary-color;
+    -fx-border-color: -fx-primary-color;
+}
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+/* --- SCROLLPANE FIX --- */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+.scroll-pane .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+/* --- SEPARATOR --- */
+.separator .line {
+    -fx-border-color: #f1f5f9;
 }

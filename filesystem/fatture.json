@@ -1,0 +1,8 @@
+[ {
+  "idFattura" : 1,
+  "idPrenotazione" : 1,
+  "idUtente" : 2,
+  "codiceFiscaleCliente" : null,
+  "dataEmissione" : "2026-05-05",
+  "linkPdf" : "NC-1-20260505.pdf"
+} ]

@@ -1,0 +1,8 @@
+[ {
+  "idPagamento" : 1,
+  "idPrenotazione" : 1,
+  "importoFinale" : 25.0,
+  "metodo" : "PAYPAL",
+  "stato" : "RIMBORSATO",
+  "dataPagamento" : "2026-05-05T18:50:32.4931989"
+} ]
