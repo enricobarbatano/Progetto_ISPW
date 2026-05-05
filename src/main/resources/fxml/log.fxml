@@ -4,23 +4,34 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.ispw.view.gui.fxml.LogFXMLController"
-      styleClass="root" stylesheets="/css/app.css"
-      spacing="10" alignment="TOP_CENTER">
-    <padding>
-        <Insets top="24" right="24" bottom="24" left="24"/>
-    </padding>
-    
-    <Label text="📊 Log di sistema" styleClass="title"/>
-    
-    <Label fx:id="lblError" styleClass="error"/>
-    
-    <ListView fx:id="listLogs" prefHeight="300"/>
-    
-    <Button text="Aggiorna" onAction="#onRefresh" styleClass="secondary"/>
-    
-    <Button text="Home" onAction="#onHome" styleClass="secondary"/>
-</VBox>
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.ispw.view.gui.fxml.LogFXMLController"
+            fitToWidth="true"
+            stylesheets="/css/app.css"
+            styleClass="root">
+
+    <content>
+        <VBox alignment="TOP_CENTER" spacing="15" styleClass="root">
+            <padding>
+                <Insets top="30" right="30" bottom="30" left="30"/>
+            </padding>
+
+            <VBox spacing="12" maxWidth="800" alignment="TOP_CENTER">
+                <Label text="📜 Log di Sistema" styleClass="title"/>
+                <Label fx:id="lblError" text="" styleClass="error" wrapText="true"/>
+
+                <ListView fx:id="listLogs" prefHeight="400" maxWidth="Infinity"/>
+
+                <HBox spacing="12" alignment="CENTER">
+                    <Button text="🔄 Aggiorna" onAction="#onRefresh" styleClass="primary"/>
+                    <Button text="Home" onAction="#onHome" styleClass="secondary"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>

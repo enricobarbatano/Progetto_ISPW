@@ -1,128 +1,133 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.collections.FXCollections?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.FXCollections?>
 <?import java.lang.String?>
 
-<ScrollPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
             fx:controller="com.ispw.view.gui.fxml.PrenotazioneFXMLController"
-            fitToWidth="true" stylesheets="/css/app.css" styleClass="root">
+            fitToWidth="true"
+            stylesheets="/css/app.css"
+            styleClass="root">
+
     <content>
-        <VBox spacing="15" alignment="TOP_CENTER" fillWidth="true" styleClass="root">
+        <VBox alignment="TOP_CENTER" spacing="20" styleClass="root">
             <padding>
                 <Insets top="30" right="30" bottom="30" left="30"/>
             </padding>
-            
-            <Label text="⚽ PRENOTAZIONE CAMPO" styleClass="title"/>
-            
-            <Label fx:id="lblError" styleClass="error" wrapText="true" maxWidth="600"/>
-            
-            <Label fx:id="lblSuccess" styleClass="muted" wrapText="true" maxWidth="600"/>
-            
-            <Separator prefWidth="600"/>
-            
-            <VBox fx:id="boxSearch" spacing="12" alignment="CENTER" maxWidth="650">
-                <Label text="🏟️ CAMPI DISPONIBILI" styleClass="muted"/>
-                
-                <ListView fx:id="listCampi" prefHeight="220" prefWidth="600"/>
-                
-                <Button text="📋 Carica Lista Campi" onAction="#onListaCampi" styleClass="secondary" prefWidth="260"/>
-                
-                <Separator prefWidth="550"/>
-                
-                <Label text="🔍 RICERCA DISPONIBILITÀ" styleClass="muted"/>
-                
-                <TextField fx:id="txtIdCampo" promptText="ID Campo" prefWidth="450"/>
-                
-                <DatePicker fx:id="datePicker" promptText="Data" prefWidth="450"/>
-                
-                <ComboBox fx:id="comboOra" promptText="Ora inizio" prefWidth="450">
-                    <items>
-                        <FXCollections fx:factory="observableArrayList">
-                            <String fx:value="08:00"/>
-                            <String fx:value="08:30"/>
-                            <String fx:value="09:00"/>
-                            <String fx:value="09:30"/>
-                            <String fx:value="10:00"/>
-                            <String fx:value="10:30"/>
-                            <String fx:value="11:00"/>
-                            <String fx:value="11:30"/>
-                            <String fx:value="12:00"/>
-                            <String fx:value="12:30"/>
-                            <String fx:value="13:00"/>
-                            <String fx:value="13:30"/>
-                            <String fx:value="14:00"/>
-                            <String fx:value="14:30"/>
-                            <String fx:value="15:00"/>
-                            <String fx:value="15:30"/>
-                            <String fx:value="16:00"/>
-                            <String fx:value="16:30"/>
-                            <String fx:value="17:00"/>
-                            <String fx:value="17:30"/>
-                            <String fx:value="18:00"/>
-                            <String fx:value="18:30"/>
-                            <String fx:value="19:00"/>
-                            <String fx:value="19:30"/>
-                            <String fx:value="20:00"/>
-                            <String fx:value="20:30"/>
-                            <String fx:value="21:00"/>
-                            <String fx:value="21:30"/>
-                            <String fx:value="22:00"/>
-                        </FXCollections>
-                    </items>
-                </ComboBox>
-                
-                <TextField fx:id="txtDurata" promptText="Durata (minuti)" prefWidth="450"/>
-                
-                <Button text="🔎 Cerca Disponibilità" onAction="#onCerca" styleClass="primary" prefWidth="260"/>
+
+            <!-- Header Messaggi -->
+            <VBox spacing="5" alignment="CENTER">
+                <Label text="🎾 Prenota un Campo" styleClass="title"/>
+                <Label fx:id="lblError" text="" styleClass="error" wrapText="true"/>
+                <Label fx:id="lblSuccess" text="" styleClass="success-label" wrapText="true"/>
             </VBox>
-            
-            <Separator prefWidth="600"/>
-            
-            <VBox fx:id="boxSlots" spacing="12" alignment="CENTER" maxWidth="650" managed="false" visible="false">
-                <Label text="📅 SLOT DISPONIBILI" styleClass="muted"/>
+
+            <!-- STEP 1: RICERCA -->
+            <VBox fx:id="boxSearch" spacing="15" maxWidth="600" styleClass="card">
+                <Label text="1. Scegli Campo e Orario" styleClass="subtitle"/>
                 
-                <ListView fx:id="listSlots" prefHeight="260" prefWidth="600"/>
-                
-                <Button text="✅ Seleziona Slot" onAction="#onSelezionaSlot" styleClass="primary" prefWidth="260"/>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button text="🔄 Carica Campi" onAction="#onListaCampi" styleClass="secondary-small"/>
+                    <TextField fx:id="txtIdCampo" promptText="ID Campo" prefWidth="80" disable="true"/>
+                </HBox>
+
+                <ListView fx:id="listCampi" prefHeight="150"/>
+
+                <GridPane hgap="15" vgap="10">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50"/>
+                        <ColumnConstraints percentWidth="50"/>
+                    </columnConstraints>
+
+                    <VBox spacing="5" GridPane.columnIndex="0">
+                        <Label text="Data:"/>
+                        <DatePicker fx:id="datePicker" maxWidth="Infinity"/>
+                    </VBox>
+
+                    <VBox spacing="5" GridPane.columnIndex="1">
+                        <Label text="Dalle ore:"/>
+                        <ComboBox fx:id="comboOra" maxWidth="Infinity">
+                            <items>
+                                <FXCollections fx:factory="observableArrayList">
+                                    <String fx:value="08:00"/>
+                                    <String fx:value="09:00"/>
+                                    <String fx:value="10:00"/>
+                                    <String fx:value="11:00"/>
+                                    <String fx:value="12:00"/>
+                                    <String fx:value="15:00"/>
+                                    <String fx:value="16:00"/>
+                                    <String fx:value="17:00"/>
+                                    <String fx:value="18:00"/>
+                                    <String fx:value="19:00"/>
+                                    <String fx:value="20:00"/>
+                                    <String fx:value="21:00"/>
+                                </FXCollections>
+                            </items>
+                        </ComboBox>
+                    </VBox>
+
+                    <VBox spacing="5" GridPane.rowIndex="1" GridPane.columnIndex="0">
+                        <Label text="Durata (minuti):"/>
+                        <TextField fx:id="txtDurata" promptText="Es: 1"/>
+                    </VBox>
+                </GridPane>
+
+                <Button text="Cerca Disponibilità" onAction="#onCerca" maxWidth="Infinity" styleClass="primary"/>
             </VBox>
-            
-            <Separator prefWidth="600"/>
-            
-            <VBox fx:id="boxPagamento" spacing="12" alignment="CENTER" maxWidth="650" managed="false" visible="false">
-                <Label text="💳 RIEPILOGO E PAGAMENTO" styleClass="muted"/>
-                
-                <Label fx:id="lblRiepilogo" styleClass="muted" wrapText="true" maxWidth="600"/>
-                
-                <Label fx:id="lblImporto" styleClass="muted"/>
-                
-                <TextField fx:id="txtMetodo" promptText="Metodo pagamento" text="PAYPAL" prefWidth="450"/>
-                
-                <TextField fx:id="txtCredenziale" promptText="Codice fiscale" prefWidth="450"/>
-                
-                <Button text="💰 Procedi al Pagamento" onAction="#onPaga" styleClass="primary" prefWidth="260"/>
+
+            <!-- STEP 2: SLOT DISPONIBILI -->
+            <VBox fx:id="boxSlots" spacing="15" maxWidth="600" styleClass="card" visible="false" managed="false">
+                <Label text="2. Seleziona lo Slot" styleClass="subtitle"/>
+                <ListView fx:id="listSlots" prefHeight="200"/>
+                <HBox spacing="10">
+                    <Button text="Conferma Selezione" onAction="#onSelezionaSlot" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="primary"/>
+                    <Button text="Annulla" onAction="#onReset" styleClass="secondary"/>
+                </HBox>
             </VBox>
-            
-            <Separator prefWidth="600"/>
-            
-            <VBox fx:id="boxEsito" spacing="12" alignment="CENTER" maxWidth="650" managed="false" visible="false">
-                <Label text="✅ PRENOTAZIONE COMPLETATA" styleClass="muted"/>
+
+            <!-- STEP 3: PAGAMENTO -->
+            <VBox fx:id="boxPagamento" spacing="15" maxWidth="600" styleClass="card" visible="false" managed="false">
+                <Label text="3. Riepilogo e Pagamento" styleClass="subtitle"/>
                 
-                <Label fx:id="lblEsitoPagamento" styleClass="muted" wrapText="true" maxWidth="600"/>
-                
-                <Button text="🏠 Torna alla Home" onAction="#onHome" styleClass="secondary" prefWidth="260"/>
-                
-                <Button text="➕ Nuova Prenotazione" onAction="#onReset" styleClass="primary" prefWidth="260"/>
+                <VBox spacing="10" styleClass="info-box">
+                    <Label fx:id="lblRiepilogo" text="..." wrapText="true"/>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Label text="Totale: " styleClass="bold"/>
+                        <Label fx:id="lblImporto" text="0.00 EUR" styleClass="price-tag"/>
+                    </HBox>
+                </VBox>
+
+                <VBox spacing="10">
+                    <Label text="Metodo Pagamento:"/>
+                    <TextField fx:id="txtMetodo" promptText="Esempio: PAYPAL"/>
+                    
+                    <Label text="Codice Fiscale / Credenziale:"/>
+                    <TextField fx:id="txtCredenziale" promptText="Inserisci CF per la ricevuta"/>
+                </VBox>
+
+                <HBox spacing="10">
+                    <Button text="Paga Ora" onAction="#onPaga" HBox.hgrow="ALWAYS" maxWidth="Infinity" styleClass="primary"/>
+                    <Button text="Indietro" onAction="#onIndietroSlots" styleClass="secondary"/>
+                </HBox>
             </VBox>
+
+            <!-- STEP 4: ESITO -->
+            <VBox fx:id="boxEsito" spacing="20" maxWidth="600" alignment="CENTER" styleClass="card" visible="false" managed="false">
+                <Label text="Esito Operazione" styleClass="subtitle"/>
+                <Label fx:id="lblEsitoPagamento" text="..." styleClass="bold" wrapText="true" alignment="CENTER"/>
+                <Button text="Torna alla Dashboard" onAction="#onHome" styleClass="primary"/>
+            </VBox>
+
+            <!-- Footer Navigazione -->
+            <HBox spacing="15" alignment="CENTER">
+                <Button text="Home" onAction="#onHome" styleClass="secondary"/>
+                <Button text="Reset" onAction="#onReset" styleClass="danger-small"/>
+            </HBox>
+
         </VBox>
     </content>
 </ScrollPane>

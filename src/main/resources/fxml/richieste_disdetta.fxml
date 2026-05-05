@@ -1,38 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.ispw.view.gui.fxml.RichiesteDisdettaFXMLController"
-      styleClass="root" stylesheets="/css/app.css"
-      spacing="10" alignment="TOP_CENTER">
-    <padding>
-        <Insets top="24" right="24" bottom="24" left="24"/>
-    </padding>
-    
-    <Label text="📋 Richieste disdetta (Gestore)" styleClass="title"/>
-    
-    <Label fx:id="lblError" styleClass="error"/>
-    
-    <Label fx:id="lblSuccess" styleClass="muted"/>
-    
-    <ListView fx:id="listRichieste" prefHeight="200"/>
-    
-    <TextField fx:id="txtIdRichiesta" promptText="Id richiesta"/>
-    
-    <TextArea fx:id="txtNotaGestore" promptText="Nota gestore (opzionale)" prefRowCount="3"/>
-    
-    <Button text="Ricarica" onAction="#onRicarica" styleClass="secondary"/>
-    
-    <Button text="Approva" onAction="#onApprova" styleClass="primary"/>
-    
-    <Button text="Rifiuta" onAction="#onRifiuta" styleClass="danger"/>
-    
-    <Button text="Home" onAction="#onHome" styleClass="secondary"/>
-</VBox>
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.ispw.view.gui.fxml.RichiesteDisdettaFXMLController"
+            fitToWidth="true"
+            stylesheets="/css/app.css"
+            styleClass="root">
+
+    <content>
+        <VBox alignment="TOP_CENTER" spacing="15" styleClass="root">
+            <padding>
+                <Insets top="30" right="30" bottom="30" left="30"/>
+            </padding>
+
+            <VBox spacing="12" maxWidth="800" alignment="TOP_CENTER">
+                <Label text="📩 Richieste di Disdetta" styleClass="title"/>
+                
+                <HBox spacing="10" alignment="CENTER_RIGHT">
+                    <Label fx:id="lblError" text="" styleClass="error" HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblSuccess" text="" styleClass="success-label"/>
+                    <Button text="🔄 Ricarica" onAction="#onRicarica" styleClass="secondary-small"/>
+                </HBox>
+
+                <ListView fx:id="listRichieste" prefHeight="250" maxWidth="Infinity"/>
+
+                <Separator/>
+
+                <VBox spacing="10" alignment="TOP_LEFT" styleClass="card">
+                    <Label text="Gestione Richiesta Selezionata" styleClass="subtitle"/>
+                    
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="ID Richiesta:"/>
+                        <TextField fx:id="txtIdRichiesta" prefWidth="80" disable="true"/>
+                    </HBox>
+
+                    <Label text="Nota per l'utente (opzionale):"/>
+                    <TextArea fx:id="txtNotaGestore" promptText="Inserisci qui il motivo dell'approvazione o del rifiuto..." prefHeight="80" wrapText="true"/>
+
+                    <HBox spacing="15" alignment="CENTER">
+                        <Button text="✅ Approva Disdetta" onAction="#onApprova" styleClass="primary" prefWidth="180"/>
+                        <Button text="❌ Rifiuta Richiesta" onAction="#onRifiuta" styleClass="danger" prefWidth="180"/>
+                    </HBox>
+                </VBox>
+
+                <Button text="Home" onAction="#onHome" styleClass="secondary"/>
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>

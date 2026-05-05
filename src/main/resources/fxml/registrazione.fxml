@@ -6,28 +6,35 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.ispw.view.gui.fxml.RegistrazioneFXMLController"
-      styleClass="root" stylesheets="@/css/app.css"
-      spacing="10" alignment="CENTER">
+      alignment="CENTER" spacing="15" 
+      stylesheets="/css/app.css"
+      styleClass="root">
+    
     <padding>
-        <Insets top="24" right="24" bottom="24" left="24"/>
+        <Insets top="30" right="40" bottom="30" left="40"/>
     </padding>
-    
-    <Label text="⚽ Registrazione" styleClass="title"/>
-    
-    <Label fx:id="lblError" styleClass="error"/>
-    
-    <TextField fx:id="txtNome" promptText="Nome"/>
-    
-    <TextField fx:id="txtCognome" promptText="Cognome"/>
-    
-    <TextField fx:id="txtEmail" promptText="Email"/>
-    
-    <PasswordField fx:id="txtPassword" promptText="Password"/>
-    
-    <Button text="Registra" onAction="#onRegistra" styleClass="primary"/>
-    
-    <Button text="Torna al login" onAction="#onLogin" styleClass="secondary"/>
+
+    <VBox spacing="10" maxWidth="350" alignment="CENTER">
+        <Label text="📝 Registrazione" styleClass="title"/>
+        <Label fx:id="lblError" text="" styleClass="error" wrapText="true" alignment="CENTER"/>
+
+        <VBox spacing="8" alignment="CENTER_LEFT">
+            <TextField fx:id="txtNome" promptText="Nome"/>
+            <TextField fx:id="txtCognome" promptText="Cognome"/>
+            <TextField fx:id="txtEmail" promptText="Email (user@example.com)"/>
+            <PasswordField fx:id="txtPassword" promptText="Scegli una password"/>
+        </VBox>
+
+        <Button text="Crea Account" onAction="#onRegistra" maxWidth="Infinity" styleClass="primary"/>
+        
+        <HBox spacing="5" alignment="CENTER">
+            <Label text="Hai già un account?" styleClass="muted"/>
+            <Button text="Accedi qui" onAction="#onLogin" styleClass="link-button"/>
+        </HBox>
+    </VBox>
 </VBox>

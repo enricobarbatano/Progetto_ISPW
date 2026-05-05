@@ -262,6 +262,14 @@ public class PrenotazioneFXMLController {
         if (controller == null) return;
         controller.tornaAllaHome();
     }
+    
+    @FXML
+    private void onIndietroSlots() {
+    // comportamento "indietro": torna allo step slots o ricerca
+    // esempio: nascondi pagamento e mostra slots
+    show(boxPagamento, false);
+    show(boxSlots, true);
+    }
 
     @FXML
     private void onReset() {

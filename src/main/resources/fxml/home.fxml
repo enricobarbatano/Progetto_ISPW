@@ -3,29 +3,52 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.ispw.view.gui.fxml.HomeFXMLController"
-      styleClass="root" stylesheets="/css/app.css"
-      spacing="10" alignment="TOP_CENTER">
-    <padding>
-        <Insets top="24" right="24" bottom="24" left="24"/>
-    </padding>
-    
-    <Label text="⚽ Home" styleClass="title"/>
-    
-    <Label fx:id="lblRuolo" styleClass="muted"/>
-    
-    <Button text="Account" onAction="#onAccount" styleClass="secondary"/>
-    
-    <Button fx:id="btnOp1" onAction="#onOp1" styleClass="primary"/>
-    
-    <Button fx:id="btnOp2" onAction="#onOp2" styleClass="primary"/>
-    
-    <Button fx:id="btnLog" onAction="#onLog" styleClass="secondary"/>
-    
-    <Button fx:id="btnRichiesteDisdetta" onAction="#onRichiesteDisdetta" styleClass="secondary"/>
-    
-    <Button text="Logout" onAction="#onLogout" styleClass="danger"/>
-</VBox>
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.ispw.view.gui.fxml.HomeFXMLController"
+            fitToWidth="true"
+            stylesheets="/css/app.css"
+            styleClass="root">
+
+    <content>
+        <VBox alignment="TOP_CENTER" spacing="20" styleClass="root">
+            <padding>
+                <Insets top="40" right="40" bottom="40" left="40"/>
+            </padding>
+
+            <VBox spacing="10" alignment="CENTER" maxWidth="600">
+                <Label text="🏠 Dashboard principale" styleClass="title"/>
+                <Label fx:id="lblRuolo" text="Ruolo: -" styleClass="muted"/>
+                
+                <Separator/>
+
+                <!-- Griglia pulsanti principali -->
+                <VBox spacing="15" alignment="CENTER">
+                    <HBox spacing="15" alignment="CENTER">
+                        <Button fx:id="btnOp1" text="..." onAction="#onOp1" prefWidth="220" prefHeight="80" styleClass="primary"/>
+                        <Button fx:id="btnOp2" text="..." onAction="#onOp2" prefWidth="220" prefHeight="80" styleClass="primary"/>
+                    </HBox>
+
+                    <HBox spacing="15" alignment="CENTER">
+                        <!-- Questi bottoni sono gestiti dinamicamente per Ruolo.GESTORE -->
+                        <Button fx:id="btnLog" text="Log" onAction="#onLog" prefWidth="220" styleClass="secondary"/>
+                        <Button fx:id="btnRichiesteDisdetta" text="Richieste disdetta" onAction="#onRichiesteDisdetta" prefWidth="220" styleClass="secondary"/>
+                    </HBox>
+                </VBox>
+
+                <Separator/>
+
+                <!-- Azioni Account -->
+                <HBox spacing="15" alignment="CENTER">
+                    <Button text="👤 Account" onAction="#onAccount" styleClass="secondary"/>
+                    <Button text="🚪 Logout" onAction="#onLogout" styleClass="danger"/>
+                </HBox>
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>

@@ -4,34 +4,71 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.ispw.view.gui.fxml.DisdettaFXMLController"
-      styleClass="root" stylesheets="/css/app.css"
-      spacing="10" alignment="TOP_CENTER">
-    <padding>
-        <Insets top="24" right="24" bottom="24" left="24"/>
-    </padding>
-    
-    <Label text="❌ Disdetta (Richiesta)" styleClass="title"/>
-    
-    <Label fx:id="lblError" styleClass="error"/>
-    
-    <Label fx:id="lblSuccess" styleClass="muted"/>
-    
-    <ListView fx:id="listPrenotazioni" prefHeight="200"/>
-    
-    <TextField fx:id="txtIdPrenotazione" promptText="Id prenotazione"/>
-    
-    <Label fx:id="lblAnteprima" styleClass="muted"/>
-    
-    <Button text="Ricarica prenotazioni" onAction="#onRicarica" styleClass="secondary"/>
-    
-    <Button text="Anteprima" onAction="#onAnteprima" styleClass="primary"/>
-    
-    <Button text="Invia richiesta disdetta" onAction="#onInviaRichiesta" styleClass="primary"/>
-    
-    <Button text="Home" onAction="#onHome" styleClass="secondary"/>
-</VBox>
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.ispw.view.gui.fxml.DisdettaFXMLController"
+            fitToWidth="true"
+            stylesheets="/css/app.css"
+            styleClass="root">
+
+    <content>
+        <VBox alignment="TOP_CENTER" spacing="16" styleClass="root">
+            <padding>
+                <Insets top="36" right="36" bottom="36" left="36"/>
+            </padding>
+
+            <VBox spacing="12" maxWidth="720" alignment="TOP_CENTER">
+                
+                <Label text="❌ Disdetta Prenotazione" styleClass="title"/>
+                
+                <Label fx:id="lblError" text="" styleClass="error" wrapText="true"/>
+                <Label fx:id="lblSuccess" text="" styleClass="muted" wrapText="true"/>
+
+                <Separator/>
+
+                <!-- Lista delle prenotazioni -->
+                <VBox spacing="10" alignment="TOP_LEFT">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Seleziona una prenotazione cancellabile" styleClass="muted"/>
+                        <Button text="🔄 Aggiorna Lista" onAction="#onRicarica" styleClass="secondary"/>
+                    </HBox>
+                    
+                    <ListView fx:id="listPrenotazioni" prefHeight="250" maxWidth="Infinity"/>
+                </VBox>
+
+                <Separator/>
+
+                <!-- Azioni di Disdetta -->
+                <VBox spacing="12" alignment="CENTER" maxWidth="500">
+                    <Label text="Dettagli Cancellazione" styleClass="muted"/>
+                    
+                    <HBox spacing="10" alignment="CENTER">
+                        <Label text="ID Prenotazione:"/>
+                        <TextField fx:id="txtIdPrenotazione" promptText="Seleziona o inserisci ID" prefWidth="150"/>
+                    </HBox>
+
+                    <!-- Area Anteprima Penale -->
+                    <VBox spacing="8" alignment="CENTER" style="-fx-background-color: rgba(0,0,0,0.05); -fx-background-radius: 8; -fx-padding: 10;">
+                        <Label fx:id="lblAnteprima" text="Richiedi anteprima per vedere le penali" styleClass="muted"/>
+                        <Button text="Calcola Penale" onAction="#onAnteprima" styleClass="secondary"/>
+                    </VBox>
+
+                    <HBox spacing="15" alignment="CENTER">
+                        <Button text="Invia Richiesta Disdetta" onAction="#onInviaRichiesta" styleClass="primary"/>
+                    </HBox>
+                </VBox>
+
+                <Separator/>
+
+                <Button text="Torna alla Home" onAction="#onHome" styleClass="secondary"/>
+
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>

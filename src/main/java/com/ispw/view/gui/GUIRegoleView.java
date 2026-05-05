@@ -17,7 +17,9 @@ public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole,
 
     private final GUIGraphicControllerRegole controller;
 
-    // Evita di richiedere lista campi ad ogni onShow senza payload
+    private Parent cachedRoot;
+    private RegoleFXMLController cachedFx;
+
     private boolean campiRequested = false;
 
     public GUIRegoleView(GUIGraphicControllerRegole controller) {
@@ -34,27 +36,24 @@ public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole,
         super.onShow(params);
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/regole.fxml"));
-            Parent root = loader.load();
-
-            RegoleFXMLController fx = loader.getController();
-            fx.init(controller, sessione);
-            fx.render(getLastParams());
-
-            GuiLauncher.setRoot(root);
-
-            // Best-effort: se non ho campi e non ho errori, richiedo lista campi UNA sola volta
-            boolean hasCampi = getLastParams().get(GraphicControllerUtils.KEY_CAMPI) != null;
-            boolean hasError = getLastParams().get(GraphicControllerUtils.KEY_ERROR) != null;
-
-            if (!hasCampi && !hasError && !campiRequested) {
-                campiRequested = true;
-                controller.richiediListaCampi();
+            if (cachedRoot == null || cachedFx == null) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/regole.fxml"));
+                cachedRoot = loader.load();
+                cachedFx = loader.getController();
             }
 
-            // se arrivano i campi, resetto il flag
-            if (hasCampi) {
-                campiRequested = false;
+            cachedFx.init(controller, sessione);
+            cachedFx.render(getLastParams());
+            GuiLauncher.setRoot(cachedRoot);
+
+            boolean hasError = getLastParams().get(GraphicControllerUtils.KEY_ERROR) != null;
+            boolean hasCampi = getLastParams().get(GraphicControllerUtils.KEY_CAMPI) != null;
+
+            if (hasCampi) campiRequested = false;
+
+            if (!hasError && !hasCampi && !campiRequested) {
+                campiRequested = true;
+                controller.richiediListaCampi();
             }
 
         } catch (Exception e) {

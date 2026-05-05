@@ -5,27 +5,39 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.ispw.view.gui.fxml.LoginFXMLController"
-      styleClass="root" stylesheets="/css/app.css"
-      spacing="10" alignment="CENTER">
+      alignment="CENTER" spacing="20" 
+      stylesheets="/css/app.css"
+      styleClass="root">
+    
     <padding>
-        <Insets top="24" right="24" bottom="24" left="24"/>
+        <Insets top="40" right="40" bottom="40" left="40"/>
     </padding>
-    
-    <Label text="⚽ Login" styleClass="title"/>
-    
-    <Label fx:id="lblError" styleClass="error"/>
-    
-    <TextField fx:id="txtEmail" promptText="Email"/>
-    
-    <PasswordField fx:id="txtPassword" promptText="Password"/>
-    
-    <HBox spacing="10" alignment="CENTER">
-        <Button text="Login" onAction="#onLogin" styleClass="primary"/>
-        <Button text="Registrazione" onAction="#onRegistrazione" styleClass="secondary"/>
-    </HBox>
+
+    <VBox spacing="15" maxWidth="350" alignment="CENTER">
+        <Label text="🔑 Accesso" styleClass="title"/>
+        
+        <Label fx:id="lblError" text="" styleClass="error" wrapText="true" alignment="CENTER"/>
+
+        <VBox spacing="10" alignment="CENTER_LEFT">
+            <Label text="Email" styleClass="muted"/>
+            <TextField fx:id="txtEmail" promptText="esempio@email.com"/>
+            
+            <Label text="Password" styleClass="muted"/>
+            <PasswordField fx:id="txtPassword" promptText="Tua password"/>
+        </VBox>
+
+        <VBox spacing="10" alignment="CENTER">
+            <Button text="Accedi" onAction="#onLogin" maxWidth="Infinity" styleClass="primary"/>
+            <HBox spacing="5" alignment="CENTER">
+                <Label text="Non hai un account?" styleClass="muted"/>
+                <Button text="Registrati" onAction="#onRegistrazione" styleClass="link-button"/>
+            </HBox>
+        </VBox>
+    </VBox>
 </VBox>

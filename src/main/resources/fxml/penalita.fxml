@@ -4,34 +4,76 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.ispw.view.gui.fxml.PenalitaFXMLController"
-      styleClass="root" stylesheets="/css/app.css"
-      spacing="10" alignment="TOP_CENTER">
-    <padding>
-        <Insets top="24" right="24" bottom="24" left="24"/>
-    </padding>
-    
-    <Label text="⚠️ Penalità (Gestore)" styleClass="title"/>
-    
-    <Label fx:id="lblError" styleClass="error"/>
-    
-    <Label fx:id="lblSuccess" styleClass="muted"/>
-    
-    <ListView fx:id="listUtenti" prefHeight="200"/>
-    
-    <TextField fx:id="txtIdUtente" promptText="Id utente"/>
-    
-    <TextField fx:id="txtImporto" promptText="Importo"/>
-    
-    <TextField fx:id="txtMotivazione" promptText="Motivazione"/>
-    
-    <Button text="Lista utenti" onAction="#onListaUtenti" styleClass="secondary"/>
-    
-    <Button text="Applica penalità" onAction="#onApplica" styleClass="danger"/>
-    
-    <Button text="Home" onAction="#onHome" styleClass="secondary"/>
-</VBox>
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.ispw.view.gui.fxml.PenalitaFXMLController"
+            fitToWidth="true"
+            stylesheets="/css/app.css"
+            styleClass="root">
+
+    <content>
+        <VBox alignment="TOP_CENTER" spacing="16" styleClass="root">
+            <padding>
+                <Insets top="36" right="36" bottom="36" left="36"/>
+            </padding>
+
+            <VBox spacing="12" maxWidth="720" alignment="TOP_CENTER">
+                
+                <Label text="⚖️ Gestione Penalità" styleClass="title"/>
+                
+                <Label fx:id="lblError" text="" styleClass="error" wrapText="true"/>
+                <Label fx:id="lblSuccess" text="" styleClass="muted" wrapText="true"/>
+
+                <Separator/>
+
+                <!-- Sezione Selezione Utente -->
+                <VBox spacing="10" alignment="TOP_LEFT">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="Seleziona l'utente da sanzionare" styleClass="muted"/>
+                        <Button text="🔍 Carica Utenti" onAction="#onListaUtenti" styleClass="secondary"/>
+                    </HBox>
+                    
+                    <ListView fx:id="listUtenti" prefHeight="200" maxWidth="Infinity"/>
+                </VBox>
+
+                <Separator/>
+
+                <!-- Form di applicazione penalità -->
+                <VBox spacing="15" alignment="TOP_CENTER" maxWidth="500">
+                    <Label text="Dati Penalità" styleClass="muted"/>
+
+                    <VBox spacing="8" alignment="TOP_LEFT">
+                        <Label text="ID Utente (selezionato):"/>
+                        <TextField fx:id="txtIdUtente" promptText="ID Utente" disable="true"/>
+                    </VBox>
+
+                    <VBox spacing="8" alignment="TOP_LEFT">
+                        <Label text="Importo (€):"/>
+                        <TextField fx:id="txtImporto" promptText="Es: 15.50"/>
+                    </VBox>
+
+                    <VBox spacing="8" alignment="TOP_LEFT">
+                        <Label text="Motivazione:"/>
+                        <TextField fx:id="txtMotivazione" promptText="Specificare il motivo della sanzione"/>
+                    </VBox>
+
+                    <HBox spacing="15" alignment="CENTER">
+                        <Button text="Applica Penalità" onAction="#onApplica" styleClass="primary"/>
+                    </HBox>
+                </VBox>
+
+                <Separator/>
+
+                <!-- Navigazione -->
+                <Button text="Torna alla Home" onAction="#onHome" styleClass="secondary"/>
+
+            </VBox>
+        </VBox>
+    </content>
+</ScrollPane>
