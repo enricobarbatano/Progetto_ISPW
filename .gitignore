@@ -27,3 +27,13 @@ Thumbs.db
 *.mp4
 *.mov
 *.mkv
+
+
+# Script/local build artifacts
+build_installer.cmd
+
+# draw.io autosave/backup files
+*.drawio.drawio.xml
+
+# Documenti Word locali
+ISPW_Project.docx
