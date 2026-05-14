@@ -23,7 +23,7 @@ public abstract class DAOFactory {
 
     private static Path fileSystemRoot;
 
-    // ✅ IN_MEMORY seed root (solo lettura; non persiste)
+    // IN_MEMORY seed root (solo lettura; non persiste)
     private static Path seedRoot;
 
     /**
@@ -102,7 +102,7 @@ public abstract class DAOFactory {
         }
         return instance;
     }
-
+    // questi metodi astratti saranno implementanti concretamente dalle factory concrete dopo getInstance
     public abstract CampoDAO getCampoDAO();
     public abstract FatturaDAO getFatturaDAO();
 

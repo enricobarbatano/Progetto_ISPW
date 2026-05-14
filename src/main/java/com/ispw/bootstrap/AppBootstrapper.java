@@ -19,6 +19,16 @@ public final class AppBootstrapper {
 
         // 2) Config DBMS (solo se DBMS)
         if (config.persistency() == PersistencyProvider.DBMS) {
+
+            
+        // ✅ registra il driver (utile in runtime custom/jlink)
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+            } catch (ClassNotFoundException e) {
+                System.err.println("Driver MySQL non trovato nel classpath: " + e.getMessage());
+                return;
+            }
+
             DbmsConnectionFactory.init(
                 // FIX: niente &amp; nel codice Java
                 "jdbc:mysql://localhost:3306/centro_sportivo?useSSL=false&serverTimezone=Europe/Rome",

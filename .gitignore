@@ -27,3 +27,8 @@ Thumbs.db
 *.mp4
 *.mov
 *.mkv
+
+*build_installer.cmd
+
+*DesignMVC.drawio.drawio.xml
+*ISPW_Project.docx

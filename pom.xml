@@ -3,207 +3,317 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.ispw</groupId>
-    <artifactId>Progetto_ISPW</artifactId>
-    <version>1.0-SNAPSHOT</version>
+  <groupId>com.ispw</groupId>
+  <artifactId>Progetto_ISPW</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>Progetto_ISPW</name>
 
-    <name>Progetto_ISPW</name>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>17</maven.compiler.release>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>17</maven.compiler.release>
-        <javafx.version>21.0.2</javafx.version>
-    </properties>
+    <javafx.version>21.0.2</javafx.version>
+    <junit.bom.version>5.11.0</junit.bom.version>
+    <lombok.version>1.18.42</lombok.version>
 
-    <!-- JUnit BOM -->
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>5.11.0</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <main.class>com.ispw.App</main.class>
+    <app.module.name>com.ispw.progetto</app.module.name>
 
+    <argLine></argLine>
+
+    <!-- Versioni driver per DIST (copia artifacts specifici) -->
+    <mysql.version>9.5.0</mysql.version>
+    <protobuf.version>4.31.1</protobuf.version>
+
+    <!-- Nome zip finale -->
+    <dist.zip.name>SPORTBOOKING</dist.zip.name>
+  </properties>
+
+  <dependencyManagement>
     <dependencies>
-
-        <!-- ✅ JUnit 5 -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- ✅ H2 per test DB -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>2.2.224</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- ✅ Mockito -->
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-inline</artifactId>
-            <version>5.2.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.11.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- ✅ MySQL JDBC Driver -->
-        <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <version>9.5.0</version>
-        </dependency>
-
-        <!-- ✅ JavaFX (necessario per GUI) -->
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-
-        <!-- ✅ JavaFX FXML (necessario per FXMLLoader e @FXML) -->
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
-            <version>${javafx.version}</version>
-        </dependency>
-
-        <!-- ✅ Lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.42</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- ✅ Jackson per serializzazione JSON -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.17.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.17.1</version>
-        </dependency>
-
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.bom.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
     </dependencies>
+  </dependencyManagement>
 
-    <build>
+  <dependencies>
+
+    <!-- TEST -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>2.2.224</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-inline</artifactId>
+      <version>5.2.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-junit-jupiter</artifactId>
+      <version>5.11.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- JAVAFX -->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-fxml</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+
+    <!-- LOMBOK -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- JACKSON -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>2.17.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+      <version>2.17.1</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <!-- Compiler + Lombok -->
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+        <configuration>
+          <release>${maven.compiler.release}</release>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
+
+      <!-- Surefire -->
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <useModulePath>false</useModulePath>
+          <argLine>@{argLine} --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.invoke=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED</argLine>
+        </configuration>
+      </plugin>
+
+      <!-- Failsafe -->
+      <plugin>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>3.3.0</version>
+        <configuration>
+          <useModulePath>false</useModulePath>
+          <argLine>@{argLine} --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.lang.invoke=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED</argLine>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- JavaFX plugin (run + jlink) -->
+      <plugin>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-maven-plugin</artifactId>
+        <version>0.0.8</version>
+        <configuration>
+          <mainClass>${app.module.name}/${main.class}</mainClass>
+          <launcher>Progetto_ISPW</launcher>
+          <jlinkImageName>Progetto_ISPW</jlinkImageName>
+          <stripDebug>true</stripDebug>
+          <noManPages>true</noManPages>
+          <noHeaderFiles>true</noHeaderFiles>
+        </configuration>
+      </plugin>
+      <!-- javafx:jlink è supportato dal plugin OpenJFX -->
+      <!-- [7](https://codingtechroom.com/question/resolve-unknown-lifecycle-phase-build-maven) -->
+
+    </plugins>
+  </build>
+
+  <profiles>
+
+    <!-- DBMS (sviluppo): attivo di default quando NON attivi altri profili -->
+    <profile>
+      <id>dbms</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.mysql</groupId>
+          <artifactId>mysql-connector-j</artifactId>
+          <version>${mysql.version}</version>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <!-- Attenzione: activeByDefault si disattiva quando attivi un altro profilo con -P -->
+    <!-- [1](https://maven.apache.org/guides/introduction/introduction-to-profiles.html)[2](https://stackoverflow.com/questions/5309379/how-to-keep-maven-profiles-which-are-activebydefault-active-even-if-another-prof) -->
+
+    <!-- ✅ DIST: build “pronta da consegnare” con drivers + bat + zip -->
+    <profile>
+      <id>dist</id>
+
+      <build>
         <plugins>
 
-            <!-- ✅ Shade Plugin (FAT-JAR) -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.0</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.ispw.App</mainClass>
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+          <!-- 1) genera immagine jlink in target/Progetto_ISPW -->
+          <plugin>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-maven-plugin</artifactId>
+            <version>0.0.8</version>
+            <executions>
+              <execution>
+                <id>make-jlink-image</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>jlink</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- [7](https://codingtechroom.com/question/resolve-unknown-lifecycle-phase-build-maven) -->
 
-            <!-- ✅ Compiler + Lombok -->
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+          <!-- 2) copia artifacts specifici (mysql + protobuf) dentro l'immagine -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>3.10.0</version>
+            <executions>
+              <execution>
+                <id>copy-dbms-artifacts</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
                 <configuration>
-                    <release>${maven.compiler.release}</release>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>1.18.42</version>
-                        </path>
-                    </annotationProcessorPaths>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>com.mysql</groupId>
+                      <artifactId>mysql-connector-j</artifactId>
+                      <version>${mysql.version}</version>
+                      <type>jar</type>
+                      <outputDirectory>${project.build.directory}/Progetto_ISPW/drivers</outputDirectory>
+                      <destFileName>mysql-connector-j-${mysql.version}.jar</destFileName>
+                    </artifactItem>
+                    <artifactItem>
+                      <groupId>com.google.protobuf</groupId>
+                      <artifactId>protobuf-java</artifactId>
+                      <version>${protobuf.version}</version>
+                      <type>jar</type>
+                      <outputDirectory>${project.build.directory}/Progetto_ISPW/drivers</outputDirectory>
+                      <destFileName>protobuf-java-${protobuf.version}.jar</destFileName>
+                    </artifactItem>
+                  </artifactItems>
+                  <overWriteReleases>false</overWriteReleases>
+                  <overWriteSnapshots>true</overWriteSnapshots>
                 </configuration>
-            </plugin>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- dependency:copy con artifactItems è il modo “ufficiale” per copiare artifacts specifici -->
+          <!-- [3](https://maven.apache.org/plugins/maven-dependency-plugin/examples/copying-artifacts.html)[4](https://maven.apache.org/plugins/maven-dependency-plugin/copy-mojo.html) -->
 
-            <!-- ✅ Surefire (JUnit 5) -->
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.3.0</version>
+          <!-- 3) copia il BAT DBMS dentro bin/ dell'immagine (serve un file sorgente nel repo) -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>3.2.0</version>
+            <executions>
+              <execution>
+                <id>copy-dbms-bat</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
                 <configuration>
-                    <useModulePath>false</useModulePath>
+                  <target>
+                    <copy file="${project.basedir}/src/main/dist/Progetto_ISPW_DBMS.bat"
+                          todir="${project.build.directory}/Progetto_ISPW/bin"
+                          overwrite="true"/>
+                  </target>
                 </configuration>
-            </plugin>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- antrun consente di eseguire task Ant (es. copy) durante il lifecycle -->
+          <!-- [8](https://maven.apache.org/plugin-tools/maven-plugin-plugin/examples/generate-descriptor.html)[9](https://www.programmersought.com/article/20147101335/) -->
 
-            <!-- ✅ Failsafe -->
-            <plugin>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.3.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- ✅ JavaFX plugin -->
-            <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
+          <!-- 4) zip finale “SPORTBOOKING.zip” includendo tutta l’immagine (che ora contiene drivers + bat) -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>3.7.1</version>
+            <executions>
+              <execution>
+                <id>make-final-zip</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
                 <configuration>
-                    <!-- tieni App come entrypoint: selezione CLI/GUI -->
-                    <mainClass>com.ispw.App</mainClass>
+                  <finalName>${dist.zip.name}</finalName>
+                  <appendAssemblyId>false</appendAssemblyId>
+                  <descriptors>
+                    <descriptor>src/main/assembly/dist.xml</descriptor>
+                  </descriptors>
                 </configuration>
-            </plugin>
-
-            <!-- ✅ jpackage -->
-            <plugin>
-                <groupId>com.github.wiverson</groupId>
-                <artifactId>jpackage-maven-plugin</artifactId>
-                <version>1.8.0</version>
-
-                <configuration>
-                    <installerName>Progetto_ISPW</installerName>
-                    <appName>Progetto_ISPW</appName>
-                    <vendor>ISP W</vendor>
-
-                    <mainClass>com.ispw.App</mainClass>
-
-                    <input>${project.build.directory}</input>
-                    <mainJar>${project.build.finalName}-shaded.jar</mainJar>
-
-                    <type>exe</type>
-                    <winConsole>false</winConsole>
-                </configuration>
-            </plugin>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- assembly plugin: crea zip includendo file/dir definiti nel descriptor -->
+          <!-- [5](https://technointerface.com/the-complete-maven-lifecycle-guide-java-examples-custom-phases-private-repos-d75d28e93557)[6](https://www.baeldung.com/maven-goals-phases) -->
 
         </plugins>
-    </build>
+      </build>
+    </profile>
+
+  </profiles>
 
 </project>

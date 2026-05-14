@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.UnitTestBase;
+import com.ispw.UnitTestBase;
 import com.ispw.bean.DatiFatturaBean;
 import com.ispw.bean.DatiPagamentoBean;
 import com.ispw.bean.DatiPenalitaBean;

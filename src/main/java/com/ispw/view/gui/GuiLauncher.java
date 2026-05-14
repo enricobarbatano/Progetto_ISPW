@@ -44,14 +44,27 @@ public class GuiLauncher extends Application {
 	// L2) setRoot/setStage: gestione scena.
 	// L3) start: inizializzazione stage.
 
+	
 	@Override
-	public void start(Stage primaryStage) {
-		setStage(primaryStage);
-		stage.setTitle("ISPW");
-		stage.setScene(new Scene(new VBox(), 800, 600));
-		stage.show();
-		if (onReady != null) {
-			Platform.runLater(onReady);
-		}
-	}
+public void start(Stage primaryStage) {
+    setStage(primaryStage);
+    stage.setTitle("ISPW");
+
+    Scene scene = new Scene(new VBox(), 800, 600);
+
+    // ✅ B) carica CSS dal classpath/modulo e applicalo alla Scene
+    var cssUrl = com.ispw.App.class.getResource("/css/app.css");
+    if (cssUrl == null) {
+        System.err.println("CSS non trovato: /css/app.css");
+    } else {
+        scene.getStylesheets().add(cssUrl.toExternalForm());
+    }
+
+    stage.setScene(scene);
+    stage.show();
+
+    if (onReady != null) {
+        Platform.runLater(onReady);
+    }
+}
 }
