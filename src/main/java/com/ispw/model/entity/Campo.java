@@ -1,13 +1,3 @@
-
-/*“Nel progetto coesistono entity anemiche e entity con comportamento:
-le entity che modellano vincoli di dominio 
-(es. Campo con gestione degli slot) includono metodi per mantenere invarianti;
-per altre entity la logica applicativa è orchestrata dai logic controller,
-mantenendo i DAO come layer di persistenza e preservando DIP/SRP.” */
-
-
-
-
 package com.ispw.model.entity;
 
 import java.io.Serializable;
@@ -21,47 +11,93 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+/*
+ * Nel progetto coesistono entity anemiche e entity con comportamento:
+ * le entity che modellano vincoli di dominio
+ * (es. Campo con gestione degli slot) includono metodi per mantenere invarianti;
+ * per altre entity la logica applicativa è orchestrata dai logic controller,
+ * mantenendo i DAO come layer di persistenza e preservando DIP/SRP.
+ */
 public final class Campo implements Serializable {
 
     // SEZIONE ARCHITETTURALE
     // Legenda architettura:
-    // A1) Collaboratori: entity campo con prenotazioni associate.
-    // A2) IO: stato operativo e disponibilita'.
+    // A1) Collaboratori: entity Campo con prenotazioni associate a runtime.
+    // A2) IO: stato operativo e disponibilità.
 
     private int idCampo;
     private String nome;
     private String tipoSport;
-    private Float costoOrario;       // es. 20.0f = 20 EUR/h
-    private boolean isAttivo;        // se false, non Ã¨ prenotabile
-    private boolean flagManutenzione;// se true, non Ã¨ prenotabile
+    private Float costoOrario;
+    private boolean isAttivo;
+    private boolean flagManutenzione;
 
-   @JsonIgnore
+    /*
+     * Lista runtime delle prenotazioni associate al campo.
+     *
+     * IMPORTANTE:
+     * - Non viene serializzata in JSON grazie a @JsonIgnore.
+     * - Non rappresenta lo stato persistente di Campo.
+     * - Serve solo in memoria per i metodi di dominio, ad esempio isDisponibile(...).
+     *
+     * Le prenotazioni persistite vivono nel relativo DAO/file/tabella di Prenotazione.
+     */
+    @JsonIgnore
     private final List<Prenotazione> listaPrenotazioni = new ArrayList<>();
 
     // SEZIONE LOGICA
     // Legenda logica:
     // L1) getters/setters: dati anagrafici campo.
-    // L2) isDisponibile/bloccoSlot/sbloccaSlot: gestione disponibilita'.
+    // L2) isDisponibile/bloccoSlot/sbloccaSlot: gestione disponibilità.
     // L3) updateStatoOperativo/updateDisponibilitaCampo: stato operativo.
 
-  
-    public int getIdCampo() { return idCampo; }
-    public void setIdCampo(int idCampo) { this.idCampo = idCampo; }
+    public int getIdCampo() {
+        return idCampo;
+    }
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public void setIdCampo(int idCampo) {
+        this.idCampo = idCampo;
+    }
 
-    public String getTipoSport() { return tipoSport; }
-    public void setTipoSport(String tipoSport) { this.tipoSport = tipoSport; }
+    public String getNome() {
+        return nome;
+    }
 
-    public Float getCostoOrario() { return costoOrario; }
-    public void setCostoOrario(Float costoOrario) { this.costoOrario = costoOrario; }
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
 
-    public boolean isAttivo() { return isAttivo; }
-    public void setAttivo(boolean attivo) { isAttivo = attivo; }
+    public String getTipoSport() {
+        return tipoSport;
+    }
 
-    public boolean isFlagManutenzione() { return flagManutenzione; }
-    public void setFlagManutenzione(boolean flagManutenzione) { this.flagManutenzione = flagManutenzione; }
+    public void setTipoSport(String tipoSport) {
+        this.tipoSport = tipoSport;
+    }
+
+    public Float getCostoOrario() {
+        return costoOrario;
+    }
+
+    public void setCostoOrario(Float costoOrario) {
+        this.costoOrario = costoOrario;
+    }
+
+    public boolean isAttivo() {
+        return isAttivo;
+    }
+
+    public void setAttivo(boolean attivo) {
+        isAttivo = attivo;
+    }
+
+    public boolean isFlagManutenzione() {
+        return flagManutenzione;
+    }
+
+    public void setFlagManutenzione(boolean flagManutenzione) {
+        this.flagManutenzione = flagManutenzione;
+    }
 
     public List<Prenotazione> getListaPrenotazioni() {
         return Collections.unmodifiableList(listaPrenotazioni);
@@ -74,47 +110,95 @@ public final class Campo implements Serializable {
     }
 
     /**
-     * Verifica se il campo Ã¨ prenotabile nella finestra richiesta.
-     * Regole semplici:
-     * 1) Se non Ã¨ attivo o Ã¨ in manutenzione -> NON disponibile.
-     * 2) Se non abbiamo prenotazioni caricate -> non possiamo verificare conflitti, quindi OK.
-     * 3) Altrimenti, controlliamo che l'intervallo non si sovrapponga a prenotazioni giÃ  esistenti (stesso giorno).
+     * Imposta le prenotazioni runtime associate al campo.
      *
-     * @param data      giorno richiesto (java.sql.Date)
-     * @param oraInizio ora inizio richiesta (java.sql.Time)
-     * @param oraFine   ora fine richiesta (puÃ² essere null -> slot "puntuale")
+     * Questo metodo viene usato dal layer applicativo/use case quando deve
+     * verificare la disponibilità di un campo.
+     *
+     * Flusso previsto:
+     * - CampoDAO carica il Campo puro.
+     * - PrenotazioneDAO carica le prenotazioni attive associate al campo.
+     * - Il logic controller inserisce temporaneamente tali prenotazioni nel Campo.
+     * - Campo.isDisponibile(...) usa questa lista runtime per controllare conflitti.
+     *
+     * La lista viene prima svuotata per evitare duplicati nel caso in cui lo stesso
+     * oggetto Campo venga arricchito più volte durante l'esecuzione.
+     *
+     * La lista non viene serializzata perché listaPrenotazioni è annotata con @JsonIgnore.
+     *
+     * @param prenotazioni lista di prenotazioni da usare solo a runtime
+     */
+    public void setPrenotazioniRuntime(List<Prenotazione> prenotazioni) {
+        listaPrenotazioni.clear();
+
+        if (prenotazioni == null) {
+            return;
+        }
+
+        for (Prenotazione p : prenotazioni) {
+            if (p != null) {
+                listaPrenotazioni.add(p);
+            }
+        }
+    }
+
+    /**
+     * Verifica se il campo è prenotabile nella finestra richiesta.
+     *
+     * Regole:
+     * 1) Se il campo non è attivo o è in manutenzione, non è disponibile.
+     * 2) Se non ci sono prenotazioni runtime caricate, si assume nessun conflitto.
+     * 3) Altrimenti, si controlla che l'intervallo richiesto non si sovrapponga
+     *    a prenotazioni già presenti nello stesso giorno.
+     *
+     * @param data      giorno richiesto
+     * @param oraInizio ora inizio richiesta
+     * @param oraFine   ora fine richiesta; se null viene trattata come slot puntuale
      * @return true se disponibile, false altrimenti
      */
     public boolean isDisponibile(Date data, Time oraInizio, Time oraFine) {
-        // Stato operativo del campo
-        if (!isAttivo || flagManutenzione) return false;
+        if (!isAttivo || flagManutenzione) {
+            return false;
+        }
 
-        // Conversione in tipi java.time (piÃ¹ semplici da confrontare)
         LocalDate giorno = data.toLocalDate();
-        LocalTime start  = oraInizio.toLocalTime();
-        LocalTime end    = (oraFine != null ? oraFine.toLocalTime() : start); // se null, uso start (slot istantaneo)
+        LocalTime start = oraInizio.toLocalTime();
+        LocalTime end = (oraFine != null) ? oraFine.toLocalTime() : start;
 
-        // Se non abbiamo prenotazioni in memoria, assumiamo nessun conflitto
-        if (listaPrenotazioni.isEmpty()) return true;
+        if (listaPrenotazioni.isEmpty()) {
+            return true;
+        }
 
-        // Controllo conflitti con prenotazioni dello stesso giorno
         for (Prenotazione p : listaPrenotazioni) {
-            if (p.getData() == null || p.getOraInizio() == null || !giorno.equals(p.getData())) continue;
+            if (p.getData() == null || p.getOraInizio() == null || !giorno.equals(p.getData())) {
+                continue;
+            }
 
             LocalTime pStart = p.getOraInizio();
-            LocalTime pEnd   = (p.getOraFine() != null ? p.getOraFine() : pStart);
+            LocalTime pEnd = (p.getOraFine() != null) ? p.getOraFine() : pStart;
 
-            // Regola di sovrapposizione (intervalli [start, end)):
-            // si sovrappongono se start < pEnd E pStart < end
+            /*
+             * Regola di sovrapposizione intervalli [start, end):
+             * due intervalli si sovrappongono se:
+             *
+             * start < pEnd && pStart < end
+             */
             boolean overlap = start.isBefore(pEnd) && pStart.isBefore(end);
-            if (overlap) return false;
+            if (overlap) {
+                return false;
+            }
         }
+
         return true;
     }
 
     /**
-     * "Blocca" uno slot aggiungendo una prenotazione tecnica in memoria.
-     * Utile per evitare doppie prenotazioni nello stesso istante.
+     * Blocca uno slot aggiungendo una prenotazione tecnica in memoria.
+     *
+     * Nota:
+     * questa operazione modifica solo la lista runtime del Campo.
+     * Non persiste una prenotazione: la persistenza reale dello slot deve passare
+     * da PrenotazioneDAO.store(...).
      */
     public void bloccoSlot(Date data, Time oraInizio, Time oraFine) {
         Prenotazione p = new Prenotazione();
@@ -127,8 +211,13 @@ public final class Campo implements Serializable {
     }
 
     /**
-     * "Sblocca" lo slot: rimuove la prenotazione (o il blocco tecnico) che
-     * ha la stessa data e la stessa ora di inizio.
+     * Sblocca uno slot rimuovendo dalla lista runtime la prenotazione
+     * con stessa data e stessa ora di inizio.
+     *
+     * Nota:
+     * questa operazione modifica solo lo stato runtime del Campo.
+     * La persistenza dello stato della prenotazione deve essere gestita tramite
+     * PrenotazioneDAO.updateStato(...).
      */
     public void sbloccaSlot(Date data, Time oraInizio) {
         LocalDate d = data.toLocalDate();
@@ -140,7 +229,7 @@ public final class Campo implements Serializable {
     }
 
     /**
-     * Aggiorna lo stato operativo (attivo/manutenzione).
+     * Aggiorna lo stato operativo del campo.
      */
     public void updateStatoOperativo(boolean isAttivo, boolean flagManutenzione) {
         this.isAttivo = isAttivo;
@@ -148,13 +237,15 @@ public final class Campo implements Serializable {
     }
 
     /**
-     * Piccolo "wrapper" per uniformarsi a possibili chiamate testuali (es. da CLI):
-     * azione = "BLOCCA" -> blocco puntuale
-     * azione = "SBLOCCA" -> sblocco
-     * (Puoi estenderlo con "ATTIVA"/"DISATTIVA" se serve)
+     * Wrapper per uniformarsi a possibili chiamate testuali, ad esempio da CLI.
+     *
+     * azione = "BLOCCA"  -> blocco puntuale runtime
+     * azione = "SBLOCCA" -> sblocco runtime
      */
     public void updateDisponibilitaCampo(int idCampo, Date data, Time time, String azione) {
-        if (idCampo != this.idCampo) return;
+        if (idCampo != this.idCampo) {
+            return;
+        }
 
         if ("SBLOCCA".equalsIgnoreCase(azione)) {
             sbloccaSlot(data, time);

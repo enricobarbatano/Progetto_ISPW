@@ -51,18 +51,47 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
 
     // -----------------------
     // Protected raw operations
-    // (Subclasses override these to provide DB/FS I/O)
+    // Subclasses override these to provide DB/FS I/O.
     // -----------------------
-    protected Prenotazione rawLoad(Integer id) { return null; }
-    protected void rawStore(Prenotazione entity) { /* no-op in memory */ }
-    protected void rawDelete(Integer id) { /* no-op in memory */ }
-    protected List<Prenotazione> rawFindByUtente(int idUtente) { return null; }
-    protected List<Prenotazione> rawFindByUtenteAndStato(int idUtente, StatoPrenotazione stato) { return null; }
-    protected void rawUpdateStato(int idPrenotazione, StatoPrenotazione nuovoStato) { /* no-op in memory */ }
+
+    protected Prenotazione rawLoad(Integer id) {
+        return null;
+    }
+
+    protected void rawStore(Prenotazione entity) {
+        // no-op in memory
+    }
+
+    protected void rawDelete(Integer id) {
+        // no-op in memory
+    }
+
+    protected List<Prenotazione> rawFindByUtente(int idUtente) {
+        return null;
+    }
+
+    protected List<Prenotazione> rawFindByUtenteAndStato(int idUtente, StatoPrenotazione stato) {
+        return null;
+    }
+
+    /**
+     * Raw hook per query "prenotazioni associate a un campo".
+     * I provider persistenti (FS/DBMS) lo implementano accedendo al proprio supporto:
+     * - FileSystem: prenotazioni.json
+     * - DBMS: tabella prenotazioni
+     */
+    protected List<Prenotazione> rawFindByCampo(int idCampo) {
+        return null;
+    }
+
+    protected void rawUpdateStato(int idPrenotazione, StatoPrenotazione nuovoStato) {
+        // no-op in memory
+    }
 
     // -----------------------
     // Public DAO API (cache-first template + ALWAYS COMPOSE)
     // -----------------------
+
     @Override
     public Prenotazione load(Integer id) {
         if (id == null || id <= 0) return null;
@@ -75,6 +104,7 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
         } finally {
             lock.readLock().unlock();
         }
+
         if (cached != null) {
             // A2: ensure composed (if someone stored raw objects in cache)
             composeIfNeeded(cached);
@@ -82,13 +112,13 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
         }
 
         // STEP 2: fallback raw (only if persistent)
-        Prenotazione p = null;
+        Prenotazione p;
         if (persistent) {
             p = rawLoad(id);
         } else {
-            // IN_MEMORY and not present
             return null;
         }
+
         if (p == null) return null;
 
         // STEP 3: compose ALWAYS (A2)
@@ -109,7 +139,7 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
     public void store(Prenotazione entity) {
         if (entity == null) return;
 
-        // new entity (id == 0)
+        // New entity
         if (entity.getIdPrenotazione() == 0) {
             if (persistent) {
                 // rawStore should assign id (DB auto/gen or FS max+1)
@@ -117,8 +147,7 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
 
                 int id = entity.getIdPrenotazione();
                 if (id <= 0) {
-                    // Defensive fallback: generate id from cache space
-                    // (preferably never happens for real DBMS providers)
+                    // Defensive fallback
                     lock.writeLock().lock();
                     try {
                         int next = cache.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
@@ -130,7 +159,6 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
                     return;
                 }
 
-                // compose before caching (A2)
                 composeIfNeeded(entity);
 
                 lock.writeLock().lock();
@@ -147,7 +175,7 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
                 try {
                     int next = cache.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
                     entity.setIdPrenotazione(next);
-                    composeIfNeeded(entity); // A2
+                    composeIfNeeded(entity);
                     cache.put(next, entity);
                 } finally {
                     lock.writeLock().unlock();
@@ -156,8 +184,8 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
             }
         }
 
-        // existing entity
-        composeIfNeeded(entity); // A2
+        // Existing entity
+        composeIfNeeded(entity);
 
         lock.writeLock().lock();
         try {
@@ -199,7 +227,6 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
         }
 
         if (persistent) {
-            // fallback rawLoad (costly but compatible)
             Prenotazione p = rawLoad(id);
             if (p != null) {
                 // Do NOT force compose in exists() (keep it lightweight)
@@ -212,13 +239,16 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
                 return true;
             }
         }
+
         return false;
     }
 
     @Override
     public Prenotazione create(Integer id) {
         Prenotazione p = new Prenotazione();
-        if (id != null && id > 0) p.setIdPrenotazione(id);
+        if (id != null && id > 0) {
+            p.setIdPrenotazione(id);
+        }
         return p;
     }
 
@@ -232,15 +262,15 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
         final List<Prenotazione> res;
 
         if (persistent) {
-           
             res = rawFindByUtente(idUtente);
         } else {
-            // IN_MEMORY from cache
             res = new ArrayList<>();
             lock.readLock().lock();
             try {
                 for (Prenotazione p : cache.values()) {
-                    if (p != null && p.getIdUtente() == idUtente) res.add(p);
+                    if (p != null && p.getIdUtente() == idUtente) {
+                        res.add(p);
+                    }
                 }
             } finally {
                 lock.readLock().unlock();
@@ -249,7 +279,6 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
 
         if (res == null) return new ArrayList<>();
 
-        // Sort
         res.sort(ORDER_BY_DATA_ORA_ID);
 
         // A2: compose ALL
@@ -258,11 +287,12 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
             composeIfNeeded(p);
         }
 
-        // cache-put results
         lock.writeLock().lock();
         try {
             for (Prenotazione p : res) {
-                if (p != null) cache.put(p.getIdPrenotazione(), p);
+                if (p != null) {
+                    cache.put(p.getIdPrenotazione(), p);
+                }
             }
         } finally {
             lock.writeLock().unlock();
@@ -282,7 +312,9 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
             lock.readLock().lock();
             try {
                 for (Prenotazione p : cache.values()) {
-                    if (p != null && p.getIdUtente() == idUtente && p.getStato() == stato) res.add(p);
+                    if (p != null && p.getIdUtente() == idUtente && p.getStato() == stato) {
+                        res.add(p);
+                    }
                 }
             } finally {
                 lock.readLock().unlock();
@@ -302,7 +334,9 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
         lock.writeLock().lock();
         try {
             for (Prenotazione p : res) {
-                if (p != null) cache.put(p.getIdPrenotazione(), p);
+                if (p != null) {
+                    cache.put(p.getIdPrenotazione(), p);
+                }
             }
         } finally {
             lock.writeLock().unlock();
@@ -312,8 +346,67 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
     }
 
     @Override
+    public List<Prenotazione> findByCampo(int idCampo) {
+        if (idCampo <= 0) return new ArrayList<>();
+
+        final List<Prenotazione> res;
+
+        if (persistent) {
+            res = rawFindByCampo(idCampo);
+        } else {
+            res = new ArrayList<>();
+            lock.readLock().lock();
+            try {
+                for (Prenotazione p : cache.values()) {
+                    if (p != null && p.getIdCampo() == idCampo) {
+                        res.add(p);
+                    }
+                }
+            } finally {
+                lock.readLock().unlock();
+            }
+        }
+
+        if (res == null) return new ArrayList<>();
+
+        res.sort(ORDER_BY_DATA_ORA_ID);
+
+        /*
+         * A2: compose ALL.
+         * Questa composizione rimane coerente con l'architettura attuale:
+         * PrenotazioneDAO compone Prenotazione richiedendo CampoDAO/PagamentoDAO/FatturaDAO.
+         *
+         * Nota anti-ciclo:
+         * questo resta sicuro se CampoDAO non chiama PrenotazioneDAO.
+         */
+        prewarmCampoCache(res);
+        for (Prenotazione p : res) {
+            composeIfNeeded(p);
+        }
+
+        lock.writeLock().lock();
+        try {
+            for (Prenotazione p : res) {
+                if (p != null) {
+                    cache.put(p.getIdPrenotazione(), p);
+                }
+            }
+        } finally {
+            lock.writeLock().unlock();
+        }
+
+        return res;
+    }
+
+    @Override
+    public List<Prenotazione> findAttiveByCampo(int idCampo) {
+        return findByCampo(idCampo).stream()
+                .filter(p -> p != null && p.getStato() != StatoPrenotazione.ANNULLATA)
+                .toList();
+    }
+
+    @Override
     public void updateStato(int idPrenotazione, StatoPrenotazione nuovoStato) {
-        // Update cache if present
         lock.writeLock().lock();
         try {
             Prenotazione p = cache.get(idPrenotazione);
@@ -330,7 +423,7 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
         }
     }
 
-    /** Compatibilità: pulisce la cache (test) */
+    /** Compatibilità: pulisce la cache (test). */
     public void clear() {
         lock.writeLock().lock();
         try {
@@ -341,21 +434,21 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
     }
 
     // -----------------------
-    // A2 Composition logic (DAO father calls DAO children, cache-first)
+    // A2 Composition logic
     // -----------------------
 
     /**
      * Composizione A2: per ogni prenotazione,
-     * compone i campi Campo, 
-     * Pagamento e Fattura se non già presenti.
-     * IMPORTANT (anti-loop): CampoDAO non deve comporre Prenotazioni.
+     * compone Campo, Pagamento e Fattura se non già presenti.
+     *
+     * IMPORTANT:
+     * per evitare cicli di composizione, CampoDAO non deve comporre Prenotazioni.
      */
     protected void composeIfNeeded(Prenotazione p) {
         if (p == null) return;
 
         // Campo
         if (p.getCampo() == null && p.getIdCampo() > 0) {
-            
             Object campoDao = getDaoFromFactory("getCampoDAO");
             Campo campo = (Campo) invokeFirstNonNull(
                     campoDao,
@@ -363,7 +456,9 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
                     new Class<?>[] { Integer.class, int.class },
                     new Object[] { p.getIdCampo(), p.getIdCampo() }
             );
-            if (campo != null) p.setCampo(campo);
+            if (campo != null) {
+                p.setCampo(campo);
+            }
         }
 
         // Pagamento (by prenotazione)
@@ -375,34 +470,41 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
                     new Class<?>[] { int.class, Integer.class },
                     new Object[] { p.getIdPrenotazione(), p.getIdPrenotazione() }
             );
-            if (pag != null) p.setPagamento(pag);
+            if (pag != null) {
+                p.setPagamento(pag);
+            }
         }
 
-        // Fattura (try common signatures; adapt if your FatturaDAO differs)
+        // Fattura
         if (p.getFattura() == null) {
             Object fatDao = getDaoFromFactory("getFatturaDAO");
-            // Prefer a "by prenotazione" lookup if present
             Fattura fatt = (Fattura) invokeFirstNonNull(
                     fatDao,
                     new String[] {"findByPrenotazione", "findByIdPrenotazione", "findLastByUtente"},
                     new Class<?>[] { int.class, int.class, int.class },
                     new Object[] { p.getIdPrenotazione(), p.getIdPrenotazione(), p.getIdUtente() }
             );
-            if (fatt != null) p.setFattura(fatt);
+            if (fatt != null) {
+                p.setFattura(fatt);
+            }
         }
     }
 
-    //Prewarm helper: dato un elenco di prenotazioni, pre-carica in cache i campi Campo associati (A2).
-    // Questo è un'ottimizzazione per evitare N chiamate individuali a CampoDAO quando si carica una lista di prenotazioni.
-
+    /**
+     * Prewarm helper: dato un elenco di prenotazioni,
+     * pre-carica in cache i campi associati.
+     */
     private void prewarmCampoCache(List<Prenotazione> list) {
         Object campoDao = getDaoFromFactory("getCampoDAO");
         if (campoDao == null || list == null || list.isEmpty()) return;
 
         Set<Integer> ids = new HashSet<>();
         for (Prenotazione p : list) {
-            if (p != null && p.getIdCampo() > 0) ids.add(p.getIdCampo());
+            if (p != null && p.getIdCampo() > 0) {
+                ids.add(p.getIdCampo());
+            }
         }
+
         for (Integer idCampo : ids) {
             invokeFirstNonNull(
                     campoDao,
@@ -412,12 +514,11 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
             );
         }
     }
+
     // -----------------------
-    // Reflection helpers (to avoid hard-binding to specific DAO interfaces/method names)
+    // Reflection helpers
     // -----------------------
 
-    // Reflection helper: dato il nome di un metodo factory (es. "getCampoDAO"), 
-    // prova a invocarlo su DAOFactory per ottenere l'istanza del DAO figlio.
     private Object getDaoFromFactory(String factoryMethodName) {
         try {
             Object factory = DAOFactory.getInstance();
@@ -427,18 +528,16 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
             return null;
         }
     }
-    // Reflection helper: dato un target, una lista di nomi di metodi, tipi di parametri e argomenti,
-    // prova a invocare ciascuna combinazione fino a trovare una che restituisce un risultato non null.
-    // Questo è utile per adattarsi a diversi DAO che potrebbero avere metodi di lookup con nomi o firme leggermente diverse.
+
     private Object invokeFirstNonNull(Object target, String[] methodNames, Class<?>[] paramTypes, Object[] args) {
         if (target == null || methodNames == null) return null;
 
         for (String name : methodNames) {
             try {
-                // Try each provided signature pairing (we pass parallel arrays; same index)
                 for (int i = 0; i < paramTypes.length && i < args.length; i++) {
                     Method m = findMethod(target.getClass(), name, paramTypes[i]);
                     if (m == null) continue;
+
                     Object out = m.invoke(target, args[i]);
                     if (out != null) return out;
                 }
@@ -446,9 +545,10 @@ public class BasePrenotazioneDAO implements PrenotazioneDAO {
                 // try next
             }
         }
+
         return null;
     }
-    // Helper per trovare un metodo con nome e tipo di parametro specificati, restituendo null se non trovato.
+
     private Method findMethod(Class<?> clazz, String name, Class<?> paramType) {
         try {
             return clazz.getMethod(name, paramType);

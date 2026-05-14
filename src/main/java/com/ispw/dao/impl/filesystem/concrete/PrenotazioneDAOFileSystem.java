@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.ispw.dao.exception.DaoException;
 import com.ispw.dao.impl.base.BasePrenotazioneDAO;
-import com.ispw.dao.impl.filesystem.json.JsonListFileStore; // <-- adatta al tuo package reale
+import com.ispw.dao.impl.filesystem.json.JsonListFileStore;
 import com.ispw.model.entity.Prenotazione;
 import com.ispw.model.enums.StatoPrenotazione;
 
@@ -20,7 +20,8 @@ import com.ispw.model.enums.StatoPrenotazione;
  * FileSystem Prenotazione DAO (JSON) implemented as subclass of BasePrenotazioneDAO.
  * Implements raw I/O reading/writing a list of Prenotazione on disk (prenotazioni.json).
  *
- * NOTE: Prenotazione entity should @JsonIgnore composed fields (campo/pagamento/fattura)
+ * NOTE:
+ * Prenotazione entity should @JsonIgnore composed fields (campo/pagamento/fattura)
  * so that we persist RAW data only (FK + slot + stato).
  */
 public class PrenotazioneDAOFileSystem extends BasePrenotazioneDAO {
@@ -30,7 +31,7 @@ public class PrenotazioneDAOFileSystem extends BasePrenotazioneDAO {
                       .thenComparing(Prenotazione::getOraInizio, Comparator.nullsLast(Comparator.naturalOrder()))
                       .thenComparingInt(Prenotazione::getIdPrenotazione);
 
-    // ordine stabile nel file (opzionale ma utile)
+    // Ordine stabile nel file JSON
     private static final Comparator<Prenotazione> ORDER_BY_ID =
             Comparator.comparingInt(Prenotazione::getIdPrenotazione);
 
@@ -38,17 +39,15 @@ public class PrenotazioneDAOFileSystem extends BasePrenotazioneDAO {
     private final JsonListFileStore<Prenotazione> jsonStore;
 
     public PrenotazioneDAOFileSystem(Path storageDir) {
-        super(true); // persistent
+        super(true);
         try {
             Files.createDirectories(storageDir);
         } catch (IOException e) {
             throw new DaoException("Impossibile creare directory storage: " + storageDir, e);
         }
 
-        // da .ser a .json
         this.filePath = storageDir.resolve("prenotazioni.json");
 
-        // store generico: 1 file JSON per entità
         this.jsonStore = new JsonListFileStore<>(
                 filePath,
                 new TypeReference<List<Prenotazione>>() {},
@@ -59,11 +58,13 @@ public class PrenotazioneDAOFileSystem extends BasePrenotazioneDAO {
     private Map<Integer, Prenotazione> readAllAsMap() {
         List<Prenotazione> list = jsonStore.readAll();
         Map<Integer, Prenotazione> map = new ConcurrentHashMap<>();
+
         for (Prenotazione p : list) {
             if (p != null && p.getIdPrenotazione() > 0) {
                 map.put(p.getIdPrenotazione(), p);
             }
         }
+
         return map;
     }
 
@@ -80,6 +81,7 @@ public class PrenotazioneDAOFileSystem extends BasePrenotazioneDAO {
     @Override
     protected void rawStore(Prenotazione entity) {
         if (entity == null) return;
+
         Map<Integer, Prenotazione> data = readAllAsMap();
 
         if (entity.getIdPrenotazione() == 0) {
@@ -94,6 +96,7 @@ public class PrenotazioneDAOFileSystem extends BasePrenotazioneDAO {
     @Override
     protected void rawDelete(Integer id) {
         if (id == null) return;
+
         Map<Integer, Prenotazione> data = readAllAsMap();
         data.remove(id);
         writeAllFromMap(data);
@@ -103,9 +106,13 @@ public class PrenotazioneDAOFileSystem extends BasePrenotazioneDAO {
     protected List<Prenotazione> rawFindByUtente(int idUtente) {
         Map<Integer, Prenotazione> data = readAllAsMap();
         List<Prenotazione> out = new ArrayList<>();
+
         for (Prenotazione p : data.values()) {
-            if (p != null && p.getIdUtente() == idUtente) out.add(p);
+            if (p != null && p.getIdUtente() == idUtente) {
+                out.add(p);
+            }
         }
+
         out.sort(ORDER_BY_DATA_ORA_ID);
         return out;
     }
@@ -114,9 +121,28 @@ public class PrenotazioneDAOFileSystem extends BasePrenotazioneDAO {
     protected List<Prenotazione> rawFindByUtenteAndStato(int idUtente, StatoPrenotazione stato) {
         Map<Integer, Prenotazione> data = readAllAsMap();
         List<Prenotazione> out = new ArrayList<>();
+
         for (Prenotazione p : data.values()) {
-            if (p != null && p.getIdUtente() == idUtente && p.getStato() == stato) out.add(p);
+            if (p != null && p.getIdUtente() == idUtente && p.getStato() == stato) {
+                out.add(p);
+            }
         }
+
+        out.sort(ORDER_BY_DATA_ORA_ID);
+        return out;
+    }
+
+    @Override
+    protected List<Prenotazione> rawFindByCampo(int idCampo) {
+        Map<Integer, Prenotazione> data = readAllAsMap();
+        List<Prenotazione> out = new ArrayList<>();
+
+        for (Prenotazione p : data.values()) {
+            if (p != null && p.getIdCampo() == idCampo) {
+                out.add(p);
+            }
+        }
+
         out.sort(ORDER_BY_DATA_ORA_ID);
         return out;
     }
@@ -124,6 +150,7 @@ public class PrenotazioneDAOFileSystem extends BasePrenotazioneDAO {
     @Override
     protected void rawUpdateStato(int idPrenotazione, StatoPrenotazione nuovoStato) {
         Map<Integer, Prenotazione> data = readAllAsMap();
+
         Prenotazione p = data.get(idPrenotazione);
         if (p != null) {
             p.setStato(nuovoStato);

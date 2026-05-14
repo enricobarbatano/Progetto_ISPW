@@ -12,7 +12,7 @@ import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.bean.UtenteBean;
 import com.ispw.model.enums.Ruolo;
 
-public class LogicControllerGestioneAccountTest {
+class LogicControllerGestioneAccountTest {
     
     @Test
     @DisplayName("Recupera info account: sessione null -> null")
@@ -89,7 +89,7 @@ public class LogicControllerGestioneAccountTest {
     @DisplayName("Aggiorna Dati Account: nuovi dati Null->Ko")
     void aggiornaDatiAccount_nuoviDatiNull_returnKo(){
     var ctrl=new LogicControllerGestioneAccount();
-    //var d= new DatiAccountBean();
+   
     var result=ctrl.aggiornaDatiAccount(null);
     assertFalse(result.isSuccesso());
     assertEquals("Dati non validi", result.getMessaggio());

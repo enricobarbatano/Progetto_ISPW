@@ -79,8 +79,8 @@ public abstract class DAOFactory {
         };
     }
 
-    @SuppressWarnings("unused") // invoked via reflection in tests
-    static synchronized void resetForTests() {
+   
+    public static synchronized void resetForTests() {
         provider = null;
         fileSystemRoot = null;
         seedRoot = null; //  importantissimo per test ripetibili

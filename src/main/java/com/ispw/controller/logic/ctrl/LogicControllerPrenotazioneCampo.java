@@ -1,7 +1,5 @@
 package com.ispw.controller.logic.ctrl;
 
-import java.sql.Date;
-import java.sql.Time;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -49,13 +47,26 @@ public class LogicControllerPrenotazioneCampo {
     private static final String MSG_INPUT_NON_VALIDO = "Input non valido";
 
     @SuppressWarnings("java:S1312")
-    private Logger log() { return Logger.getLogger(getClass().getName()); }
+    private Logger log() {
+        return Logger.getLogger(getClass().getName());
+    }
 
     // DAO on-demand (runtime via factory)
-    private PrenotazioneDAO prenotazioneDAO() { return DAOFactory.getInstance().getPrenotazioneDAO(); }
-    private CampoDAO        campoDAO()        { return DAOFactory.getInstance().getCampoDAO(); }
-    private GeneralUserDAO  userDAO()         { return DAOFactory.getInstance().getGeneralUserDAO(); }
-    private PagamentoDAO    pagamentoDAO()    { return DAOFactory.getInstance().getPagamentoDAO(); }
+    private PrenotazioneDAO prenotazioneDAO() {
+        return DAOFactory.getInstance().getPrenotazioneDAO();
+    }
+
+    private CampoDAO campoDAO() {
+        return DAOFactory.getInstance().getCampoDAO();
+    }
+
+    private GeneralUserDAO userDAO() {
+        return DAOFactory.getInstance().getGeneralUserDAO();
+    }
+
+    private PagamentoDAO pagamentoDAO() {
+        return DAOFactory.getInstance().getPagamentoDAO();
+    }
 
     // 0) Lista campi
     public CampiBean listaCampi() {
@@ -77,7 +88,7 @@ public class LogicControllerPrenotazioneCampo {
         return dispCtrl.verificaDisponibilita(param);
     }
 
-    // 2) NUOVA PRENOTAZIONE (crea DA_PAGARE + blocca slot) → Riepilogo
+    // 2) NUOVA PRENOTAZIONE (crea DA_PAGARE persistita) → Riepilogo
     public RiepilogoPrenotazioneBean nuovaPrenotazione(DatiInputPrenotazioneBean input,
                                                        SessioneUtenteBean sessione) {
         return nuovaPrenotazione(input, sessione, new LogicControllerGestoreDisponibilita());
@@ -116,11 +127,10 @@ public class LogicControllerPrenotazioneCampo {
         final var user = resolveUserFromSession(sessione);
         if (user == null) return null;
 
-        //  (da esame) prenotazione consentita solo a UTENTE
-        // Se vuoi permetterla anche al gestore, dimmelo e tolgo questo check.
+        // Prenotazione consentita solo a UTENTE
         if (user.getRuolo() != Ruolo.UTENTE) return null;
 
-        // 1) (ri)verifica disponibilità
+        // 1) (ri)verifica disponibilità tramite controller disponibilità
         ParametriVerificaBean pv = new ParametriVerificaBean();
         pv.setIdCampo(idCampo);
         pv.setData(data.toString());
@@ -129,9 +139,9 @@ public class LogicControllerPrenotazioneCampo {
 
         var slots = dispCtrl.verificaDisponibilita(pv);
         boolean disponibile = slots.stream().anyMatch(d ->
-                Objects.equals(d.getData(),     data.toString())
+                Objects.equals(d.getData(), data.toString())
              && Objects.equals(d.getOraInizio(), inizio.toString())
-             && Objects.equals(d.getOraFine(),   fine.toString())
+             && Objects.equals(d.getOraFine(), fine.toString())
         );
 
         if (!disponibile) {
@@ -139,12 +149,17 @@ public class LogicControllerPrenotazioneCampo {
             return null;
         }
 
-        // 2) blocca slot su Campo
+        /*
+         * 2) Recupera il Campo puro.
+         *
+         * Non blocchiamo più lo slot dentro Campo con c.bloccoSlot(...),
+         * perché listaPrenotazioni è runtime-only e @JsonIgnore.
+         *
+         * La persistenza effettiva dello slot è rappresentata dalla Prenotazione
+         * salvata tramite PrenotazioneDAO.store(...).
+         */
         Campo c = campoDAO().findById(idCampo);
         if (c == null) return null;
-
-        c.bloccoSlot(Date.valueOf(data), Time.valueOf(inizio), Time.valueOf(fine));
-        campoDAO().store(c);
 
         // 3) crea Prenotazione (DA_PAGARE) e persiste
         Prenotazione p = new Prenotazione();
@@ -157,7 +172,8 @@ public class LogicControllerPrenotazioneCampo {
 
         prenotazioneDAO().store(p);
 
-        log().fine(() -> "[PRENOT] Creata prenotazione id=" + p.getIdPrenotazione() + " per utente=" + user.getEmail());
+        log().fine(() -> "[PRENOT] Creata prenotazione id=" + p.getIdPrenotazione()
+                + " per utente=" + user.getEmail());
 
         // 4) riepilogo
         return buildRiepilogo(p, c, sessione.getUtente(), durataMin);
@@ -177,20 +193,20 @@ public class LogicControllerPrenotazioneCampo {
     StatoPagamentoBean completaPrenotazione(DatiPagamentoBean dati,
                                             SessioneUtenteBean sessione,
                                             GestionePagamentoPrenotazione payCtrl,
-                                            GestioneFatturaPrenotazione   fattCtrl,
-                                            GestioneNotificaPrenotazione  notiCtrl) {
+                                            GestioneFatturaPrenotazione fattCtrl,
+                                            GestioneNotificaPrenotazione notiCtrl) {
 
         if (!isCheckoutInputValid(dati, sessione, payCtrl, fattCtrl, notiCtrl)) {
             return esitoPagamento(false, "KO", MSG_INPUT_NON_VALIDO);
         }
 
-        //  Risoluzione utente demandata alla Facade (runtime)
+        // Risoluzione utente demandata alla Facade (runtime)
         final var user = resolveUserFromSession(sessione);
         if (user == null) {
             return esitoPagamento(false, "KO", "Utente inesistente");
         }
 
-        //  checkout consentito solo a UTENTE
+        // Checkout consentito solo a UTENTE
         if (user.getRuolo() != Ruolo.UTENTE) {
             return esitoPagamento(false, "KO", "Operazione non consentita");
         }
@@ -219,8 +235,8 @@ public class LogicControllerPrenotazioneCampo {
     private boolean isCheckoutInputValid(DatiPagamentoBean dati,
                                          SessioneUtenteBean sessione,
                                          GestionePagamentoPrenotazione payCtrl,
-                                         GestioneFatturaPrenotazione   fattCtrl,
-                                         GestioneNotificaPrenotazione  notiCtrl) {
+                                         GestioneFatturaPrenotazione fattCtrl,
+                                         GestioneNotificaPrenotazione notiCtrl) {
         return dati != null
             && sessione != null
             && sessione.getUtente() != null
@@ -254,11 +270,13 @@ public class LogicControllerPrenotazioneCampo {
         if (pag != null) {
             StatoPagamentoBean bean = new StatoPagamentoBean();
             bean.setSuccesso(success);
+
             if (pag.getStato() != null) {
                 bean.setStato(pag.getStato().name());
             } else {
                 bean.setStato(success ? PAGATO : "KO");
             }
+
             bean.setIdTransazione(newTxId("PX"));
             bean.setDataPagamento(pag.getDataPagamento());
             bean.setMessaggio(success ? "Pagamento eseguito" : "Pagamento rifiutato");
@@ -276,15 +294,20 @@ public class LogicControllerPrenotazioneCampo {
         bean.setIdCampo(campo.getIdCampo());
         bean.setNome(campo.getNome());
         bean.setTipoSport(campo.getTipoSport());
+
         if (campo.getCostoOrario() != null) {
             bean.setCostoOrario(java.math.BigDecimal.valueOf(campo.getCostoOrario()));
         }
+
         bean.setAttivo(campo.isAttivo());
         bean.setFlagManutenzione(campo.isFlagManutenzione());
+
         return bean;
     }
 
-    private boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
+    private boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
 
     private RiepilogoPrenotazioneBean buildRiepilogo(Prenotazione p, Campo c, UtenteBean utente, int durataMin) {
         RiepilogoPrenotazioneBean r = new RiepilogoPrenotazioneBean();
@@ -295,8 +318,10 @@ public class LogicControllerPrenotazioneCampo {
         if (c != null && c.getCostoOrario() != null) {
             importo = c.getCostoOrario() * (durataMin / 60f);
         }
+
         r.setImportoTotale(importo);
         r.setDatiFiscali(null);
+
         return r;
     }
 
@@ -309,6 +334,7 @@ public class LogicControllerPrenotazioneCampo {
     private boolean isPagamentoOk(StatoPagamento stato) {
         if (stato == null) return false;
         if (stato == StatoPagamento.OK) return true;
+
         final String s = stato.name();
         return s.contains("ESEGUITO")
             || s.contains("APPROVATO")
@@ -317,7 +343,9 @@ public class LogicControllerPrenotazioneCampo {
             || s.contains("COMPLETATO");
     }
 
-    private String newTxId(String prefix) { return prefix + "-" + System.currentTimeMillis(); }
+    private String newTxId(String prefix) {
+        return prefix + "-" + System.currentTimeMillis();
+    }
 
     private StatoPagamentoBean esitoPagamento(boolean ok, String stato, String msg) {
         StatoPagamentoBean bean = new StatoPagamentoBean();
@@ -334,8 +362,10 @@ public class LogicControllerPrenotazioneCampo {
      */
     private com.ispw.model.entity.GeneralUser resolveUserFromSession(SessioneUtenteBean sessione) {
         if (sessione == null || sessione.getUtente() == null) return null;
+
         final String email = normalizeEmail(sessione.getUtente().getEmail());
         if (email == null) return null;
+
         return userDAO().findByEmail(email);
     }
 }

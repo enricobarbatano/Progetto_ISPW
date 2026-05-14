@@ -32,6 +32,42 @@ public class LogicControllerGestoreDisponibilita
     }
 
     /**
+     * Carica un Campo tramite CampoDAO e lo arricchisce con le prenotazioni attive
+     * tramite PrenotazioneDAO.
+     *
+     * Questa composizione viene fatta nel layer applicativo per evitare che CampoDAO
+     * debba accedere direttamente alla persistenza delle Prenotazioni.
+     *
+     * CampoDAO resta quindi responsabile dei soli dati di Campo, mentre
+     * PrenotazioneDAO resta responsabile delle query sulle Prenotazioni.
+     */
+    private Campo caricaCampoConPrenotazioniAttive(int idCampo) {
+        Campo campo = campoDAO().findById(idCampo);
+        if (campo == null) {
+            return null;
+        }
+
+        List<Prenotazione> prenotazioniAttive = prenotazioneDAO().findAttiveByCampo(idCampo);
+        campo.setPrenotazioniRuntime(prenotazioniAttive);
+
+        return campo;
+    }
+
+    /**
+     * Arricchisce un Campo già caricato con le sue prenotazioni attive.
+     *
+     * Utile quando si caricano tutti i campi tramite CampoDAO.findAll().
+     */
+    private void caricaPrenotazioniAttiveSuCampo(Campo campo) {
+        if (campo == null || campo.getIdCampo() <= 0) {
+            return;
+        }
+
+        List<Prenotazione> prenotazioniAttive = prenotazioneDAO().findAttiveByCampo(campo.getIdCampo());
+        campo.setPrenotazioniRuntime(prenotazioniAttive);
+    }
+
+    /**
      * Libera lo slot occupato da una prenotazione:
      * - recupera prenotazione
      * - recupera campo
@@ -121,10 +157,12 @@ public class LogicControllerGestoreDisponibilita
 
     /**
      * Verifica disponibilità:
-     * - Se idCampo presente, verifica solo quel campo, altrimenti su tutti i campi;
-     * - Calcola oraFine = oraInizio + durataMin (default 60 se <=0);
-     * - Usa Campo.isDisponibile(Date, Time, Time) e stato operativo;
-     * - Costruisce DatiDisponibilitaBean.
+     * - Se idCampo presente, verifica solo quel campo;
+     * - altrimenti verifica tutti i campi;
+     * - calcola oraFine = oraInizio + durataMin (default 60 se <= 0);
+     * - carica le prenotazioni attive tramite PrenotazioneDAO;
+     * - usa Campo.isDisponibile(Date, Time, Time) e stato operativo;
+     * - costruisce DatiDisponibilitaBean.
      */
     @Override
     public List<DatiDisponibilitaBean> verificaDisponibilita(ParametriVerificaBean param) {
@@ -148,12 +186,17 @@ public class LogicControllerGestoreDisponibilita
 
         List<Campo> campi;
         CampoDAO cDAO = campoDAO();
+
         try {
             if (param.getIdCampo() > 0) {
-                Campo unico = cDAO.findById(param.getIdCampo());
+                Campo unico = caricaCampoConPrenotazioniAttive(param.getIdCampo());
                 campi = (unico != null) ? List.of(unico) : List.of();
             } else {
                 campi = cDAO.findAll();
+
+                for (Campo c : campi) {
+                    caricaPrenotazioniAttiveSuCampo(c);
+                }
             }
         } catch (RuntimeException ex) {
             return List.of();
@@ -189,6 +232,7 @@ public class LogicControllerGestoreDisponibilita
                 out.add(bean);
             }
         }
+
         return out;
     }
 }
