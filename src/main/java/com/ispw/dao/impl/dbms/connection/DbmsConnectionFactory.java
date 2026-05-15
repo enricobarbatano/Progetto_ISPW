@@ -33,6 +33,7 @@ public final class DbmsConnectionFactory implements ConnectionFactory {
         return instance;
     }
 
+    //questo metodo è il nucleo dell'I/O con dbms perchè crea la connessione con il db tramite drivermanager jdbc
     @Override
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection(url, user, password);

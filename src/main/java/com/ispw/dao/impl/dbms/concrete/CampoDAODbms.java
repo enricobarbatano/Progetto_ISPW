@@ -13,6 +13,11 @@ import com.ispw.dao.impl.base.BaseCampoDAO;
 import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
 import com.ispw.model.entity.Campo;
 
+
+/*ResultSet -> Entity
+Entity -> PreparedStatement
+ */
+
 public class CampoDAODbms extends BaseCampoDAO {
 
     private static final String SQL_FIND_ALL =
@@ -48,17 +53,20 @@ public class CampoDAODbms extends BaseCampoDAO {
         if (id == null || id <= 0) {
             return null;
         }
-
+        
+        //1) viene aperta una connessione con il dbms tramite il metodo getConnection dell'interfaccia ConnectionFactory.java 
+        // e l'istanza singleton concreta passata run-time dalla dbmsfactory dao alla creazione delle classi dao
         try (Connection c = cf.getConnection();
+        //prepared statementè un oggetto che rappresenta una query e definisce il passaggio da O.O a istanza relazionale nel db
              PreparedStatement ps = c.prepareStatement(SQL_FIND_BY_ID)) {
-
+        //carichiamo i parametri della query, in questo caso l'id del campo che vogliamo caricare
             ps.setInt(1, id);
-
+            // il result set è il risultato della query che ci fornisce l'istanza campo legata all'id dato in inout in forma relazionale, 
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
                     return null;
                 }
-
+                //il metodo map campo crea l'istanza campo run-time trasformando da rappresentazione relazionale a object oriented
                 return mapCampo(rs);
             }
 
@@ -141,7 +149,8 @@ public class CampoDAODbms extends BaseCampoDAO {
     }
 
     /* ===================== HELPERS ===================== */
-
+    
+    // qui avviene il mapping record relazionale --> O.O 
     private Campo mapCampo(ResultSet rs) throws SQLException {
         Campo c = new Campo();
 
@@ -159,7 +168,8 @@ public class CampoDAODbms extends BaseCampoDAO {
 
         return c;
     }
-
+    
+// qui avviene il mapping opposto O.O--> record relazionale
     private void bind(PreparedStatement ps, Campo c) throws SQLException {
         ps.setString(1, c.getNome());
         ps.setString(2, c.getTipoSport());

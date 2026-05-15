@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +35,7 @@ import com.ispw.dao.exception.DaoException;
 public class JsonListFileStore<E> {
 
     /**
-     * ObjectMapper condiviso:
+     * ObjectMapper condiviso-> è il componente jackson che effettua la trasformazione O.O<--> json:
      * - JavaTimeModule: supporto tipi java.time
      * - WRITE_DATES_AS_TIMESTAMPS disabilitato: date serializzate come stringhe (ISO) e non timestamp numerici.
      */
@@ -55,7 +54,6 @@ public class JsonListFileStore<E> {
      * Se null, viene mantenuto l'ordine dell'input.
      */
     private final Comparator<E> stableOrder;
-
     public JsonListFileStore(Path filePath, TypeReference<List<E>> typeRef) {
         this(filePath, typeRef, null);
     }
@@ -67,8 +65,9 @@ public class JsonListFileStore<E> {
     }
 
     /**
-     * Legge tutti gli elementi dal file JSON.
-     * - Se il file non esiste: ritorna lista vuota (utile al primo avvio).
+     * controlla se il file esiste, se non esiste ritorna un eccezione
+     * se esiste l'objectmapper llegge il json (filepath.tofile converte la stringa dentro filepath in un path)
+     *  e lo converte in una lista di tipo typereference che è relativo ad ogni dao
      */
     public List<E> readAll() {
         if (Files.notExists(filePath)) return new ArrayList<>();
@@ -117,17 +116,10 @@ public class JsonListFileStore<E> {
       /**
      * Helper: trasforma una lista in mappa usando un estrattore di id.
      * (Lo metto qui per comodità, così i DAO restano puliti.)
-     */
-    // Il metodo toMap è un helper che trasforma una lista di entità in una mappa, 
-    // utilizzando una funzione di estrazione dell'id per determinare le chiavi della mappa.
-    public <K> java.util.Map<K, E> toMap(List<E> list, Function<E, K> idExtractor) {
-        java.util.Map<K, E> map = new java.util.concurrent.ConcurrentHashMap<>();
-        if (list == null) return map;
-        for (E e : list) {
-            if (e == null) continue;
-            K key = idExtractor.apply(e);
-            if (key != null) map.put(key, e);
-        }
-        return map;
-    }
+        Prendi una lista di oggetti E
+        estrai da ogni oggetto una chiave K
+        costruisci una Map<K, E>
+      */
+    
+    
 }

@@ -38,23 +38,29 @@ public class PrenotazioneDAOFileSystem extends BasePrenotazioneDAO {
     private final Path filePath;
     private final JsonListFileStore<Prenotazione> jsonStore;
 
+    //stroage directory è il path della cartella FS dove ho i file json delle diverse istanze e anche questo viene passato dalla dilesystemdaofactory a run-time
     public PrenotazioneDAOFileSystem(Path storageDir) {
         super(true);
         try {
+            //il costruttore verifica che la directory di storga esista davvero sennò la crea
             Files.createDirectories(storageDir);
         } catch (IOException e) {
             throw new DaoException("Impossibile creare directory storage: " + storageDir, e);
         }
 
         this.filePath = storageDir.resolve("prenotazioni.json");
-
+        // gestisco il file prenotazioni.son come una lista di prenotazione: rappresentazione fs<--> O.O
         this.jsonStore = new JsonListFileStore<>(
                 filePath,
+                // type reference è importantissimo perchè essendo la classe jsonlistfilestore generica e utilizzata da tutti i fs dao, non sa a priori
+                // che tipo convertire, perciò definiamo una new type reference e passiamo quella che è la rappresentazione run-time del file.json
                 new TypeReference<List<Prenotazione>>() {},
                 ORDER_BY_ID
         );
     }
 
+    // trsaformiamo la lista in una mappa per motivi di semplicità run time, 
+    // siccome la useremo per fare ad esempio ricerche id prenotazione-> istanza prenotazione, come le quuery per sql
     private Map<Integer, Prenotazione> readAllAsMap() {
         List<Prenotazione> list = jsonStore.readAll();
         Map<Integer, Prenotazione> map = new ConcurrentHashMap<>();
