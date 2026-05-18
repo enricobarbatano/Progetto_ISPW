@@ -6,12 +6,17 @@ import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerRichiesteD
 import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
 import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 
+/**
+ * Controller grafico GUI del flusso gestore del caso d'uso "Disdici prenotazione".
+ *
+ * Questa classe contiene solo le parti specifiche della GUI:
+ * - definizione del logger;
+ * - navigazione verso home.
+ *
+ * La logica comune di caricamento, approvazione e rifiuto delle richieste
+ * viene ereditata dalla classe astratta.
+ */
 public class GUIGraphicControllerRichiesteDisdetta extends AbstractGraphicControllerRichiesteDisdetta {
-
-    // SEZIONE ARCHITETTURALE
-    // A1) Concreto GUI: estende AbstractGraphicControllerRichiesteDisdetta
-    // A2) Differenze CLI/GUI: solo log() e goToHome()
-    // A3) Nessuna logica applicativa: demandata al logic controller
 
     public GUIGraphicControllerRichiesteDisdetta(GraphicControllerNavigation navigator) {
         super(navigator);
@@ -23,6 +28,9 @@ public class GUIGraphicControllerRichiesteDisdetta extends AbstractGraphicContro
         return Logger.getLogger(getClass().getName());
     }
 
+    /**
+     * Torna alla home.
+     */
     @Override
     protected void goToHome() {
         if (navigator != null) {

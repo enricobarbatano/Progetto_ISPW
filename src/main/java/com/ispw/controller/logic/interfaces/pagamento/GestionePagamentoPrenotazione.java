@@ -1,8 +1,9 @@
 package com.ispw.controller.logic.interfaces.pagamento;
 
 import com.ispw.bean.DatiPagamentoBean;
-import com.ispw.model.enums.StatoPagamento;
+import com.ispw.bean.StatoPagamentoBean;
 
 public interface GestionePagamentoPrenotazione {
-    StatoPagamento richiediPagamentoPrenotazione(DatiPagamentoBean datiPagamentoBean, int idPrenotazione);
+
+    StatoPagamentoBean richiediPagamentoPrenotazione(DatiPagamentoBean dati, int idPrenotazione);
 }

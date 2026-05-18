@@ -3,29 +3,38 @@ package com.ispw.controller.graphic.gui;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import com.ispw.bean.DatiAccountBean;
-import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerAccount;
 import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
 import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
-import com.ispw.controller.logic.ctrl.LogicControllerGestioneAccount;
 
+/**
+ * Controller grafico GUI del caso d'uso "Gestione account".
+ *
+ * Questa classe contiene solo le parti specifiche della GUI:
+ * - definizione del logger;
+ * - navigazione verso login;
+ * - navigazione verso home.
+ *
+ * La logica comune del caso d'uso viene ereditata dalla classe astratta.
+ * La logica applicativa viene delegata al logic controller tramite factory
+ * nella classe astratta.
+ */
 public class GUIGraphicControllerAccount extends AbstractGraphicControllerAccount {
-
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: estende AbstractGraphicControllerAccount e usa GraphicControllerNavigation.
-    // A2) IO verso GUI/CLI: riceve/ritorna bean (DatiAccountBean, SessioneUtenteBean).
-    // A3) Logica delegata: usa LogicControllerGestioneAccount.
 
     public GUIGraphicControllerAccount(GraphicControllerNavigation navigator) {
         super(navigator);
     }
 
+    @SuppressWarnings("java:S1312")
     @Override
-    protected Logger log() { return Logger.getLogger(getClass().getName()); }
+    protected Logger log() {
+        return Logger.getLogger(getClass().getName());
+    }
 
+    /**
+     * Torna alla schermata di login.
+     */
     @Override
     protected void goToLogin() {
         if (navigator != null) {
@@ -33,35 +42,25 @@ public class GUIGraphicControllerAccount extends AbstractGraphicControllerAccoun
         }
     }
 
+    /**
+     * Torna alla home.
+     *
+     * Se la sessione è presente, viene passata alla schermata successiva.
+     */
     @Override
     protected void goToHome(SessioneUtenteBean sessione) {
-        if (navigator != null) {
-            if (sessione != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_HOME,
-                    Map.of(GraphicControllerUtils.KEY_SESSIONE, sessione));
-            } else {
-                navigator.goTo(GraphicControllerUtils.ROUTE_HOME, null);
-            }
+        if (navigator == null) {
+            return;
         }
+
+        if (sessione != null) {
+            navigator.goTo(
+                    GraphicControllerUtils.ROUTE_HOME,
+                    Map.of(GraphicControllerUtils.KEY_SESSIONE, sessione)
+            );
+            return;
+        }
+
+        navigator.goTo(GraphicControllerUtils.ROUTE_HOME, null);
     }
-
-    @Override
-    protected DatiAccountBean recuperaInformazioniAccount(SessioneUtenteBean sessione) {
-        return new LogicControllerGestioneAccount().recuperaInformazioniAccount(sessione);
-    }
-
-    @Override
-    protected EsitoOperazioneBean aggiornaDatiAccountConNotifica(DatiAccountBean bean) {
-        return new LogicControllerGestioneAccount().aggiornaDatiAccountConNotifica(bean);
-    }
-
-    @Override
-    protected EsitoOperazioneBean cambiaPasswordConNotifica(String vecchiaPassword, String nuovaPassword,
-                                                            SessioneUtenteBean sessione) {
-        return new LogicControllerGestioneAccount().cambiaPasswordConNotifica(vecchiaPassword, nuovaPassword, sessione);
-    }
-
-    // SEZIONE LOGICA
-    // Legenda metodi: nessun helper privato.
-
 }

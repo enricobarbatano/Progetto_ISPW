@@ -15,20 +15,20 @@ import com.ispw.bean.RiepilogoPrenotazioneBean;
 import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.bean.UtenteBean;
 import com.ispw.controller.logic.ServiceFactory;
+import com.ispw.controller.logic.interfaces.CtrlDisdetta;
 import com.ispw.controller.logic.interfaces.disponibilita.GestioneDisponibilitaDisdetta;
 import com.ispw.controller.logic.interfaces.fattura.GestioneFatturaRimborso;
 import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaDisdetta;
+import com.ispw.controller.logic.interfaces.pagamento.GestionePagamentoDisdetta;
 import com.ispw.controller.logic.interfaces.pagamento.GestionePagamentoRimborso;
 import com.ispw.dao.factory.DAOFactory;
 import com.ispw.dao.interfaces.GeneralUserDAO;
 import com.ispw.dao.interfaces.LogDAO;
-import com.ispw.dao.interfaces.PagamentoDAO;
 import com.ispw.dao.interfaces.PrenotazioneDAO;
 import com.ispw.dao.interfaces.RegolePenalitaDAO;
 import com.ispw.dao.interfaces.RegoleTempisticheDAO;
 import com.ispw.dao.interfaces.RichiestaDisdettaDAO;
 import com.ispw.model.entity.GeneralUser;
-import com.ispw.model.entity.Pagamento;
 import com.ispw.model.entity.Prenotazione;
 import com.ispw.model.entity.RegolePenalita;
 import com.ispw.model.entity.RegoleTempistiche;
@@ -56,7 +56,7 @@ import com.ispw.model.enums.StatoRichiestaDisdetta;
  * Il layer grafico chiama solo questi metodi pubblici e non conosce i DAO
  * né i controller secondari usati internamente.
  */
-public class LogicControllerDisdettaPrenotazione {
+public class LogicControllerDisdettaPrenotazione implements CtrlDisdetta {
 
     // Messaggi comuni
     private static final String MSG_INPUT_NON_VALIDO = "Input non valido";
@@ -97,10 +97,6 @@ public class LogicControllerDisdettaPrenotazione {
         return DAOFactory.getInstance().getGeneralUserDAO();
     }
 
-    private PagamentoDAO pagamentoDAO() {
-        return DAOFactory.getInstance().getPagamentoDAO();
-    }
-
     private LogDAO logDAO() {
         return DAOFactory.getInstance().getLogDAO();
     }
@@ -139,6 +135,9 @@ public class LogicControllerDisdettaPrenotazione {
     private GestioneDisponibilitaDisdetta dispCtrl() {
         return ServiceFactory.getDisponibilitaDisdettaService();
     }
+    private GestionePagamentoDisdetta payDisdettaCtrl() {
+    return ServiceFactory.getPagamentoDisdettaService();
+}
 
     // STEP 0: consultazione prenotazioni e anteprima
 
@@ -150,13 +149,14 @@ public class LogicControllerDisdettaPrenotazione {
      * - ha data e ora valide;
      * - è futura rispetto al momento corrente.
      */
+    @Override
     public List<RiepilogoPrenotazioneBean> ottieniPrenotazioniCancellabili(UtenteBean utente) {
         //controllo sul bean
         if (utente == null || LogicControllerHelper.isBlank(utente.getEmail())) {
             return List.of();
         }
 
-        //controlla se l'utente (findbyemail) esiste e se ha RUOLO==UTENTE
+        //controlla se l'utente esiste e se ha ruolo UTENTE
         GeneralUser user = userDAO().findByEmail(LogicControllerHelper.normalizeEmail(utente.getEmail()));
         if (user == null || user.getRuolo() != Ruolo.UTENTE) {
             return List.of();
@@ -168,10 +168,10 @@ public class LogicControllerDisdettaPrenotazione {
         //memorizza il time attuale
         LocalDateTime now = LocalDateTime.now();
 
-        //genera una lista riepilogo prenotazionebean che vuota
+        //genera una lista riepilogo prenotazione bean vuota
         List<RiepilogoPrenotazioneBean> out = new ArrayList<>();
 
-        //controlla se è cancellabile tramite metodo helper is cancellable
+        //controlla se ogni prenotazione è cancellabile
         for (Prenotazione prenotazione : prenotazioni) {
             if (!isCancellablePrenotazione(prenotazione, now)) {
                 continue;
@@ -181,14 +181,14 @@ public class LogicControllerDisdettaPrenotazione {
             RiepilogoPrenotazioneBean riepilogo = new RiepilogoPrenotazioneBean();
             riepilogo.setIdPrenotazione(prenotazione.getIdPrenotazione());
             riepilogo.setUtente(utente);
-            riepilogo.setImportoTotale(getImportoPagato(prenotazione.getIdPrenotazione()));
+            riepilogo.setImportoTotale(payDisdettaCtrl().recuperaImportoPagato(prenotazione.getIdPrenotazione()));
             riepilogo.setDatiFiscali(null);
 
-            //infine aggiunge la singola prenotazione cancellabile alla lista
+            //aggiunge la singola prenotazione cancellabile alla lista
             out.add(riepilogo);
         }
 
-        //ritorna la lista al graphic controller che la mostrarà all'utente
+        //ritorna la lista al graphic controller che la mostrerà all'utente
         return out;
     }
 
@@ -201,6 +201,7 @@ public class LogicControllerDisdettaPrenotazione {
      * Il metodo non crea nessuna richiesta e non modifica la prenotazione:
      * si limita a controllare se la disdetta è possibile e a calcolare la penale.
      */
+    @Override
     public EsitoDisdettaBean anteprimaDisdetta(int idPrenotazione, SessioneUtenteBean sessione) {
         return validaDisdetta(idPrenotazione, sessione);
     }
@@ -226,6 +227,7 @@ public class LogicControllerDisdettaPrenotazione {
      * un esito al graphic controller. Il caso d'uso però è differito:
      * la disdetta rimane PENDING finché il gestore non la approva o rifiuta.
      */
+    @Override
     public EsitoOperazioneBean richiediDisdetta(int idPrenotazione, String notaUtente, SessioneUtenteBean sessione) {
         //controllo sull'input
         if (sessione == null || sessione.getUtente() == null
@@ -233,12 +235,13 @@ public class LogicControllerDisdettaPrenotazione {
             return LogicControllerHelper.esito(false, MSG_INPUT_NON_VALIDO);
         }
 
-        //mi definisco la mia entity run time attraverso resolveUserFromSessione e sessione e faccio i relativi controlli
+        //risolvo l'utente reale partendo dalla sessione
         GeneralUser user = resolveUserFromSession(sessione);
         if (user == null) {
             return LogicControllerHelper.esito(false, MSG_UTENTE_INESISTENTE);
         }
 
+        //la richiesta di disdetta può essere creata solo da un utente finale
         if (user.getRuolo() != Ruolo.UTENTE) {
             return LogicControllerHelper.esito(false, MSG_SOLO_UTENTE);
         }
@@ -256,7 +259,6 @@ public class LogicControllerDisdettaPrenotazione {
          * Evita di creare più richieste PENDING per la stessa prenotazione.
          * Se ne esiste già una in attesa, l'utente deve aspettare la decisione del gestore.
          */
-        //controllo che la richiesta non sia già presente richiamando il metodo del dao findbyPrenotazione
         RichiestaDisdettaRimborso existing = richiestaDAO().findByPrenotazione(idPrenotazione);
         if (existing != null && existing.getStato() == StatoRichiestaDisdetta.PENDING) {
             return LogicControllerHelper.esito(false, MSG_RICHIESTA_GIA_ESISTE);
@@ -264,11 +266,15 @@ public class LogicControllerDisdettaPrenotazione {
 
         //definisco i valori della richiesta di disdetta
         float penale = Math.max(0f, preview.getPenale());
-        float importoPagato = getImportoPagato(idPrenotazione);
+        float importoPagato = payDisdettaCtrl().recuperaImportoPagato(idPrenotazione);
         float rimborsoStimato = Math.max(0f, importoPagato - penale);
 
-        //creo una nuova istanza richiesta di disdetta in stato Pending (siccome ho verificato che non esiste già una),
-        //questa entity servirà a coordinare il caso d'uso complesso, che si baserà sullo stato di questa entity
+        /*
+         * Creo una nuova richiesta di disdetta in stato PENDING.
+         * Questa entity serve a coordinare il caso d'uso complesso:
+         * sarà lo stato della richiesta a dire se è in attesa, approvata,
+         * rifiutata oppure eseguita.
+         */
         RichiestaDisdettaRimborso richiesta = new RichiestaDisdettaRimborso();
         richiesta.setIdPrenotazione(idPrenotazione);
         richiesta.setIdUtente(user.getIdUtente());
@@ -288,7 +294,7 @@ public class LogicControllerDisdettaPrenotazione {
                         + " penaleStimata=" + penale
                         + " rimborsoStimato=" + rimborsoStimato);
 
-        //infine ritorno l'esito al graphic controller
+        //ritorno l'esito al graphic controller
         return LogicControllerHelper.esito(true, MSG_RICHIESTA_OK);
     }
 
@@ -303,13 +309,14 @@ public class LogicControllerDisdettaPrenotazione {
      * Questa lista dovrebbe essere usata dalla schermata del gestore
      * per mostrare le richieste in attesa.
      */
+    @Override
     public List<RichiestaDisdettaBean> listaRichiestePending(SessioneUtenteBean sessioneGestore) {
-        //controlla se il ruolo dell'utente della sessione è == gestore
+        //controlla se il ruolo dell'utente della sessione è GESTORE
         if (!isGestore(sessioneGestore)) {
             return List.of();
         }
 
-        //recupera dal dao le richieste in stato pending e le inserisce nella lista che verrà passata al graphicController
+        //recupera dal DAO le richieste in stato PENDING e le converte in bean
         return richiestaDAO().findByStato(StatoRichiestaDisdetta.PENDING).stream()
                 .filter(r -> r != null)
                 .map(this::toBean)
@@ -330,18 +337,19 @@ public class LogicControllerDisdettaPrenotazione {
      * - il sistema prova ad annullare la prenotazione;
      * - se l'annullamento va a buon fine, la richiesta passa a ESEGUITA.
      */
+    @Override
     public EsitoOperazioneBean valutaRichiestaDisdetta(
             int idRichiesta,
-            //approva è la variabile scelta dal gestore che definisce se ha approvato o no la disdetta
             boolean approva,
             String notaGestore,
             SessioneUtenteBean sessioneGestore) {
 
-        //controlli del gestore e che l'input sia valido
+        //controllo che l'operazione sia effettuata da un gestore
         if (!isGestore(sessioneGestore)) {
             return LogicControllerHelper.esito(false, MSG_SOLO_GESTORE);
         }
 
+        //controllo che l'id richiesta sia valido
         if (idRichiesta <= 0) {
             return LogicControllerHelper.esito(false, MSG_INPUT_NON_VALIDO);
         }
@@ -354,28 +362,24 @@ public class LogicControllerDisdettaPrenotazione {
             return LogicControllerHelper.esito(false, MSG_RICHIESTA_ASSENTE);
         }
 
-        //controllo se lo stato è davvero pending
+        //controllo se lo stato è davvero PENDING
         if (richiesta.getStato() != StatoRichiestaDisdetta.PENDING) {
             return LogicControllerHelper.esito(false, MSG_RICHIESTA_GIA_GESTITA);
         }
 
-        //carico l'id del gestore che servirà nel metodo update del dao
+        //carico l'id del gestore che servirà nel metodo update del DAO
         Integer idGestore = resolveGestoreId(sessioneGestore);
 
-        //se approva == FALSE
+        //se approva == false, la richiesta viene rifiutata
         if (!approva) {
-            //aggiorno lo stato della richiesta a rifiutata
             richiestaDAO().updateStato(idRichiesta, StatoRichiestaDisdetta.RIFIUTATA, idGestore, notaGestore);
 
-            //aggiungo il log dell'evento
             appendLogSafe(richiesta.getIdUtente(), "RICHIESTA_DISDETTA RIFIUTATA #" + idRichiesta);
 
-            //return esito al graphic controller
             return LogicControllerHelper.esito(true, MSG_RICHIESTA_RIFIUTATA);
         }
 
-        //approva è == TRUE
-        //cambio lo stato della richiesta in approvata, quindi manca solo eseguirla concretamente
+        //se approva == true, la richiesta passa prima ad APPROVATA
         richiestaDAO().updateStato(idRichiesta, StatoRichiestaDisdetta.APPROVATA, idGestore, notaGestore);
 
         //mi carico l'istanza dell'utente tramite l'id presente nella richiesta di disdetta
@@ -391,7 +395,7 @@ public class LogicControllerDisdettaPrenotazione {
 
         //controllo se l'esito dell'annullamento della prenotazione è andato bene
         if (exec.isSuccesso()) {
-            //cambio lo stato della richiesta da approvata ad eseguita
+            //cambio lo stato della richiesta da APPROVATA a ESEGUITA
             richiestaDAO().updateStato(idRichiesta, StatoRichiestaDisdetta.ESEGUITA, idGestore, notaGestore);
 
             //segno il log dell'evento
@@ -405,7 +409,9 @@ public class LogicControllerDisdettaPrenotazione {
         return LogicControllerHelper.esito(false, MSG_APPROVA_KO);
     }
 
+    // =====================================================================
     // ESECUZIONE TECNICA DELLA RICHIESTA APPROVATA
+    // =====================================================================
 
     /**
      * Esegue l'annullamento tecnico di una prenotazione partendo da una richiesta approvata.
@@ -435,23 +441,16 @@ public class LogicControllerDisdettaPrenotazione {
             return LogicControllerHelper.esito(false, MSG_GIA_ANNULLATA);
         }
 
-        //carico la penale per calcolare il rimborso
+        //carico la penale salvata nella richiesta
         float penale = getPenaleStimata(richiesta);
 
-        /*
-         * I controller secondari vengono recuperati tramite ServiceFactory.
-         * In questo modo non vengono passati come parametri e non vengono creati
-         * direttamente con new dentro il controller principale.
-         */
-
-        //esegue il rimborso definendo pagamento e fattura
+        //esegue il rimborso, se previsto
         processRefundIfConfirmed(prenotazione, idPrenotazione, penale);
 
         /*
          * Prima liberiamo lo slot, poi eliminiamo la prenotazione.
          * Così eventuali collaboratori che cercano la prenotazione la trovano ancora.
          */
-        //libero lo slot che era occupato
         liberaRisorsa(idPrenotazione);
 
         //cancello la prenotazione
@@ -464,7 +463,9 @@ public class LogicControllerDisdettaPrenotazione {
         return LogicControllerHelper.esito(true, MSG_DISDETTA_OK);
     }
 
+    // =====================================================================
     // VALIDAZIONE E CALCOLO PENALE
+    // =====================================================================
 
     /**
      * Verifica se l'utente può creare una richiesta di disdetta
@@ -509,7 +510,9 @@ public class LogicControllerDisdettaPrenotazione {
         return out;
     }
 
-    // Esito standard per una disdetta non valida utilizzato se quei controlli in validaDisdetta falliscono.
+    /**
+     * Esito standard per una disdetta non valida.
+     */
     private EsitoDisdettaBean invalidoEsito() {
         EsitoDisdettaBean out = new EsitoDisdettaBean();
         out.setPossibile(false);
@@ -583,7 +586,7 @@ public class LogicControllerDisdettaPrenotazione {
             return;
         }
 
-        float importoPagato = getImportoPagato(idPrenotazione);
+       float importoPagato = payDisdettaCtrl().recuperaImportoPagato(idPrenotazione);
         float rimborso = Math.max(0f, importoPagato - penale);
         if (rimborso <= 0f) {
             return;
@@ -636,16 +639,6 @@ public class LogicControllerDisdettaPrenotazione {
         return inizio.isAfter(now);
     }
 
-    /**
-     * Recupera l'importo effettivamente pagato per una prenotazione.
-     */
-    private float getImportoPagato(int idPrenotazione) {
-        Pagamento pag = pagamentoDAO().findByPrenotazione(idPrenotazione);
-        if (pag == null || pag.getImportoFinale() == null) {
-            return 0f;
-        }
-        return pag.getImportoFinale().floatValue();
-    }
 
     /**
      * Estrae la penale salvata nella richiesta.
@@ -655,6 +648,7 @@ public class LogicControllerDisdettaPrenotazione {
         if (penale == null) {
             return 0f;
         }
+
         return Math.max(0f, penale.floatValue());
     }
 
@@ -710,7 +704,7 @@ public class LogicControllerDisdettaPrenotazione {
             SystemLog systemLog = new SystemLog();
             systemLog.setTimestamp(LocalDateTime.now());
             systemLog.setIdUtenteCoinvolto(idUtente);
-            systemLog.setDescrizione(descr);
+            systemLog.setDescrizione(LogicControllerHelper.safe(descr));
             logDAO().append(systemLog);
         } catch (RuntimeException ex) {
             log().log(Level.FINE, "Append log disdetta fallito: {0}", ex.getMessage());
@@ -725,6 +719,7 @@ public class LogicControllerDisdettaPrenotazione {
                 || LogicControllerHelper.isBlank(sessione.getUtente().getEmail())) {
             return null;
         }
+
         return userDAO().findByEmail(LogicControllerHelper.normalizeEmail(sessione.getUtente().getEmail()));
     }
 
@@ -757,6 +752,7 @@ public class LogicControllerDisdettaPrenotazione {
         b.setNotaUtente(r.getNotaUtente());
         b.setNotaGestore(r.getNotaGestore());
         b.setIdGestoreDecisione(r.getIdGestoreDecisione());
+
         return b;
     }
 }

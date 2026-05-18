@@ -13,15 +13,24 @@ import com.ispw.bean.UtentiBean;
 import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
 import com.ispw.controller.graphic.interfaces.GraphicControllerPenalita;
 import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
-import com.ispw.controller.logic.ctrl.LogicControllerApplicaPenalita;
+import com.ispw.controller.logic.LogicControllerFactory;
+import com.ispw.controller.logic.interfaces.CtrlApplicaPenalita;
 
+/**
+ * Controller grafico astratto del caso d'uso "Applica penalità".
+ *
+ * Questa classe contiene la logica comune tra GUI e CLI:
+ * - richiede la lista utenti selezionabili;
+ * - permette la selezione di un utente;
+ * - costruisce il bean della penalità;
+ * - chiama il controller logico;
+ * - aggiorna la route penalità tramite navigator.
+ *
+ * Nota di progetto:
+ * il graphic controller dipende dall'interfaccia CtrlApplicaPenalita,
+ * ottenuta tramite LogicControllerFactory.
+ */
 public abstract class AbstractGraphicControllerPenalita implements GraphicControllerPenalita {
-
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: implementa GraphicControllerPenalita (interfaccia) e usa GraphicControllerNavigation.
-    // A2) IO verso GUI/CLI: riceve/ritorna bean (DatiPenalitaBean, UtentiBean) e Map.
-    // A3) Logica delegata: usa LogicControllerApplicaPenalita.
 
     protected final GraphicControllerNavigation navigator;
 
@@ -33,9 +42,17 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
 
     protected abstract void goToHome();
 
-    protected LogicControllerApplicaPenalita logicController() {
-        return new LogicControllerApplicaPenalita();
+    // =====================================================================
+    // LOGIC CONTROLLER
+    // =====================================================================
+
+    protected CtrlApplicaPenalita logicController() {
+        return LogicControllerFactory.getPenalitaController();
     }
+
+    // =====================================================================
+    // NAVIGAZIONE
+    // =====================================================================
 
     @Override
     public String getRouteName() {
@@ -44,31 +61,58 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
 
     @Override
     public void onShow(Map<String, Object> params) {
+        // In questa schermata non è necessario gestire parametri in modo comune.
     }
 
+    // STEP 1: lista utenti
+
+    /**
+     * Richiede la lista degli utenti a cui è possibile applicare una penalità.
+     */
     public void richiediListaUtenti() {
         try {
             List<String> utenti = formatUtenti(logicController().listaUtentiPerPenalita());
+
             if (navigator != null) {
                 navigator.goTo(GraphicControllerUtils.ROUTE_PENALITA,
-                    Map.of(GraphicControllerUtils.KEY_UTENTI, utenti));
+                        Map.of(GraphicControllerUtils.KEY_UTENTI, utenti));
             }
-        } catch (Exception e) {
-            log().log(Level.SEVERE, "Errore recupero lista utenti", e);
+        } catch (RuntimeException ex) {
+            log().log(Level.SEVERE, "Errore recupero lista utenti", ex);
         }
     }
 
+    // STEP 2: selezione utente
+
+    /**
+     * Seleziona un utente tramite email.
+     *
+     * Il metodo non applica ancora la penalità:
+     * aggiorna soltanto la route con l'utente selezionato.
+     */
     @Override
     public void selezionaUtente(String email) {
         if (isEmailNonValida(email)) {
             return;
         }
+
         if (navigator != null) {
             navigator.goTo(GraphicControllerUtils.ROUTE_PENALITA,
-                Map.of(GraphicControllerUtils.KEY_EMAIL, email.trim()));
+                    Map.of(GraphicControllerUtils.KEY_EMAIL, email.trim()));
         }
     }
 
+    // STEP 3: applicazione penalità
+
+    /**
+     * Applica una penalità a un utente.
+     *
+     * Il metodo:
+     * - controlla id utente, importo e motivazione;
+     * - costruisce DatiPenalitaBean;
+     * - chiama il controller logico;
+     * - naviga con successo o mostra errore.
+     */
     @Override
     public void applicaPenalita(int idUtente, float importo, String motivazione) {
         if (isIdUtenteNonValido(idUtente) || isPenalitaNonValida(importo, motivazione)) {
@@ -78,43 +122,41 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
         try {
             DatiPenalitaBean dati = buildPenalitaBean(idUtente, importo, motivazione);
 
-            EsitoOperazioneBean esito = logicController().applicaSanzione(
-                dati,
-                null,
-                null);
+            EsitoOperazioneBean esito = logicController().applicaSanzione(dati, null, null);
 
             if (esito == null || !esito.isSuccesso()) {
-                notifyPenalitaError(esito != null ? esito.getMessaggio()
-                    : GraphicControllerUtils.MSG_OPERAZIONE_NON_RIUSCITA);
+                notifyPenalitaError(esito != null
+                        ? esito.getMessaggio()
+                        : GraphicControllerUtils.MSG_OPERAZIONE_NON_RIUSCITA);
                 return;
             }
 
             if (navigator != null) {
                 navigator.goTo(GraphicControllerUtils.ROUTE_PENALITA,
-                    Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
+                        Map.of(GraphicControllerUtils.KEY_SUCCESSO, esito.getMessaggio()));
             }
-        } catch (Exception e) {
-            log().log(Level.SEVERE, "Errore applicazione penalita", e);
+        } catch (RuntimeException ex) {
+            log().log(Level.SEVERE, "Errore applicazione penalita", ex);
         }
     }
 
+    // STEP 4: ritorno home
+
+    /**
+     * Torna alla home delegando il comportamento concreto alla classe GUI o CLI.
+     */
     @Override
     public void tornaAllaHome() {
         goToHome();
     }
 
-    // SEZIONE LOGICA
-    // Legenda metodi:
-    // 1) notifyPenalitaError(...) - notifica errore e naviga.
-    // 2) isEmailNonValida(...) - valida email.
-    // 3) isIdUtenteNonValido(...) - valida id utente.
-    // 4) isPenalitaNonValida(...) - valida penalita.
-    // 5) buildPenalitaBean(...) - costruisce bean penalita.
-    // 6) formatUtenti(...) - formatta lista utenti.
-    // 7) formatUtente(...) - formatta singolo utente.
+    // =====================================================================
+    // HELPERS PENALITÀ
+    // =====================================================================
+
     private void notifyPenalitaError(String message) {
         GraphicControllerUtils.notifyError(log(), navigator, GraphicControllerUtils.ROUTE_PENALITA,
-            GraphicControllerUtils.PREFIX_PENALITA, message);
+                GraphicControllerUtils.PREFIX_PENALITA, message);
     }
 
     private boolean isEmailNonValida(String email) {
@@ -122,6 +164,7 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
             notifyPenalitaError(GraphicControllerUtils.MSG_EMAIL_UTENTE_NON_VALIDA);
             return true;
         }
+
         return false;
     }
 
@@ -130,6 +173,7 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
             notifyPenalitaError(GraphicControllerUtils.MSG_ID_UTENTE_NON_VALIDO);
             return true;
         }
+
         return false;
     }
 
@@ -138,6 +182,7 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
             notifyPenalitaError(GraphicControllerUtils.MSG_DATI_PENALITA_NON_VALIDI);
             return true;
         }
+
         return false;
     }
 
@@ -146,6 +191,7 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
         dati.setIdUtente(idUtente);
         dati.setMotivazione(motivazione.trim());
         dati.setImporto(BigDecimal.valueOf(importo));
+
         return dati;
     }
 
@@ -153,15 +199,17 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
         if (utenti == null || utenti.getUtenti() == null || utenti.getUtenti().isEmpty()) {
             return List.of("Nessun utente disponibile");
         }
+
         return utenti.getUtenti().stream()
-            .map(this::formatUtente)
-            .toList();
+                .map(this::formatUtente)
+                .toList();
     }
 
     private String formatUtente(UtenteSelezioneBean u) {
         if (u == null) {
             return "";
         }
+
         String email = u.getEmail() != null ? u.getEmail() : "";
         return String.format("#%d - %s (%s)", u.getIdUtente(), email, u.getRuolo());
     }

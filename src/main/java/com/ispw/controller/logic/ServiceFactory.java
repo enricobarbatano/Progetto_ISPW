@@ -21,11 +21,15 @@ import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaRegistrazio
 import com.ispw.controller.logic.interfaces.pagamento.GestionePagamentoPenalita;
 import com.ispw.controller.logic.interfaces.pagamento.GestionePagamentoPrenotazione;
 import com.ispw.controller.logic.interfaces.pagamento.GestionePagamentoRimborso;
+import com.ispw.controller.logic.interfaces.pagamento.GestionePagamentoDisdetta;
 
 public class ServiceFactory {
 
     // ===================== PAGAMENTO =====================
 
+    public static  GestionePagamentoDisdetta getPagamentoDisdettaService() {
+        return new LogicControllerGestionePagamento();
+    }
     public static GestionePagamentoPrenotazione getPagamentoPrenotazioneService() {
         return new LogicControllerGestionePagamento();
     }

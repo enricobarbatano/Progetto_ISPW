@@ -17,15 +17,23 @@ import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
 import com.ispw.controller.graphic.interfaces.GraphicControllerPrenotazione;
 import com.ispw.controller.graphic.interfaces.GraphicControllerPrenotazioneUtils;
 import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
-import com.ispw.controller.logic.ctrl.LogicControllerPrenotazioneCampo;
+import com.ispw.controller.logic.LogicControllerFactory;
+import com.ispw.controller.logic.interfaces.CtrlPrenotazione;
 
+/**
+ * Controller grafico astratto del caso d'uso "Prenota campo".
+ *
+ * Questa classe contiene la logica comune tra GUI e CLI:
+ * - valida gli input ricevuti dalla view;
+ * - chiama il controller logico tramite interfaccia;
+ * - formatta i dati da mostrare;
+ * - usa il navigator per cambiare schermata o aggiornare la stessa route.
+ *
+ * Nota di progetto:
+ * il graphic controller non conosce l'implementazione concreta del logic controller.
+ * Usa CtrlPrenotazione ottenuto tramite LogicControllerFactory.
+ */
 public abstract class AbstractGraphicControllerPrenotazione implements GraphicControllerPrenotazione {
-
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: implementa GraphicControllerPrenotazione (interfaccia) e usa GraphicControllerNavigation.
-    // A2) IO verso GUI/CLI: riceve/ritorna bean (ParametriVerificaBean, DatiInputPrenotazioneBean, DatiPagamentoBean).
-    // A3) Logica delegata: usa LogicControllerPrenotazioneCampo.
 
     protected final GraphicControllerNavigation navigator;
 
@@ -39,8 +47,8 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
 
     protected abstract void goToHome();
 
-    protected LogicControllerPrenotazioneCampo logicController() {
-        return new LogicControllerPrenotazioneCampo();
+    protected CtrlPrenotazione logicController() {
+        return LogicControllerFactory.getPrenotazioneController();
     }
 
     @Override
@@ -50,6 +58,7 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
 
     @Override
     public void onShow(Map<String, Object> params) {
+        // In questa schermata non è necessario gestire parametri in modo comune.
     }
 
     @Override
@@ -61,14 +70,14 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
 
         try {
             List<String> slot = GraphicControllerPrenotazioneUtils.formatSlotDisponibili(
-                logicController().trovaSlotDisponibili(input));
+                    logicController().trovaSlotDisponibili(input));
 
             if (navigator != null) {
                 navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE,
-                    Map.of(GraphicControllerUtils.KEY_SLOT_DISPONIBILI, slot));
+                        Map.of(GraphicControllerUtils.KEY_SLOT_DISPONIBILI, slot));
             }
-        } catch (Exception e) {
-            log().log(Level.SEVERE, "Errore ricerca disponibilita", e);
+        } catch (RuntimeException ex) {
+            log().log(Level.SEVERE, "Errore ricerca disponibilita", ex);
         }
     }
 
@@ -78,6 +87,7 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
             notifyPrenotazioneError(GraphicControllerUtils.MSG_DATI_PRENOTAZIONE_NULLI);
             return;
         }
+
         if (sessione == null) {
             notifyPrenotazioneError(GraphicControllerUtils.MSG_SESSIONE_MANCANTE_PRENOTAZIONE);
             return;
@@ -98,10 +108,10 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
 
             if (navigator != null) {
                 navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE,
-                    Map.of(GraphicControllerUtils.KEY_RIEPILOGO, payload));
+                        Map.of(GraphicControllerUtils.KEY_RIEPILOGO, payload));
             }
-        } catch (Exception e) {
-            log().log(Level.SEVERE, "Errore creazione prenotazione", e);
+        } catch (RuntimeException ex) {
+            log().log(Level.SEVERE, "Errore creazione prenotazione", ex);
         }
     }
 
@@ -111,6 +121,7 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
             notifyPrenotazioneError(GraphicControllerUtils.MSG_DATI_PAGAMENTO_NULLI);
             return;
         }
+
         if (sessione == null) {
             notifyPrenotazioneError(GraphicControllerUtils.MSG_SESSIONE_MANCANTE_PAGAMENTO);
             return;
@@ -133,10 +144,10 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
 
             if (navigator != null) {
                 navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE,
-                    Map.of(GraphicControllerUtils.KEY_PAGAMENTO, payload));
+                        Map.of(GraphicControllerUtils.KEY_PAGAMENTO, payload));
             }
-        } catch (Exception e) {
-            log().log(Level.SEVERE, "Errore pagamento", e);
+        } catch (RuntimeException ex) {
+            log().log(Level.SEVERE, "Errore pagamento", ex);
         }
     }
 
@@ -148,37 +159,35 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
     public void richiediListaCampi(SessioneUtenteBean sessione) {
         try {
             List<String> campi = formatCampi(logicController().listaCampi());
+
             if (navigator != null) {
                 Map<String, Object> payload = new HashMap<>();
                 payload.put(GraphicControllerUtils.KEY_CAMPI, campi);
+
                 if (sessione != null) {
                     payload.put(GraphicControllerUtils.KEY_SESSIONE, sessione);
                 }
+
                 navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE, payload);
             }
-        } catch (Exception e) {
-            log().log(Level.SEVERE, "Errore recupero lista campi", e);
+        } catch (RuntimeException ex) {
+            log().log(Level.SEVERE, "Errore recupero lista campi", ex);
         }
     }
 
-    // SEZIONE LOGICA
-    // Legenda metodi:
-    // 1) formatCampi(...) - formatta lista campi.
-    // 2) cercaDisponibilitaRaw(...) - adapter per input grezzi.
-    // 3) creaPrenotazioneRaw(...) - adapter per input grezzi.
-    // 4) procediAlPagamentoRaw(...) - adapter per input grezzi.
     private List<String> formatCampi(CampiBean campi) {
         if (campi == null || campi.getCampi() == null) {
             return List.of();
         }
+
         return campi.getCampi().stream()
-            .map(c -> String.format("#%d - %s (%s) [attivo=%s, manutenzione=%s]",
-                c.getIdCampo(),
-                c.getNome(),
-                c.getTipoSport(),
-                c.isAttivo(),
-                c.isFlagManutenzione()))
-            .toList();
+                .map(c -> String.format("#%d - %s (%s) [attivo=%s, manutenzione=%s]",
+                        c.getIdCampo(),
+                        c.getNome(),
+                        c.getTipoSport(),
+                        c.isAttivo(),
+                        c.isFlagManutenzione()))
+                .toList();
     }
 
     public void cercaDisponibilitaRaw(int idCampo, String data, String oraInizio, int durataMin) {
@@ -187,6 +196,7 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
         input.setData(data);
         input.setOraInizio(oraInizio);
         input.setDurataMin(durataMin);
+
         cercaDisponibilita(input);
     }
 
@@ -197,6 +207,7 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
         input.setData(data);
         input.setOraInizio(oraInizio);
         input.setOraFine(oraFine);
+
         creaPrenotazione(input, sessione);
     }
 
@@ -206,6 +217,7 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
         pagamento.setMetodo(metodo);
         pagamento.setCredenziale(credenziale);
         pagamento.setImporto(importo);
+
         procediAlPagamento(pagamento, sessione);
     }
 }
