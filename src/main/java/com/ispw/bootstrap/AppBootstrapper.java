@@ -5,7 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import com.ispw.controller.factory.FrontendControllerFactory;
+import com.ispw.controller.graphic.factory.FrontendControllerFactory;
 import com.ispw.dao.factory.DAOFactory;
 import com.ispw.dao.impl.dbms.connection.DbmsConnectionFactory;
 import com.ispw.model.enums.PersistencyProvider;

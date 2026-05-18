@@ -81,9 +81,6 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
             EsitoOperazioneBean esito = logicController().applicaSanzione(
                 dati,
                 null,
-                null,
-                null,
-                null,
                 null);
 
             if (esito == null || !esito.isSuccesso()) {

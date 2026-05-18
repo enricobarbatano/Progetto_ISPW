@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 public class DatiPenalitaBean  {
    
-
+    private boolean sospendiAccount;
     private int idUtente;
     private BigDecimal importo;
     private String motivazione;
@@ -44,4 +44,11 @@ public class DatiPenalitaBean  {
     public void setDataDecorrenza(LocalDate dataDecorrenza) {
          this.dataDecorrenza = dataDecorrenza;
          }
+    public boolean isSospendiAccount() {
+    return sospendiAccount;
+    }
+
+    public void setSospendiAccount(boolean sospendiAccount) {
+    this.sospendiAccount = sospendiAccount;
+    }
 }

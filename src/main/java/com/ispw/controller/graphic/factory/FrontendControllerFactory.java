@@ -1,4 +1,4 @@
-package com.ispw.controller.factory;
+package com.ispw.controller.graphic.factory;
 
 import com.ispw.controller.graphic.interfaces.GraphicControllerAccount;
 import com.ispw.controller.graphic.interfaces.GraphicControllerDisdetta;

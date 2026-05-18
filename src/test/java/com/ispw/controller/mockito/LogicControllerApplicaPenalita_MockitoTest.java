@@ -13,10 +13,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.intThat;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -28,6 +29,7 @@ import com.ispw.bean.DatiFatturaBean;
 import com.ispw.bean.DatiPagamentoBean;
 import com.ispw.bean.DatiPenalitaBean;
 import com.ispw.bean.EsitoOperazioneBean;
+import com.ispw.controller.logic.ServiceFactory;
 import com.ispw.controller.logic.ctrl.LogicControllerApplicaPenalita;
 import com.ispw.controller.logic.interfaces.fattura.GestioneFatturaPenalita;
 import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaPenalita;
@@ -37,35 +39,43 @@ import com.ispw.model.entity.UtenteFinale;
 import com.ispw.model.enums.Ruolo;
 import com.ispw.model.enums.StatoAccount;
 
-// Test di integrazione con Mockito per verificare l'orchestrazione di LogicControllerApplicaPenalita:
-// - Verifica che, dati input validi, vengano invocati i collaboratori (notifica, pagamento, fattura) 
-// con i parametri corretti (normalizzazione inclusa).
-
+// Test con Mockito per verificare l'orchestrazione di LogicControllerApplicaPenalita.
+// Dopo il refactoring, i service non vengono più passati come parametri:
+// vengono recuperati tramite ServiceFactory.
+// Per questo motivo la ServiceFactory viene mockata staticamente.
 @ExtendWith(MockitoExtension.class)
-class LogicControllerApplicaPenalita_MockitoTest extends UnitTestBase{
+class LogicControllerApplicaPenalitaMockitoTest extends UnitTestBase {
 
-    // Collaboratori mockati=
-    @Mock private GestionePagamentoPenalita payCtrl;
-    @Mock private GestioneFatturaPenalita fattCtrl;
-    @Mock private GestioneNotificaPenalita notiCtrl;
-    // ArgumentCaptor per catturare i parametri con cui vengono invocati pagamento e fattura
-    @Captor private ArgumentCaptor<DatiPagamentoBean> pagamentoCaptor;
-    @Captor private ArgumentCaptor<DatiFatturaBean> fatturaCaptor;
+    @Mock
+    private GestionePagamentoPenalita payCtrl;
+
+    @Mock
+    private GestioneFatturaPenalita fattCtrl;
+
+    @Mock
+    private GestioneNotificaPenalita notiCtrl;
+
+    @Captor
+    private ArgumentCaptor<DatiPagamentoBean> pagamentoCaptor;
+
+    @Captor
+    private ArgumentCaptor<DatiFatturaBean> fatturaCaptor;
 
     private LogicControllerApplicaPenalita controller;
 
-    // Prima di ogni test, inizializza il controller e prepara un utente nel DAO (per evitare errori "utente inesistente").
     @BeforeEach
     void init() {
         controller = new LogicControllerApplicaPenalita();
 
-        // Assumo che i tuoi test già inizializzino DAOFactory su IN_MEMORY (via BaseDAOTest o bootstrap test).
-        // Se non fosse così, dimmelo e ti do il bootstrap minimo.
         var userDAO = DAOFactory.getInstance().getGeneralUserDAO();
-        // Pulisci se il tuo DAO ha clear(); altrimenti ignora
-        try { userDAO.getClass().getMethod("clear").invoke(userDAO); } catch (Exception ignored) {}
 
-        // Seed utente esistente (per evitare KO "utente inesistente")
+        try {
+            userDAO.getClass().getMethod("clear").invoke(userDAO);
+        } catch (ReflectiveOperationException ex) {
+            // Alcune implementazioni DAO di test potrebbero non esporre clear().
+            // In quel caso il test continua usando lo stato disponibile.
+        }
+
         UtenteFinale u = new UtenteFinale();
         u.setIdUtente(10);
         u.setNome("Mario");
@@ -74,13 +84,13 @@ class LogicControllerApplicaPenalita_MockitoTest extends UnitTestBase{
         u.setPassword("pwd");
         u.setRuolo(Ruolo.UTENTE);
         u.setStatoAccount(StatoAccount.ATTIVO);
+
         userDAO.store(u);
     }
 
     @Test
     @DisplayName("Penalità: orchestrazione -> invoca notifica/pagamento/fattura e normalizza pagamento")
     void applicaSanzione_orchestrazione_invocaCollaboratori_eNormalizzaPagamento() {
-
         // Arrange
         DatiPenalitaBean dati = new DatiPenalitaBean();
         dati.setIdUtente(10);
@@ -89,42 +99,55 @@ class LogicControllerApplicaPenalita_MockitoTest extends UnitTestBase{
         dati.setImporto(new BigDecimal("30.00"));
 
         DatiPagamentoBean pay = new DatiPagamentoBean();
-        pay.setImporto(0f);      // forza normalizzazione -> importo = 30.00
-        pay.setMetodo("   ");    // blank -> default "PAYPAL"
+        pay.setImporto(0f);
+        pay.setMetodo("   ");
 
         DatiFatturaBean fatt = new DatiFatturaBean();
-        fatt.setDataOperazione(null); // normalizzazione fattura (data = oggi)
+        fatt.setDataOperazione(null);
 
-        // When().thenReturn() per simulare i collaboratori: restituiscono sempre successo (EsitoOperazioneBean con successo=true).
         when(payCtrl.richiediPagamentoPenalita(any(DatiPagamentoBean.class), anyInt()))
                 .thenReturn(null);
+
         when(fattCtrl.generaFatturaPenalita(any(DatiFatturaBean.class), anyInt()))
                 .thenReturn(null);
 
-        // Act
-        EsitoOperazioneBean esito = controller.applicaSanzione(dati, pay, fatt, payCtrl, fattCtrl, notiCtrl);
+        /*
+         * Mock statico della ServiceFactory.
+         * Così, quando il controller chiama i metodi accessor interni,
+         * riceve i mock definiti in questo test.
+         */
+        try (MockedStatic<ServiceFactory> serviceFactoryMock = Mockito.mockStatic(ServiceFactory.class)) {
+            serviceFactoryMock.when(ServiceFactory::getPagamentoPenalitaService).thenReturn(payCtrl);
+            serviceFactoryMock.when(ServiceFactory::getFatturaPenalitaService).thenReturn(fattCtrl);
+            serviceFactoryMock.when(ServiceFactory::getNotificaPenalitaService).thenReturn(notiCtrl);
 
-        // Assert esito
-        assertNotNull(esito);
-        assertTrue(esito.isSuccesso());
+            // Act
+            EsitoOperazioneBean esito = controller.applicaSanzione(dati, pay, fatt);
 
-        // Verify notifica: 
-        verify(notiCtrl, times(1)).inviaNotificaPenalita(eq("10"));
+            // Assert esito
+            assertNotNull(esito);
+            assertTrue(esito.isSuccesso());
 
-        // Verify pagamento: deve essere invocato una volta con idPenalita > 0
-        verify(payCtrl, times(1)).richiediPagamentoPenalita(pagamentoCaptor.capture(), intThat(id -> id > 0));
-        DatiPagamentoBean paySent = pagamentoCaptor.getValue();
-        assertNotNull(paySent);
+            // Verify notifica
+            verify(notiCtrl, times(1)).inviaNotificaPenalita("10");
 
-        // Normalizzazione pagamento: importo -> 30, metodo -> PAYPAL
-        assertEquals(30.0f, paySent.getImporto(), 0.0001f);
-        assertEquals("PAYPAL", paySent.getMetodo());
+            // Verify pagamento
+            verify(payCtrl, times(1))
+                    .richiediPagamentoPenalita(pagamentoCaptor.capture(), intThat(id -> id > 0));
 
-        // Verify fattura: invocata una volta con lo stesso idPenalita del pagamento
-        verify(fattCtrl, times(1)).generaFatturaPenalita(fatturaCaptor.capture(), intThat(id -> id > 0));
-        assertNotNull(fatturaCaptor.getValue());
+            DatiPagamentoBean paySent = pagamentoCaptor.getValue();
+            assertNotNull(paySent);
 
-        // Non chiamare oltre
-        verifyNoMoreInteractions(notiCtrl, payCtrl, fattCtrl);
+            assertEquals(30.0f, paySent.getImporto(), 0.0001f);
+            assertEquals("PAYPAL", paySent.getMetodo());
+
+            // Verify fattura
+            verify(fattCtrl, times(1))
+                    .generaFatturaPenalita(fatturaCaptor.capture(), intThat(id -> id > 0));
+
+            assertNotNull(fatturaCaptor.getValue());
+
+            verifyNoMoreInteractions(notiCtrl, payCtrl, fattCtrl);
+        }
     }
 }

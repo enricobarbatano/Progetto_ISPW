@@ -1,16 +1,17 @@
-package com.ispw.controller.factory;
+package com.ispw.controller.graphic.factory;
 
-import com.ispw.controller.graphic.cli.CLIGraphicControllerAccount;
-import com.ispw.controller.graphic.cli.CLIGraphicControllerDisdetta;
-import com.ispw.controller.graphic.cli.CLIGraphicControllerLog;
-import com.ispw.controller.graphic.cli.CLIGraphicControllerNavigation;
-import com.ispw.controller.graphic.cli.CLIGraphicControllerPenalita;
-import com.ispw.controller.graphic.cli.CLIGraphicControllerPrenotazione;
-import com.ispw.controller.graphic.cli.CLIGraphicControllerRegistrazione;
-import com.ispw.controller.graphic.cli.CLIGraphicControllerRegole;
-import com.ispw.controller.graphic.cli.CLIGraphicControllerRichiesteDisdetta;
-import com.ispw.controller.graphic.cli.CLIGraphicLoginController;
+import java.util.logging.Logger;
 
+import com.ispw.controller.graphic.gui.GUIGraphicControllerAccount;
+import com.ispw.controller.graphic.gui.GUIGraphicControllerDisdetta;
+import com.ispw.controller.graphic.gui.GUIGraphicControllerLog;
+import com.ispw.controller.graphic.gui.GUIGraphicControllerNavigation;
+import com.ispw.controller.graphic.gui.GUIGraphicControllerPenalita;
+import com.ispw.controller.graphic.gui.GUIGraphicControllerPrenotazione;
+import com.ispw.controller.graphic.gui.GUIGraphicControllerRegistrazione;
+import com.ispw.controller.graphic.gui.GUIGraphicControllerRegole;
+import com.ispw.controller.graphic.gui.GUIGraphicControllerRichiesteDisdetta;
+import com.ispw.controller.graphic.gui.GUIGraphicLoginController;
 import com.ispw.controller.graphic.interfaces.GraphicControllerAccount;
 import com.ispw.controller.graphic.interfaces.GraphicControllerDisdetta;
 import com.ispw.controller.graphic.interfaces.GraphicControllerLog;
@@ -22,41 +23,45 @@ import com.ispw.controller.graphic.interfaces.GraphicControllerRegole;
 import com.ispw.controller.graphic.interfaces.GraphicControllerRichiesteDisdetta;
 import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.graphic.interfaces.GraphicLoginController;
+import com.ispw.view.gui.GUIAccountView;
+import com.ispw.view.gui.GUIDisdettaView;
+import com.ispw.view.gui.GUIHomeView;
+import com.ispw.view.gui.GUILogView;
+import com.ispw.view.gui.GUILoginView;
+import com.ispw.view.gui.GUIPenalitaView;
+import com.ispw.view.gui.GUIPrenotazioneView;
+import com.ispw.view.gui.GUIRegistrazioneView;
+import com.ispw.view.gui.GUIRegoleView;
+import com.ispw.view.gui.GUIRichiesteDisdettaView;
+import com.ispw.view.gui.GuiLauncher;
 
-import com.ispw.view.cli.CLIAccountView;
-import com.ispw.view.cli.CLIDisdettaView;
-import com.ispw.view.cli.CLIHomeView;
-import com.ispw.view.cli.CLILogView;
-import com.ispw.view.cli.CLILoginView;
-import com.ispw.view.cli.CLIPenalitaView;
-import com.ispw.view.cli.CLIPrenotazioneView;
-import com.ispw.view.cli.CLIRegistrazioneView;
-import com.ispw.view.cli.CLIRegoleView;
-import com.ispw.view.cli.CLIRichiesteDisdettaView;
+public final class GUIFrontendControllerFactory extends FrontendControllerFactory {
 
-public final class CLIFrontendControllerFactory extends FrontendControllerFactory {
+    private static final Logger logger = Logger.getLogger(GUIFrontendControllerFactory.class.getName());
 
-    // Navigation
-    private CLIGraphicControllerNavigation navigationController;
+    // Navigation (router)
+    private GUIGraphicControllerNavigation navigationController;
 
-    // Controller + view login/home
-    private CLIGraphicLoginController loginController;
-    private CLILoginView loginView;
-    private CLIHomeView homeView;
+    // Login
+    private GUIGraphicLoginController loginController;
+    private GUILoginView loginView;
+
+    // Home
+    private GUIHomeView homeView;
 
     // Views
-    private CLIRegistrazioneView registrazioneView;
-    private CLIAccountView accountView;
-    private CLIPrenotazioneView prenotazioneView;
-    private CLIDisdettaView disdettaView;
-    private CLIRegoleView regoleView;
-    private CLIPenalitaView penalitaView;
-    private CLILogView logView;
+    private GUIRegistrazioneView registrazioneView;
+    private GUIAccountView accountView;
+    private GUIPrenotazioneView prenotazioneView;
+    private GUIDisdettaView disdettaView;
+    private GUIRegoleView regoleView;
+    private GUIPenalitaView penalitaView;
+    private GUILogView logView;
 
-    // ✅ Nuova view
-    private CLIRichiesteDisdettaView richiesteDisdettaView;
+    // Nuova view (gestore: richieste disdetta)
+    private GUIRichiesteDisdettaView richiesteDisdettaView;
 
-    // Interfacce controller (per DIP)
+    // Controller (interfacce, DIP)
     private GraphicControllerAccount accountController;
     private GraphicControllerRegistrazione registrazioneController;
     private GraphicControllerPrenotazione prenotazioneController;
@@ -65,13 +70,13 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     private GraphicControllerPenalita penalitaController;
     private GraphicControllerLog logController;
 
-    // ✅ Nuovo controller
+    //Nuovo controller
     private GraphicControllerRichiesteDisdetta richiesteDisdettaController;
 
     @Override
     public void startApplication() {
-        System.out.println("Avvio CLI...");
-        getNavigationController().goTo(GraphicControllerUtils.ROUTE_LOGIN);
+        logger.info("Avvio GUI...");
+        GuiLauncher.launchApp(() -> getNavigationController().goTo(GraphicControllerUtils.ROUTE_LOGIN));
     }
 
     // ===================== Controllers =====================
@@ -80,7 +85,7 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     public GraphicLoginController createLoginController() {
         if (loginController == null) {
             GraphicControllerNavigation navigator = getNavigationController();
-            loginController = new CLIGraphicLoginController(navigator);
+            loginController = new GUIGraphicLoginController(navigator);
         }
         return loginController;
     }
@@ -89,7 +94,7 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     public GraphicControllerAccount createAccountController() {
         if (accountController == null) {
             GraphicControllerNavigation navigator = getNavigationController();
-            accountController = new CLIGraphicControllerAccount(navigator);
+            accountController = new GUIGraphicControllerAccount(navigator);
         }
         return accountController;
     }
@@ -98,7 +103,7 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     public GraphicControllerRegistrazione createRegistrazioneController() {
         if (registrazioneController == null) {
             GraphicControllerNavigation navigator = getNavigationController();
-            registrazioneController = new CLIGraphicControllerRegistrazione(navigator);
+            registrazioneController = new GUIGraphicControllerRegistrazione(navigator);
         }
         return registrazioneController;
     }
@@ -107,7 +112,7 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     public GraphicControllerPrenotazione createPrenotazioneController() {
         if (prenotazioneController == null) {
             GraphicControllerNavigation navigator = getNavigationController();
-            prenotazioneController = new CLIGraphicControllerPrenotazione(navigator);
+            prenotazioneController = new GUIGraphicControllerPrenotazione(navigator);
         }
         return prenotazioneController;
     }
@@ -116,7 +121,7 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     public GraphicControllerDisdetta createDisdettaController() {
         if (disdettaController == null) {
             GraphicControllerNavigation navigator = getNavigationController();
-            disdettaController = new CLIGraphicControllerDisdetta(navigator);
+            disdettaController = new GUIGraphicControllerDisdetta(navigator);
         }
         return disdettaController;
     }
@@ -125,7 +130,7 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     public GraphicControllerRegole createRegoleController() {
         if (regoleController == null) {
             GraphicControllerNavigation navigator = getNavigationController();
-            regoleController = new CLIGraphicControllerRegole(navigator);
+            regoleController = new GUIGraphicControllerRegole(navigator);
         }
         return regoleController;
     }
@@ -134,7 +139,7 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     public GraphicControllerPenalita createPenalitaController() {
         if (penalitaController == null) {
             GraphicControllerNavigation navigator = getNavigationController();
-            penalitaController = new CLIGraphicControllerPenalita(navigator);
+            penalitaController = new GUIGraphicControllerPenalita(navigator);
         }
         return penalitaController;
     }
@@ -143,17 +148,17 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     public GraphicControllerLog createLogController() {
         if (logController == null) {
             GraphicControllerNavigation navigator = getNavigationController();
-            logController = new CLIGraphicControllerLog(navigator);
+            logController = new GUIGraphicControllerLog(navigator);
         }
         return logController;
     }
 
-    // ✅ Nuovo: richieste disdetta gestore
+    // Nuovo: richieste disdetta (gestore)
     @Override
     public GraphicControllerRichiesteDisdetta createRichiesteDisdettaController() {
         if (richiesteDisdettaController == null) {
             GraphicControllerNavigation navigator = getNavigationController();
-            richiesteDisdettaController = new CLIGraphicControllerRichiesteDisdetta(navigator);
+            richiesteDisdettaController = new GUIGraphicControllerRichiesteDisdetta(navigator);
         }
         return richiesteDisdettaController;
     }
@@ -161,7 +166,7 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
     @Override
     public GraphicControllerNavigation createNavigationController() {
         if (navigationController == null) {
-            navigationController = new CLIGraphicControllerNavigation();
+            navigationController = new GUIGraphicControllerNavigation();
             registerRoutes();
         }
         return navigationController;
@@ -173,83 +178,83 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
 
     // ===================== Views =====================
 
-    public CLILoginView createLoginView() {
+    public GUILoginView createLoginView() {
         if (loginView == null) {
-            loginView = new CLILoginView(loginController == null
-                ? (CLIGraphicLoginController) createLoginController()
+            loginView = new GUILoginView(loginController == null
+                ? (GUIGraphicLoginController) createLoginController()
                 : loginController);
         }
         return loginView;
     }
 
-    public CLIHomeView createHomeView() {
+    public GUIHomeView createHomeView() {
         if (homeView == null) {
-            homeView = new CLIHomeView(getNavigationController());
+            homeView = new GUIHomeView(getNavigationController());
         }
         return homeView;
     }
 
-    public CLIRegistrazioneView createRegistrazioneView() {
+    public GUIRegistrazioneView createRegistrazioneView() {
         if (registrazioneView == null) {
-            registrazioneView = new CLIRegistrazioneView(
-                (CLIGraphicControllerRegistrazione) createRegistrazioneController());
+            registrazioneView = new GUIRegistrazioneView(
+                (GUIGraphicControllerRegistrazione) createRegistrazioneController());
         }
         return registrazioneView;
     }
 
-    public CLIAccountView createAccountView() {
+    public GUIAccountView createAccountView() {
         if (accountView == null) {
-            accountView = new CLIAccountView(
-                (CLIGraphicControllerAccount) createAccountController());
+            accountView = new GUIAccountView(
+                (GUIGraphicControllerAccount) createAccountController());
         }
         return accountView;
     }
 
-    public CLIPrenotazioneView createPrenotazioneView() {
+    public GUIPrenotazioneView createPrenotazioneView() {
         if (prenotazioneView == null) {
-            prenotazioneView = new CLIPrenotazioneView(
-                (CLIGraphicControllerPrenotazione) createPrenotazioneController());
+            prenotazioneView = new GUIPrenotazioneView(
+                (GUIGraphicControllerPrenotazione) createPrenotazioneController());
         }
         return prenotazioneView;
     }
 
-    public CLIDisdettaView createDisdettaView() {
+    public GUIDisdettaView createDisdettaView() {
         if (disdettaView == null) {
-            disdettaView = new CLIDisdettaView(
-                (CLIGraphicControllerDisdetta) createDisdettaController());
+            disdettaView = new GUIDisdettaView(
+                (GUIGraphicControllerDisdetta) createDisdettaController());
         }
         return disdettaView;
     }
 
-    public CLIRegoleView createRegoleView() {
+    public GUIRegoleView createRegoleView() {
         if (regoleView == null) {
-            regoleView = new CLIRegoleView(
-                (CLIGraphicControllerRegole) createRegoleController());
+            regoleView = new GUIRegoleView(
+                (GUIGraphicControllerRegole) createRegoleController());
         }
         return regoleView;
     }
 
-    public CLIPenalitaView createPenalitaView() {
+    public GUIPenalitaView createPenalitaView() {
         if (penalitaView == null) {
-            penalitaView = new CLIPenalitaView(
-                (CLIGraphicControllerPenalita) createPenalitaController());
+            penalitaView = new GUIPenalitaView(
+                (GUIGraphicControllerPenalita) createPenalitaController());
         }
         return penalitaView;
     }
 
-    public CLILogView createLogView() {
+    public GUILogView createLogView() {
         if (logView == null) {
-            logView = new CLILogView(
-                (CLIGraphicControllerLog) createLogController());
+            logView = new GUILogView(
+                (GUIGraphicControllerLog) createLogController());
         }
         return logView;
     }
 
-    // ✅ Nuova view: richieste disdetta (gestore)
-    public CLIRichiesteDisdettaView createRichiesteDisdettaView() {
+    // Nuova view (gestore)
+    public GUIRichiesteDisdettaView createRichiesteDisdettaView() {
         if (richiesteDisdettaView == null) {
-            richiesteDisdettaView = new CLIRichiesteDisdettaView(
-                (CLIGraphicControllerRichiesteDisdetta) createRichiesteDisdettaController()
+            richiesteDisdettaView = new GUIRichiesteDisdettaView(
+                (GUIGraphicControllerRichiesteDisdetta) createRichiesteDisdettaController()
             );
         }
         return richiesteDisdettaView;
@@ -268,7 +273,7 @@ public final class CLIFrontendControllerFactory extends FrontendControllerFactor
         navigationController.registerRoute(createPenalitaView().getRouteName(), createPenalitaView());
         navigationController.registerRoute(createLogView().getRouteName(), createLogView());
 
-        // ✅ Nuova route
+        // Nuova route gestore
         navigationController.registerRoute(createRichiesteDisdettaView().getRouteName(), createRichiesteDisdettaView());
     }
 }
