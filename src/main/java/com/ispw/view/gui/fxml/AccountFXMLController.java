@@ -1,6 +1,5 @@
 package com.ispw.view.gui.fxml;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import com.ispw.bean.SessioneUtenteBean;
@@ -13,14 +12,23 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 /**
- * Controller per la gestione del profilo utente (Account).
- * Rifattorizzato per eliminare warning di inutilizzo e migliorare la robustezza.
+ * Controller FXML per la gestione account.
+ *
+ * RESPONSABILITÀ:
+ * - mostra dati utente
+ * - raccoglie input
+ * - delega al controller grafico
+ *
+ * NON:
+ * - crea bean
+ * - contiene logica di business
  */
 public class AccountFXMLController {
 
     private GUIGraphicControllerAccount controller;
     private SessioneUtenteBean sessione;
-    private Integer idUtente; 
+
+    private Integer idUtente;
 
     @FXML private Label lblError;
     @FXML private Label lblSuccess;
@@ -33,7 +41,7 @@ public class AccountFXMLController {
     @FXML private PasswordField newPwd;
 
     /**
-     * Inizializza il controller con le dipendenze necessarie.
+     * Inizializzazione dipendenze
      */
     public void init(GUIGraphicControllerAccount controller, SessioneUtenteBean sessione) {
         this.controller = controller;
@@ -41,117 +49,88 @@ public class AccountFXMLController {
     }
 
     /**
-     * Esegue il rendering dei dati ricevuti dal controller grafico.
+     * Rendering dati provenienti dal controller grafico
      */
     public void render(Map<String, Object> params) {
+
         if (params == null) return;
 
-        // Gestione Messaggi di Errore e Successo
+        // Messaggi
         Object err = params.get(GraphicControllerUtils.KEY_ERROR);
-        Object msg = params.get(GraphicControllerUtils.KEY_MESSAGE);
-        if (msg == null) msg = params.get(GraphicControllerUtils.KEY_SUCCESSO);
+        Object ok  = params.get(GraphicControllerUtils.KEY_SUCCESSO);
 
-        lblError.setText(err != null ? String.valueOf(err) : "");
-        lblSuccess.setText(msg != null ? String.valueOf(msg) : "");
+        lblError.setText(err != null ? err.toString() : "");
+        lblSuccess.setText(ok != null ? ok.toString() : "");
 
-        // Caricamento Dati Account nei Campi di Testo
-        idUtente = null; // Reset cautelativo
-        Object rawDati = params.get(GraphicControllerUtils.KEY_DATI_ACCOUNT);
+        // Dati account
+        Object raw = params.get(GraphicControllerUtils.KEY_DATI_ACCOUNT);
 
-        if (rawDati instanceof Map<?, ?> dati) {
-            // Estrazione sicura dell'ID (Unboxing Safety)
+        if (raw instanceof Map<?, ?> dati) {
+
             Object idRaw = dati.get(GraphicControllerUtils.KEY_ID_UTENTE);
             if (idRaw instanceof Integer i) {
-                this.idUtente = i;
+                idUtente = i;
             }
 
-            // Popolamento campi con controllo null/stringa
-            setTextIfPresent(txtNome, dati.get(GraphicControllerUtils.KEY_NOME));
-            setTextIfPresent(txtCognome, dati.get(GraphicControllerUtils.KEY_COGNOME));
-            setTextIfPresent(txtEmail, dati.get(GraphicControllerUtils.KEY_EMAIL));
+            setText(txtNome, dati.get(GraphicControllerUtils.KEY_NOME));
+            setText(txtCognome, dati.get(GraphicControllerUtils.KEY_COGNOME));
+            setText(txtEmail, dati.get(GraphicControllerUtils.KEY_EMAIL));
         }
     }
 
-    /**
-     * Helper per impostare il testo solo se il valore non è nullo.
-     */
-    private void setTextIfPresent(TextField field, Object value) {
-        if (field != null && value != null) {
-            field.setText(String.valueOf(value));
-        }
-    }
+    // =========================================================
+    // EVENTI UI
+    // =========================================================
 
-    // --- GESTIONE EVENTI (Annotazioni @FXML aggiunte per risolvere i warning) ---
-
-    @FXML 
+    @FXML
     public void onLoad() {
-        clearLocalError();
-        if (controller != null) {
-            controller.loadAccount(sessione);
-        }
+        controller.loadAccount(sessione);
     }
 
-    @FXML 
+    @FXML
     public void onUpdate() {
-        clearLocalError();
-        if (controller == null) return;
 
         if (idUtente == null) {
-            lblError.setText("Dati account non caricati: premi 'Ricarica dati'");
+            lblError.setText("Ricaricare dati account");
             return;
         }
 
-        Map<String, Object> updatePayload = new HashMap<>();
-        updatePayload.put(GraphicControllerUtils.KEY_ID_UTENTE, idUtente);
-        updatePayload.put(GraphicControllerUtils.KEY_SESSIONE, sessione);
-
-        addTrimmedTextToMap(updatePayload, GraphicControllerUtils.KEY_NOME, txtNome);
-        addTrimmedTextToMap(updatePayload, GraphicControllerUtils.KEY_COGNOME, txtCognome);
-        addTrimmedTextToMap(updatePayload, GraphicControllerUtils.KEY_EMAIL, txtEmail);
-
-        controller.aggiornaDatiAccount(updatePayload);
+        controller.aggiornaDatiAccount(
+                idUtente,
+                txtNome.getText(),
+                txtCognome.getText(),
+                txtEmail.getText(),
+                sessione
+        );
     }
 
-    @FXML 
+    @FXML
     public void onChangePwd() {
-        clearLocalError();
-        if (controller == null) return;
 
-        String rawNewPwd = newPwd.getText();
-        if (rawNewPwd == null || rawNewPwd.trim().length() < 6) {
-            lblError.setText("Nuova password non valida (min 6 caratteri)");
-            return;
-        }
-        controller.cambiaPassword(oldPwd.getText(), rawNewPwd, sessione);
+        controller.cambiaPassword(
+                oldPwd.getText(),
+                newPwd.getText(),
+                sessione
+        );
     }
 
-    @FXML 
+    @FXML
     public void onHome() {
-        clearLocalError();
-        if (controller != null) {
-            controller.tornaAllaHome(sessione);
-        }
+        controller.tornaAllaHome(sessione);
     }
 
-    @FXML 
+    @FXML
     public void onLogout() {
-        clearLocalError();
-        if (controller != null) {
-            controller.logout();
-        }
+        controller.logout();
     }
 
-    /**
-     * Helper per aggiungere testo alla mappa solo se non vuoto.
-     */
-    private void addTrimmedTextToMap(Map<String, Object> map, String key, TextField field) {
-        if (field != null && field.getText() != null && !field.getText().isBlank()) {
-            map.put(key, field.getText().trim());
-        }
-    }
+    // =========================================================
+    // HELPERS
+    // =========================================================
 
-    private void clearLocalError() {
-        lblError.setText("");
-        lblSuccess.setText("");
+    private void setText(TextField f, Object v) {
+        if (f != null && v != null) {
+            f.setText(v.toString());
+        }
     }
 }

@@ -1,19 +1,27 @@
 package com.ispw.controller.graphic.interfaces;
 
-import java.util.Map;
+import java.math.BigDecimal;
+import java.time.LocalTime;
 
 public interface GraphicControllerRegole extends NavigableController {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: interfaccia del layer graphic (DIP).
-    // A2) IO verso GUI/CLI: usa Map<String, Object> per parametri regole.
-    // A3) Logica delegata: ai controller grafici concreti.
-
     void richiediListaCampi();
+
     void selezionaCampo(int idCampo);
-    void aggiornaStatoCampo(Map<String, Object> regolaCampo);
-    void aggiornaTempistiche(Map<String, Object> tempistiche);
-    void aggiornaPenalita(Map<String, Object> penalita);
+
+    void aggiornaStatoCampo(int idCampo, boolean attivo, boolean flagManutenzione);
+
+    void aggiornaTempistiche(
+            int preavvisoMinimoMinuti,
+            int durataSlotMinuti,
+            LocalTime oraApertura,
+            LocalTime oraChiusura
+    );
+
+    void aggiornaPenalita(
+            int preavvisoMinimoMinuti,
+            BigDecimal valorePenalita
+    );
+
     void tornaAllaHome();
 }

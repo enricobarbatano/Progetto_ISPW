@@ -20,19 +20,6 @@ import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.logic.LogicControllerFactory;
 import com.ispw.controller.logic.interfaces.CtrlPrenotazione;
 
-/**
- * Controller grafico astratto del caso d'uso "Prenota campo".
- *
- * Questa classe contiene la logica comune tra GUI e CLI:
- * - valida gli input ricevuti dalla view;
- * - chiama il controller logico tramite interfaccia;
- * - formatta i dati da mostrare;
- * - usa il navigator per cambiare schermata o aggiornare la stessa route.
- *
- * Nota di progetto:
- * il graphic controller non conosce l'implementazione concreta del logic controller.
- * Usa CtrlPrenotazione ottenuto tramite LogicControllerFactory.
- */
 public abstract class AbstractGraphicControllerPrenotazione implements GraphicControllerPrenotazione {
 
     protected final GraphicControllerNavigation navigator;
@@ -58,32 +45,56 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
 
     @Override
     public void onShow(Map<String, Object> params) {
-        // In questa schermata non è necessario gestire parametri in modo comune.
     }
 
     @Override
-    public void cercaDisponibilita(ParametriVerificaBean input) {
-        if (input == null) {
+public void richiediListaCampi() {
+
+    CampiBean campi = logicController().listaCampi();
+
+    List<String> lista = campi.getCampi().stream()
+            .map(c -> c.getIdCampo() + " - " + c.getNome())
+            .toList();
+
+    navigator.goTo(
+            GraphicControllerUtils.ROUTE_PRENOTAZIONE,
+            Map.of(GraphicControllerUtils.KEY_CAMPI, lista)
+    );
+}
+    @Override
+    public void cercaDisponibilita(int idCampo, String data, String oraInizio, int durataMin) {
+
+        if (idCampo <= 0 || data == null || oraInizio == null || durataMin <= 0) {
             notifyPrenotazioneError(GraphicControllerUtils.MSG_PARAMETRI_RICERCA_DISPONIBILITA_NULLI);
             return;
         }
+
+        ParametriVerificaBean input = new ParametriVerificaBean();
+        input.setIdCampo(idCampo);
+        input.setData(data);
+        input.setOraInizio(oraInizio);
+        input.setDurataMin(durataMin);
 
         try {
             List<String> slot = GraphicControllerPrenotazioneUtils.formatSlotDisponibili(
                     logicController().trovaSlotDisponibili(input));
 
-            if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE,
-                        Map.of(GraphicControllerUtils.KEY_SLOT_DISPONIBILI, slot));
-            }
+            navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE,
+                    Map.of(GraphicControllerUtils.KEY_SLOT_DISPONIBILI, slot));
+
         } catch (RuntimeException ex) {
-            log().log(Level.SEVERE, "Errore ricerca disponibilita", ex);
+            log().log(Level.SEVERE, "Errore disponibilita", ex);
         }
     }
 
     @Override
-    public void creaPrenotazione(DatiInputPrenotazioneBean input, SessioneUtenteBean sessione) {
-        if (input == null) {
+    public void creaPrenotazione(int idCampo,
+                                 String data,
+                                 String oraInizio,
+                                 String oraFine,
+                                 SessioneUtenteBean sessione) {
+
+        if (idCampo <= 0 || data == null || oraInizio == null || oraFine == null) {
             notifyPrenotazioneError(GraphicControllerUtils.MSG_DATI_PRENOTAZIONE_NULLI);
             return;
         }
@@ -93,8 +104,15 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
             return;
         }
 
+        DatiInputPrenotazioneBean input = new DatiInputPrenotazioneBean();
+        input.setIdCampo(idCampo);
+        input.setData(data);
+        input.setOraInizio(oraInizio);
+        input.setOraFine(oraFine);
+
         try {
-            RiepilogoPrenotazioneBean riepilogo = logicController().nuovaPrenotazione(input, sessione);
+            RiepilogoPrenotazioneBean riepilogo =
+                    logicController().nuovaPrenotazione(input, sessione);
 
             if (riepilogo == null) {
                 notifyPrenotazioneError(GraphicControllerUtils.MSG_PRENOTAZIONE_NON_CREATA);
@@ -106,18 +124,21 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
             payload.put(GraphicControllerUtils.KEY_IMPORTO_TOTALE, riepilogo.getImportoTotale());
             payload.put(GraphicControllerUtils.KEY_RIEPILOGO, riepilogo.toString());
 
-            if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE,
-                        Map.of(GraphicControllerUtils.KEY_RIEPILOGO, payload));
-            }
+            navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE,
+                    Map.of(GraphicControllerUtils.KEY_RIEPILOGO, payload));
+
         } catch (RuntimeException ex) {
-            log().log(Level.SEVERE, "Errore creazione prenotazione", ex);
+            log().log(Level.SEVERE, "Errore prenotazione", ex);
         }
     }
 
     @Override
-    public void procediAlPagamento(DatiPagamentoBean pagamento, SessioneUtenteBean sessione) {
-        if (pagamento == null) {
+    public void procediAlPagamento(String metodo,
+                                    String credenziale,
+                                    float importo,
+                                    SessioneUtenteBean sessione) {
+
+        if (metodo == null || credenziale == null || importo <= 0) {
             notifyPrenotazioneError(GraphicControllerUtils.MSG_DATI_PAGAMENTO_NULLI);
             return;
         }
@@ -127,8 +148,14 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
             return;
         }
 
+        DatiPagamentoBean pagamento = new DatiPagamentoBean();
+        pagamento.setMetodo(metodo);
+        pagamento.setCredenziale(credenziale);
+        pagamento.setImporto(importo);
+
         try {
-            StatoPagamentoBean esito = logicController().completaPrenotazione(pagamento, sessione);
+            StatoPagamentoBean esito =
+                    logicController().completaPrenotazione(pagamento, sessione);
 
             if (esito == null) {
                 notifyPrenotazioneError(GraphicControllerUtils.MSG_PAGAMENTO_NON_COMPLETATO);
@@ -139,13 +166,10 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
             payload.put(GraphicControllerUtils.KEY_SUCCESSO, esito.isSuccesso());
             payload.put(GraphicControllerUtils.KEY_STATO, esito.getStato());
             payload.put(GraphicControllerUtils.KEY_MESSAGGIO, esito.getMessaggio());
-            payload.put(GraphicControllerUtils.KEY_ID_TRANSAZIONE, esito.getIdTransazione());
-            payload.put(GraphicControllerUtils.KEY_DATA_PAGAMENTO, esito.getDataPagamento());
 
-            if (navigator != null) {
-                navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE,
-                        Map.of(GraphicControllerUtils.KEY_PAGAMENTO, payload));
-            }
+            navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE,
+                    Map.of(GraphicControllerUtils.KEY_PAGAMENTO, payload));
+
         } catch (RuntimeException ex) {
             log().log(Level.SEVERE, "Errore pagamento", ex);
         }
@@ -154,70 +178,5 @@ public abstract class AbstractGraphicControllerPrenotazione implements GraphicCo
     @Override
     public void tornaAllaHome() {
         goToHome();
-    }
-
-    public void richiediListaCampi(SessioneUtenteBean sessione) {
-        try {
-            List<String> campi = formatCampi(logicController().listaCampi());
-
-            if (navigator != null) {
-                Map<String, Object> payload = new HashMap<>();
-                payload.put(GraphicControllerUtils.KEY_CAMPI, campi);
-
-                if (sessione != null) {
-                    payload.put(GraphicControllerUtils.KEY_SESSIONE, sessione);
-                }
-
-                navigator.goTo(GraphicControllerUtils.ROUTE_PRENOTAZIONE, payload);
-            }
-        } catch (RuntimeException ex) {
-            log().log(Level.SEVERE, "Errore recupero lista campi", ex);
-        }
-    }
-
-    private List<String> formatCampi(CampiBean campi) {
-        if (campi == null || campi.getCampi() == null) {
-            return List.of();
-        }
-
-        return campi.getCampi().stream()
-                .map(c -> String.format("#%d - %s (%s) [attivo=%s, manutenzione=%s]",
-                        c.getIdCampo(),
-                        c.getNome(),
-                        c.getTipoSport(),
-                        c.isAttivo(),
-                        c.isFlagManutenzione()))
-                .toList();
-    }
-
-    public void cercaDisponibilitaRaw(int idCampo, String data, String oraInizio, int durataMin) {
-        ParametriVerificaBean input = new ParametriVerificaBean();
-        input.setIdCampo(idCampo);
-        input.setData(data);
-        input.setOraInizio(oraInizio);
-        input.setDurataMin(durataMin);
-
-        cercaDisponibilita(input);
-    }
-
-    public void creaPrenotazioneRaw(int idCampo, String data, String oraInizio, String oraFine,
-                                    SessioneUtenteBean sessione) {
-        DatiInputPrenotazioneBean input = new DatiInputPrenotazioneBean();
-        input.setIdCampo(idCampo);
-        input.setData(data);
-        input.setOraInizio(oraInizio);
-        input.setOraFine(oraFine);
-
-        creaPrenotazione(input, sessione);
-    }
-
-    public void procediAlPagamentoRaw(String metodo, String credenziale, float importo,
-                                      SessioneUtenteBean sessione) {
-        DatiPagamentoBean pagamento = new DatiPagamentoBean();
-        pagamento.setMetodo(metodo);
-        pagamento.setCredenziale(credenziale);
-        pagamento.setImporto(importo);
-
-        procediAlPagamento(pagamento, sessione);
     }
 }

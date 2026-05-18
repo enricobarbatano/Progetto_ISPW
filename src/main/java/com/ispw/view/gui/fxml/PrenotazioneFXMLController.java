@@ -1,6 +1,5 @@
 package com.ispw.view.gui.fxml;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -17,238 +16,307 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 
-/**
- * Controller per il wizard di prenotazione (Ricerca -> Slot -> Pagamento -> Esito).
- */
 public class PrenotazioneFXMLController {
 
+    // =========================================================
+    // DEPENDENCIES
+    // =========================================================
     private GUIGraphicControllerPrenotazione controller;
     private SessioneUtenteBean sessione;
 
-    private int lastCampoId = 0;
-    private float lastImporto = 0f;
+    // =========================================================
+    // STATE
+    // =========================================================
+    private int lastCampoId;
+    private float lastImporto;
 
+    // =========================================================
+    // UI
+    // =========================================================
     @FXML private Label lblError;
     @FXML private Label lblSuccess;
 
+    @FXML private ListView<String> listCampi;
+    @FXML private ListView<String> listSlots;
+
+    @FXML private TextField txtDurata;
+    @FXML private TextField txtMetodo;
+    @FXML private TextField txtCredenziale;
+
+    @FXML private ComboBox<String> comboOra;
+    @FXML private DatePicker datePicker;
+
+    @FXML private Label lblRiepilogo;
+    @FXML private Label lblImporto;
+    @FXML private Label lblEsitoPagamento;
+
+    // STEP BOX (IMPORTANTISSIMO per wizard)
     @FXML private VBox boxSearch;
     @FXML private VBox boxSlots;
     @FXML private VBox boxPagamento;
     @FXML private VBox boxEsito;
 
-    @FXML private ListView<String> listCampi;
-    @FXML private TextField txtIdCampo;
-    @FXML private DatePicker datePicker;
-    @FXML private ComboBox<String> comboOra;
-    @FXML private TextField txtDurata;
-
-    @FXML private ListView<String> listSlots;
-
-    @FXML private Label lblRiepilogo;
-    @FXML private Label lblImporto;
-    @FXML private TextField txtMetodo;
-    @FXML private TextField txtCredenziale;
-
-    @FXML private Label lblEsitoPagamento;
-
-    /**
-     * Inizializzazione: imposta i listener e i valori di default.
-     */
-    @FXML
-    public void initialize() {
-        if (listCampi != null) {
-            listCampi.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
-                Integer id = parseIdFromHashString(newV);
-                if (id != null) {
-                    lastCampoId = id;
-                    if (txtIdCampo != null) txtIdCampo.setText(String.valueOf(id));
-                    clearLocalError();
-                }
-            });
-        }
-
-        // Valori di default per la UX
-        if (datePicker != null && datePicker.getValue() == null) {
-            datePicker.setValue(LocalDate.now());
-        }
-        if (txtMetodo != null && (txtMetodo.getText() == null || txtMetodo.getText().isBlank())) {
-            txtMetodo.setText("PAYPAL");
-        }
-    }
-
-    public void init(GUIGraphicControllerPrenotazione controller, SessioneUtenteBean sessione) {
+    // =========================================================
+    // INIT
+    // =========================================================
+    public void init(GUIGraphicControllerPrenotazione controller,
+                     SessioneUtenteBean sessione) {
         this.controller = controller;
         this.sessione = sessione;
     }
 
     /**
-     * Metodo centrale per l'aggiornamento della vista basato sullo stato del wizard.
+     * Inizializzazione JavaFX
      */
+    @FXML
+    public void initialize() {
+
+        // ✅ blocca input manuale data (evita null)
+        if (datePicker != null) {
+            datePicker.setEditable(false);
+        }
+
+        // ✅ seleziona default ora
+        if (comboOra != null && comboOra.getItems() != null && !comboOra.getItems().isEmpty()) {
+            comboOra.getSelectionModel().selectFirst();
+        }
+    }
+
+    // =========================================================
+    // RENDER
+    // =========================================================
     public void render(Map<String, Object> params) {
+
         if (params == null) return;
 
-        // 1. Messaggi di stato
-        handleMessages(params);
-
-        // 2. Visibilità sezioni (Workflow del wizard)
-        updateWorkflowVisibility(params);
-
-        // 3. Popolamento dati (Campi, Slot, Pagamento)
-        updateDataLists(params);
-        handleRiepilogo(params.get(GraphicControllerUtils.KEY_RIEPILOGO));
-        handleEsitoPagamento(params.get(GraphicControllerUtils.KEY_PAGAMENTO));
+        renderMessaggi(params);
+        renderCampi(params);
+        renderSlot(params);
+        renderRiepilogo(params);
+        renderPagamento(params);
+        updateStepUI(params);
     }
 
-    // --- HANDLERS EVENTI FXML (Resi public per eliminare i warning) ---
-
-    @FXML
-    public void onListaCampi() {
-        clearLocalError();
-        if (controller != null) controller.richiediListaCampi(sessione);
+    private void renderMessaggi(Map<String, Object> params) {
+        lblError.setText(string(params.get(GraphicControllerUtils.KEY_ERROR)));
+        lblSuccess.setText(string(params.get(GraphicControllerUtils.KEY_SUCCESSO)));
     }
 
-    @FXML
-    public void onCerca() {
-        clearLocalError();
-        if (controller == null) return;
+    private void renderCampi(Map<String, Object> params) {
+        if (params.get(GraphicControllerUtils.KEY_CAMPI) instanceof List<?> campi) {
+            listCampi.getItems().setAll(
+                    campi.stream().map(Object::toString).toList()
+            );
+        }
+    }
 
-        Integer idCampo = resolveCampoId();
-        Integer durata = parsePositiveInt(txtDurata != null ? txtDurata.getText() : null);
+    private void renderSlot(Map<String, Object> params) {
+        if (params.get(GraphicControllerUtils.KEY_SLOT_DISPONIBILI) instanceof List<?> slots) {
+            listSlots.getItems().setAll(
+                    slots.stream().map(Object::toString).toList()
+            );
+        }
+    }
 
-        if (idCampo == null || durata == null || datePicker.getValue() == null || isComboOraEmpty()) {
-            lblError.setText("Dati ricerca incompleti o non validi.");
+    private void renderRiepilogo(Map<String, Object> params) {
+
+        if (!(params.get(GraphicControllerUtils.KEY_RIEPILOGO) instanceof Map<?, ?> riep)) {
             return;
         }
 
-        lastCampoId = idCampo;
-        String data = datePicker.getValue().toString();
-        String ora = comboOra.getValue().trim();
+        lblRiepilogo.setText(string(riep.get(GraphicControllerUtils.KEY_RIEPILOGO)));
 
-        controller.cercaDisponibilitaRaw(idCampo, data, ora, durata);
+        Object imp = riep.get(GraphicControllerUtils.KEY_IMPORTO_TOTALE);
+        if (imp instanceof Number n) {
+            lastImporto = n.floatValue();
+        }
+
+        lblImporto.setText(String.valueOf(lastImporto));
     }
 
-    @FXML
-    public void onSelezionaSlot() {
-        clearLocalError();
-        if (controller == null || listSlots == null) return;
+    private void renderPagamento(Map<String, Object> params) {
 
-        int idx = listSlots.getSelectionModel().getSelectedIndex();
-        if (idx < 0) {
-            lblError.setText("Seleziona uno slot dalla lista.");
+        if (!(params.get(GraphicControllerUtils.KEY_PAGAMENTO) instanceof Map<?, ?> pay)) {
             return;
         }
 
-        String slot = listSlots.getItems().get(idx);
-        PrenotazioneViewUtils.SlotInfo info = PrenotazioneViewUtils.parseSlot(slot);
-        
-        if (info == null || lastCampoId <= 0) {
-            lblError.setText("Errore nella selezione dello slot. Riprova.");
-            return;
-        }
+        String esito = PrenotazioneViewUtils.formatEsitoPagamento(
+                pay.get(GraphicControllerUtils.KEY_SUCCESSO),
+                pay.get(GraphicControllerUtils.KEY_STATO),
+                pay.get(GraphicControllerUtils.KEY_MESSAGGIO)
+        );
 
-        controller.creaPrenotazioneRaw(lastCampoId, info.data(), info.oraInizio(), info.oraFine(), sessione);
+        lblEsitoPagamento.setText(esito);
     }
 
-    @FXML
-    public void onPaga() {
-        clearLocalError();
-        if (controller == null) return;
+    /**
+     * Gestione wizard UI (MOSTRA STEP CORRETTO)
+     */
+    private void updateStepUI(Map<String, Object> params) {
 
-        String metodo = getSafeText(txtMetodo);
-        String cred = getSafeText(txtCredenziale);
-
-        if (metodo.isEmpty() || cred.isEmpty() || lastImporto <= 0f) {
-            lblError.setText("Dati di pagamento incompleti.");
-            return;
-        }
-
-        controller.procediAlPagamentoRaw(metodo, cred, lastImporto, sessione);
-    }
-
-    @FXML
-    public void onHome() {
-        if (controller != null) controller.tornaAllaHome();
-    }
-
-    @FXML
-    public void onIndietroSlots() {
-        show(boxPagamento, false);
-        show(boxSlots, true);
-    }
-
-    @FXML
-    public void onReset() {
-        clearLocalError();
-        resetFields();
-        show(boxSearch, true);
-        show(boxSlots, false);
-        show(boxPagamento, false);
-        show(boxEsito, false);
-        if (controller != null) controller.richiediListaCampi(sessione);
-    }
-
-    // --- HELPER DI SUPPORTO ---
-
-    private void handleMessages(Map<String, Object> params) {
-        Object err = params.get(GraphicControllerUtils.KEY_ERROR);
-        Object ok = params.get(GraphicControllerUtils.KEY_MESSAGE);
-        if (ok == null) ok = params.get(GraphicControllerUtils.KEY_SUCCESSO);
-        if (ok == null) ok = params.get(GraphicControllerUtils.KEY_MESSAGGIO);
-
-        lblError.setText(err != null ? String.valueOf(err) : "");
-        lblSuccess.setText(ok != null ? String.valueOf(ok) : "");
-    }
-
-    private void updateWorkflowVisibility(Map<String, Object> params) {
-        // Logica di progressione automatica basata sulla presenza di dati specifici
         boolean hasSlots = params.get(GraphicControllerUtils.KEY_SLOT_DISPONIBILI) != null;
-        boolean hasRiep = params.get(GraphicControllerUtils.KEY_RIEPILOGO) != null;
-        boolean hasPay = params.get(GraphicControllerUtils.KEY_PAGAMENTO) != null;
+        boolean hasRiep  = params.get(GraphicControllerUtils.KEY_RIEPILOGO) != null;
+        boolean hasPay   = params.get(GraphicControllerUtils.KEY_PAGAMENTO) != null;
 
-        show(boxSearch, !hasPay);
-        show(boxSlots, hasSlots && !hasRiep && !hasPay);
+        show(boxSearch, !hasSlots && !hasRiep && !hasPay);
+        show(boxSlots, hasSlots && !hasRiep);
         show(boxPagamento, hasRiep && !hasPay);
         show(boxEsito, hasPay);
     }
 
-    private void updateDataLists(Map<String, Object> params) {
-        // Lista Campi
-        if (listCampi != null) {
-            listCampi.getItems().clear();
-            if (params.get(GraphicControllerUtils.KEY_CAMPI) instanceof List<?> campi) {
-                campi.forEach(c -> listCampi.getItems().add(String.valueOf(c)));
-            }
+    // =========================================================
+    // EVENTI
+    // =========================================================
+
+    @FXML
+    public void onListaCampi() {
+        controller.richiediListaCampi();
+    }
+
+    @FXML
+    public void onCerca() {
+
+        clear();
+
+        Integer idCampo = extractCampo();
+        String data = extractData();
+        String ora = extractOra();
+        Integer durata = extractDurata();
+
+        if (idCampo == null || data == null || ora == null || durata == null) {
+            return;
         }
-        // Lista Slot
-        if (listSlots != null) {
-            listSlots.getItems().clear();
-            if (params.get(GraphicControllerUtils.KEY_SLOT_DISPONIBILI) instanceof List<?> slots) {
-                slots.forEach(s -> listSlots.getItems().add(String.valueOf(s)));
-            }
+
+        lastCampoId = idCampo;
+
+        controller.cercaDisponibilita(idCampo, data, ora, durata);
+    }
+
+    @FXML
+    public void onSelezionaSlot() {
+
+        String slot = listSlots.getSelectionModel().getSelectedItem();
+
+        if (slot == null) {
+            error("Seleziona uno slot");
+            return;
+        }
+
+        var info = PrenotazioneViewUtils.parseSlot(slot);
+
+        if (info == null) {
+            error("Formato slot non valido");
+            return;
+        }
+
+        controller.creaPrenotazione(
+                lastCampoId,
+                info.data(),
+                info.oraInizio(),
+                info.oraFine(),
+                sessione
+        );
+    }
+
+    @FXML
+    public void onPaga() {
+
+        String metodo = clean(txtMetodo);
+        String cred = clean(txtCredenziale);
+
+        if (metodo.isBlank() || cred.isBlank()) {
+            error("Dati pagamento mancanti");
+            return;
+        }
+
+        controller.procediAlPagamento(metodo, cred, lastImporto, sessione);
+    }
+
+    @FXML
+    public void onReset() {
+
+        lastCampoId = 0;
+        lastImporto = 0;
+
+        txtDurata.clear();
+        txtMetodo.clear();
+        txtCredenziale.clear();
+
+        datePicker.setValue(null);
+        comboOra.setValue(null);
+
+        listSlots.getItems().clear();
+
+        clear();
+
+        // torna step iniziale
+        show(boxSearch, true);
+        show(boxSlots, false);
+        show(boxPagamento, false);
+        show(boxEsito, false);
+    }
+
+    @FXML
+    public void onIndietroSlots() {
+        show(boxSlots, true);
+        show(boxPagamento, false);
+    }
+
+    @FXML
+    public void onHome() {
+        controller.tornaAllaHome();
+    }
+
+    // =========================================================
+    // HELPERS INPUT
+    // =========================================================
+
+    private Integer extractCampo() {
+
+        String selected = listCampi.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            error("Seleziona un campo");
+            return null;
+        }
+
+        try {
+            return Integer.parseInt(selected.split("-")[0].trim());
+        } catch (NumberFormatException e) {
+            error("Errore ID campo");
+            return null;
         }
     }
 
-    private void handleRiepilogo(Object rawRiep) {
-        if (rawRiep instanceof Map<?, ?> riep) {
-            Object msg = riep.get(GraphicControllerUtils.KEY_RIEPILOGO);
-            Object imp = riep.get(GraphicControllerUtils.KEY_IMPORTO_TOTALE);
+    private String extractData() {
+        if (datePicker.getValue() == null) {
+            error("Seleziona una data");
+            return null;
+        }
+        return datePicker.getValue().toString();
+    }
 
-            if (lblRiepilogo != null) lblRiepilogo.setText(msg != null ? String.valueOf(msg) : "");
-            lastImporto = (imp instanceof Number n) ? n.floatValue() : 0f;
-            if (lblImporto != null) lblImporto.setText(String.format("%.2f EUR", lastImporto));
+    private String extractOra() {
+        String ora = comboOra.getValue();
+        if (ora == null) {
+            error("Seleziona un orario");
+            return null;
+        }
+        return ora;
+    }
+
+    private Integer extractDurata() {
+        try {
+            return Integer.parseInt(txtDurata.getText()); // ✅ minuti corretti
+        } catch (NumberFormatException e) {
+            error("Durata non valida");
+            return null;
         }
     }
 
-    private void handleEsitoPagamento(Object rawPay) {
-        if (rawPay instanceof Map<?, ?> pay) {
-            Object success = pay.get(GraphicControllerUtils.KEY_SUCCESSO);
-            Object stato = pay.get(GraphicControllerUtils.KEY_STATO);
-            Object msg = pay.get(GraphicControllerUtils.KEY_MESSAGGIO);
-
-            String esito = PrenotazioneViewUtils.formatEsitoPagamento(success, stato, msg);
-            if (lblEsitoPagamento != null) lblEsitoPagamento.setText(esito);
-        }
-    }
+    // =========================================================
+    // UTIL
+    // =========================================================
 
     private void show(VBox box, boolean v) {
         if (box != null) {
@@ -257,50 +325,21 @@ public class PrenotazioneFXMLController {
         }
     }
 
-    private void clearLocalError() {
-        if (lblError != null) lblError.setText("");
-        if (lblSuccess != null) lblSuccess.setText("");
+    private void error(String msg) {
+        lblError.setText(msg);
+        lblSuccess.setText("");
     }
 
-    private Integer resolveCampoId() {
-        if (lastCampoId > 0) return lastCampoId;
-        return parsePositiveInt(getSafeText(txtIdCampo));
+    private void clear() {
+        lblError.setText("");
+        lblSuccess.setText("");
     }
 
-    private String getSafeText(TextField tf) {
-        return (tf != null && tf.getText() != null) ? tf.getText().trim() : "";
+    private String clean(TextField f) {
+        return (f != null && f.getText() != null) ? f.getText().trim() : "";
     }
 
-    private boolean isComboOraEmpty() {
-        return comboOra == null || comboOra.getValue() == null || comboOra.getValue().trim().isEmpty();
-    }
-
-    private Integer parsePositiveInt(String raw) {
-        if (raw == null || raw.isBlank()) return null;
-        try {
-            int v = Integer.parseInt(raw);
-            return v > 0 ? v : null;
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
-    private Integer parseIdFromHashString(String s) {
-        if (s == null || !s.contains("#")) return null;
-        try {
-            String sub = s.split("#")[1].split(" ")[0].replaceAll("[^0-9]", "");
-            return Integer.parseInt(sub);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private void resetFields() {
-        if (txtIdCampo != null) txtIdCampo.setText("");
-        if (txtDurata != null) txtDurata.setText("");
-        if (txtCredenziale != null) txtCredenziale.setText("");
-        if (datePicker != null) datePicker.setValue(LocalDate.now());
-        lastCampoId = 0;
-        lastImporto = 0f;
+    private String string(Object o) {
+        return o != null ? o.toString() : "";
     }
 }

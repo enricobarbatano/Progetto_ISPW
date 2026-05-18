@@ -8,17 +8,13 @@ import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerRegistrazione;
 import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
 import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
+import com.ispw.model.enums.Ruolo;
 
 /**
- * Controller grafico CLI del caso d'uso "Registrazione".
+ * CLI controller registrazione
  *
- * Questa classe contiene la parte specifica CLI:
- * - lettura dei dati da mappa;
- * - validazione minima dei campi obbligatori;
- * - gestione della navigazione in base all'esito.
- *
- * La registrazione vera e propria viene delegata al controller logico
- * tramite la classe astratta e la LogicControllerFactory.
+ * ✅ riceve dati grezzi (NON Map)
+ * ✅ crea bean nel controller
  */
 public class CLIGraphicControllerRegistrazione extends AbstractGraphicControllerRegistrazione {
 
@@ -39,65 +35,40 @@ public class CLIGraphicControllerRegistrazione extends AbstractGraphicController
     }
 
     /**
-     * Invia i dati di registrazione al caso d'uso.
-     *
-     * Il metodo:
-     * - controlla che la mappa sia presente;
-     * - estrae i campi necessari;
-     * - valida i campi obbligatori;
-     * - costruisce il bean;
-     * - delega la registrazione alla classe astratta;
-     * - naviga verso login in caso di successo.
+     * ✅ VERSIONE CORRETTA (senza Map)
      */
     @Override
-    public void inviaDatiRegistrazione(Map<String, Object> datiRegistrazione) {
-        if (datiRegistrazione == null) {
-            notifyRegistrazioneError(GraphicControllerUtils.MSG_DATI_REGISTRAZIONE_MANCANTI);
-            return;
-        }
-
-        String nome = safeTrim(datiRegistrazione.get(GraphicControllerUtils.KEY_NOME));
-        String cognome = safeTrim(datiRegistrazione.get(GraphicControllerUtils.KEY_COGNOME));
-        String email = safeTrim(datiRegistrazione.get(GraphicControllerUtils.KEY_EMAIL));
-        String password = safeTrim(datiRegistrazione.get(GraphicControllerUtils.KEY_PASSWORD));
+    public void inviaDatiRegistrazione(
+            String nome,
+            String cognome,
+            String email,
+            String password,
+            Ruolo ruolo
+    ) {
 
         if (!hasText(nome) || !hasText(cognome) || !hasText(email) || !hasText(password)) {
-            notifyRegistrazioneError(GraphicControllerUtils.MSG_CAMPI_OBBLIGATORI_MANCANTI);
+            notifyError(GraphicControllerUtils.MSG_CAMPI_OBBLIGATORI_MANCANTI);
             return;
         }
 
-        DatiRegistrazioneBean bean = buildRegistrazioneBean(nome, cognome, email, password);
+        DatiRegistrazioneBean bean =
+                buildRegistrazioneBean(nome, cognome, email, password);
 
         EsitoOperazioneBean esito = registraNuovoUtente(bean);
 
         if (esito != null && esito.isSuccesso()) {
             vaiAlLogin();
-            return;
+        } else {
+            notifyError(GraphicControllerUtils.MSG_REGISTRAZIONE_NON_RIUSCITA);
         }
-
-        notifyRegistrazioneError(esito != null
-                ? esito.getMessaggio()
-                : GraphicControllerUtils.MSG_REGISTRAZIONE_NON_RIUSCITA);
     }
 
-    /**
-     * Torna alla schermata di login.
-     */
     @Override
     protected void goToLogin() {
-        if (navigator != null) {
-            navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN);
-        }
+        navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN);
     }
 
-    // =====================================================================
-    // HELPERS REGISTRAZIONE CLI
-    // =====================================================================
-
-    /**
-     * Notifica un errore relativo alla registrazione.
-     */
-    private void notifyRegistrazioneError(String message) {
+    private void notifyError(String message) {
         GraphicControllerUtils.notifyError(
                 LOGGER,
                 navigator,
@@ -107,21 +78,7 @@ public class CLIGraphicControllerRegistrazione extends AbstractGraphicController
         );
     }
 
-    /**
-     * Converte un valore generico in stringa trimmed.
-     */
-    private String safeTrim(Object value) {
-        if (value == null) {
-            return null;
-        }
-
-        return value.toString().trim();
-    }
-
-    /**
-     * Controlla che una stringa contenga almeno un carattere non spazio.
-     */
-    private boolean hasText(String value) {
-        return value != null && !value.isBlank();
+    private boolean hasText(String v) {
+        return v != null && !v.isBlank();
     }
 }

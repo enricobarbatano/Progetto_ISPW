@@ -42,7 +42,7 @@ public class GUIRegoleView extends GenericViewGUI implements ViewGestioneRegole,
                 cachedFx = loader.getController();
             }
 
-            cachedFx.init(controller, sessione);
+            cachedFx.init(controller);
             cachedFx.render(getLastParams());
             GuiLauncher.setRoot(cachedRoot);
 

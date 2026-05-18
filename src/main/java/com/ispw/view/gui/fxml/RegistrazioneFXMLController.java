@@ -4,13 +4,16 @@ import java.util.Map;
 
 import com.ispw.controller.graphic.gui.GUIGraphicControllerRegistrazione;
 import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
-import com.ispw.view.shared.RegistrazioneViewUtils;
+import com.ispw.model.enums.Ruolo;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
+/**
+ * Controller FXML registrazione
+ */
 public class RegistrazioneFXMLController {
 
     private GUIGraphicControllerRegistrazione controller;
@@ -26,24 +29,24 @@ public class RegistrazioneFXMLController {
     }
 
     public void render(Map<String, Object> params) {
-        Object err = params != null ? params.get(GraphicControllerUtils.KEY_ERROR) : null;
-        lblError.setText(err != null ? String.valueOf(err) : "");
+        Object err = params.get(GraphicControllerUtils.KEY_ERROR);
+        lblError.setText(err != null ? err.toString() : "");
     }
 
-    @FXML private void onRegistra() {
-        if (controller == null) return;
+    @FXML
+    public void onRegistra() {
+
         controller.inviaDatiRegistrazione(
-                RegistrazioneViewUtils.buildForm(
-                        txtNome.getText(),
-                        txtCognome.getText(),
-                        txtEmail.getText(),
-                        txtPassword.getText()
-                )
+                txtNome.getText(),
+                txtCognome.getText(),
+                txtEmail.getText(),
+                txtPassword.getText(),
+                Ruolo.UTENTE
         );
     }
 
-    @FXML private void onLogin() {
-        if (controller == null) return;
+    @FXML
+    public void onLogin() {
         controller.vaiAlLogin();
     }
 }

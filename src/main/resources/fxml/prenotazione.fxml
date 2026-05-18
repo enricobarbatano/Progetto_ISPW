@@ -63,7 +63,7 @@
                     </VBox>
 
                     <VBox spacing="5" GridPane.columnIndex="2">
-                        <Label text="Durata (ore)" style="-fx-font-weight: bold;"/>
+                        <Label text="Durata (minuti)" style="-fx-font-weight: bold;"/>
                         <TextField fx:id="txtDurata" promptText="Es: 1"/>
                     </VBox>
                 </GridPane>

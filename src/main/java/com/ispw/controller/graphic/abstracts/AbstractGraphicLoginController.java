@@ -15,23 +15,14 @@ import com.ispw.controller.logic.interfaces.CtrlAccesso;
  * Controller grafico astratto del caso d'uso "Login".
  *
  * Questa classe contiene la logica comune tra GUI e CLI:
- * - controlla le credenziali ricevute dalla view;
+ * - riceve input grezzi dalla view;
+ * - costruisce il bean di login;
+ * - controlla le credenziali ricevute;
  * - chiama il controller logico di accesso;
  * - salva il log di accesso;
  * - naviga verso home, login o registrazione.
- *
- * Le classi concrete GUI e CLI gestiscono solo le differenze specifiche
- * del frontend, come la visualizzazione degli errori.
- *
- * Nota di progetto:
- * il graphic controller non conosce l'implementazione concreta del logic controller.
- * Usa CtrlAccesso ottenuto tramite LogicControllerFactory.
  */
 public abstract class AbstractGraphicLoginController implements GraphicLoginController {
-
-    // =====================================================================
-    // COLLABORATORI
-    // =====================================================================
 
     protected final GraphicControllerNavigation navigator;
 
@@ -49,18 +40,9 @@ public abstract class AbstractGraphicLoginController implements GraphicLoginCont
 
     protected abstract void goToHome(SessioneUtenteBean sessione);
 
-    // =====================================================================
-    // LOGIC CONTROLLER
-    // =====================================================================
-
     protected CtrlAccesso logicController() {
         return LogicControllerFactory.getAccessoController();
     }
-
-    /*
-     * Hook protetti mantenuti per compatibilità con le classi concrete.
-     * Di default delegano al controller logico ottenuto tramite factory.
-     */
 
     protected SessioneUtenteBean verificaCredenziali(DatiLoginBean credenziali) {
         return logicController().verificaCredenziali(credenziali);
@@ -70,10 +52,6 @@ public abstract class AbstractGraphicLoginController implements GraphicLoginCont
         logicController().saveLog(sessione);
     }
 
-    // =====================================================================
-    // NAVIGAZIONE
-    // =====================================================================
-
     @Override
     public String getRouteName() {
         return GraphicControllerUtils.ROUTE_LOGIN;
@@ -81,26 +59,22 @@ public abstract class AbstractGraphicLoginController implements GraphicLoginCont
 
     @Override
     public void onShow(Map<String, Object> params) {
-        // In questa schermata non è necessario gestire parametri in modo comune.
+        // In questa schermata non è necessario gestire parametri comuni.
     }
 
-    // STEP 1: login
-
     /**
-     * Effettua il login.
+     * Effettua il login partendo da input grezzi ricevuti dalla view.
      *
-     * Il metodo:
-     * - controlla che le credenziali siano presenti;
-     * - chiama il controller logico;
-     * - se il login riesce, salva il log e va alla home;
-     * - se fallisce, torna alla schermata login con errore.
+     * Il bean DatiLoginBean viene costruito qui, non nella view.
      */
     @Override
-    public void effettuaLogin(DatiLoginBean credenziali) {
-        if (credenziali == null) {
+    public void effettuaLogin(String email, String password) {
+        if (email == null || password == null) {
             goToLoginWithError(GraphicControllerUtils.MSG_CREDENZIALI_MANCANTI);
             return;
         }
+
+        DatiLoginBean credenziali = new DatiLoginBean(email, password);
 
         try {
             SessioneUtenteBean sessione = verificaCredenziali(credenziali);
@@ -116,51 +90,18 @@ public abstract class AbstractGraphicLoginController implements GraphicLoginCont
         }
     }
 
-    // STEP 2: logout
-
-    /**
-     * Esegue il logout tornando alla schermata di login.
-     */
     @Override
     public void logout() {
         goToLogin();
     }
 
-    // STEP 3: registrazione
-
-    /**
-     * Naviga verso la schermata di registrazione.
-     */
     @Override
     public void vaiARegistrazione() {
         goToRegistrazione();
     }
 
-    // STEP 4: home
-
-    /**
-     * Naviga verso la home senza una sessione specifica.
-     */
     @Override
     public void vaiAHome() {
         goToHome(null);
-    }
-
-    // =====================================================================
-    // ADAPTER
-    // =====================================================================
-
-    /**
-     * Adapter per input grezzi del login.
-     *
-     * Costruisce DatiLoginBean e delega al metodo principale.
-     */
-    public void effettuaLoginRaw(String email, String password) {
-        if (email == null && password == null) {
-            effettuaLogin(null);
-            return;
-        }
-
-        effettuaLogin(new DatiLoginBean(email, password));
     }
 }
