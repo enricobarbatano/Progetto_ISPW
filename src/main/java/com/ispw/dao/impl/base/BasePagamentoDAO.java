@@ -19,7 +19,7 @@ import com.ispw.model.entity.Pagamento;
  */
 public class BasePagamentoDAO implements PagamentoDAO {
 
-        private static final Comparator<Pagamento> ORDER_BY_DATA_DESC_ID_DESC =
+    private static final Comparator<Pagamento> ORDER_BY_DATA_DESC_ID_DESC =
             Comparator.comparing(Pagamento::getDataPagamento, Comparator.nullsLast(Comparator.reverseOrder()))
                   .thenComparing(Comparator.comparingInt(Pagamento::getIdPagamento).reversed());
 
@@ -43,6 +43,7 @@ public class BasePagamentoDAO implements PagamentoDAO {
     // Subclasses override these to provide DB/FS I/O.
     // Default implementations are no-op / null and are valid for IN_MEMORY base.
     // -----------------------
+    @SuppressWarnings("java:S1172")
     protected Pagamento rawLoad(Integer id) {
         return null;
     }
@@ -55,6 +56,7 @@ public class BasePagamentoDAO implements PagamentoDAO {
         // default: no-op for IN_MEMORY base
     }
 
+    @SuppressWarnings("java:S1172")
     protected Pagamento rawFindByPrenotazione(int idPrenotazione) {
         return null;
     }
@@ -234,6 +236,7 @@ public class BasePagamentoDAO implements PagamentoDAO {
 
         return null;
     }
+
     /**
      * Compatibilità: pulisce la cache (usato dai test tramite reflection).
      */
@@ -245,5 +248,4 @@ public class BasePagamentoDAO implements PagamentoDAO {
             lock.writeLock().unlock();
         }
     }
-
 }
