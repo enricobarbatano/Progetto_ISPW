@@ -4,6 +4,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.controller.graphic.gui.GUIGraphicControllerDisdetta;
@@ -16,118 +18,180 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 
 /**
- * Controller per la gestione delle disdette.
- * Implementa Initializable per gestire correttamente il ciclo di vita JavaFX.
+ * Controller FXML per la gestione delle disdette lato utente.
+ *
+ * RESPONSABILITÀ:
+ * - mostrare le prenotazioni cancellabili;
+ * - leggere la prenotazione selezionata dalla lista;
+ * - mostrare l'anteprima della disdetta;
+ * - inviare la richiesta di disdetta al graphic controller.
+ *
+ * NON:
+ * - crea bean;
+ * - crea Map per il logic layer;
+ * - chiama direttamente il logic controller;
+ * - accede a DAO o persistenza;
+ * - gestisce direttamente il routing.
+ *
+ * Nota:
+ * il caricamento della lista avviene tramite il pulsante "Aggiorna Lista",
+ * cioè tramite onRicarica(). Non viene eseguito automaticamente dalla GUIView,
+ * così si evitano loop di navigazione.
  */
 public class DisdettaFXMLController implements Initializable {
+
+    private static final Pattern ID_PRENOTAZIONE_PATTERN = Pattern.compile("#\\s*(\\d+)");
 
     private GUIGraphicControllerDisdetta controller;
     private SessioneUtenteBean sessione;
 
-    // Stato interno per la gestione dell'ID e dell'anteprima
+    /*
+     * Stato locale della schermata.
+     * selectedId rappresenta l'id prenotazione selezionato.
+     * previewPossibile e previewPenale rappresentano l'ultima anteprima ricevuta.
+     */
     private Integer selectedId;
     private Boolean previewPossibile;
     private Float previewPenale;
 
     @FXML private Label lblError;
     @FXML private Label lblSuccess;
+
     @FXML private ListView<String> listPrenotazioni;
     @FXML private TextField txtIdPrenotazione;
+
     @FXML private Label lblAnteprima;
 
     /**
-     * Inizializzazione: impostiamo il listener sulla lista.
-     * Cambiato in public per evitare i warning "never used" di alcuni IDE.
+     * Metodo chiamato automaticamente da JavaFX dopo il caricamento FXML.
+     *
+     * Imposta il listener sulla ListView, così quando l'utente seleziona
+     * una prenotazione viene aggiornato anche il campo txtIdPrenotazione.
      */
     @Override
     @FXML
     public void initialize(URL location, ResourceBundle resources) {
-        if (listPrenotazioni != null) {
-            listPrenotazioni.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
-                Integer id = parseIdFromPrenotazioneString(newV);
-                if (id != null) {
-                    selectedId = id;
-                    if (txtIdPrenotazione != null) {
-                        txtIdPrenotazione.setText(String.valueOf(id));
-                    }
-                    clearLocalError();
-                }
-            });
-        }
+        setupPrenotazioneSelectionListener();
     }
 
+    /**
+     * Inizializza il controller FXML con il graphic controller e la sessione.
+     *
+     * @param controller controller grafico della disdetta
+     * @param sessione sessione utente corrente
+     */
     public void init(GUIGraphicControllerDisdetta controller, SessioneUtenteBean sessione) {
         this.controller = controller;
         this.sessione = sessione;
     }
 
+    /**
+     * Renderizza i dati ricevuti dal navigator.
+     *
+     * Il metodo aggiorna solo le sezioni presenti nel payload.
+     * Questo evita di svuotare la lista quando arriva, ad esempio,
+     * solo il payload dell'anteprima.
+     *
+     * @param params parametri della route corrente
+     */
     public void render(Map<String, Object> params) {
-        if (params == null) return;
+        if (params == null) {
+            clearMessages();
+            return;
+        }
 
-        // 1. Gestione messaggi (Error/Success)
-        Object err = params.get(GraphicControllerUtils.KEY_ERROR);
-        Object ok = params.get(GraphicControllerUtils.KEY_MESSAGE);
-        if (ok == null) ok = params.get(GraphicControllerUtils.KEY_SUCCESSO);
+        renderMessages(params);
 
-        lblError.setText(err != null ? String.valueOf(err) : "");
-        lblSuccess.setText(ok != null ? String.valueOf(ok) : "");
+        if (params.containsKey(GraphicControllerUtils.KEY_PRENOTAZIONI)) {
+            renderPrenotazioni(params.get(GraphicControllerUtils.KEY_PRENOTAZIONI));
+        }
 
-        // 2. Popolamento Lista Prenotazioni
-        updateListView(params.get(GraphicControllerUtils.KEY_PRENOTAZIONI));
+        if (params.containsKey(GraphicControllerUtils.KEY_ANTEPRIMA)) {
+            renderAnteprima(params.get(GraphicControllerUtils.KEY_ANTEPRIMA));
+        }
 
-        // 3. Gestione Anteprima (Safe Unboxing)
-        handlePreviewData(params.get(GraphicControllerUtils.KEY_ANTEPRIMA));
+        if (params.containsKey(GraphicControllerUtils.KEY_ID_PRENOTAZIONE)) {
+            renderSelectedId(params.get(GraphicControllerUtils.KEY_ID_PRENOTAZIONE));
+        }
 
-        // 4. Sincronizzazione ID selezionato dal payload
-        handleSelectedIdFromParams(params.get(GraphicControllerUtils.KEY_ID_PRENOTAZIONE));
+        restoreSelection();
     }
 
-    // --- Handlers FXML (Resi public per eliminare i warning) ---
+    // =========================================================
+    // EVENTI FXML
+    // =========================================================
 
+    /**
+     * Richiede le prenotazioni cancellabili.
+     *
+     * Questo metodo è richiamato dal pulsante "Aggiorna Lista".
+     */
     @FXML
     public void onRicarica() {
-        clearLocalError();
+        clearMessages();
+
         if (controller != null) {
             controller.richiediPrenotazioniCancellabili(sessione);
         }
     }
 
+    /**
+     * Richiede l'anteprima della disdetta per la prenotazione selezionata.
+     */
     @FXML
     public void onAnteprima() {
-        clearLocalError();
-        if (controller == null) return;
+        clearMessages();
 
-        Integer id = resolveIdFromUI();
-        if (id == null) {
-            lblError.setText("ID non valido: seleziona dalla lista o inseriscilo manualmente.");
+        if (controller == null) {
+            showError("Controller disdetta non disponibile");
             return;
         }
 
-        selectedId = id;
-        controller.richiediAnteprimaDisdetta(id, sessione);
+        Integer idPrenotazione = resolveIdPrenotazione();
+
+        if (idPrenotazione == null) {
+            showError("ID non valido: seleziona dalla lista o inseriscilo manualmente.");
+            return;
+        }
+
+        selectedId = idPrenotazione;
+        controller.richiediAnteprimaDisdetta(idPrenotazione, sessione);
     }
 
+    /**
+     * Invia la richiesta di disdetta.
+     *
+     * La view passa al graphic controller soltanto l'id prenotazione
+     * e la sessione. La logica applicativa resta nel layer sottostante.
+     */
     @FXML
     public void onInviaRichiesta() {
-        clearLocalError();
-        if (controller == null) return;
+        clearMessages();
 
-        Integer id = resolveIdFromUI();
-        if (id == null) {
-            lblError.setText("Seleziona una prenotazione valida.");
+        if (controller == null) {
+            showError("Controller disdetta non disponibile");
             return;
         }
 
-        // Controllo logico sull'anteprima caricata
+        Integer idPrenotazione = resolveIdPrenotazione();
+
+        if (idPrenotazione == null) {
+            showError("Seleziona una prenotazione valida.");
+            return;
+        }
+
         if (Boolean.FALSE.equals(previewPossibile)) {
-            lblError.setText("Disdetta non consentita per questa prenotazione.");
+            showError("Disdetta non consentita per questa prenotazione.");
             return;
         }
 
-        selectedId = id;
-        controller.confermaDisdetta(id, sessione);
+        selectedId = idPrenotazione;
+        controller.confermaDisdetta(idPrenotazione, sessione);
     }
 
+    /**
+     * Torna alla home.
+     */
     @FXML
     public void onHome() {
         if (controller != null) {
@@ -135,105 +199,276 @@ public class DisdettaFXMLController implements Initializable {
         }
     }
 
-    // --- Helper di Supporto e Pulizia Logica ---
+    // =========================================================
+    // SETUP UI
+    // =========================================================
 
-    private void updateListView(Object rawList) {
-        if (listPrenotazioni == null) return;
+    /**
+     * Collega la selezione della ListView all'id prenotazione corrente.
+     */
+    private void setupPrenotazioneSelectionListener() {
+        if (listPrenotazioni == null) {
+            return;
+        }
+
+        listPrenotazioni.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldValue, newValue) -> handlePrenotazioneSelection(newValue));
+    }
+
+    /**
+     * Gestisce la selezione di una prenotazione nella lista.
+     *
+     * @param selectedItem riga selezionata nella ListView
+     */
+    private void handlePrenotazioneSelection(String selectedItem) {
+        Integer id = parseIdFromPrenotazioneString(selectedItem);
+
+        if (id == null) {
+            return;
+        }
+
+        selectedId = id;
+
+        if (txtIdPrenotazione != null) {
+            txtIdPrenotazione.setText(String.valueOf(id));
+        }
+
+        clearMessages();
+    }
+
+    // =========================================================
+    // RENDER HELPERS
+    // =========================================================
+
+    /**
+     * Renderizza messaggi di errore e successo.
+     */
+    private void renderMessages(Map<String, Object> params) {
+        Object err = params.get(GraphicControllerUtils.KEY_ERROR);
+        Object ok = params.get(GraphicControllerUtils.KEY_MESSAGE);
+
+        if (ok == null) {
+            ok = params.get(GraphicControllerUtils.KEY_SUCCESSO);
+        }
+
+        setLabelText(lblError, err);
+        setLabelText(lblSuccess, ok);
+    }
+
+    /**
+     * Renderizza la lista delle prenotazioni cancellabili.
+     */
+    private void renderPrenotazioni(Object rawList) {
+        if (listPrenotazioni == null) {
+            return;
+        }
+
         listPrenotazioni.getItems().clear();
-        
-        if (rawList instanceof List<?> list) {
-            for (Object item : list) {
-                listPrenotazioni.getItems().add(String.valueOf(item));
-            }
-            if (listPrenotazioni.getItems().isEmpty()) {
-                listPrenotazioni.getItems().add("(nessuna prenotazione cancellabile)");
-            }
+
+        if (rawList instanceof List<?> prenotazioni) {
+            listPrenotazioni.getItems().setAll(
+                    prenotazioni.stream()
+                            .map(Object::toString)
+                            .toList()
+            );
+        }
+
+        if (listPrenotazioni.getItems().isEmpty()) {
+            listPrenotazioni.getItems().add("(nessuna prenotazione cancellabile)");
         }
     }
 
-    private void handlePreviewData(Object rawAnte) {
+    /**
+     * Renderizza l'anteprima della disdetta.
+     */
+    private void renderAnteprima(Object rawAnteprima) {
         previewPossibile = null;
         previewPenale = null;
 
-        if (rawAnte instanceof Map<?, ?> ante) {
-            Object poss = ante.get(GraphicControllerUtils.KEY_POSSIBILE);
-            Object pen = ante.get(GraphicControllerUtils.KEY_PENALE);
+        if (!(rawAnteprima instanceof Map<?, ?> anteprima)) {
+            setLabelText(lblAnteprima, "");
+            return;
+        }
 
-            // Evitiamo unboxing impliciti pericolosi
-            previewPossibile = (poss instanceof Boolean b) ? b : null;
-            previewPenale = (pen instanceof Number n) ? n.floatValue() : 0.0f;
+        Object possibile = anteprima.get(GraphicControllerUtils.KEY_POSSIBILE);
+        Object penale = anteprima.get(GraphicControllerUtils.KEY_PENALE);
 
-            if (lblAnteprima != null) {
-                String possStr = (previewPossibile != null) ? (previewPossibile ? "Sì" : "No") : "-";
-                lblAnteprima.setText(String.format("Disdetta possibile: %s | Penale: %.2f EUR", possStr, previewPenale));
-            }
-        } else if (lblAnteprima != null) {
-            lblAnteprima.setText("");
+        previewPossibile = possibile instanceof Boolean b ? b : null;
+        previewPenale = penale instanceof Number n ? n.floatValue() : 0.0f;
+
+        String possibileText = previewPossibile == null
+                ? "-"
+                : previewPossibile ? "Sì" : "No";
+
+        if (lblAnteprima != null) {
+            lblAnteprima.setText(
+                    String.format("Disdetta possibile: %s | Penale: %.2f EUR",
+                            possibileText,
+                            previewPenale)
+            );
         }
     }
 
-    private void handleSelectedIdFromParams(Object rawId) {
-        if (rawId instanceof Integer id && id > 0) {
-            selectedId = id;
-            if (txtIdPrenotazione != null) txtIdPrenotazione.setText(String.valueOf(id));
+    /**
+     * Renderizza l'id prenotazione selezionato da payload.
+     */
+    private void renderSelectedId(Object rawId) {
+        if (!(rawId instanceof Number number)) {
+            return;
         }
 
-        // Mantiene la selezione visuale nella lista
-        if (selectedId != null && listPrenotazioni != null) {
-            int idx = findIndexById(selectedId, listPrenotazioni.getItems());
-            if (idx >= 0) listPrenotazioni.getSelectionModel().select(idx);
+        int id = number.intValue();
+
+        if (id <= 0) {
+            return;
+        }
+
+        selectedId = id;
+
+        if (txtIdPrenotazione != null) {
+            txtIdPrenotazione.setText(String.valueOf(id));
         }
     }
 
-    private Integer resolveIdFromUI() {
-        if (selectedId != null && selectedId > 0) return selectedId;
-
-        // Parsing manuale dal TextField
-        String text = (txtIdPrenotazione != null) ? txtIdPrenotazione.getText() : null;
-        Integer manual = parsePositiveInt(text);
-        if (manual != null) return manual;
-
-        // Fallback dalla selezione attuale della lista
-        if (listPrenotazioni != null) {
-            String selected = listPrenotazioni.getSelectionModel().getSelectedItem();
-            return parseIdFromPrenotazioneString(selected);
+    /**
+     * Ripristina la selezione visiva nella lista, se possibile.
+     */
+    private void restoreSelection() {
+        if (selectedId == null || selectedId <= 0 || listPrenotazioni == null) {
+            return;
         }
-        return null;
+
+        int index = findIndexById(selectedId, listPrenotazioni.getItems());
+
+        if (index >= 0) {
+            listPrenotazioni.getSelectionModel().select(index);
+        }
     }
 
-    private void clearLocalError() {
-        if (lblError != null) lblError.setText("");
-        if (lblSuccess != null) lblSuccess.setText("");
+    // =========================================================
+    // INPUT HELPERS
+    // =========================================================
+
+    /**
+     * Risolve l'id prenotazione usando prima lo stato locale,
+     * poi il TextField e infine la selezione della lista.
+     */
+    private Integer resolveIdPrenotazione() {
+        if (selectedId != null && selectedId > 0) {
+            return selectedId;
+        }
+
+        Integer manualId = parsePositiveInt(safeText(txtIdPrenotazione));
+
+        if (manualId != null) {
+            return manualId;
+        }
+
+        String selected = listPrenotazioni != null
+                ? listPrenotazioni.getSelectionModel().getSelectedItem()
+                : null;
+
+        return parseIdFromPrenotazioneString(selected);
     }
 
+    /**
+     * Estrae l'id da stringhe che contengono un formato tipo "#25".
+     */
+    private Integer parseIdFromPrenotazioneString(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+
+        Matcher matcher = ID_PRENOTAZIONE_PATTERN.matcher(raw);
+
+        if (!matcher.find()) {
+            return null;
+        }
+
+        return parsePositiveInt(matcher.group(1));
+    }
+
+    /**
+     * Converte una stringa in intero positivo.
+     */
     private Integer parsePositiveInt(String raw) {
-        if (raw == null || raw.trim().isEmpty()) return null;
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+
         try {
-            int v = Integer.parseInt(raw.trim());
-            return v > 0 ? v : null;
+            int value = Integer.parseInt(raw.trim());
+            return value > 0 ? value : null;
         } catch (NumberFormatException e) {
             return null;
         }
     }
 
-    private Integer parseIdFromPrenotazioneString(String s) {
-        if (s == null || !s.contains("#")) return null;
-        try {
-            // Estrae il numero dopo il carattere '#'
-            String sub = s.substring(s.indexOf('#') + 1).split(" ")[0];
-            int id = Integer.parseInt(sub.replaceAll("[^0-9]", ""));
-            return id > 0 ? id : null;
-        } catch (Exception e) {
-            return null;
+    /**
+     * Cerca nella lista l'indice della prenotazione con l'id indicato.
+     */
+    private int findIndexById(int id, List<String> items) {
+        if (items == null) {
+            return -1;
+        }
+
+        for (int i = 0; i < items.size(); i++) {
+            Integer parsed = parseIdFromPrenotazioneString(items.get(i));
+
+            if (parsed != null && parsed == id) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    // =========================================================
+    // UTILITY UI
+    // =========================================================
+
+    /**
+     * Restituisce testo pulito da un TextField.
+     */
+    private String safeText(TextField field) {
+        return field != null && field.getText() != null
+                ? field.getText().trim()
+                : "";
+    }
+
+    /**
+     * Imposta testo su una Label.
+     */
+    private void setLabelText(Label label, Object value) {
+        if (label != null) {
+            label.setText(value != null ? value.toString() : "");
         }
     }
 
-    private int findIndexById(int id, List<String> items) {
-        if (items == null) return -1;
-        for (int i = 0; i < items.size(); i++) {
-            Integer parsed = parseIdFromPrenotazioneString(items.get(i));
-            if (parsed != null && parsed == id) return i;
+    /**
+     * Mostra un messaggio di errore locale.
+     */
+    private void showError(String message) {
+        if (lblError != null) {
+            lblError.setText(message);
         }
-        return -1;
+
+        if (lblSuccess != null) {
+            lblSuccess.setText("");
+        }
+    }
+
+    /**
+     * Pulisce i messaggi locali.
+     */
+    private void clearMessages() {
+        if (lblError != null) {
+            lblError.setText("");
+        }
+
+        if (lblSuccess != null) {
+            lblSuccess.setText("");
+        }
     }
 }

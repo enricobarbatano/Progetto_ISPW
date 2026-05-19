@@ -12,8 +12,25 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 
 /**
- * Controller per la visualizzazione dei log di sistema.
- * Rimosso il campo 'sessione' poiché non utilizzato nelle chiamate al controller.
+ * Controller FXML per la visualizzazione dei log di sistema.
+ *
+ * RESPONSABILITÀ:
+ * - mostrare eventuali messaggi di errore;
+ * - mostrare la lista dei log ricevuti dal navigator;
+ * - delegare al graphic controller la richiesta di aggiornamento log;
+ * - delegare al graphic controller il ritorno alla home.
+ *
+ * NON:
+ * - legge file di log;
+ * - accede a DAO o persistenza;
+ * - chiama direttamente il logic controller;
+ * - crea bean;
+ * - gestisce direttamente la navigazione.
+ *
+ * Nota:
+ * il caricamento dei log avviene tramite il pulsante "Aggiorna Registro",
+ * che richiama onRefresh(). La GUIView non carica automaticamente i log
+ * in onShow(), così si evitano cicli di navigazione.
  */
 public class LogFXMLController {
 
@@ -23,49 +40,107 @@ public class LogFXMLController {
     @FXML private ListView<String> listLogs;
 
     /**
-     * Inizializzazione del controller.
-     * Rimosso l'assegnamento della sessione per eliminare i warning dell'IDE.
+     * Inizializza il controller FXML con il graphic controller.
+     *
+     * La sessione viene ricevuta per coerenza con le altre schermate,
+     * ma non è necessaria agli handler di questa view.
+     *
+     * @param controller controller grafico dei log
+     * @param sessione sessione corrente, non usata direttamente in questa view
      */
+    @SuppressWarnings("java:S1172")
     public void init(GUIGraphicControllerLog controller, SessioneUtenteBean sessione) {
         this.controller = controller;
-        // La sessione qui viene ignorata perché non serve ai metodi onRefresh o onHome
     }
 
+    /**
+     * Renderizza i dati ricevuti dal navigator.
+     *
+     * La lista viene aggiornata solo se nel payload è presente KEY_LOGS.
+     * In questo modo un eventuale messaggio di errore non cancella
+     * automaticamente i log già mostrati.
+     *
+     * @param params parametri della route corrente
+     */
     public void render(Map<String, Object> params) {
-        if (params == null) return;
+        if (params == null) {
+            clearError();
+            return;
+        }
 
-        Object err = params.get(GraphicControllerUtils.KEY_ERROR);
-        lblError.setText(err != null ? String.valueOf(err) : "");
+        renderError(params);
 
-        updateLogList(params.get(GraphicControllerUtils.KEY_LOGS));
-    }
-
-    private void updateLogList(Object rawLogs) {
-        if (listLogs == null) return;
-        listLogs.getItems().clear();
-        
-        if (rawLogs instanceof List<?> logs) {
-            for (Object log : logs) {
-                listLogs.getItems().add(String.valueOf(log));
-            }
-            if (listLogs.getItems().isEmpty()) {
-                listLogs.getItems().add("(nessun log disponibile)");
-            }
+        if (params.containsKey(GraphicControllerUtils.KEY_LOGS)) {
+            renderLogs(params.get(GraphicControllerUtils.KEY_LOGS));
         }
     }
 
-    @FXML 
+    /**
+     * Richiede l'aggiornamento del registro log.
+     */
+    @FXML
     public void onRefresh() {
-        if (lblError != null) lblError.setText("");
+        clearError();
+
         if (controller != null) {
             controller.richiediLog(20);
         }
     }
 
-    @FXML 
+    /**
+     * Torna alla home.
+     */
+    @FXML
     public void onHome() {
         if (controller != null) {
             controller.tornaAllaHome();
+        }
+    }
+
+    // =========================================================
+    // RENDER HELPERS
+    // =========================================================
+
+    /**
+     * Renderizza eventuali messaggi di errore.
+     */
+    private void renderError(Map<String, Object> params) {
+        Object err = params.get(GraphicControllerUtils.KEY_ERROR);
+
+        if (lblError != null) {
+            lblError.setText(err != null ? String.valueOf(err) : "");
+        }
+    }
+
+    /**
+     * Renderizza la lista dei log.
+     */
+    private void renderLogs(Object rawLogs) {
+        if (listLogs == null) {
+            return;
+        }
+
+        listLogs.getItems().clear();
+
+        if (rawLogs instanceof List<?> logs) {
+            listLogs.getItems().setAll(
+                    logs.stream()
+                            .map(Object::toString)
+                            .toList()
+            );
+        }
+
+        if (listLogs.getItems().isEmpty()) {
+            listLogs.getItems().add("(nessun log disponibile)");
+        }
+    }
+
+    /**
+     * Pulisce il messaggio di errore locale.
+     */
+    private void clearError() {
+        if (lblError != null) {
+            lblError.setText("");
         }
     }
 }

@@ -2,32 +2,73 @@ package com.ispw.view.cli.console;
 
 import java.util.Scanner;
 
+/**
+ * Console view per il login.
+ *
+ * Si occupa solo di input/output su console.
+ */
 public class ConsoleLoginView {
-
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: console view login.
-    // A2) IO: input/output su standard input/output.
 
     private final Scanner in = new Scanner(System.in);
 
-    // SEZIONE LOGICA
-    // Legenda logica:
-    // L1) render: stampa menu.
-    // L2) readChoice/readEmail/readPassword: input utente.
-    // L3) showError/showWelcome: messaggi.
+    /**
+     * Stampa il menu di login.
+     */
     public void render() {
         System.out.println("\n=== LOGIN ===");
         System.out.println("1) Login");
         System.out.println("2) Registrazione");
+        System.out.println("0) Esci");
     }
 
+    /**
+     * Legge la scelta dell'utente.
+     */
     public String readChoice() {
         System.out.print("Scelta: ");
         return in.nextLine().trim();
     }
-    public String readEmail() { System.out.print("Email: "); return in.nextLine(); }
-    public String readPassword() { System.out.print("Password: "); return in.nextLine(); }
-    public void showError(String msg) { System.out.println("[ERRORE] " + msg); }
-    public void showWelcome(String name) { System.out.println("Benvenuto, " + name + "!"); }
+
+    /**
+     * Legge l'email.
+     */
+    public String readEmail() {
+        System.out.print("Email: ");
+        return in.nextLine().trim();
+    }
+
+    /**
+     * Legge la password.
+     */
+    public String readPassword() {
+        System.out.print("Password: ");
+        return in.nextLine();
+    }
+
+    /**
+     * Mostra un errore solo se il messaggio è presente.
+     */
+    public void showError(String msg) {
+        if (msg != null && !msg.isBlank()) {
+            System.out.println("[ERRORE] " + msg);
+        }
+    }
+
+    /**
+     * Mostra un messaggio informativo.
+     */
+    public void showInfo(String msg) {
+        if (msg != null && !msg.isBlank()) {
+            System.out.println(msg);
+        }
+    }
+
+    /**
+     * Mostra un messaggio di benvenuto.
+     */
+    public void showWelcome(String name) {
+        if (name != null && !name.isBlank()) {
+            System.out.println("Benvenuto, " + name + "!");
+        }
+    }
 }

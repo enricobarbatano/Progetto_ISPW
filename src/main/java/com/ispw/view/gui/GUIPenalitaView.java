@@ -1,8 +1,12 @@
 package com.ispw.view.gui;
 
+import java.io.IOException;
 import java.util.Map;
-import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.ispw.controller.graphic.gui.GUIGraphicControllerPenalita;
+import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.graphic.interfaces.NavigableController;
 import com.ispw.view.gui.fxml.PenalitaFXMLController;
 import com.ispw.view.interfaces.ViewGestionePenalita;
@@ -12,26 +16,58 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-public class GUIPenalitaView extends GenericViewGUI implements ViewGestionePenalita, NavigableController {
+/**
+ * View GUI per la gestione delle penalità.
+ *
+ * RESPONSABILITÀ:
+ * - caricare il file penalita.fxml;
+ * - inizializzare il controller FXML;
+ * - renderizzare i dati ricevuti dal navigator;
+ * - visualizzare la schermata.
+ *
+ * NON:
+ * - richiedere automaticamente la lista utenti in onShow();
+ * - calcolare penalità;
+ * - creare bean;
+ * - contenere logica applicativa.
+ *
+ * Nota:
+ * la lista utenti viene richiesta tramite il pulsante "Carica Lista",
+ * che richiama PenalitaFXMLController.onListaUtenti().
+ */
+public class GUIPenalitaView extends GenericViewGUI
+        implements ViewGestionePenalita, NavigableController {
+
+    private static final Logger LOGGER = Logger.getLogger(GUIPenalitaView.class.getName());
 
     private final GUIGraphicControllerPenalita controller;
 
-    // ✅ cache per non perdere selezione / campi su round-trip
     private Parent cachedRoot;
     private PenalitaFXMLController cachedFx;
 
-    // evita richieste ripetute senza payload
-    private boolean utentiRequested = false;
-
+    /**
+     * Costruisce la view di gestione penalità.
+     *
+     * @param controller controller grafico per la gestione penalità
+     */
     public GUIPenalitaView(GUIGraphicControllerPenalita controller) {
         this.controller = controller;
     }
 
+    /**
+     * Restituisce la route associata alla schermata.
+     */
     @Override
     public String getRouteName() {
         return GraphicControllerUtils.ROUTE_PENALITA;
     }
 
+    /**
+     * Mostra la schermata penalità.
+     *
+     * Il metodo non esegue richieste automatiche al graphic controller,
+     * perché tali richieste possono causare cicli di navigazione.
+     */
     @Override
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
@@ -48,23 +84,18 @@ public class GUIPenalitaView extends GenericViewGUI implements ViewGestionePenal
 
             GuiLauncher.setRoot(cachedRoot);
 
-            // Best-effort: se non ho utenti e non ho error, richiedo lista UNA volta
-            boolean hasError = getLastParams().get(GraphicControllerUtils.KEY_ERROR) != null;
-            boolean hasUtenti = getLastParams().get(GraphicControllerUtils.KEY_UTENTI) != null;
-
-            if (hasUtenti) utentiRequested = false;
-
-            if (!hasError && !hasUtenti && !utentiRequested) {
-                utentiRequested = true;
-                controller.richiediListaUtenti();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            VBox fallback = GuiViewUtils.createRoot();
-            fallback.getChildren().add(new Label("Errore caricamento Penalità"));
-            GuiLauncher.setRoot(fallback);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Errore caricamento schermata Penalità", e);
+            showFallback();
         }
     }
-}
 
+    /**
+     * Mostra una schermata semplice in caso di errore di caricamento.
+     */
+    private void showFallback() {
+        VBox fallback = GuiViewUtils.createRoot();
+        fallback.getChildren().add(new Label("Errore caricamento Penalità"));
+        GuiLauncher.setRoot(fallback);
+    }
+}

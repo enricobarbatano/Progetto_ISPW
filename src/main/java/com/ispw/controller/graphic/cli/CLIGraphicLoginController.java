@@ -49,7 +49,10 @@ public class CLIGraphicLoginController extends AbstractGraphicLoginController {
         if (navigator != null) {
             navigator.goTo(
                     GraphicControllerUtils.ROUTE_LOGIN,
-                    Map.of(GraphicControllerUtils.KEY_ERROR, message)
+                    Map.of(
+                            GraphicControllerUtils.KEY_ERROR,
+                            message != null ? message : GraphicControllerUtils.MSG_OPERAZIONE_NON_RIUSCITA
+                    )
             );
         }
     }
@@ -94,5 +97,13 @@ public class CLIGraphicLoginController extends AbstractGraphicLoginController {
                 GraphicControllerUtils.ROUTE_HOME,
                 Map.of(GraphicControllerUtils.KEY_SESSIONE, sessione)
         );
+    }
+    /**
+ * Chiude l'applicazione CLI delegando al navigator.
+ */
+    public void esci() {
+        if (navigator != null) {
+            navigator.exit();
+        }
     }
 }

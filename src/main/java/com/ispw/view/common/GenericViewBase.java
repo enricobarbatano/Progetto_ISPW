@@ -5,25 +5,29 @@ import java.util.Map;
 import com.ispw.bean.SessioneUtenteBean;
 import com.ispw.view.interfaces.GenericView;
 
+/**
+ * Classe base comune per le view CLI e GUI.
+ *
+ * Responsabilità:
+ * - conserva gli ultimi parametri ricevuti dal navigator;
+ * - aggiorna la sessione quando viene passata nei parametri;
+ * - espone helper per errore e successo.
+ *
+ * Nota:
+ * se una navigazione non contiene KEY_SESSIONE, la sessione precedente
+ * viene mantenuta. Questo permette a schermate come Home di restare
+ * coerenti anche quando un controller torna alla home senza ripassare
+ * esplicitamente la sessione.
+ */
 public abstract class GenericViewBase implements GenericView {
-
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: base comune per view CLI/GUI.
-    // A2) IO: gestisce sessione e parametri di navigazione.
 
     protected SessioneUtenteBean sessione;
     protected Map<String, Object> lastParams = Map.of();
 
-    // SEZIONE LOGICA
-    // Legenda logica:
-    // L1) onShow: aggiorna params e sessione.
-    // L2) onShow/onHide: lifecycle base.
-    // L3) getter: accesso a sessione, params e messaggi.
-
     @Override
     public void onShow(Map<String, Object> params) {
-        lastParams = (params == null) ? Map.of() : params;
+        lastParams = params != null ? params : Map.of();
+
         if (lastParams.containsKey(KEY_SESSIONE)) {
             sessione = readSession(lastParams);
         }
@@ -36,13 +40,22 @@ public abstract class GenericViewBase implements GenericView {
 
     @Override
     public void onHide() {
+        // Hook disponibile per eventuali view concrete.
     }
 
-    public SessioneUtenteBean getSessione() { return sessione; }
+    public SessioneUtenteBean getSessione() {
+        return sessione;
+    }
 
-    public Map<String, Object> getLastParams() { return lastParams; }
+    public Map<String, Object> getLastParams() {
+        return lastParams;
+    }
 
-    public String getLastError() { return readError(lastParams); }
+    public String getLastError() {
+        return readError(lastParams);
+    }
 
-    public String getLastSuccess() { return readSuccess(lastParams); }
+    public String getLastSuccess() {
+        return readSuccess(lastParams);
+    }
 }

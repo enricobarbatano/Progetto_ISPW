@@ -34,23 +34,25 @@ public class CLIDisdettaView extends GenericViewCLI implements ViewDisdettaPreno
     }
 
     @Override
-    public void onShow(Map<String, Object> params) {
-        super.onShow(params);
+public void onShow(Map<String, Object> params) {
+    super.onShow(params);
 
-        renderHeader();
+    boolean hasSuccess = lastParams.containsKey(GraphicControllerUtils.KEY_SUCCESSO);
+    boolean hasAnteprima = lastParams.containsKey(GraphicControllerUtils.KEY_ANTEPRIMA);
+    boolean hasElenco = lastParams.containsKey(GraphicControllerUtils.KEY_PRENOTAZIONI);
+    boolean hasError = lastParams.containsKey(GraphicControllerUtils.KEY_ERROR);
 
-        // 1) se ho successo, mostro esito e propongo home
-        if (handleSuccess()) return;
-
-        // 2) se ho anteprima, gestisco conferma (invio richiesta)
-        if (handleAnteprima()) return;
-
-        // 3) se ho elenco, gestisco selezione prenotazione
-        if (handleElenco()) return;
-
-        // 4) altrimenti richiedo elenco prenotazioni cancellabili
+    if (!hasSuccess && !hasAnteprima && !hasElenco && !hasError) {
         controller.richiediPrenotazioniCancellabili(sessione);
+        return;
     }
+
+    renderHeader();
+
+    if (handleSuccess()) return;
+    if (handleAnteprima()) return;
+    if (handleElenco()) return;
+}
 
     private void renderHeader() {
         // Intestazione + messaggi standard
@@ -75,7 +77,7 @@ public class CLIDisdettaView extends GenericViewCLI implements ViewDisdettaPreno
             return true;
         }
 
-        System.out.print("Id prenotazione da disdire (0 = home): ");
+        System.out.print("Inserisci ID prenotazione, es. 30 oppure 0 = home: ");
         Integer id = readPositiveIntOrZero();
 
         if (id == null) {

@@ -95,8 +95,11 @@ public abstract class AbstractGraphicControllerNavigation implements GraphicCont
         controller.onShow(Map.of());
     }
 
-    /**
+   /**
      * Termina l'applicazione.
+     *
+     * Nella CLI viene usato dal menu login con la voce "Esci".
+     * Anche in GUI può essere riutilizzato da eventuali pulsanti di uscita.
      */
     @Override
     public void exit() {

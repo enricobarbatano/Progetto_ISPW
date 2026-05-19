@@ -9,21 +9,27 @@ import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.graphic.interfaces.NavigableController;
 import com.ispw.view.interfaces.ViewGestionePenalita;
 
-public class CLIPenalitaView extends GenericViewCLI implements ViewGestionePenalita, NavigableController {
+/**
+ * View CLI per la gestione penalità.
+ *
+ * RESPONSABILITÀ:
+ * - mostrare la lista utenti ricevuta dal graphic controller;
+ * - leggere id utente, importo e motivazione da console;
+ * - chiamare il graphic controller con parametri semplici.
+ *
+ * NON:
+ * - crea bean;
+ * - chiama logic controller;
+ * - accede a DAO o persistenza;
+ * - costruisce Map applicative per la logica.
+ */
+public class CLIPenalitaView extends GenericViewCLI
+        implements ViewGestionePenalita, NavigableController {
 
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: view CLI penalita, usa controller grafico.
-    // A2) IO: input console e lista utenti.
     private final Scanner in = new Scanner(System.in);
     private final CLIGraphicControllerPenalita controller;
 
     private Integer lastId;
-
-    // SEZIONE LOGICA
-    // Legenda logica:
-    // L1) onShow: menu e dispatch.
-    // L2) handleApplicaPenalita/readIdUtente: input guidato.
 
     public CLIPenalitaView(CLIGraphicControllerPenalita controller) {
         this.controller = controller;
@@ -40,26 +46,9 @@ public class CLIPenalitaView extends GenericViewCLI implements ViewGestionePenal
 
         CliViewUtils.printMessages(getLastError(), getLastSuccess());
 
-        Object rawUtenti = lastParams.get(GraphicControllerUtils.KEY_UTENTI);
-        if (rawUtenti instanceof List<?> list) {
-            System.out.println("\n=== UTENTI ===");
-            for (Object u : list) {
-                System.out.println(String.valueOf(u));
-            }
-            System.out.print("Id utente da selezionare (0 = annulla): ");
-            String raw = in.nextLine().trim();
-            if (!raw.isBlank()) {
-                int id = Integer.parseInt(raw);
-                if (id > 0) {
-                    lastId = id;
-                }
-            }
-        }
+        renderUtentiIfPresent();
+        printMenu();
 
-        System.out.println("1) Lista utenti");
-        System.out.println("2) Applica penalita");
-        System.out.println("0) Home");
-        System.out.print("Scelta: ");
         String scelta = in.nextLine().trim();
 
         switch (scelta) {
@@ -70,30 +59,156 @@ public class CLIPenalitaView extends GenericViewCLI implements ViewGestionePenal
         }
     }
 
+    /**
+     * Mostra gli utenti se presenti nel payload.
+     */
+    private void renderUtentiIfPresent() {
+        Object rawUtenti = lastParams.get(GraphicControllerUtils.KEY_UTENTI);
+
+        if (!(rawUtenti instanceof List<?> utentiObj)) {
+            return;
+        }
+
+        List<String> utenti = utentiObj.stream()
+                .map(Object::toString)
+                .toList();
+
+        System.out.println("\n=== UTENTI ===");
+
+        if (utenti.isEmpty()) {
+            System.out.println("(nessun utente disponibile)");
+            return;
+        }
+
+        for (String utente : utenti) {
+            System.out.println(" - " + utente);
+        }
+
+        Integer selected = readOptionalPositiveInt("Id utente da selezionare (0 = annulla): ");
+
+        if (selected != null && selected > 0) {
+            lastId = selected;
+        }
+    }
+
+    /**
+     * Stampa il menu principale.
+     */
+    private void printMenu() {
+        System.out.println("\n1) Lista utenti");
+        System.out.println("2) Applica penalita");
+        System.out.println("0) Home");
+        System.out.print("Scelta: ");
+    }
+
+    /**
+     * Legge i dati della penalità e delega al controller grafico.
+     */
     private void handleApplicaPenalita() {
-        int id = readIdUtente();
-        System.out.print("Importo: ");
-        float importo = Float.parseFloat(in.nextLine());
+        Integer id = readIdUtente();
+
+        if (id == null) {
+            System.out.println("[ERRORE] Id utente non valido");
+            return;
+        }
+
+        Float importo = readPositiveFloat("Importo: ");
+
+        if (importo == null) {
+            System.out.println("[ERRORE] Importo non valido");
+            return;
+        }
+
         System.out.print("Motivazione: ");
-        String motivazione = in.nextLine();
+        String motivazione = in.nextLine().trim();
+
+        if (motivazione.isBlank()) {
+            System.out.println("[ERRORE] Motivazione obbligatoria");
+            return;
+        }
+
         controller.applicaPenalita(id, importo, motivazione);
     }
 
-    private int readIdUtente() {
-        if (lastId != null) {
+    /**
+     * Legge l'id utente, usando lastId come valore suggerito.
+     */
+    private Integer readIdUtente() {
+        if (lastId != null && lastId > 0) {
             System.out.print("Id utente (invio per confermare " + lastId + "): ");
             String raw = in.nextLine().trim();
+
             if (raw.isBlank()) {
                 return lastId;
             }
-        } else {
-            System.out.print("Id utente: ");
-            String raw = in.nextLine().trim();
-            if (!raw.isBlank()) {
-                return Integer.parseInt(raw);
-            }
+
+            return parsePositiveInt(raw);
         }
-        System.out.print("Id utente: ");
-        return Integer.parseInt(in.nextLine());
+
+        return readRequiredPositiveInt("Id utente: ");
+    }
+
+    /**
+     * Legge un intero positivo obbligatorio.
+     */
+    private Integer readRequiredPositiveInt(String prompt) {
+        System.out.print(prompt);
+        return parsePositiveInt(in.nextLine().trim());
+    }
+
+    /**
+     * Legge un intero positivo opzionale.
+     */
+    private Integer readOptionalPositiveInt(String prompt) {
+        System.out.print(prompt);
+        String raw = in.nextLine().trim();
+
+        if (raw.isBlank()) {
+            return null;
+        }
+
+        Integer value = parseNonNegativeInt(raw);
+        return value != null && value > 0 ? value : null;
+    }
+
+    /**
+     * Legge un float positivo.
+     *
+     * Accetta sia punto sia virgola come separatore decimale.
+     */
+    private Float readPositiveFloat(String prompt) {
+        System.out.print(prompt);
+        String raw = in.nextLine().trim().replace(',', '.');
+
+        try {
+            float value = Float.parseFloat(raw);
+            return value > 0 ? value : null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Parsing intero positivo.
+     */
+    private Integer parsePositiveInt(String raw) {
+        Integer value = parseNonNegativeInt(raw);
+        return value != null && value > 0 ? value : null;
+    }
+
+    /**
+     * Parsing intero non negativo.
+     */
+    private Integer parseNonNegativeInt(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+
+        try {
+            int value = Integer.parseInt(raw.trim());
+            return value >= 0 ? value : null;
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 }

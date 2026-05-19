@@ -14,17 +14,19 @@ import com.ispw.view.interfaces.ViewGestionePrenotazione;
 import com.ispw.view.shared.PrenotazioneViewUtils;
 
 /**
- * View CLI per prenotazione campo.
+ * View CLI per la prenotazione campo.
  *
  * RESPONSABILITÀ:
- * - mostra campi disponibili
- * - raccoglie input utente
- * - chiama il GraphicController con parametri semplici
+ * - mostrare campi disponibili;
+ * - raccogliere input utente;
+ * - mostrare slot, riepilogo e pagamento;
+ * - chiamare il graphic controller con parametri semplici.
  *
- * IMPORTANTE:
- * ❌ NON crea Bean
- * ❌ NON usa Map per input
- * ✅ usa solo parametri primitivi
+ * NON:
+ * - crea bean;
+ * - chiama direttamente il logic controller;
+ * - accede a DAO o persistenza;
+ * - costruisce Map applicative per il layer logico.
  */
 public class CLIPrenotazioneView extends GenericViewCLI
         implements ViewGestionePrenotazione, NavigableController {
@@ -59,16 +61,18 @@ public class CLIPrenotazioneView extends GenericViewCLI
 
         CliViewUtils.printMessages(getLastError(), getLastSuccess());
 
-        // STEP pagamento
-        if (handlePagamentoPayload()) return;
+        if (handlePagamentoPayload()) {
+            return;
+        }
 
-        // STEP riepilogo
-        if (handleRiepilogoPayload()) return;
+        if (handleRiepilogoPayload()) {
+            return;
+        }
 
-        // STEP slot disponibili
-        if (handleSlotDisponibiliPayload()) return;
+        if (handleSlotDisponibiliPayload()) {
+            return;
+        }
 
-        // STEP iniziale → lista campi
         Object rawCampi = lastParams.get(GraphicControllerUtils.KEY_CAMPI);
 
         if (!(rawCampi instanceof List<?> campiObj)) {
@@ -76,12 +80,11 @@ public class CLIPrenotazioneView extends GenericViewCLI
             return;
         }
 
-        @SuppressWarnings("unchecked")
-        List<String> campi = (List<String>) campiObj;
+        List<String> campi = campiObj.stream()
+                .map(Object::toString)
+                .toList();
 
         searchView.showCampi(campi);
-
-        // richiesta ricerca
         searchView.renderSearchForm();
 
         lastCampoId = searchView.readCampoId();
@@ -89,7 +92,6 @@ public class CLIPrenotazioneView extends GenericViewCLI
         String ora = searchView.readOraInizio();
         int durata = searchView.readDurataMin();
 
-        // ✅ FIX: metodo corretto
         controller.cercaDisponibilita(
                 lastCampoId,
                 data,
@@ -98,20 +100,16 @@ public class CLIPrenotazioneView extends GenericViewCLI
         );
     }
 
-    // =========================================================
-    // SLOT DISPONIBILI
-    // =========================================================
-
     private boolean handleSlotDisponibiliPayload() {
-
         Object raw = lastParams.get(GraphicControllerUtils.KEY_SLOT_DISPONIBILI);
 
         if (!(raw instanceof List<?> slotsObj)) {
             return false;
         }
 
-        @SuppressWarnings("unchecked")
-        List<String> slots = (List<String>) slotsObj;
+        List<String> slots = slotsObj.stream()
+                .map(Object::toString)
+                .toList();
 
         searchView.showResults(slots);
 
@@ -120,21 +118,29 @@ public class CLIPrenotazioneView extends GenericViewCLI
             return true;
         }
 
-        int sel = searchView.askSlotSelectionIndex(slots.size());
+        int selectedIndex = searchView.askSlotSelectionIndex(slots.size());
 
-        if (sel < 0) return true;
-
-        String slot = slots.get(sel);
-
-        PrenotazioneViewUtils.SlotInfo info =
-                PrenotazioneViewUtils.parseSlot(slot);
-
-        if (info == null) {
-            searchView.showError("Formato slot non valido");
+        if (selectedIndex < 0) {
+            System.out.println("Selezione annullata.");
+            CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
             return true;
         }
 
-        // ✅ FIX: metodo corretto
+        String slot = slots.get(selectedIndex);
+        PrenotazioneViewUtils.SlotInfo info = PrenotazioneViewUtils.parseSlot(slot);
+
+        if (info == null) {
+            searchView.showError("Formato slot non valido");
+            CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
+            return true;
+        }
+
+        if (lastCampoId <= 0) {
+            searchView.showError("Campo non selezionato correttamente");
+            CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
+            return true;
+        }
+
         controller.creaPrenotazione(
                 lastCampoId,
                 info.data(),
@@ -146,29 +152,20 @@ public class CLIPrenotazioneView extends GenericViewCLI
         return true;
     }
 
-    // =========================================================
-    // RIEPILOGO
-    // =========================================================
-
     private boolean handleRiepilogoPayload() {
-
         Object raw = lastParams.get(GraphicControllerUtils.KEY_RIEPILOGO);
 
         if (!(raw instanceof Map<?, ?> riepilogo)) {
             return false;
         }
 
-        Object riepilogoStr =
-                riepilogo.get(GraphicControllerUtils.KEY_RIEPILOGO);
+        Object riepilogoRaw = riepilogo.get(GraphicControllerUtils.KEY_RIEPILOGO);
+        Object importoRaw = riepilogo.get(GraphicControllerUtils.KEY_IMPORTO_TOTALE);
 
-        Object importo =
-                riepilogo.get(GraphicControllerUtils.KEY_IMPORTO_TOTALE);
-
-        String riepilogoText =
-                (riepilogoStr == null) ? "" : riepilogoStr.toString();
+        String riepilogoText = riepilogoRaw != null ? riepilogoRaw.toString() : "";
 
         if (riepilogoText.isBlank()) {
-            confirmView.showInfo("Nessuno slot disponibile.");
+            confirmView.showInfo("Riepilogo non disponibile.");
             CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
             return true;
         }
@@ -178,35 +175,35 @@ public class CLIPrenotazioneView extends GenericViewCLI
         boolean conferma = confirmView.askConfirmation();
 
         if (!conferma) {
-            confirmView.showInfo("Operazione annullata");
+            confirmView.showInfo("Operazione annullata.");
+            CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
             return true;
         }
 
-        float importoVal =
-                (importo instanceof Number n) ? n.floatValue() : 0f;
+        float importo = importoRaw instanceof Number n ? n.floatValue() : 0f;
 
-        pagamentoView.renderPaymentForm(importoVal, "PAYPAL");
+        if (importo <= 0f) {
+            pagamentoView.showError("Importo non valido");
+            CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
+            return true;
+        }
+
+        pagamentoView.renderPaymentForm(importo, "PAYPAL");
 
         String metodo = pagamentoView.readMetodoPagamento();
-        String cred = pagamentoView.readCredenzialiPagamento();
+        String credenziale = pagamentoView.readCredenzialiPagamento();
 
-        // ✅ FIX: metodo corretto
         controller.procediAlPagamento(
                 metodo,
-                cred,
-                importoVal,
+                credenziale,
+                importo,
                 sessione
         );
 
         return true;
     }
 
-    // =========================================================
-    // PAGAMENTO
-    // =========================================================
-
     private boolean handlePagamentoPayload() {
-
         Object raw = lastParams.get(GraphicControllerUtils.KEY_PAGAMENTO);
 
         if (!(raw instanceof Map<?, ?> pagamento)) {
@@ -215,13 +212,15 @@ public class CLIPrenotazioneView extends GenericViewCLI
 
         Object success = pagamento.get(GraphicControllerUtils.KEY_SUCCESSO);
         Object stato = pagamento.get(GraphicControllerUtils.KEY_STATO);
-        Object msg = pagamento.get(GraphicControllerUtils.KEY_MESSAGGIO);
+        Object messaggio = pagamento.get(GraphicControllerUtils.KEY_MESSAGGIO);
 
-        String esito =
-                PrenotazioneViewUtils.formatEsitoPagamento(success, stato, msg);
+        String esito = PrenotazioneViewUtils.formatEsitoPagamento(
+                success,
+                stato,
+                messaggio
+        );
 
         pagamentoView.showPaymentOutcome(esito);
-
         CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
 
         return true;

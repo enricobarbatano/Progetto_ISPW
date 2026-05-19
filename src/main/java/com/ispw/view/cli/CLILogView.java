@@ -10,19 +10,23 @@ import com.ispw.controller.graphic.interfaces.NavigableController;
 import com.ispw.view.interfaces.ViewLog;
 import com.ispw.view.shared.LogViewUtils;
 
+/**
+ * View CLI per la visualizzazione dei log.
+ *
+ * RESPONSABILITÀ:
+ * - verificare autorizzazione gestore;
+ * - mostrare log ricevuti dal graphic controller;
+ * - delegare caricamento log e ritorno home.
+ *
+ * NON:
+ * - accede a DAO;
+ * - chiama logic controller;
+ * - crea bean.
+ */
 public class CLILogView extends GenericViewCLI implements ViewLog, NavigableController {
-
-    // SEZIONE ARCHITETTURALE
-    // Legenda architettura:
-    // A1) Collaboratori: view CLI log, usa controller grafico.
-    // A2) IO: parametri log e input console.
 
     private final CLIGraphicControllerLog controller;
     private final Scanner in = new Scanner(System.in);
-
-    // SEZIONE LOGICA
-    // Legenda logica:
-    // L1) onShow: verifica ruolo e render logs.
 
     public CLILogView(CLIGraphicControllerLog controller) {
         this.controller = controller;
@@ -37,6 +41,8 @@ public class CLILogView extends GenericViewCLI implements ViewLog, NavigableCont
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
+        CliViewUtils.printMessages(getLastError(), getLastSuccess());
+
         if (!LogViewUtils.isGestore(sessione)) {
             System.out.println("Accesso ai log riservato al gestore.");
             controller.tornaAllaHome();
@@ -44,20 +50,29 @@ public class CLILogView extends GenericViewCLI implements ViewLog, NavigableCont
         }
 
         List<String> logs = LogViewUtils.readLogs(lastParams);
+
         if (logs == null) {
             controller.richiediLog(20);
             return;
         }
 
+        renderLogs(logs);
+        CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
+    }
+
+    /**
+     * Stampa i log ricevuti.
+     */
+    private void renderLogs(List<String> logs) {
         System.out.println("\n=== LOG SISTEMA ===");
+
         if (logs.isEmpty()) {
             System.out.println("(nessun log disponibile)");
-        } else {
-            for (Object l : logs) {
-                System.out.println(String.valueOf(l));
-            }
+            return;
         }
 
-        CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
+        for (String log : logs) {
+            System.out.println(" - " + log);
+        }
     }
 }

@@ -20,8 +20,14 @@ public class ConsolePagamentoView {
         System.out.println(String.format("%n=== PAGAMENTO ===%nImporto: %.2f EUR%nMetodo suggerito: %s", importo, metodo));
     }
     public String readMetodoPagamento() {
-        System.out.print("Metodo (SATISPAY|PAYPAL|BONIFICO): ");
-        return in.nextLine().trim();
+    System.out.print("Metodo (SATISPAY|PAYPAL|BONIFICO, invio = PAYPAL): ");
+    String metodo = in.nextLine().trim();
+
+    if (metodo.isBlank()) {
+        return "PAYPAL";
+    }
+
+    return metodo;
     }
     public String readCredenzialiPagamento() {
         System.out.print("Codice fiscale: ");

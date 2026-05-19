@@ -61,7 +61,7 @@ public class BaseRichiestaDisdettaDAO implements RichiestaDisdettaDAO {
         try {
             if (seeded) return;
 
-            // ✅ prima cache: se già popolata, non seedare
+            //  prima cache: se già popolata, non seedare
             if (!cache.isEmpty()) {
                 recomputeNextIdUnsafe();
                 seeded = true;
@@ -155,7 +155,7 @@ public class BaseRichiestaDisdettaDAO implements RichiestaDisdettaDAO {
         }
 
         if (Boolean.TRUE.equals(persistent)) {
-            // ✅ Persistente: chiamata raw UNA SOLA VOLTA
+            // Persistente: chiamata raw UNA SOLA VOLTA
             rawStore(richiesta);
 
             // fallback se il raw non ha assegnato id
@@ -282,8 +282,26 @@ public class BaseRichiestaDisdettaDAO implements RichiestaDisdettaDAO {
     @Override
     public List<RichiestaDisdettaRimborso> findByStato(StatoRichiestaDisdetta stato) {
         ensureSeeded();
-        if (stato == null) return List.of();
 
+        if (stato == null) {
+            return List.of();
+        }
+
+        /*
+        * Se il DAO è persistente, la fonte autorevole è il DB/FS.
+        * Usiamo findAll() perché in modalità persistent == true
+        * quel metodo richiama rawFindAll() e riallinea la cache.
+        */
+        if (Boolean.TRUE.equals(persistent)) {
+            return findAll().stream()
+                    .filter(r -> r != null && stato.equals(r.getStato()))
+                    .sorted(Comparator.comparingInt(RichiestaDisdettaRimborso::getIdRichiesta))
+                    .toList();
+        }
+
+        /*
+        * In modalità in-memory la cache è invece la fonte principale.
+        */
         lock.readLock().lock();
         try {
             return cache.values().stream()
@@ -298,13 +316,32 @@ public class BaseRichiestaDisdettaDAO implements RichiestaDisdettaDAO {
     @Override
     public RichiestaDisdettaRimborso findByPrenotazione(int idPrenotazione) {
         ensureSeeded();
-        if (idPrenotazione <= 0) return null;
 
+        if (idPrenotazione <= 0) {
+            return null;
+        }
+
+        /*
+        * In modalità persistente bisogna leggere dal DB/FS tramite findAll().
+        * Se leggessimo solo dalla cache, dopo un riavvio dell'app la cache
+        * sarebbe vuota anche se il database contiene già richieste.
+        */
+        if (Boolean.TRUE.equals(persistent)) {
+            return findAll().stream()
+                    .filter(r -> r != null && r.getIdPrenotazione() == idPrenotazione)
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        /*
+        * In modalità in-memory la cache è sufficiente.
+        */
         lock.readLock().lock();
         try {
             return cache.values().stream()
                     .filter(r -> r != null && r.getIdPrenotazione() == idPrenotazione)
-                    .findFirst().orElse(null);
+                    .findFirst()
+                    .orElse(null);
         } finally {
             lock.readLock().unlock();
         }

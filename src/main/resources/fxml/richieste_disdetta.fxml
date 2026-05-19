@@ -30,7 +30,7 @@
                 </HBox>
 
                 <VBox styleClass="card">
-                    <ListView fx:id="listRichieste" prefHeight="250" styleClass="list-view"/>
+                    <ListView fx:id="listRichieste" prefHeight="350" styleClass="list-view"/>
                 </VBox>
 
                 <VBox spacing="20" styleClass="card">

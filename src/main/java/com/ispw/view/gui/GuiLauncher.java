@@ -47,7 +47,7 @@ public class GuiLauncher extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		setStage(primaryStage);
-		stage.setTitle("ISPW");
+		stage.setTitle("SportBooking");
 		stage.setScene(new Scene(new VBox(), 800, 600));
 		stage.show();
 		if (onReady != null) {

@@ -13,8 +13,8 @@ import com.ispw.model.enums.Ruolo;
 /**
  * CLI controller registrazione
  *
- * ✅ riceve dati grezzi (NON Map)
- * ✅ crea bean nel controller
+ * riceve dati grezzi (NON Map)
+ * ✅crea bean nel controller
  */
 public class CLIGraphicControllerRegistrazione extends AbstractGraphicControllerRegistrazione {
 
@@ -35,7 +35,7 @@ public class CLIGraphicControllerRegistrazione extends AbstractGraphicController
     }
 
     /**
-     * ✅ VERSIONE CORRETTA (senza Map)
+     *  VERSIONE CORRETTA (senza Map)
      */
     @Override
     public void inviaDatiRegistrazione(
@@ -65,8 +65,11 @@ public class CLIGraphicControllerRegistrazione extends AbstractGraphicController
 
     @Override
     protected void goToLogin() {
+    if (navigator != null) {
         navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN);
     }
+    }
+
 
     private void notifyError(String message) {
         GraphicControllerUtils.notifyError(

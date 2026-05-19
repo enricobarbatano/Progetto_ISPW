@@ -9,11 +9,20 @@ import com.ispw.view.cli.console.ConsoleLoginView;
 import com.ispw.view.interfaces.ViewLogin;
 
 /**
- * View CLI login.
+ * View CLI per il login.
  *
  * RESPONSABILITÀ:
- * - raccoglie email/password
- * - chiama controller con dati semplici
+ * - mostrare il menu di login;
+ * - raccogliere email e password;
+ * - delegare il login al graphic controller;
+ * - delegare il passaggio alla registrazione;
+ * - delegare la chiusura dell'applicazione.
+ *
+ * NON:
+ * - crea bean;
+ * - chiama direttamente il logic controller;
+ * - accede a DAO o persistenza;
+ * - gestisce logica applicativa.
  */
 public class CLILoginView extends GenericViewCLI
         implements ViewLogin, NavigableController {
@@ -40,6 +49,7 @@ public class CLILoginView extends GenericViewCLI
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
+        // Il login rappresenta l'ingresso non autenticato.
         sessione = null;
 
         console.render();
@@ -47,15 +57,40 @@ public class CLILoginView extends GenericViewCLI
 
         String choice = console.readChoice();
 
-        if ("2".equals(choice)) {
-            controller.vaiARegistrazione();
-            return;
+        switch (choice) {
+            case "1" -> handleLogin();
+            case "2" -> controller.vaiARegistrazione();
+            case "0" -> handleExit();
+            default -> handleInvalidChoice();
         }
+    }
 
+    /**
+     * Legge le credenziali da console e le passa al graphic controller.
+     */
+    private void handleLogin() {
         String email = console.readEmail();
         String password = console.readPassword();
 
-        // ✅ chiamata corretta
         controller.effettuaLogin(email, password);
+    }
+
+    /**
+     * Chiude l'applicazione.
+     */
+    private void handleExit() {
+        console.showInfo("Chiusura applicazione...");
+        controller.esci();
+    }
+
+    /**
+     * Gestisce una scelta non valida.
+     *
+     * Non chiama goToLogin(), perché quel metodo è protected.
+     * Usa logout(), che è pubblico e riporta alla route login.
+     */
+    private void handleInvalidChoice() {
+        console.showError("Scelta non valida");
+        controller.logout();
     }
 }
