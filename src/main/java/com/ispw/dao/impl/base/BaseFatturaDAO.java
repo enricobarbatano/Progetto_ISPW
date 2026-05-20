@@ -40,15 +40,27 @@ public class BaseFatturaDAO implements FatturaDAO {
     // -----------------------
     // RAW HOOKS (I/O) - override in DBMS/FS
     // -----------------------
-    protected Fattura rawLoad(Integer id) { return null; }
-    protected void rawStore(Fattura entity) { /* no-op in memory */ }
-    protected void rawDelete(Integer id) { /* no-op in memory */ }
+    @SuppressWarnings("java:S1172")
+    protected Fattura rawLoad(Integer id) {
+        return null;
+    }
+
+    protected void rawStore(Fattura entity) {
+        // no-op: base in-memory implementation
+    }
+
+    protected void rawDelete(Integer id) {
+        // no-op: base in-memory implementation
+    }
 
     /**
      * Per persistent provider deve restituire l'ultima fattura dell'utente (DB/FS).
      * Default IN_MEMORY: null.
      */
-    protected Fattura rawFindLastByUtente(int idUtente) { return null; }
+    @SuppressWarnings("java:S1172")
+    protected Fattura rawFindLastByUtente(int idUtente) {
+        return null;
+    }
 
     // -----------------------
     // DAO API - cache-first

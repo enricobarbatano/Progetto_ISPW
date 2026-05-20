@@ -1,5 +1,6 @@
 package com.ispw.dao.impl.base;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -11,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,102 +24,128 @@ import com.ispw.model.entity.Gestore;
 import com.ispw.model.enums.Permesso;
 
 /**
- * Base concreta del DAO Gestore (cache-first).
+ * Base concreta del DAO Gestore.
+ *
+ * Responsabilità:
+ * - comportamento cache-first;
+ * - seed iniziale solo in modalità IN_MEMORY seeded;
+ * - delega raw* ai provider persistenti.
  *
  * Tri-state persistence flag:
- * - persistent == TRUE  : subclass is persistent (DBMS/FS) and should use raw* I/O
- * - persistent == FALSE : pure IN_MEMORY (no seed, no raw I/O)
- * - persistent == NULL  : IN_MEMORY seeded (load once from seed/gestori.json into cache; never persist back)
- *
- * DBMS/FileSystem subclasses should extend this class and call super(Boolean.TRUE).
+ * - TRUE  : DBMS/FS, usa raw*;
+ * - FALSE : IN_MEMORY puro, senza seed;
+ * - NULL  : IN_MEMORY seeded, carica seed/gestori.json una sola volta.
  */
 public class BaseGestoreDAO implements GestoreDAO {
 
     protected final Map<Integer, Gestore> cache = new ConcurrentHashMap<>();
     protected final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    // ✅ Tri-state: null => seed-enabled in-memory
     private final Boolean persistent;
 
-    // Seed-on-first-use state (only used when persistent == null)
     private volatile boolean seeded = false;
-    private volatile int nextId = 1;
+    private final AtomicInteger nextId = new AtomicInteger(1);
 
-    /** Default: IN_MEMORY seeded (persistent == null) */
-    public BaseGestoreDAO() { this(null); }
+    public BaseGestoreDAO() {
+        this(null);
+    }
 
-    /** Protected constructor for subclasses */
-    protected BaseGestoreDAO(Boolean persistent) { this.persistent = persistent; }
+    protected BaseGestoreDAO(Boolean persistent) {
+        this.persistent = persistent;
+    }
 
     // -------- RAW HOOKS (DB/FS) --------
-    protected Gestore rawLoad(Integer id) { return null; }
-    protected void rawStore(Gestore entity) { }
-    protected void rawDelete(Integer id) { }
-    protected Gestore rawFindByEmail(String email) { return null; }
-    protected List<Gestore> rawFindAll() { return null; }
+
+    @SuppressWarnings("java:S1172")
+    protected Gestore rawLoad(Integer id) {
+        return null;
+    }
+
+    protected void rawStore(Gestore entity) {
+        // no-op: base in-memory implementation
+    }
+
+    @SuppressWarnings("java:S1172")
+    protected void rawDelete(Integer id) {
+        // no-op: base in-memory implementation
+    }
+
+    @SuppressWarnings("java:S1172")
+    protected Gestore rawFindByEmail(String email) {
+        return null;
+    }
+
+    protected List<Gestore> rawFindAll() {
+        return List.of();
+    }
 
     // -----------------------
-    // Seed logic (ONLY when persistent == null)
+    // Seed logic
     // -----------------------
+
     private void ensureSeeded() {
-        // Seed ONLY when persistent == null
         if (persistent != null) return;
         if (seeded) return;
 
         lock.writeLock().lock();
         try {
-            if (seeded) return; // double-check
-            // ✅ prima controlla la cache: se non è vuota, NON caricare seed
+            if (seeded) return;
+
             if (!cache.isEmpty()) {
-                recomputeNextIdUnsafe();
-                seeded = true;
+                markSeededUnsafe();
                 return;
             }
 
-            List<Gestore> initial = readSeedGestori();
-            if (initial != null) {
-                for (Gestore g : initial) {
-                    if (g == null) continue;
-                    int id = g.getIdUtente();
-                    if (id <= 0) continue;
-
-                    // normalizza email per coerenza con findByEmail
-                    if (g.getEmail() != null) {
-                        g.setEmail(normalizeEmail(g.getEmail()));
-                    }
-                    cache.put(id, g);
-                }
+            for (Gestore gestore : readSeedGestori()) {
+                addSeedGestoreIfValid(gestore);
             }
 
-            recomputeNextIdUnsafe();
-            seeded = true;
+            markSeededUnsafe();
         } finally {
             lock.writeLock().unlock();
         }
     }
 
+    private void markSeededUnsafe() {
+        recomputeNextIdUnsafe();
+        seeded = true;
+    }
+
+    private void addSeedGestoreIfValid(Gestore gestore) {
+        if (gestore != null && gestore.getIdUtente() > 0) {
+            if (gestore.getEmail() != null) {
+                gestore.setEmail(normalizeEmail(gestore.getEmail()));
+            }
+            cache.put(gestore.getIdUtente(), gestore);
+        }
+    }
+
     private void recomputeNextIdUnsafe() {
         int max = cache.keySet().stream().mapToInt(Integer::intValue).max().orElse(0);
-        nextId = max + 1;
-        if (nextId <= 0) nextId = 1;
+        int computedNextId = max + 1;
+        if (computedNextId <= 0) {
+            computedNextId = 1;
+        }
+        nextId.set(computedNextId);
     }
 
     private List<Gestore> readSeedGestori() {
         try {
             Path root = DAOFactory.getSeedRootOrDefault();
             Path file = root.resolve("gestori.json");
-            if (!Files.exists(file)) return List.of();
+            if (!Files.exists(file)) {
+                return List.of();
+            }
 
             ObjectMapper om = new ObjectMapper();
-            // Safe even if Gestore doesn't have Java time fields
             om.registerModule(new JavaTimeModule());
 
             CollectionType listType = om.getTypeFactory()
                     .constructCollectionType(List.class, Gestore.class);
 
-            return om.readValue(file.toFile(), listType);
-        } catch (Exception ex) {
-            // best-effort: se seed fallisce, parti vuoto
+            List<Gestore> result = om.readValue(file.toFile(), listType);
+            return result != null ? result : List.of();
+        } catch (IOException ex) {
             return List.of();
         }
     }
@@ -139,15 +167,21 @@ public class BaseGestoreDAO implements GestoreDAO {
         }
 
         if (Boolean.TRUE.equals(persistent)) {
-            Gestore g = rawLoad(id);
-            if (g != null && g.getIdUtente() > 0) {
-                if (g.getEmail() != null) g.setEmail(normalizeEmail(g.getEmail()));
+            Gestore gestore = rawLoad(id);
+            if (gestore != null && gestore.getIdUtente() > 0) {
+                if (gestore.getEmail() != null) {
+                    gestore.setEmail(normalizeEmail(gestore.getEmail()));
+                }
                 lock.writeLock().lock();
-                try { cache.put(g.getIdUtente(), g); }
-                finally { lock.writeLock().unlock(); }
+                try {
+                    cache.put(gestore.getIdUtente(), gestore);
+                } finally {
+                    lock.writeLock().unlock();
+                }
             }
-            return g;
+            return gestore;
         }
+
         return null;
     }
 
@@ -156,22 +190,25 @@ public class BaseGestoreDAO implements GestoreDAO {
         ensureSeeded();
 
         if (Boolean.TRUE.equals(persistent)) {
-            List<Gestore> res = rawFindAll();
-            if (res == null) return new ArrayList<>();
+            List<Gestore> result = rawFindAll();
+            if (result == null) return new ArrayList<>();
 
-            // normalizza + cache update
             lock.writeLock().lock();
             try {
-                for (Gestore g : res) {
-                    if (g != null && g.getIdUtente() > 0) {
-                        if (g.getEmail() != null) g.setEmail(normalizeEmail(g.getEmail()));
-                        cache.put(g.getIdUtente(), g);
+                for (Gestore gestore : result) {
+                    if (gestore != null && gestore.getIdUtente() > 0) {
+                        if (gestore.getEmail() != null) {
+                            gestore.setEmail(normalizeEmail(gestore.getEmail()));
+                        }
+                        cache.put(gestore.getIdUtente(), gestore);
                     }
                 }
-            } finally { lock.writeLock().unlock(); }
+            } finally {
+                lock.writeLock().unlock();
+            }
 
-            res.sort(Comparator.comparingInt(Gestore::getIdUtente));
-            return res;
+            result.sort(Comparator.comparingInt(Gestore::getIdUtente));
+            return result;
         }
 
         lock.readLock().lock();
@@ -179,7 +216,9 @@ public class BaseGestoreDAO implements GestoreDAO {
             List<Gestore> out = new ArrayList<>(cache.values());
             out.sort(Comparator.comparingInt(Gestore::getIdUtente));
             return out;
-        } finally { lock.readLock().unlock(); }
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     @Override
@@ -188,46 +227,60 @@ public class BaseGestoreDAO implements GestoreDAO {
 
         ensureSeeded();
 
-        // normalizza email in ingresso
         if (entity.getEmail() != null) {
             entity.setEmail(normalizeEmail(entity.getEmail()));
         }
 
-        // Persistent provider: delegate id generation to rawStore if id==0
         if (entity.getIdUtente() == 0 && Boolean.TRUE.equals(persistent)) {
             rawStore(entity);
             int id = entity.getIdUtente();
+
             if (id <= 0) {
                 lock.writeLock().lock();
                 try {
                     int next = cache.keySet().stream().mapToInt(Integer::intValue).max().orElse(0) + 1;
                     entity.setIdUtente(next);
                     cache.put(next, entity);
-                } finally { lock.writeLock().unlock(); }
+                } finally {
+                    lock.writeLock().unlock();
+                }
             } else {
                 lock.writeLock().lock();
-                try { cache.put(id, entity); } finally { lock.writeLock().unlock(); }
+                try {
+                    cache.put(id, entity);
+                } finally {
+                    lock.writeLock().unlock();
+                }
             }
             return;
         }
 
-        // IN_MEMORY (persistent == null or false): assign new id if needed
         if (entity.getIdUtente() == 0) {
             lock.writeLock().lock();
             try {
-                if (nextId <= 0) recomputeNextIdUnsafe();
-                int id = nextId++;
+                if (nextId.get() <= 0) {
+                    recomputeNextIdUnsafe();
+                }
+                int id = nextId.getAndIncrement();
                 entity.setIdUtente(id);
                 cache.put(id, entity);
-            } finally { lock.writeLock().unlock(); }
+            } finally {
+                lock.writeLock().unlock();
+            }
             return;
         }
 
         int id = entity.getIdUtente();
         lock.writeLock().lock();
-        try { cache.put(id, entity); } finally { lock.writeLock().unlock(); }
+        try {
+            cache.put(id, entity);
+        } finally {
+            lock.writeLock().unlock();
+        }
 
-        if (Boolean.TRUE.equals(persistent)) rawStore(entity);
+        if (Boolean.TRUE.equals(persistent)) {
+            rawStore(entity);
+        }
     }
 
     @Override
@@ -237,8 +290,15 @@ public class BaseGestoreDAO implements GestoreDAO {
         ensureSeeded();
 
         lock.writeLock().lock();
-        try { cache.remove(id); } finally { lock.writeLock().unlock(); }
-        if (Boolean.TRUE.equals(persistent)) rawDelete(id);
+        try {
+            cache.remove(id);
+        } finally {
+            lock.writeLock().unlock();
+        }
+
+        if (Boolean.TRUE.equals(persistent)) {
+            rawDelete(id);
+        }
     }
 
     @Override
@@ -248,25 +308,36 @@ public class BaseGestoreDAO implements GestoreDAO {
         ensureSeeded();
 
         lock.readLock().lock();
-        try { if (cache.containsKey(id)) return true; } finally { lock.readLock().unlock(); }
+        try {
+            if (cache.containsKey(id)) return true;
+        } finally {
+            lock.readLock().unlock();
+        }
 
         if (Boolean.TRUE.equals(persistent)) {
-            Gestore g = rawLoad(id);
-            if (g != null && g.getIdUtente() > 0) {
-                if (g.getEmail() != null) g.setEmail(normalizeEmail(g.getEmail()));
+            Gestore gestore = rawLoad(id);
+            if (gestore != null && gestore.getIdUtente() > 0) {
+                if (gestore.getEmail() != null) {
+                    gestore.setEmail(normalizeEmail(gestore.getEmail()));
+                }
                 lock.writeLock().lock();
-                try { cache.put(g.getIdUtente(), g); } finally { lock.writeLock().unlock(); }
+                try {
+                    cache.put(gestore.getIdUtente(), gestore);
+                } finally {
+                    lock.writeLock().unlock();
+                }
                 return true;
             }
         }
+
         return false;
     }
 
     @Override
     public Gestore create(Integer id) {
-        Gestore g = new Gestore();
-        g.setIdUtente(id != null ? id : 0);
-        return g;
+        Gestore gestore = new Gestore();
+        gestore.setIdUtente(id != null ? id : 0);
+        return gestore;
     }
 
     @Override
@@ -278,27 +349,39 @@ public class BaseGestoreDAO implements GestoreDAO {
     public Gestore findByEmail(String email) {
         ensureSeeded();
 
-        final String norm = normalizeEmail(email);
-        if (norm == null || norm.isBlank()) return null;
+        final String normalized = normalizeEmail(email);
+        if (normalized == null || normalized.isBlank()) return null;
 
         lock.readLock().lock();
         try {
             Optional<Gestore> fromCache = cache.values().stream()
-                .filter(g -> g != null && g.getEmail() != null &&
-                             normalizeEmail(g.getEmail()).equals(norm))
-                .findFirst();
-            if (fromCache.isPresent()) return fromCache.get();
-        } finally { lock.readLock().unlock(); }
+                    .filter(g -> g != null && g.getEmail() != null &&
+                            normalizeEmail(g.getEmail()).equals(normalized))
+                    .findFirst();
+
+            if (fromCache.isPresent()) {
+                return fromCache.get();
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
 
         if (Boolean.TRUE.equals(persistent)) {
-            Gestore g = rawFindByEmail(norm);
-            if (g != null && g.getIdUtente() > 0) {
-                if (g.getEmail() != null) g.setEmail(normalizeEmail(g.getEmail()));
+            Gestore gestore = rawFindByEmail(normalized);
+            if (gestore != null && gestore.getIdUtente() > 0) {
+                if (gestore.getEmail() != null) {
+                    gestore.setEmail(normalizeEmail(gestore.getEmail()));
+                }
                 lock.writeLock().lock();
-                try { cache.put(g.getIdUtente(), g); } finally { lock.writeLock().unlock(); }
+                try {
+                    cache.put(gestore.getIdUtente(), gestore);
+                } finally {
+                    lock.writeLock().unlock();
+                }
             }
-            return g;
+            return gestore;
         }
+
         return null;
     }
 
@@ -306,34 +389,42 @@ public class BaseGestoreDAO implements GestoreDAO {
 
     @Override
     public Set<Permesso> getPermessi(int idGestore) {
-        Gestore g = load(idGestore);
-        return (g == null || g.getPermessi() == null) ? Set.of() : Set.copyOf(g.getPermessi());
+        Gestore gestore = load(idGestore);
+        return (gestore == null || gestore.getPermessi() == null)
+                ? Set.of()
+                : Set.copyOf(gestore.getPermessi());
     }
 
     @Override
     public boolean hasPermesso(int idGestore, Permesso permesso) {
-        Gestore g = load(idGestore);
-        return g != null && g.getPermessi() != null && g.getPermessi().contains(permesso);
+        Gestore gestore = load(idGestore);
+        return gestore != null
+                && gestore.getPermessi() != null
+                && gestore.getPermessi().contains(permesso);
     }
 
     @Override
     public void assegnaPermesso(int idGestore, Permesso permesso) {
         Objects.requireNonNull(permesso, "permesso non può essere null");
-        Gestore g = load(idGestore);
-        if (g == null || g.getPermessi() == null) return;
-        if (!g.getPermessi().contains(permesso)) {
-            g.getPermessi().add(permesso);
-            store(g);
+
+        Gestore gestore = load(idGestore);
+        if (gestore == null || gestore.getPermessi() == null) return;
+
+        if (!gestore.getPermessi().contains(permesso)) {
+            gestore.getPermessi().add(permesso);
+            store(gestore);
         }
     }
 
     @Override
     public void rimuoviPermesso(int idGestore, Permesso permesso) {
         Objects.requireNonNull(permesso, "permesso non può essere null");
-        Gestore g = load(idGestore);
-        if (g == null || g.getPermessi() == null) return;
-        if (g.getPermessi().remove(permesso)) {
-            store(g);
+
+        Gestore gestore = load(idGestore);
+        if (gestore == null || gestore.getPermessi() == null) return;
+
+        if (gestore.getPermessi().remove(permesso)) {
+            store(gestore);
         }
     }
 
@@ -341,16 +432,14 @@ public class BaseGestoreDAO implements GestoreDAO {
         return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
     }
 
-    /**
-     * Compatibilità: pulisce la cache (usato dai test).
-     * NEW: resetta anche lo stato di seeding + nextId.
-     */
     public void clear() {
         lock.writeLock().lock();
         try {
             cache.clear();
             seeded = false;
-            nextId = 1;
-        } finally { lock.writeLock().unlock(); }
+            nextId.set(1);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 }

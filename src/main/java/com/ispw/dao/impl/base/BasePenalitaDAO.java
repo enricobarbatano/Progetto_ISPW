@@ -30,10 +30,23 @@ public class BasePenalitaDAO implements PenalitaDAO {
     protected BasePenalitaDAO(boolean persistent) { this.persistent = persistent; }
 
     // raw hooks
-    protected Penalita rawLoad(Integer id) { return null; }
-    protected void rawStore(Penalita entity) { }
-    protected void rawDelete(Integer id) { }
-    protected List<Penalita> rawFindByUtente(int idUtente) { return null; }
+    @SuppressWarnings("java:S1172")
+    protected Penalita rawLoad(Integer id) {
+        return null;
+    }
+
+    protected void rawStore(Penalita entity) {
+        // no-op: base in-memory implementation
+    }
+
+    protected void rawDelete(Integer id) {
+        // no-op: base in-memory implementation
+    }
+
+    @SuppressWarnings("java:S1172")
+    protected List<Penalita> rawFindByUtente(int idUtente) {
+        return List.of();
+    }
 
     @Override
     public Penalita load(Integer id) {
@@ -114,7 +127,13 @@ public class BasePenalitaDAO implements PenalitaDAO {
     }
 
     @Override
-    public Penalita create(Integer id) { Penalita p = new Penalita(); if (id != null) p.setIdPenalita(id); return p; }
+    public Penalita create(Integer id) {
+        Penalita p = new Penalita();
+        if (id != null && id > 0) {
+            p.setIdPenalita(id);
+        }
+        return p;
+    }
 
     @Override
     public List<Penalita> recuperaPenalitaUtente(int idUtente) {
