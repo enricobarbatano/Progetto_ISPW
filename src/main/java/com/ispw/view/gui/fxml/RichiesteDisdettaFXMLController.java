@@ -40,25 +40,25 @@ import javafx.scene.control.TextField;
 public class RichiesteDisdettaFXMLController {
 
     private static final Pattern ID_RICHIESTA_PATTERN =
-            Pattern.compile("Richiesta\\s*#?\\s*(\\d+)");
+        Pattern.compile("Richiesta\\s{0,10}#?\\s{0,10}(\\d{1,10})");
 
-    private static final Pattern ID_PRENOTAZIONE_PATTERN =
-            Pattern.compile("pren\\s*#?\\s*(\\d+)");
+private static final Pattern ID_PRENOTAZIONE_PATTERN =
+        Pattern.compile("pren\\s{0,10}#?\\s{0,10}(\\d{1,10})");
 
-    private static final Pattern ID_UTENTE_PATTERN =
-            Pattern.compile("utente\\s*#?\\s*(\\d+)");
+private static final Pattern ID_UTENTE_PATTERN =
+        Pattern.compile("utente\\s{0,10}#?\\s{0,10}(\\d{1,10})");
 
-    private static final Pattern STATO_PATTERN =
-            Pattern.compile("stato=([^\\s]+)");
+private static final Pattern STATO_PATTERN =
+        Pattern.compile("stato=([^\\s]{1,40})");
 
-    private static final Pattern PENALE_PATTERN =
-            Pattern.compile("penale=(\\d+(?:[\\.,]\\d+)?)");
+private static final Pattern PENALE_PATTERN =
+        Pattern.compile("penale=(\\d{1,10}(?:[\\.,]\\d{1,2})?)");
 
-    private static final Pattern RIMBORSO_PATTERN =
-            Pattern.compile("rimborso=(\\d+(?:[\\.,]\\d+)?)");
+private static final Pattern RIMBORSO_PATTERN =
+        Pattern.compile("rimborso=(\\d{1,10}(?:[\\.,]\\d{1,2})?)");
 
-    private static final Pattern DATA_RICHIESTA_PATTERN =
-            Pattern.compile("richiesta@([^\\s]+)");
+private static final Pattern DATA_RICHIESTA_PATTERN =
+        Pattern.compile("richiesta@([^\\s]{1,40})");
 
     private GUIGraphicControllerRichiesteDisdetta controller;
     private SessioneUtenteBean sessione;
