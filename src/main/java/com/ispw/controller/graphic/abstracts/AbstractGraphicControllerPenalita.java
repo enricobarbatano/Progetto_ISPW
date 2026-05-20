@@ -69,6 +69,7 @@ public abstract class AbstractGraphicControllerPenalita implements GraphicContro
     /**
      * Richiede la lista degli utenti a cui è possibile applicare una penalità.
      */
+    @Override
     public void richiediListaUtenti() {
         try {
             List<String> utenti = formatUtenti(logicController().listaUtentiPerPenalita());

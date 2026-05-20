@@ -12,6 +12,17 @@ import com.ispw.controller.graphic.interfaces.GraphicControllerRichiesteDisdetta
 import com.ispw.controller.graphic.interfaces.GraphicLoginController;
 import com.ispw.model.enums.FrontendProvider;
 
+
+/**
+ * Factory astratta per i controller grafici.
+ *
+ * Il Singleton è intenzionale:
+ * il frontend provider viene scelto una sola volta a bootstrap,
+ * così tutta l'applicazione usa sempre la stessa configurazione frontend
+ * evitando incoerenze tra CLI e GUI.
+ */
+
+@SuppressWarnings("java:S6548")
 public abstract class FrontendControllerFactory {
 
     // Stato: provider scelto a bootstrap e istanza singleton

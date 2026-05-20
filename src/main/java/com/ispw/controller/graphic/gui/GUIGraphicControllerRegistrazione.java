@@ -17,7 +17,7 @@ public class GUIGraphicControllerRegistrazione extends AbstractGraphicController
     }
 
     /**
-     * ✅ versione corretta senza Map
+     *  versione corretta senza Map
      */
     @Override
     public void inviaDatiRegistrazione(

@@ -14,7 +14,7 @@ import com.ispw.model.enums.Ruolo;
  * CLI controller registrazione
  *
  * riceve dati grezzi (NON Map)
- * ✅crea bean nel controller
+ *crea bean nel controller
  */
 public class CLIGraphicControllerRegistrazione extends AbstractGraphicControllerRegistrazione {
 

@@ -18,12 +18,19 @@ import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaGestioneAcc
 import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaPenalita;
 import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaPrenotazione;
 import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaRegistrazione;
+import com.ispw.controller.logic.interfaces.pagamento.GestionePagamentoDisdetta;
 import com.ispw.controller.logic.interfaces.pagamento.GestionePagamentoPenalita;
 import com.ispw.controller.logic.interfaces.pagamento.GestionePagamentoPrenotazione;
 import com.ispw.controller.logic.interfaces.pagamento.GestionePagamentoRimborso;
-import com.ispw.controller.logic.interfaces.pagamento.GestionePagamentoDisdetta;
 
 public class ServiceFactory {
+
+
+    private ServiceFactory() {
+        // Classe factory statica: non deve essere istanziata.
+    }
+
+    // metodi statici...
 
     // ===================== PAGAMENTO =====================
 

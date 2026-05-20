@@ -23,7 +23,7 @@ public class RichiestaDisdettaDAOFileSystem extends BaseRichiestaDisdettaDAO {
             Comparator.comparingInt(RichiestaDisdettaRimborso::getIdRichiesta);
 
     public RichiestaDisdettaDAOFileSystem(Path storageDir) {
-        // Se la tua base usa Boolean tri-state: super(Boolean.TRUE);
+      
         super(true);
 
         try {
