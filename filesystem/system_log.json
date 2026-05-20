@@ -76,4 +76,76 @@
   "tipoOperazione" : null,
   "idUtenteCoinvolto" : 2,
   "descrizione" : "RICHIESTA_DISDETTA ESEGUITA #1"
+}, {
+  "idLog" : 14,
+  "timestamp" : "2026-05-20T14:48:40.8819336",
+  "tipoOperazione" : "ACCESSO_ESEGUITO",
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "Login effettuato per utente enrico.barbatano@gmail.com"
+}, {
+  "idLog" : 15,
+  "timestamp" : "2026-05-20T14:48:53.7836046",
+  "tipoOperazione" : "AGGIORNAMENTO_DATI_PERSONALI",
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "[ACCOUNT] Aggiornati dati account"
+}, {
+  "idLog" : 16,
+  "timestamp" : "2026-05-20T14:49:30.7410973",
+  "tipoOperazione" : null,
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "RICHIESTA_DISDETTA #2 pren=1 penaleStimata=0.0 rimborsoStimato=60.0"
+}, {
+  "idLog" : 17,
+  "timestamp" : "2026-05-20T14:50:39.9873859",
+  "tipoOperazione" : "ACCESSO_ESEGUITO",
+  "idUtenteCoinvolto" : 100,
+  "descrizione" : "Login effettuato per utente admin@test.it"
+}, {
+  "idLog" : 18,
+  "timestamp" : "2026-05-20T14:52:32.1791834",
+  "tipoOperazione" : "ACCESSO_ESEGUITO",
+  "idUtenteCoinvolto" : 100,
+  "descrizione" : "Login effettuato per utente admin@test.it"
+}, {
+  "idLog" : 19,
+  "timestamp" : "2026-05-20T14:52:40.1206089",
+  "tipoOperazione" : null,
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "DISDETTA_PRENOTAZIONE #1 - penale 0.0 EUR"
+}, {
+  "idLog" : 20,
+  "timestamp" : "2026-05-20T14:52:40.1246088",
+  "tipoOperazione" : null,
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "RICHIESTA_DISDETTA ESEGUITA #2"
+}, {
+  "idLog" : 21,
+  "timestamp" : "2026-05-20T14:55:30.2063379",
+  "tipoOperazione" : "ACCESSO_ESEGUITO",
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "Login effettuato per utente enrybarba2002@gmail.com"
+}, {
+  "idLog" : 22,
+  "timestamp" : "2026-05-20T14:56:24.6609341",
+  "tipoOperazione" : null,
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "RICHIESTA_DISDETTA #3 pren=1 penaleStimata=10.0 rimborsoStimato=30.0"
+}, {
+  "idLog" : 23,
+  "timestamp" : "2026-05-20T14:56:38.2069158",
+  "tipoOperazione" : "ACCESSO_ESEGUITO",
+  "idUtenteCoinvolto" : 100,
+  "descrizione" : "Login effettuato per utente admin@test.it"
+}, {
+  "idLog" : 24,
+  "timestamp" : "2026-05-20T14:56:57.5646641",
+  "tipoOperazione" : null,
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "DISDETTA_PRENOTAZIONE #1 - penale 10.0 EUR"
+}, {
+  "idLog" : 25,
+  "timestamp" : "2026-05-20T14:56:57.5686628",
+  "tipoOperazione" : null,
+  "idUtenteCoinvolto" : 2,
+  "descrizione" : "RICHIESTA_DISDETTA ESEGUITA #3"
 } ]

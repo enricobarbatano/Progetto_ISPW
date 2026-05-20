@@ -10,4 +10,28 @@
   "notaUtente" : null,
   "notaGestore" : "",
   "idGestoreDecisione" : 100
+}, {
+  "idRichiesta" : 2,
+  "idPrenotazione" : 1,
+  "idUtente" : 2,
+  "timestampRichiesta" : "2026-05-20T14:49:30.7370907",
+  "timestampDecisione" : "2026-05-20T14:52:40.1236091",
+  "penaleStimata" : 0.0,
+  "rimborsoStimato" : 60.0,
+  "stato" : "ESEGUITA",
+  "notaUtente" : null,
+  "notaGestore" : "va bene",
+  "idGestoreDecisione" : 100
+}, {
+  "idRichiesta" : 3,
+  "idPrenotazione" : 1,
+  "idUtente" : 2,
+  "timestampRichiesta" : "2026-05-20T14:56:24.650933",
+  "timestampDecisione" : "2026-05-20T14:56:57.5676629",
+  "penaleStimata" : 10.0,
+  "rimborsoStimato" : 30.0,
+  "stato" : "ESEGUITA",
+  "notaUtente" : null,
+  "notaGestore" : "va bene",
+  "idGestoreDecisione" : 100
 } ]

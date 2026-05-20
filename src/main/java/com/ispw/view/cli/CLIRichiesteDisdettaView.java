@@ -23,6 +23,7 @@ import com.ispw.view.cli.console.ConsoleRichiesteDisdettaElencoView;
  * - chiama logic controller;
  * - accede a DAO o persistenza.
  */
+
 public class CLIRichiesteDisdettaView extends GenericViewCLI implements NavigableController {
 
     private final CLIGraphicControllerRichiesteDisdetta controller;
@@ -50,10 +51,6 @@ public class CLIRichiesteDisdettaView extends GenericViewCLI implements Navigabl
 
         renderHeader();
 
-        /*
-         * Se il payload non contiene ancora la lista richieste,
-         * chiedo al graphic controller di caricarla.
-         */
         if (!hasRichiestePayload()) {
             controller.caricaRichiestePending(sessione);
             System.out.println("(caricamento richieste...)");
@@ -61,10 +58,12 @@ public class CLIRichiesteDisdettaView extends GenericViewCLI implements Navigabl
         }
 
         List<String> richieste = readRichiesteFromPayload();
+
         elencoView.show(richieste);
 
         if (!richieste.isEmpty()) {
-            selectedId = decisionView.askSelectedId();
+            Integer selectedInput = decisionView.askSelectedId();
+            selectedId = resolveRichiestaIdFromSelection(selectedInput, richieste);
         } else {
             selectedId = null;
         }
@@ -83,9 +82,8 @@ public class CLIRichiesteDisdettaView extends GenericViewCLI implements Navigabl
     /**
      * Verifica se il payload contiene la chiave delle richieste.
      *
-     * Questo mantiene la logica precedente:
-     * - chiave assente: bisogna caricare;
-     * - chiave presente ma non lista: viene trattata come lista vuota.
+     * Se la chiave non è presente, la view chiede il caricamento
+     * delle richieste pending al graphic controller.
      */
     private boolean hasRichiestePayload() {
         return lastParams.containsKey(GraphicControllerUtils.KEY_RICHIESTE);
@@ -94,9 +92,7 @@ public class CLIRichiesteDisdettaView extends GenericViewCLI implements Navigabl
     /**
      * Legge le richieste dal payload in modo sicuro.
      *
-     * Se il valore non è una lista, restituisce lista vuota.
-     * Questo risolve S1168: i metodi che restituiscono collezioni
-     * non devono restituire null.
+     * Se il payload non contiene una lista, restituisce lista vuota.
      */
     private List<String> readRichiesteFromPayload() {
         Object raw = lastParams.get(GraphicControllerUtils.KEY_RICHIESTE);
@@ -108,6 +104,75 @@ public class CLIRichiesteDisdettaView extends GenericViewCLI implements Navigabl
         return richiesteObj.stream()
                 .map(Object::toString)
                 .toList();
+    }
+
+    /**
+     * Traduce la selezione dell'utente nell'id reale della richiesta.
+     *
+     * Caso tipico:
+     * - la lista mostra: [1] Richiesta#2 ...
+     * - l'utente inserisce: 1
+     * - il metodo restituisce: 2
+     *
+     * Se invece l'utente inserisce direttamente un id non interpretabile
+     * come indice di lista, viene lasciato invariato.
+     */
+    private Integer resolveRichiestaIdFromSelection(Integer selectedInput, List<String> richieste) {
+        if (selectedInput == null || selectedInput <= 0) {
+            return null;
+        }
+
+        if (selectedInput <= richieste.size()) {
+            Integer parsedId = parseRichiestaId(richieste.get(selectedInput - 1));
+
+            if (parsedId != null) {
+                return parsedId;
+            }
+        }
+
+        return selectedInput;
+    }
+
+    /**
+     * Estrae l'id reale da una stringa del tipo:
+     *
+     * Richiesta#2 pren#1 utente#2 ...
+     *
+     * Non usa regex per evitare ulteriori warning Sonar sui pattern.
+     */
+    private Integer parseRichiestaId(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+
+        int markerIndex = raw.indexOf("Richiesta#");
+
+        if (markerIndex < 0) {
+            return null;
+        }
+
+        int start = markerIndex + "Richiesta#".length();
+        StringBuilder digits = new StringBuilder();
+
+        for (int i = start; i < raw.length(); i++) {
+            char current = raw.charAt(i);
+
+            if (!Character.isDigit(current)) {
+                break;
+            }
+
+            digits.append(current);
+        }
+
+        if (digits.isEmpty()) {
+            return null;
+        }
+
+        try {
+            return Integer.valueOf(digits.toString());
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     /**
