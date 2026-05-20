@@ -48,11 +48,11 @@ public class DisdettaFXMLController implements Initializable {
     /*
      * Stato locale della schermata.
      * selectedId rappresenta l'id prenotazione selezionato.
-     * previewPossibile e previewPenale rappresentano l'ultima anteprima ricevuta.
+     * previewPossibile rappresenta l'ultima anteprima ricevuta.
+     * La penale, invece, viene usata solo durante il render e quindi resta locale.
      */
     private Integer selectedId;
     private Boolean previewPossibile;
-    private Float previewPenale;
 
     @FXML private Label lblError;
     @FXML private Label lblSuccess;
@@ -284,7 +284,7 @@ public class DisdettaFXMLController implements Initializable {
      */
     private void renderAnteprima(Object rawAnteprima) {
         previewPossibile = null;
-        previewPenale = null;
+        float previewPenale = 0.0f;
 
         if (!(rawAnteprima instanceof Map<?, ?> anteprima)) {
             setLabelText(lblAnteprima, "");
@@ -295,11 +295,12 @@ public class DisdettaFXMLController implements Initializable {
         Object penale = anteprima.get(GraphicControllerUtils.KEY_PENALE);
 
         previewPossibile = possibile instanceof Boolean b ? b : null;
-        previewPenale = penale instanceof Number n ? n.floatValue() : 0.0f;
 
-        String possibileText = previewPossibile == null
-                ? "-"
-                : previewPossibile ? "Sì" : "No";
+        if (penale instanceof Number n) {
+            previewPenale = n.floatValue();
+        }
+
+        String possibileText = formatPreviewPossibile(previewPossibile);
 
         if (lblAnteprima != null) {
             lblAnteprima.setText(
@@ -308,6 +309,21 @@ public class DisdettaFXMLController implements Initializable {
                             previewPenale)
             );
         }
+    }
+
+    /**
+     * Converte l'esito booleano dell'anteprima in testo leggibile.
+     */
+    private String formatPreviewPossibile(Boolean possibile) {
+        if (possibile == null) {
+            return "-";
+        }
+
+        if (Boolean.TRUE.equals(possibile)) {
+            return "Sì";
+        }
+
+        return "No";
     }
 
     /**

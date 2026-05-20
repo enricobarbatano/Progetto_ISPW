@@ -1,5 +1,5 @@
 package com.ispw.view.gui;
-
+import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,19 +17,18 @@ import javafx.scene.layout.VBox;
 /**
  * View GUI per la home.
  *
- * RESPONSABILITÀ:
- * - caricare il file FXML home.fxml
- * - inizializzare il controller FXML con la sessione
- * - visualizzare il menu principale
+ * Responsabilità:
+ * - caricare il file FXML home.fxml;
+ * - inizializzare il controller FXML con navigator e sessione;
+ * - visualizzare il menu principale.
  *
  * NON:
- * - contenere logica di navigazione
- * - creare bean
+ * - contiene logica di business;
+ * - crea bean;
+ * - implementa logica applicativa di navigazione.
  *
- * ARCHITETTURA:
- * La home è un hub di navigazione verso tutti i casi d'uso.
- * Il controller FXML ha accesso al navigator per permettere
- * all'utente di navigare verso le diverse funzionalità.
+ * Architettura:
+ * la home è un hub grafico di navigazione verso i casi d'uso.
  */
 public class GUIHomeView extends GenericViewGUI implements NavigableController {
 
@@ -40,14 +39,14 @@ public class GUIHomeView extends GenericViewGUI implements NavigableController {
     /**
      * Costruisce la view home.
      *
-     * @param navigator il navigator per la navigazione tra schermate
+     * @param navigator controller di navigazione grafica
      */
     public GUIHomeView(GraphicControllerNavigation navigator) {
         this.navigator = navigator;
     }
 
     /**
-     * Restituisce il nome della route.
+     * Restituisce il nome della route associata alla home.
      */
     @Override
     public String getRouteName() {
@@ -57,8 +56,11 @@ public class GUIHomeView extends GenericViewGUI implements NavigableController {
     /**
      * Visualizza la schermata home.
      *
-     * Carica l'FXML, inizializza il controller con la sessione,
-     * e mostra il menu principale.
+     * Carica l'FXML, inizializza il controller FXML
+     * e mostra la root grafica.
+     *
+     * In caso di errore di caricamento o inizializzazione,
+     * viene mostrata una schermata di fallback.
      */
     @Override
     public void onShow(Map<String, Object> params) {
@@ -73,13 +75,14 @@ public class GUIHomeView extends GenericViewGUI implements NavigableController {
 
             GuiLauncher.setRoot(root);
 
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             LOGGER.log(Level.SEVERE, "Errore caricamento schermata Home", e);
 
-            // Fallback UI
             VBox fallback = GuiViewUtils.createRoot();
             fallback.getChildren().add(new Label("Errore caricamento Home"));
+
             GuiLauncher.setRoot(fallback);
         }
     }
 }
+

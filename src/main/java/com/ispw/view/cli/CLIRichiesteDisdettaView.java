@@ -50,14 +50,17 @@ public class CLIRichiesteDisdettaView extends GenericViewCLI implements Navigabl
 
         renderHeader();
 
-        List<String> richieste = readRichiesteFromPayload();
-
-        if (richieste == null) {
+        /*
+         * Se il payload non contiene ancora la lista richieste,
+         * chiedo al graphic controller di caricarla.
+         */
+        if (!hasRichiestePayload()) {
             controller.caricaRichiestePending(sessione);
             System.out.println("(caricamento richieste...)");
             return;
         }
 
+        List<String> richieste = readRichiesteFromPayload();
         elencoView.show(richieste);
 
         if (!richieste.isEmpty()) {
@@ -78,13 +81,28 @@ public class CLIRichiesteDisdettaView extends GenericViewCLI implements Navigabl
     }
 
     /**
+     * Verifica se il payload contiene la chiave delle richieste.
+     *
+     * Questo mantiene la logica precedente:
+     * - chiave assente: bisogna caricare;
+     * - chiave presente ma non lista: viene trattata come lista vuota.
+     */
+    private boolean hasRichiestePayload() {
+        return lastParams.containsKey(GraphicControllerUtils.KEY_RICHIESTE);
+    }
+
+    /**
      * Legge le richieste dal payload in modo sicuro.
+     *
+     * Se il valore non è una lista, restituisce lista vuota.
+     * Questo risolve S1168: i metodi che restituiscono collezioni
+     * non devono restituire null.
      */
     private List<String> readRichiesteFromPayload() {
         Object raw = lastParams.get(GraphicControllerUtils.KEY_RICHIESTE);
 
         if (!(raw instanceof List<?> richiesteObj)) {
-            return null;
+            return List.of();
         }
 
         return richiesteObj.stream()

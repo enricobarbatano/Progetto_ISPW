@@ -1,5 +1,6 @@
 package com.ispw.view.gui;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,22 +19,23 @@ import javafx.scene.layout.VBox;
 /**
  * View GUI per la registrazione di un nuovo utente.
  *
- * RESPONSABILITÀ:
- * - caricare il file FXML registrazione.fxml
- * - inizializzare il controller FXML
- * - renderizzare i dati (messaggi di errore/successo)
- * - visualizzare il form di registrazione
+ * Responsabilità:
+ * - caricare il file FXML registrazione.fxml;
+ * - inizializzare il controller FXML;
+ * - renderizzare messaggi di errore o successo;
+ * - visualizzare il form di registrazione.
  *
  * NON:
- * - creare bean di registrazione (responsabilità del controller grafico)
- * - validare i dati (responsabilità del controller grafico)
- * - gestire la navigazione
+ * - crea bean di registrazione;
+ * - valida direttamente i dati;
+ * - gestisce direttamente la navigazione.
  *
- * NOTA:
- * Durante la registrazione, la sessione è null.
- * Solo dopo il login, la sessione viene creata.
+ * Nota:
+ * durante la registrazione la sessione è null.
+ * La sessione viene creata solo dopo il login.
  */
-public class GUIRegistrazioneView extends GenericViewGUI implements ViewRegistrazione, NavigableController {
+public class GUIRegistrazioneView extends GenericViewGUI
+        implements ViewRegistrazione, NavigableController {
 
     private static final Logger LOGGER = Logger.getLogger(GUIRegistrazioneView.class.getName());
 
@@ -42,14 +44,14 @@ public class GUIRegistrazioneView extends GenericViewGUI implements ViewRegistra
     /**
      * Costruisce la view di registrazione.
      *
-     * @param controller il controller grafico per la registrazione
+     * @param controller controller grafico per la registrazione
      */
     public GUIRegistrazioneView(GUIGraphicControllerRegistrazione controller) {
         this.controller = controller;
     }
 
     /**
-     * Restituisce il nome della route.
+     * Restituisce il nome della route associata alla registrazione.
      */
     @Override
     public String getRouteName() {
@@ -59,14 +61,16 @@ public class GUIRegistrazioneView extends GenericViewGUI implements ViewRegistra
     /**
      * Visualizza la schermata di registrazione.
      *
-     * Carica l'FXML, inizializza il controller, e renderizza i messaggi.
-     * La sessione è null durante la registrazione.
+     * La sessione viene forzata a null perché in questa fase
+     * l'utente non è ancora autenticato.
+     *
+     * In caso di errore di caricamento o inizializzazione,
+     * viene mostrata una schermata di fallback.
      */
     @Override
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
-        // La registrazione non richiede sessione
         sessione = null;
 
         try {
@@ -79,13 +83,14 @@ public class GUIRegistrazioneView extends GenericViewGUI implements ViewRegistra
 
             GuiLauncher.setRoot(root);
 
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             LOGGER.log(Level.SEVERE, "Errore caricamento schermata Registrazione", e);
 
-            // Fallback UI
             VBox fallback = GuiViewUtils.createRoot();
             fallback.getChildren().add(new Label("Errore caricamento schermata Registrazione"));
+
             GuiLauncher.setRoot(fallback);
         }
     }
 }
+

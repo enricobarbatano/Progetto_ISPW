@@ -12,7 +12,24 @@ import com.ispw.view.cli.console.ConsoleDisdettaElencoView;
 import com.ispw.view.cli.console.ConsoleDisdettaEsitoView;
 import com.ispw.view.interfaces.ViewDisdettaPrenotazione;
 
-public class CLIDisdettaView extends GenericViewCLI implements ViewDisdettaPrenotazione, NavigableController {
+/**
+ * View CLI per la richiesta di disdetta lato utente.
+ *
+ * Responsabilità:
+ * - mostrare le prenotazioni cancellabili;
+ * - mostrare l'anteprima della disdetta;
+ * - mostrare l'esito della richiesta;
+ * - raccogliere input da console;
+ * - delegare le azioni al graphic controller.
+ *
+ * Non contiene:
+ * - logica applicativa;
+ * - chiamate a logic controller;
+ * - accesso a DAO o persistenza;
+ * - creazione di bean.
+ */
+public class CLIDisdettaView extends GenericViewCLI
+        implements ViewDisdettaPrenotazione, NavigableController {
 
     private final CLIGraphicControllerDisdetta controller;
 
@@ -34,34 +51,53 @@ public class CLIDisdettaView extends GenericViewCLI implements ViewDisdettaPreno
     }
 
     @Override
-public void onShow(Map<String, Object> params) {
-    super.onShow(params);
+    public void onShow(Map<String, Object> params) {
+        super.onShow(params);
 
-    boolean hasSuccess = lastParams.containsKey(GraphicControllerUtils.KEY_SUCCESSO);
-    boolean hasAnteprima = lastParams.containsKey(GraphicControllerUtils.KEY_ANTEPRIMA);
-    boolean hasElenco = lastParams.containsKey(GraphicControllerUtils.KEY_PRENOTAZIONI);
-    boolean hasError = lastParams.containsKey(GraphicControllerUtils.KEY_ERROR);
+        boolean hasSuccess = lastParams.containsKey(GraphicControllerUtils.KEY_SUCCESSO);
+        boolean hasAnteprima = lastParams.containsKey(GraphicControllerUtils.KEY_ANTEPRIMA);
+        boolean hasElenco = lastParams.containsKey(GraphicControllerUtils.KEY_PRENOTAZIONI);
+        boolean hasError = lastParams.containsKey(GraphicControllerUtils.KEY_ERROR);
 
-    if (!hasSuccess && !hasAnteprima && !hasElenco && !hasError) {
-        controller.richiediPrenotazioniCancellabili(sessione);
-        return;
+        if (!hasSuccess && !hasAnteprima && !hasElenco && !hasError) {
+            controller.richiediPrenotazioniCancellabili(sessione);
+            return;
+        }
+
+        renderHeader();
+
+        if (handleSuccess()) {
+            return;
+        }
+
+        if (handleAnteprima()) {
+            return;
+        }
+
+        /*
+         * S3626:
+         * handleElenco() è l'ultima istruzione del metodo.
+         * Non serve un return dopo questa chiamata.
+         */
+        handleElenco();
     }
 
-    renderHeader();
-
-    if (handleSuccess()) return;
-    if (handleAnteprima()) return;
-    if (handleElenco()) return;
-}
-
+    /**
+     * Stampa intestazione e messaggi standard.
+     */
     private void renderHeader() {
-        // Intestazione + messaggi standard
         System.out.println("\n=== DISDETTA (RICHIESTA) ===");
         CliViewUtils.printMessages(getLastError(), getLastSuccess());
     }
 
+    /**
+     * Gestisce l'elenco delle prenotazioni cancellabili.
+     *
+     * @return true se il payload contiene un elenco gestibile, false altrimenti
+     */
     private boolean handleElenco() {
         Object raw = lastParams.get(GraphicControllerUtils.KEY_PRENOTAZIONI);
+
         if (!(raw instanceof List<?> elencoObj)) {
             return false;
         }
@@ -71,8 +107,12 @@ public void onShow(Map<String, Object> params) {
 
         elencoView.show(lista);
 
-        // Se vuoto: torna alla home (o chiedi conferma)
-        if (lista == null || lista.isEmpty()) {
+        /*
+         * S2589:
+         * lista non può essere null in questo punto.
+         * Resta solo il controllo sulla lista vuota.
+         */
+        if (lista.isEmpty()) {
             CliViewUtils.askReturnHome(in, controller::tornaAllaHome);
             return true;
         }
@@ -82,7 +122,6 @@ public void onShow(Map<String, Object> params) {
 
         if (id == null) {
             System.out.println("[ERRORE] Id non valido");
-            // ricarica elenco (round-trip)
             controller.richiediPrenotazioniCancellabili(sessione);
             return true;
         }
@@ -97,8 +136,14 @@ public void onShow(Map<String, Object> params) {
         return true;
     }
 
+    /**
+     * Gestisce il payload di anteprima disdetta.
+     *
+     * @return true se il payload contiene un'anteprima gestibile, false altrimenti
+     */
     private boolean handleAnteprima() {
         Object raw = lastParams.get(GraphicControllerUtils.KEY_ANTEPRIMA);
+
         if (!(raw instanceof Map<?, ?> anteprima)) {
             return false;
         }
@@ -117,21 +162,31 @@ public void onShow(Map<String, Object> params) {
             return true;
         }
 
-        // ✅ UC complesso: qui NON annulliamo subito, inviamo richiesta
+        /*
+         * UC complesso:
+         * qui non si annulla direttamente la prenotazione,
+         * ma si invia una richiesta di disdetta.
+         */
         System.out.print("Inviare richiesta di disdetta? [s/N]: ");
         String ans = in.nextLine().trim();
 
         if ("s".equalsIgnoreCase(ans) && selectedId != null) {
             controller.confermaDisdetta(selectedId, sessione);
         } else {
-            // se non conferma: torna elenco (o home). Scelgo elenco per UX.
             controller.richiediPrenotazioniCancellabili(sessione);
         }
+
         return true;
     }
 
+    /**
+     * Gestisce il payload di successo.
+     *
+     * @return true se il payload contiene un esito di successo, false altrimenti
+     */
     private boolean handleSuccess() {
         Object raw = lastParams.get(GraphicControllerUtils.KEY_SUCCESSO);
+
         if (raw == null) {
             return false;
         }
@@ -143,18 +198,23 @@ public void onShow(Map<String, Object> params) {
 
     /**
      * Legge un intero da console:
-     * - ritorna 0 se l'utente inserisce 0
-     * - ritorna >0 se valido
-     * - ritorna null se input non numerico
+     * - ritorna 0 se l'utente inserisce 0;
+     * - ritorna > 0 se valido;
+     * - ritorna null se input non numerico.
      */
     private Integer readPositiveIntOrZero() {
         String s = in.nextLine().trim();
-        if (s.isEmpty()) return null;
+
+        if (s.isEmpty()) {
+            return null;
+        }
+
         try {
             int v = Integer.parseInt(s);
-            return (v >= 0) ? v : null;
+            return v >= 0 ? v : null;
         } catch (NumberFormatException ex) {
             return null;
         }
     }
 }
+

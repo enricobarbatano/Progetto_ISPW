@@ -19,7 +19,7 @@ import javafx.scene.control.TextField;
  * Controller FXML per la gestione delle regole dei campi.
  *
  * RESPONSABILITÀ:
- * - mostrare la lista dei campi;
+
  * - leggere input utente da ListView, TextField e CheckBox;
  * - aggiornare i componenti grafici della schermata;
  * - delegare le operazioni al graphic controller.
@@ -36,6 +36,9 @@ import javafx.scene.control.TextField;
  * dal file regole.fxml tramite onMouseClicked="#onSelezionaCampo".
  */
 public class RegoleFXMLController {
+
+    private static final String MSG_CONTROLLER_NON_DISPONIBILE =
+            "Controller regole non disponibile";
 
     private GUIGraphicControllerRegole controller;
 
@@ -56,20 +59,10 @@ public class RegoleFXMLController {
     @FXML private TextField txtValorePenalita;
     @FXML private TextField txtPreavvisoPenalita;
 
-    /**
-     * Inizializza il controller FXML con il graphic controller.
-     *
-     * @param controller controller grafico per la gestione regole
-     */
     public void init(GUIGraphicControllerRegole controller) {
         this.controller = controller;
     }
 
-    /**
-     * Renderizza messaggi e dati ricevuti dal navigator.
-     *
-     * @param params parametri della route corrente
-     */
     public void render(Map<String, Object> params) {
         if (params == null) {
             clearMessages();
@@ -81,9 +74,6 @@ public class RegoleFXMLController {
         renderCampoSelezionato(params);
     }
 
-    /**
-     * Richiede la lista dei campi.
-     */
     @FXML
     public void onListaCampi() {
         clearMessages();
@@ -93,11 +83,6 @@ public class RegoleFXMLController {
         }
     }
 
-    /**
-     * Gestisce la selezione di un campo dalla ListView.
-     *
-     * Questo metodo è collegato al file FXML tramite onMouseClicked.
-     */
     @FXML
     public void onSelezionaCampo() {
         clearMessages();
@@ -124,15 +109,12 @@ public class RegoleFXMLController {
         }
     }
 
-    /**
-     * Aggiorna lo stato operativo del campo selezionato.
-     */
     @FXML
     public void onAggiornaStato() {
         clearMessages();
 
         if (controller == null) {
-            showError("Controller regole non disponibile");
+            showError(MSG_CONTROLLER_NON_DISPONIBILE);
             return;
         }
 
@@ -150,15 +132,12 @@ public class RegoleFXMLController {
         );
     }
 
-    /**
-     * Aggiorna le tempistiche di prenotazione dei campi.
-     */
     @FXML
     public void onAggiornaTempistiche() {
         clearMessages();
 
         if (controller == null) {
-            showError("Controller regole non disponibile");
+            showError(MSG_CONTROLLER_NON_DISPONIBILE);
             return;
         }
 
@@ -186,15 +165,12 @@ public class RegoleFXMLController {
         }
     }
 
-    /**
-     * Aggiorna il valore della penalità e il relativo preavviso minimo.
-     */
     @FXML
     public void onAggiornaPenalita() {
         clearMessages();
 
         if (controller == null) {
-            showError("Controller regole non disponibile");
+            showError(MSG_CONTROLLER_NON_DISPONIBILE);
             return;
         }
 
@@ -220,9 +196,6 @@ public class RegoleFXMLController {
         }
     }
 
-    /**
-     * Torna alla home.
-     */
     @FXML
     public void onHome() {
         if (controller != null) {
@@ -230,13 +203,6 @@ public class RegoleFXMLController {
         }
     }
 
-    // =========================================================
-    // RENDER HELPERS
-    // =========================================================
-
-    /**
-     * Renderizza messaggi di errore e successo.
-     */
     private void renderMessages(Map<String, Object> params) {
         Object err = params.get(GraphicControllerUtils.KEY_ERROR);
         Object ok = params.get(GraphicControllerUtils.KEY_MESSAGE);
@@ -249,9 +215,6 @@ public class RegoleFXMLController {
         setLabelText(lblSuccess, ok);
     }
 
-    /**
-     * Renderizza la lista dei campi.
-     */
     private void renderCampi(Map<String, Object> params) {
         Object raw = params.get(GraphicControllerUtils.KEY_CAMPI);
 
@@ -266,9 +229,6 @@ public class RegoleFXMLController {
         );
     }
 
-    /**
-     * Renderizza un eventuale campo selezionato tramite payload.
-     */
     private void renderCampoSelezionato(Map<String, Object> params) {
         Object rawId = params.get(GraphicControllerUtils.KEY_ID_CAMPO);
 
@@ -277,15 +237,6 @@ public class RegoleFXMLController {
         }
     }
 
-    // =========================================================
-    // PARSING E UTILITY
-    // =========================================================
-
-    /**
-     * Estrae l'id campo da stringhe del tipo:
-     * - "1 - Campo Calcetto"
-     * - "#1 - Campo Calcetto"
-     */
     private Integer parseCampoId(String raw) {
         if (raw == null || raw.isBlank()) {
             return null;
@@ -303,9 +254,6 @@ public class RegoleFXMLController {
         return parsePositiveInt(numericPart);
     }
 
-    /**
-     * Converte una stringa in intero positivo.
-     */
     private Integer parsePositiveInt(String raw) {
         if (raw == null || raw.isBlank()) {
             return null;
@@ -319,9 +267,6 @@ public class RegoleFXMLController {
         }
     }
 
-    /**
-     * Converte una stringa in intero non negativo.
-     */
     private Integer parseNonNegativeInt(String raw) {
         if (raw == null || raw.isBlank()) {
             return null;
@@ -335,27 +280,18 @@ public class RegoleFXMLController {
         }
     }
 
-    /**
-     * Restituisce testo pulito da un TextField.
-     */
     private String safeText(TextField field) {
         return field != null && field.getText() != null
                 ? field.getText().trim()
                 : "";
     }
 
-    /**
-     * Imposta testo su una Label.
-     */
     private void setLabelText(Label label, Object value) {
         if (label != null) {
             label.setText(value != null ? value.toString() : "");
         }
     }
 
-    /**
-     * Mostra un messaggio di errore locale.
-     */
     private void showError(String message) {
         if (lblError != null) {
             lblError.setText(message);
@@ -366,9 +302,6 @@ public class RegoleFXMLController {
         }
     }
 
-    /**
-     * Pulisce i messaggi locali.
-     */
     private void clearMessages() {
         if (lblError != null) {
             lblError.setText("");

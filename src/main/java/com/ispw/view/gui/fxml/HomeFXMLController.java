@@ -43,8 +43,7 @@ public class HomeFXMLController {
 
     @FXML private Button btnOp1;
     @FXML private Button btnOp2;
-    @FXML private Button btnLog;
-    @FXML private Button btnRichiesteDisdetta;
+ 
 
     @FXML private VBox boxGestore;
 

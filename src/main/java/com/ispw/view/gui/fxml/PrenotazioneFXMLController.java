@@ -40,6 +40,9 @@ import javafx.scene.layout.VBox;
  */
 public class PrenotazioneFXMLController {
 
+    private static final String MSG_CONTROLLER_NON_DISPONIBILE =
+            "Controller prenotazione non disponibile";
+
     private GUIGraphicControllerPrenotazione controller;
     private SessioneUtenteBean sessione;
 
@@ -139,7 +142,7 @@ public class PrenotazioneFXMLController {
         clearMessages();
 
         if (controller == null) {
-            showError("Controller prenotazione non disponibile");
+            showError(MSG_CONTROLLER_NON_DISPONIBILE);
             return;
         }
 
@@ -170,7 +173,7 @@ public class PrenotazioneFXMLController {
         clearMessages();
 
         if (controller == null) {
-            showError("Controller prenotazione non disponibile");
+            showError(MSG_CONTROLLER_NON_DISPONIBILE);
             return;
         }
 
@@ -210,7 +213,7 @@ public class PrenotazioneFXMLController {
         clearMessages();
 
         if (controller == null) {
-            showError("Controller prenotazione non disponibile");
+            showError(MSG_CONTROLLER_NON_DISPONIBILE);
             return;
         }
 
@@ -486,9 +489,6 @@ public class PrenotazioneFXMLController {
     // ESTRAZIONE INPUT
     // =========================================================
 
-    /**
-     * Estrae l'id campo selezionato.
-     */
     private Integer extractCampoId() {
         if (lastCampoId > 0) {
             return lastCampoId;
@@ -513,9 +513,6 @@ public class PrenotazioneFXMLController {
         return fromList;
     }
 
-    /**
-     * Estrae la data selezionata dal calendario.
-     */
     private String extractData() {
         if (datePicker == null || datePicker.getValue() == null) {
             showError("Seleziona una data");
@@ -525,9 +522,6 @@ public class PrenotazioneFXMLController {
         return datePicker.getValue().toString();
     }
 
-    /**
-     * Estrae l'orario selezionato dalla ComboBox.
-     */
     private String extractOra() {
         String ora = comboOra != null ? comboOra.getValue() : null;
 
@@ -539,9 +533,6 @@ public class PrenotazioneFXMLController {
         return ora.trim();
     }
 
-    /**
-     * Estrae la durata in minuti.
-     */
     private Integer extractDurata() {
         Integer durata = parsePositiveInt(safeText(txtDurata));
 
@@ -552,9 +543,6 @@ public class PrenotazioneFXMLController {
         return durata;
     }
 
-    /**
-     * Restituisce lo slot selezionato.
-     */
     private String getSelectedSlot() {
         if (listSlots == null) {
             return null;
@@ -567,11 +555,6 @@ public class PrenotazioneFXMLController {
     // PARSING E UTILITY
     // =========================================================
 
-    /**
-     * Estrae l'id campo da stringhe del tipo:
-     * - "1 - Campo Tennis"
-     * - "#1 - Campo Tennis"
-     */
     private Integer parseCampoId(String raw) {
         if (raw == null || raw.isBlank()) {
             return null;
@@ -589,9 +572,6 @@ public class PrenotazioneFXMLController {
         return parsePositiveInt(numericPart);
     }
 
-    /**
-     * Converte una stringa in intero positivo.
-     */
     private Integer parsePositiveInt(String raw) {
         if (raw == null || raw.isBlank()) {
             return null;
@@ -605,9 +585,6 @@ public class PrenotazioneFXMLController {
         }
     }
 
-    /**
-     * Mostra o nasconde una sezione del wizard.
-     */
     private void show(VBox box, boolean visible) {
         if (box != null) {
             box.setVisible(visible);
@@ -615,9 +592,6 @@ public class PrenotazioneFXMLController {
         }
     }
 
-    /**
-     * Mostra lo step iniziale del wizard.
-     */
     private void showInitialStep() {
         show(boxSearch, true);
         show(boxSlots, false);
@@ -625,36 +599,24 @@ public class PrenotazioneFXMLController {
         show(boxEsito, false);
     }
 
-    /**
-     * Restituisce testo pulito da un TextField.
-     */
     private String safeText(TextField field) {
         return field != null && field.getText() != null
                 ? field.getText().trim()
                 : "";
     }
 
-    /**
-     * Pulisce un TextField se presente.
-     */
     private void clearTextField(TextField field) {
         if (field != null) {
             field.clear();
         }
     }
 
-    /**
-     * Imposta testo su una Label.
-     */
     private void setLabelText(Label label, Object value) {
         if (label != null) {
             label.setText(value != null ? value.toString() : "");
         }
     }
 
-    /**
-     * Mostra un messaggio di errore locale.
-     */
     private void showError(String message) {
         if (lblError != null) {
             lblError.setText(message);
@@ -665,9 +627,6 @@ public class PrenotazioneFXMLController {
         }
     }
 
-    /**
-     * Pulisce i messaggi locali.
-     */
     private void clearMessages() {
         if (lblError != null) {
             lblError.setText("");
@@ -678,3 +637,4 @@ public class PrenotazioneFXMLController {
         }
     }
 }
+

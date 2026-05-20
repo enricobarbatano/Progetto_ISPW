@@ -39,10 +39,13 @@ import com.ispw.model.entity.UtenteFinale;
 import com.ispw.model.enums.Ruolo;
 import com.ispw.model.enums.StatoAccount;
 
-// Test con Mockito per verificare l'orchestrazione di LogicControllerApplicaPenalita.
-// Dopo il refactoring, i service non vengono più passati come parametri:
-// vengono recuperati tramite ServiceFactory.
-// Per questo motivo la ServiceFactory viene mockata staticamente.
+/**
+ * Test con Mockito per verificare l'orchestrazione di LogicControllerApplicaPenalita.
+ *
+ * Dopo il refactoring, i service non vengono più passati come parametri:
+ * vengono recuperati tramite ServiceFactory.
+ * Per questo motivo la ServiceFactory viene mockata staticamente.
+ */
 @ExtendWith(MockitoExtension.class)
 class LogicControllerApplicaPenalitaMockitoTest extends UnitTestBase {
 
@@ -63,7 +66,14 @@ class LogicControllerApplicaPenalitaMockitoTest extends UnitTestBase {
 
     private LogicControllerApplicaPenalita controller;
 
+    /**
+     * Setup eseguito da JUnit prima di ogni test.
+     *
+     * Il metodo sembra non usato all'IDE, ma viene richiamato da JUnit
+     * grazie all'annotazione @BeforeEach.
+     */
     @BeforeEach
+    @SuppressWarnings("unused")
     void init() {
         controller = new LogicControllerApplicaPenalita();
 
@@ -76,22 +86,21 @@ class LogicControllerApplicaPenalitaMockitoTest extends UnitTestBase {
             // In quel caso il test continua usando lo stato disponibile.
         }
 
-        UtenteFinale u = new UtenteFinale();
-        u.setIdUtente(10);
-        u.setNome("Mario");
-        u.setCognome("Rossi");
-        u.setEmail("mario@example.org");
-        u.setPassword("pwd");
-        u.setRuolo(Ruolo.UTENTE);
-        u.setStatoAccount(StatoAccount.ATTIVO);
+        UtenteFinale utente = new UtenteFinale();
+        utente.setIdUtente(10);
+        utente.setNome("Mario");
+        utente.setCognome("Rossi");
+        utente.setEmail("mario@example.org");
+        utente.setPassword("pwd");
+        utente.setRuolo(Ruolo.UTENTE);
+        utente.setStatoAccount(StatoAccount.ATTIVO);
 
-        userDAO.store(u);
+        userDAO.store(utente);
     }
 
     @Test
     @DisplayName("Penalità: orchestrazione -> invoca notifica/pagamento/fattura e normalizza pagamento")
-    void applicaSanzione_orchestrazione_invocaCollaboratori_eNormalizzaPagamento() {
-        // Arrange
+    void applicaSanzioneOrchestrazioneInvocaCollaboratoriENormalizzaPagamento() {
         DatiPenalitaBean dati = new DatiPenalitaBean();
         dati.setIdUtente(10);
         dati.setMotivazione("Danni al campo");
@@ -121,17 +130,13 @@ class LogicControllerApplicaPenalitaMockitoTest extends UnitTestBase {
             serviceFactoryMock.when(ServiceFactory::getFatturaPenalitaService).thenReturn(fattCtrl);
             serviceFactoryMock.when(ServiceFactory::getNotificaPenalitaService).thenReturn(notiCtrl);
 
-            // Act
             EsitoOperazioneBean esito = controller.applicaSanzione(dati, pay, fatt);
 
-            // Assert esito
             assertNotNull(esito);
             assertTrue(esito.isSuccesso());
 
-            // Verify notifica
             verify(notiCtrl, times(1)).inviaNotificaPenalita("10");
 
-            // Verify pagamento
             verify(payCtrl, times(1))
                     .richiediPagamentoPenalita(pagamentoCaptor.capture(), intThat(id -> id > 0));
 
@@ -141,7 +146,6 @@ class LogicControllerApplicaPenalitaMockitoTest extends UnitTestBase {
             assertEquals(30.0f, paySent.getImporto(), 0.0001f);
             assertEquals("PAYPAL", paySent.getMetodo());
 
-            // Verify fattura
             verify(fattCtrl, times(1))
                     .generaFatturaPenalita(fatturaCaptor.capture(), intThat(id -> id > 0));
 

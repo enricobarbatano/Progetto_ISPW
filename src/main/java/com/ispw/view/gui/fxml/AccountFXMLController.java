@@ -1,5 +1,4 @@
 package com.ispw.view.gui.fxml;
-
 import java.util.Map;
 
 import com.ispw.bean.SessioneUtenteBean;
@@ -32,6 +31,9 @@ import javafx.scene.control.TextField;
  * non automaticamente da GUIAccountView.onShow().
  */
 public class AccountFXMLController {
+
+    private static final String MSG_CONTROLLER_NON_DISPONIBILE =
+            "Controller account non disponibile";
 
     private GUIGraphicControllerAccount controller;
     private SessioneUtenteBean sessione;
@@ -79,7 +81,7 @@ public class AccountFXMLController {
         clearMessages();
 
         if (controller == null) {
-            showError("Controller account non disponibile");
+            showError(MSG_CONTROLLER_NON_DISPONIBILE);
             return;
         }
 
@@ -94,7 +96,7 @@ public class AccountFXMLController {
         clearMessages();
 
         if (controller == null) {
-            showError("Controller account non disponibile");
+            showError(MSG_CONTROLLER_NON_DISPONIBILE);
             return;
         }
 
@@ -129,7 +131,7 @@ public class AccountFXMLController {
         clearMessages();
 
         if (controller == null) {
-            showError("Controller account non disponibile");
+            showError(MSG_CONTROLLER_NON_DISPONIBILE);
             return;
         }
 
@@ -236,3 +238,5 @@ public class AccountFXMLController {
         }
     }
 }
+
+

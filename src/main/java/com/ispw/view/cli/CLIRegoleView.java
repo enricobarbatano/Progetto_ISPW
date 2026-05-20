@@ -212,7 +212,7 @@ public class CLIRegoleView extends GenericViewCLI
         System.out.print(prompt);
 
         try {
-            return Integer.parseInt(in.nextLine().trim());
+            return Integer.valueOf(in.nextLine().trim());
         } catch (NumberFormatException e) {
             return null;
         }

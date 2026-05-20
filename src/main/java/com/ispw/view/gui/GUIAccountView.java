@@ -1,5 +1,6 @@
 package com.ispw.view.gui;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,21 +19,20 @@ import javafx.scene.layout.VBox;
 /**
  * View GUI per la gestione account.
  *
- * RESPONSABILITÀ:
- * - caricare il file FXML account.fxml
- * - inizializzare il controller FXML con le dipendenze
- * - renderizzare i dati ricevuti dal navigator
- * - visualizzare la scena
+ * Responsabilità:
+ * - caricare il file FXML account.fxml;
+ * - inizializzare il controller FXML con le dipendenze;
+ * - renderizzare i dati ricevuti dal navigator;
+ * - visualizzare la scena.
  *
  * NON:
- * - contenere logica di business
- * - creare bean
- * - gestire la navigazione
- * - innescare loop di navigazione
+ * - contiene logica di business;
+ * - crea bean;
+ * - gestisce direttamente la navigazione;
+ * - innesca loop di navigazione.
  *
- * CACHING:
- * L'FXML viene caricato solo la prima volta per evitare
- * inefficienze di reload continui.
+ * Caching:
+ * l'FXML viene caricato solo la prima volta per evitare reload continui.
  */
 public class GUIAccountView extends GenericViewGUI
         implements ViewGestioneAccount, NavigableController {
@@ -47,12 +47,15 @@ public class GUIAccountView extends GenericViewGUI
     /**
      * Costruisce la view dell'account.
      *
-     * @param controller il controller grafico per la gestione account
+     * @param controller controller grafico per la gestione account
      */
     public GUIAccountView(GUIGraphicControllerAccount controller) {
         this.controller = controller;
     }
 
+    /**
+     * Restituisce il nome della route associata alla view account.
+     */
     @Override
     public String getRouteName() {
         return GraphicControllerUtils.ROUTE_ACCOUNT;
@@ -61,44 +64,37 @@ public class GUIAccountView extends GenericViewGUI
     /**
      * Visualizza la schermata di gestione account.
      *
-     * Carica l'FXML una sola volta (caching), inizializza il controller FXML,
-     * e renderizza i dati.
+     * Se l'FXML non è ancora stato caricato, viene caricato e conservato in cache.
+     * Poi il controller FXML viene inizializzato e vengono renderizzati i dati.
      *
-     * In caso di errore IO, mostra una schermata di fallback.
+     * In caso di errore di caricamento o inizializzazione,
+     * viene mostrata una schermata di fallback.
      */
     @Override
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
         try {
-            // Carica FXML solo la prima volta
             if (cachedRoot == null) {
-                FXMLLoader loader =
-                        new FXMLLoader(getClass().getResource("/fxml/account.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/account.fxml"));
 
                 cachedRoot = loader.load();
                 cachedFx = loader.getController();
             }
 
-            // Inizializza il controller FXML
             cachedFx.init(controller, sessione);
-
-            // Renderizza i dati ricevuti dal navigator
             cachedFx.render(getLastParams());
 
-            // Mostra la scena
             GuiLauncher.setRoot(cachedRoot);
 
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             LOGGER.log(Level.SEVERE, "Errore caricamento schermata Account", e);
 
-            // Fallback UI
             VBox fallback = GuiViewUtils.createRoot();
-            fallback.getChildren().add(
-                    new Label("Errore caricamento schermata Account")
-            );
+            fallback.getChildren().add(new Label("Errore caricamento schermata Account"));
 
             GuiLauncher.setRoot(fallback);
         }
     }
 }
+

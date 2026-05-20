@@ -12,6 +12,7 @@ import com.ispw.model.enums.PersistencyProvider;
 public abstract class UnitTestBase {
 
     @BeforeAll
+    @SuppressWarnings("unused")
     static void initDaoFactoryInMemory() {
         // Reset della DAOFactory (è package-private, quindi la chiamiamo via reflection)
         resetDaoFactory();

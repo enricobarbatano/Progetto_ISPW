@@ -52,10 +52,10 @@ public class RichiesteDisdettaFXMLController {
             Pattern.compile("stato=([^\\s]+)");
 
     private static final Pattern PENALE_PATTERN =
-            Pattern.compile("penale=([0-9]+(?:[\\.,][0-9]+)?)");
+            Pattern.compile("penale=(\\d+(?:[\\.,]\\d+)?)");
 
     private static final Pattern RIMBORSO_PATTERN =
-            Pattern.compile("rimborso=([0-9]+(?:[\\.,][0-9]+)?)");
+            Pattern.compile("rimborso=(\\d+(?:[\\.,]\\d+)?)");
 
     private static final Pattern DATA_RICHIESTA_PATTERN =
             Pattern.compile("richiesta@([^\\s]+)");
