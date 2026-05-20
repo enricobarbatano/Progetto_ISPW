@@ -11,42 +11,48 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ispw.dao.exception.DaoException;
 import com.ispw.dao.impl.base.BasePrenotazioneDAO;
 import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
 import com.ispw.model.entity.Prenotazione;
 import com.ispw.model.enums.StatoPrenotazione;
 
+/**
+ * Provider DBMS per Prenotazione.
+ * Implementa solo raw I/O JDBC.
+ * Cache-first e composizione A2 restano in BasePrenotazioneDAO.
+ */
 public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
 
     private static final String SQL_FIND_BY_ID =
-        "SELECT id_prenotazione, id_utente, id_campo, data, ora_inizio, ora_fine, stato, notifica_richiesta " +
-        "FROM prenotazioni WHERE id_prenotazione=?";
+            "SELECT id_prenotazione, id_utente, id_campo, data, ora_inizio, ora_fine, stato, notifica_richiesta " +
+            "FROM prenotazioni WHERE id_prenotazione=?";
 
     private static final String SQL_FIND_BY_UTENTE =
-        "SELECT id_prenotazione, id_utente, id_campo, data, ora_inizio, ora_fine, stato, notifica_richiesta " +
-        "FROM prenotazioni WHERE id_utente=? ORDER BY data, ora_inizio";
+            "SELECT id_prenotazione, id_utente, id_campo, data, ora_inizio, ora_fine, stato, notifica_richiesta " +
+            "FROM prenotazioni WHERE id_utente=? ORDER BY data, ora_inizio";
 
     private static final String SQL_FIND_BY_UTENTE_STATO =
-        "SELECT id_prenotazione, id_utente, id_campo, data, ora_inizio, ora_fine, stato, notifica_richiesta " +
-        "FROM prenotazioni WHERE id_utente=? AND stato=? ORDER BY data, ora_inizio";
+            "SELECT id_prenotazione, id_utente, id_campo, data, ora_inizio, ora_fine, stato, notifica_richiesta " +
+            "FROM prenotazioni WHERE id_utente=? AND stato=? ORDER BY data, ora_inizio";
 
     private static final String SQL_FIND_BY_CAMPO =
-        "SELECT id_prenotazione, id_utente, id_campo, data, ora_inizio, ora_fine, stato, notifica_richiesta " +
-        "FROM prenotazioni WHERE id_campo=? ORDER BY data, ora_inizio, id_prenotazione";
+            "SELECT id_prenotazione, id_utente, id_campo, data, ora_inizio, ora_fine, stato, notifica_richiesta " +
+            "FROM prenotazioni WHERE id_campo=? ORDER BY data, ora_inizio, id_prenotazione";
 
     private static final String SQL_INSERT =
-        "INSERT INTO prenotazioni (id_utente, id_campo, data, ora_inizio, ora_fine, stato, notifica_richiesta) " +
-        "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO prenotazioni (id_utente, id_campo, data, ora_inizio, ora_fine, stato, notifica_richiesta) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_UPDATE =
-        "UPDATE prenotazioni SET id_utente=?, id_campo=?, data=?, ora_inizio=?, ora_fine=?, stato=?, notifica_richiesta=? " +
-        "WHERE id_prenotazione=?";
+            "UPDATE prenotazioni SET id_utente=?, id_campo=?, data=?, ora_inizio=?, ora_fine=?, stato=?, notifica_richiesta=? " +
+            "WHERE id_prenotazione=?";
 
     private static final String SQL_DELETE =
-        "DELETE FROM prenotazioni WHERE id_prenotazione=?";
+            "DELETE FROM prenotazioni WHERE id_prenotazione=?";
 
     private static final String SQL_UPDATE_STATO =
-        "UPDATE prenotazioni SET stato=? WHERE id_prenotazione=?";
+            "UPDATE prenotazioni SET stato=? WHERE id_prenotazione=?";
 
     private final ConnectionFactory cf;
 
@@ -57,7 +63,9 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
 
     @Override
     protected Prenotazione rawLoad(Integer id) {
-        if (id == null || id <= 0) return null;
+        if (id == null || id <= 0) {
+            return null;
+        }
 
         try (Connection c = cf.getConnection();
              PreparedStatement ps = c.prepareStatement(SQL_FIND_BY_ID)) {
@@ -69,7 +77,7 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Prenotazione rawLoad", e);
+            throw new DaoException("Errore DBMS Prenotazione rawLoad", e);
         }
     }
 
@@ -89,7 +97,7 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Prenotazione rawFindByUtente", e);
+            throw new DaoException("Errore DBMS Prenotazione rawFindByUtente", e);
         }
 
         return out;
@@ -112,7 +120,7 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Prenotazione rawFindByUtenteAndStato", e);
+            throw new DaoException("Errore DBMS Prenotazione rawFindByUtenteAndStato", e);
         }
 
         return out;
@@ -134,7 +142,7 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Prenotazione rawFindByCampo", e);
+            throw new DaoException("Errore DBMS Prenotazione rawFindByCampo", e);
         }
 
         return out;
@@ -150,13 +158,15 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Prenotazione rawUpdateStato", e);
+            throw new DaoException("Errore DBMS Prenotazione rawUpdateStato", e);
         }
     }
 
     @Override
     protected void rawDelete(Integer id) {
-        if (id == null || id <= 0) return;
+        if (id == null || id <= 0) {
+            return;
+        }
 
         try (Connection c = cf.getConnection();
              PreparedStatement ps = c.prepareStatement(SQL_DELETE)) {
@@ -165,27 +175,28 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Prenotazione rawDelete", e);
+            throw new DaoException("Errore DBMS Prenotazione rawDelete", e);
         }
     }
 
     @Override
     protected void rawStore(Prenotazione p) {
-        if (p == null) return;
+        if (p == null) {
+            return;
+        }
 
         try (Connection c = cf.getConnection()) {
 
             if (p.getIdPrenotazione() > 0) {
+                // UPDATE se la prenotazione ha già un id.
                 try (PreparedStatement ps = c.prepareStatement(SQL_UPDATE)) {
                     bind(ps, p);
                     ps.setInt(8, p.getIdPrenotazione());
                     ps.executeUpdate();
                 }
-
             } else {
-                try (PreparedStatement ps = c.prepareStatement(
-                        SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
-
+                // INSERT con generated key.
+                try (PreparedStatement ps = c.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
                     bind(ps, p);
                     ps.executeUpdate();
 
@@ -198,11 +209,9 @@ public class PrenotazioneDAODbms extends BasePrenotazioneDAO {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Prenotazione rawStore", e);
+            throw new DaoException("Errore DBMS Prenotazione rawStore", e);
         }
     }
-
-    /* ================= helpers ================= */
 
     private Prenotazione map(ResultSet rs) throws SQLException {
         Prenotazione p = new Prenotazione();

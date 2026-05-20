@@ -7,13 +7,21 @@ import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Types;
 
+import com.ispw.dao.exception.DaoException;
 import com.ispw.dao.impl.base.BaseRegoleTempisticheDAO;
 import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
 import com.ispw.model.entity.RegoleTempistiche;
 
 /**
  * Provider DBMS per RegoleTempistiche.
- * Gestisce UNA SOLA riga (id = 1).
+ *
+ * Responsabilità:
+ * - implementare solo il raw I/O JDBC;
+ * - leggere e salvare l'unica configurazione temporale del sistema;
+ * - lasciare cache-first e logica applicativa alla BaseRegoleTempisticheDAO.
+ *
+ * Nota:
+ * esiste una sola riga logica, identificata con id = 1.
  */
 public class RegoleTempisticheDAODbms extends BaseRegoleTempisticheDAO {
 
@@ -41,27 +49,41 @@ public class RegoleTempisticheDAODbms extends BaseRegoleTempisticheDAO {
              PreparedStatement ps = c.prepareStatement(SQL_SELECT_ONE);
              ResultSet rs = ps.executeQuery()) {
 
-            if (!rs.next()) return null;
+            if (!rs.next()) {
+                return null;
+            }
 
             RegoleTempistiche rt = new RegoleTempistiche();
+
             rt.setIdConfig(1);
             rt.setDurataSlot(rs.getInt("durata_slot"));
 
-            Time open  = rs.getTime("ora_apertura");
+            Time open = rs.getTime("ora_apertura");
             Time close = rs.getTime("ora_chiusura");
-            if (open  != null) rt.setOraApertura(open.toLocalTime());
-            if (close != null) rt.setOraChiusura(close.toLocalTime());
+
+            if (open != null) {
+                rt.setOraApertura(open.toLocalTime());
+            }
+
+            if (close != null) {
+                rt.setOraChiusura(close.toLocalTime());
+            }
 
             rt.setPreavvisoMinimo(rs.getInt("preavviso_minimo"));
+
             return rt;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS RegoleTempistiche rawLoad", e);
+            throw new DaoException("Errore DBMS RegoleTempistiche rawLoad", e);
         }
     }
 
     @Override
     protected void rawSave(RegoleTempistiche regole) {
+        if (regole == null) {
+            return;
+        }
+
         try (Connection c = cf.getConnection()) {
             c.setAutoCommit(false);
 
@@ -72,23 +94,26 @@ public class RegoleTempisticheDAODbms extends BaseRegoleTempisticheDAO {
             try (PreparedStatement ins = c.prepareStatement(SQL_INSERT_ONE)) {
                 ins.setInt(1, regole.getDurataSlot());
 
-                if (regole.getOraApertura() != null)
+                if (regole.getOraApertura() != null) {
                     ins.setTime(2, Time.valueOf(regole.getOraApertura()));
-                else
+                } else {
                     ins.setNull(2, Types.TIME);
+                }
 
-                if (regole.getOraChiusura() != null)
+                if (regole.getOraChiusura() != null) {
                     ins.setTime(3, Time.valueOf(regole.getOraChiusura()));
-                else
+                } else {
                     ins.setNull(3, Types.TIME);
+                }
 
                 ins.setInt(4, regole.getPreavvisoMinimo());
                 ins.executeUpdate();
             }
 
             c.commit();
+
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS RegoleTempistiche rawSave", e);
+            throw new DaoException("Errore DBMS RegoleTempistiche rawSave", e);
         }
     }
 }

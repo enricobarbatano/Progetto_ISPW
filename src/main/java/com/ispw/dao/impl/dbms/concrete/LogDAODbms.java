@@ -10,29 +10,38 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ispw.dao.exception.DaoException;
 import com.ispw.dao.impl.base.BaseLogDAO;
 import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
 import com.ispw.model.entity.SystemLog;
 import com.ispw.model.enums.TipoOperazione;
 
+/**
+ * Provider DBMS per SystemLog.
+ * Implementa solo raw I/O JDBC.
+ */
 public class LogDAODbms extends BaseLogDAO {
 
     private static final String TBL = "system_log";
     private static final String COLS = "id_log, timestamp, tipo_operazione, id_utente_coinvolto, descrizione";
 
+    private static final String SELECT = "SELECT ";
+    private static final String FROM = " FROM ";
+
     private static final String SQL_INSERT =
-        "INSERT INTO " + TBL + " (timestamp, tipo_operazione, id_utente_coinvolto, descrizione) VALUES (?, ?, ?, ?)";
+            "INSERT INTO " + TBL +
+            " (timestamp, tipo_operazione, id_utente_coinvolto, descrizione) VALUES (?, ?, ?, ?)";
 
     private static final String SQL_FIND_BY_ID =
-        "SELECT " + COLS + " FROM " + TBL + " WHERE id_log=?";
+            SELECT + COLS + FROM + TBL + " WHERE id_log=?";
 
     private static final String SQL_FIND_BY_UTENTE =
-        "SELECT " + COLS + " FROM " + TBL +
-        " WHERE id_utente_coinvolto=? ORDER BY timestamp DESC, id_log DESC";
+            SELECT + COLS + FROM + TBL +
+            " WHERE id_utente_coinvolto=? ORDER BY timestamp DESC, id_log DESC";
 
     private static final String SQL_FIND_LAST =
-        "SELECT " + COLS + " FROM " + TBL +
-        " ORDER BY timestamp DESC, id_log DESC LIMIT ?";
+            SELECT + COLS + FROM + TBL +
+            " ORDER BY timestamp DESC, id_log DESC LIMIT ?";
 
     private final ConnectionFactory cf;
 
@@ -53,11 +62,13 @@ public class LogDAODbms extends BaseLogDAO {
             ps.executeUpdate();
 
             try (ResultSet gk = ps.getGeneratedKeys()) {
-                if (gk.next()) log.setIdLog(gk.getInt(1));
+                if (gk.next()) {
+                    log.setIdLog(gk.getInt(1));
+                }
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Log rawAppend", e);
+            throw new DaoException("Errore DBMS Log rawAppend", e);
         }
     }
 
@@ -67,64 +78,81 @@ public class LogDAODbms extends BaseLogDAO {
              PreparedStatement ps = c.prepareStatement(SQL_FIND_BY_ID)) {
 
             ps.setInt(1, id);
+
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? map(rs) : null;
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Log rawLoad", e);
+            throw new DaoException("Errore DBMS Log rawLoad", e);
         }
     }
 
     @Override
     protected List<SystemLog> rawFindByUtente(int idUtente) {
         List<SystemLog> out = new ArrayList<>();
+
         try (Connection c = cf.getConnection();
              PreparedStatement ps = c.prepareStatement(SQL_FIND_BY_UTENTE)) {
 
             ps.setInt(1, idUtente);
+
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) out.add(map(rs));
+                while (rs.next()) {
+                    out.add(map(rs));
+                }
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Log rawFindByUtente", e);
+            throw new DaoException("Errore DBMS Log rawFindByUtente", e);
         }
+
         return out;
     }
 
     @Override
     protected List<SystemLog> rawFindLast(int limit) {
         List<SystemLog> out = new ArrayList<>();
+
         try (Connection c = cf.getConnection();
              PreparedStatement ps = c.prepareStatement(SQL_FIND_LAST)) {
 
             ps.setInt(1, Math.max(1, limit));
+
             try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) out.add(map(rs));
+                while (rs.next()) {
+                    out.add(map(rs));
+                }
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Log rawFindLast", e);
+            throw new DaoException("Errore DBMS Log rawFindLast", e);
         }
+
         return out;
     }
 
     private SystemLog map(ResultSet rs) throws SQLException {
-        SystemLog l = new SystemLog();
-        l.setIdLog(rs.getInt("id_log"));
+        SystemLog log = new SystemLog();
+
+        log.setIdLog(rs.getInt("id_log"));
 
         Timestamp ts = rs.getTimestamp("timestamp");
-        l.setTimestamp(ts != null ? ts.toLocalDateTime() : LocalDateTime.now());
+        log.setTimestamp(ts != null ? ts.toLocalDateTime() : LocalDateTime.now());
 
         String tipo = rs.getString("tipo_operazione");
         if (tipo != null) {
-            try { l.setTipoOperazione(TipoOperazione.valueOf(tipo)); }
-            catch (IllegalArgumentException ignore) {}
+            try {
+                log.setTipoOperazione(TipoOperazione.valueOf(tipo));
+            } catch (IllegalArgumentException ignore) {
+                // Valore enum non valido nel DB: lascio tipoOperazione non valorizzato.
+            }
         }
 
-        l.setIdUtenteCoinvolto(rs.getInt("id_utente_coinvolto"));
-        l.setDescrizione(rs.getString("descrizione"));
-        return l;
+        log.setIdUtenteCoinvolto(rs.getInt("id_utente_coinvolto"));
+        log.setDescrizione(rs.getString("descrizione"));
+
+        return log;
     }
 }
+

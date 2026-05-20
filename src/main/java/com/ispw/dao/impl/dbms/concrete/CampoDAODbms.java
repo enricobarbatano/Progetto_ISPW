@@ -1,5 +1,6 @@
 package com.ispw.dao.impl.dbms.concrete;
 
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,15 +10,16 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ispw.dao.exception.DaoException;
 import com.ispw.dao.impl.base.BaseCampoDAO;
 import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
 import com.ispw.model.entity.Campo;
 
-
-/*ResultSet -> Entity
-Entity -> PreparedStatement
+/**
+ * Provider DBMS per Campo.
+ * Implementa solo raw I/O JDBC.
+ * Cache e logica cache-first restano in BaseCampoDAO.
  */
-
 public class CampoDAODbms extends BaseCampoDAO {
 
     private static final String SQL_FIND_ALL =
@@ -46,32 +48,29 @@ public class CampoDAODbms extends BaseCampoDAO {
         this.cf = cf;
     }
 
-    /* ===================== LOAD ===================== */
-
     @Override
     protected Campo rawLoad(Integer id) {
         if (id == null || id <= 0) {
             return null;
         }
-        
-        //1) viene aperta una connessione con il dbms tramite il metodo getConnection dell'interfaccia ConnectionFactory.java 
-        // e l'istanza singleton concreta passata run-time dalla dbmsfactory dao alla creazione delle classi dao
+
+        // Apre la connessione e prepara la query di lookup per id.
         try (Connection c = cf.getConnection();
-        //prepared statementè un oggetto che rappresenta una query e definisce il passaggio da O.O a istanza relazionale nel db
              PreparedStatement ps = c.prepareStatement(SQL_FIND_BY_ID)) {
-        //carichiamo i parametri della query, in questo caso l'id del campo che vogliamo caricare
+
+            // Inserisce l'id nel parametro della query.
             ps.setInt(1, id);
-            // il result set è il risultato della query che ci fornisce l'istanza campo legata all'id dato in inout in forma relazionale, 
+
+            // Esegue la query e converte il record in entità Campo.
             try (ResultSet rs = ps.executeQuery()) {
                 if (!rs.next()) {
                     return null;
                 }
-                //il metodo map campo crea l'istanza campo run-time trasformando da rappresentazione relazionale a object oriented
                 return mapCampo(rs);
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Campo rawLoad", e);
+            throw new DaoException("Errore DBMS Campo rawLoad", e);
         }
     }
 
@@ -79,22 +78,22 @@ public class CampoDAODbms extends BaseCampoDAO {
     protected List<Campo> rawFindAll() {
         List<Campo> out = new ArrayList<>();
 
+        // Legge tutti i campi dal DB.
         try (Connection c = cf.getConnection();
              PreparedStatement ps = c.prepareStatement(SQL_FIND_ALL);
              ResultSet rs = ps.executeQuery()) {
 
+            // Mappa ogni riga in un Campo.
             while (rs.next()) {
                 out.add(mapCampo(rs));
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Campo rawFindAll", e);
+            throw new DaoException("Errore DBMS Campo rawFindAll", e);
         }
 
         return out;
     }
-
-    /* ===================== STORE ===================== */
 
     @Override
     protected void rawStore(Campo c) {
@@ -105,16 +104,15 @@ public class CampoDAODbms extends BaseCampoDAO {
         try (Connection conn = cf.getConnection()) {
 
             if (c.getIdCampo() > 0) {
+                // UPDATE se il campo ha già un id.
                 try (PreparedStatement ps = conn.prepareStatement(SQL_UPDATE)) {
                     bind(ps, c);
                     ps.setInt(6, c.getIdCampo());
                     ps.executeUpdate();
                 }
-
             } else {
-                try (PreparedStatement ps = conn.prepareStatement(
-                        SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
-
+                // INSERT se il campo è nuovo, con recupero generated key.
+                try (PreparedStatement ps = conn.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
                     bind(ps, c);
                     ps.executeUpdate();
 
@@ -127,7 +125,7 @@ public class CampoDAODbms extends BaseCampoDAO {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Campo rawStore", e);
+            throw new DaoException("Errore DBMS Campo rawStore", e);
         }
     }
 
@@ -137,6 +135,7 @@ public class CampoDAODbms extends BaseCampoDAO {
             return;
         }
 
+        // Cancella il campo con id specificato.
         try (Connection c = cf.getConnection();
              PreparedStatement ps = c.prepareStatement(SQL_DELETE)) {
 
@@ -144,13 +143,13 @@ public class CampoDAODbms extends BaseCampoDAO {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Campo rawDelete", e);
+            throw new DaoException("Errore DBMS Campo rawDelete", e);
         }
     }
 
-    /* ===================== HELPERS ===================== */
-    
-    // qui avviene il mapping record relazionale --> O.O 
+    /**
+     * Mapping record relazionale -> oggetto Campo.
+     */
     private Campo mapCampo(ResultSet rs) throws SQLException {
         Campo c = new Campo();
 
@@ -168,8 +167,10 @@ public class CampoDAODbms extends BaseCampoDAO {
 
         return c;
     }
-    
-// qui avviene il mapping opposto O.O--> record relazionale
+
+    /**
+     * Mapping oggetto Campo -> parametri PreparedStatement.
+     */
     private void bind(PreparedStatement ps, Campo c) throws SQLException {
         ps.setString(1, c.getNome());
         ps.setString(2, c.getTipoSport());
@@ -184,3 +185,4 @@ public class CampoDAODbms extends BaseCampoDAO {
         ps.setBoolean(5, c.isFlagManutenzione());
     }
 }
+

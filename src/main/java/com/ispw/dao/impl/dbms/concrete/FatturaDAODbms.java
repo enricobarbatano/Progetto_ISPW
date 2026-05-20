@@ -7,18 +7,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
+import com.ispw.dao.exception.DaoException;
 import com.ispw.dao.impl.base.BaseFatturaDAO;
 import com.ispw.dao.impl.dbms.connection.ConnectionFactory;
 import com.ispw.model.entity.Fattura;
 
 /**
- * Provider DBMS per Fattura: implementa SOLO raw I/O JDBC.
- * La cache e la logica cache-first stanno nella BaseFatturaDAO.
+ * Provider DBMS per Fattura.
+ * Implementa solo raw I/O JDBC.
+ * Cache e logica cache-first restano in BaseFatturaDAO.
  */
 public class FatturaDAODbms extends BaseFatturaDAO {
 
-    private static final String TBL  = "fatture";
-    private static final String COLS = "id_fattura, id_prenotazione, id_utente, codice_fiscale_cliente, data_emissione, link_pdf";
+    private static final String TBL = "fatture";
+    private static final String COLS =
+            "id_fattura, id_prenotazione, id_utente, codice_fiscale_cliente, data_emissione, link_pdf";
 
     private static final String SQL_SELECT_ONE =
             "SELECT " + COLS + " FROM " + TBL + " WHERE id_fattura = ?";
@@ -50,7 +53,10 @@ public class FatturaDAODbms extends BaseFatturaDAO {
 
     @Override
     protected Fattura rawLoad(Integer id) {
-        if (id == null || id <= 0) return null;
+        if (id == null || id <= 0) {
+            return null;
+        }
+
         try (Connection c = cf.getConnection();
              PreparedStatement ps = c.prepareStatement(SQL_SELECT_ONE)) {
 
@@ -61,45 +67,54 @@ public class FatturaDAODbms extends BaseFatturaDAO {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Fattura rawLoad", e);
+            throw new DaoException("Errore DBMS Fattura rawLoad", e);
         }
     }
 
     @Override
     protected void rawStore(Fattura e) {
-        if (e == null) return;
+        if (e == null) {
+            return;
+        }
 
         try (Connection c = cf.getConnection()) {
 
-            final int id = e.getIdFattura();
+            int id = e.getIdFattura();
 
             if (id > 0 && existsDb(c, id)) {
-                // UPDATE
+                // UPDATE se la fattura esiste già su DB.
                 try (PreparedStatement ps = c.prepareStatement(SQL_UPDATE)) {
-                    bindForUpsert(ps, e, false);
+                    bindForUpsert(ps, e);
                     ps.setInt(6, e.getIdFattura());
                     ps.executeUpdate();
                 }
             } else {
-                // INSERT (id generato dal DB)
-                try (PreparedStatement ps = c.prepareStatement(SQL_INSERT, java.sql.Statement.RETURN_GENERATED_KEYS)) {
-                    bindForUpsert(ps, e, true);
+                // INSERT con id generato dal DB.
+                try (PreparedStatement ps = c.prepareStatement(
+                        SQL_INSERT,
+                        java.sql.Statement.RETURN_GENERATED_KEYS)) {
+
+                    bindForUpsert(ps, e);
                     ps.executeUpdate();
 
                     try (ResultSet gk = ps.getGeneratedKeys()) {
-                        if (gk.next()) e.setIdFattura(gk.getInt(1));
+                        if (gk.next()) {
+                            e.setIdFattura(gk.getInt(1));
+                        }
                     }
                 }
             }
 
         } catch (SQLException ex) {
-            throw new RuntimeException("Errore DBMS Fattura rawStore", ex);
+            throw new DaoException("Errore DBMS Fattura rawStore", ex);
         }
     }
 
     @Override
     protected void rawDelete(Integer id) {
-        if (id == null || id <= 0) return;
+        if (id == null || id <= 0) {
+            return;
+        }
 
         try (Connection c = cf.getConnection();
              PreparedStatement ps = c.prepareStatement(SQL_DELETE)) {
@@ -108,13 +123,15 @@ public class FatturaDAODbms extends BaseFatturaDAO {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Fattura rawDelete", e);
+            throw new DaoException("Errore DBMS Fattura rawDelete", e);
         }
     }
 
     @Override
     protected Fattura rawFindLastByUtente(int idUtente) {
-        if (idUtente <= 0) return null;
+        if (idUtente <= 0) {
+            return null;
+        }
 
         try (Connection c = cf.getConnection();
              PreparedStatement ps = c.prepareStatement(SQL_FIND_LAST_BY_UTENTE)) {
@@ -126,22 +143,26 @@ public class FatturaDAODbms extends BaseFatturaDAO {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Errore DBMS Fattura rawFindLastByUtente", e);
+            throw new DaoException("Errore DBMS Fattura rawFindLastByUtente", e);
         }
     }
 
     private boolean existsDb(Connection c, int idFattura) throws SQLException {
         try (PreparedStatement ps = c.prepareStatement(SQL_EXISTS)) {
             ps.setInt(1, idFattura);
+
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
             }
         }
     }
 
-    /** Mapper ResultSet -> Entity (raw) */
+    /**
+     * Mapping ResultSet -> Entity.
+     */
     private Fattura mapRow(ResultSet rs) throws SQLException {
         Fattura f = new Fattura();
+
         f.setIdFattura(rs.getInt("id_fattura"));
         f.setIdPrenotazione(rs.getInt("id_prenotazione"));
         f.setIdUtente(rs.getInt("id_utente"));
@@ -151,21 +172,23 @@ public class FatturaDAODbms extends BaseFatturaDAO {
 
         f.setCodiceFiscaleCliente(rs.getString("codice_fiscale_cliente"));
         f.setLinkPdf(rs.getString("link_pdf"));
+
         return f;
     }
 
     /**
-     * Bind per INSERT/UPDATE:
-     * - INSERT: 5 parametri
-     * - UPDATE: stessi 5 parametri + id in coda (gestito dal chiamante)
+     * Bind dei 5 parametri comuni a INSERT e UPDATE.
      */
-    private void bindForUpsert(PreparedStatement ps, Fattura e, boolean insert) throws SQLException {
+    private void bindForUpsert(PreparedStatement ps, Fattura e) throws SQLException {
         ps.setInt(1, e.getIdPrenotazione());
         ps.setInt(2, e.getIdUtente());
         ps.setString(3, e.getCodiceFiscaleCliente());
 
-        if (e.getDataEmissione() != null) ps.setDate(4, Date.valueOf(e.getDataEmissione()));
-        else ps.setNull(4, Types.DATE);
+        if (e.getDataEmissione() != null) {
+            ps.setDate(4, Date.valueOf(e.getDataEmissione()));
+        } else {
+            ps.setNull(4, Types.DATE);
+        }
 
         ps.setString(5, e.getLinkPdf());
     }
