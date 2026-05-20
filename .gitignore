@@ -31,9 +31,12 @@ Thumbs.db
 
 # Script/local build artifacts
 build_installer.cmd
+ARCHITECTURE.md
 
 # draw.io autosave/backup files
 *.drawio.drawio.xml
 
 # Documenti Word locali
 ISPW_Project.docx
+
+.gitignore
