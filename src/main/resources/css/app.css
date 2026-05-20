@@ -74,8 +74,7 @@
     -fx-scale-y: 1.02;
 }
 
-/* NOSONAR: :pressed è una pseudo-classe valida in JavaFX CSS. */
-.primary:pressed {
+.primary:pressed { /* NOSONAR: :pressed è una pseudo-classe valida in JavaFX CSS. */
     -fx-scale-x: 0.98;
     -fx-scale-y: 0.98;
 }
@@ -121,9 +120,8 @@
     -fx-text-fill: -fx-text-main;
 }
 
-/* NOSONAR: :focused è una pseudo-classe valida in JavaFX CSS. */
-.text-field:focused,
-.password-field:focused {
+.text-field:focused, /* NOSONAR: :focused è una pseudo-classe valida in JavaFX CSS. */
+.password-field:focused { /* NOSONAR: :focused è una pseudo-classe valida in JavaFX CSS. */
     -fx-border-color: -fx-primary-color;
     -fx-border-width: 1.5;
     -fx-effect: dropshadow(three-pass-box, rgba(37, 99, 235, 0.15), 10, 0, 0, 0);
@@ -144,13 +142,11 @@
     -fx-text-fill: -fx-text-main;
 }
 
-/* NOSONAR: :filled è una pseudo-classe valida in JavaFX CSS. */
-.list-cell:filled:hover {
+.list-cell:filled:hover { /* NOSONAR: :filled è una pseudo-classe valida in JavaFX CSS. */
     -fx-background-color: #f8fafc;
 }
 
-/* NOSONAR: :filled e :selected sono pseudo-classi valide in JavaFX CSS. */
-.list-cell:filled:selected {
+.list-cell:filled:selected { /* NOSONAR: :filled e :selected sono pseudo-classi valide in JavaFX CSS. */
     -fx-background-color: #eff6ff;
     -fx-text-fill: -fx-primary-color;
     -fx-font-weight: bold;
@@ -177,9 +173,8 @@
     -fx-background-color: transparent;
 }
 
-/* NOSONAR: :vertical e :horizontal sono pseudo-classi valide in JavaFX CSS. */
-.scroll-bar:vertical,
-.scroll-bar:horizontal {
+.scroll-bar:vertical, /* NOSONAR: :vertical è una pseudo-classe valida in JavaFX CSS. */
+.scroll-bar:horizontal { /* NOSONAR: :horizontal è una pseudo-classe valida in JavaFX CSS. */
     -fx-background-color: transparent;
     -fx-pref-width: 8;
 }
