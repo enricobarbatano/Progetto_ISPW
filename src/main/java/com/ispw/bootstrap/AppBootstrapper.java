@@ -4,6 +4,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.ispw.controller.graphic.factory.FrontendControllerFactory;
 import com.ispw.dao.factory.DAOFactory;
@@ -11,6 +13,14 @@ import com.ispw.dao.impl.dbms.connection.DbmsConnectionFactory;
 import com.ispw.model.enums.PersistencyProvider;
 
 public final class AppBootstrapper {
+
+    private static final Logger LOGGER = Logger.getLogger(AppBootstrapper.class.getName());
+
+    private AppBootstrapper() {
+        // Utility class: non deve essere istanziata.
+    }
+
+    @SuppressWarnings("java:S106")
     public static void main(String[] args) {
 
         // 1) Leggi configurazione
@@ -20,14 +30,13 @@ public final class AppBootstrapper {
         // 2) Config DBMS (solo se DBMS)
         if (config.persistency() == PersistencyProvider.DBMS) {
             DbmsConnectionFactory.init(
-                // FIX: niente &amp; nel codice Java
-                "jdbc:mysql://localhost:3306/centro_sportivo?useSSL=false&serverTimezone=Europe/Rome",
-                "ispw_user",
-                "ispw_user"
+                    "jdbc:mysql://localhost:3306/centro_sportivo?useSSL=false&serverTimezone=Europe/Rome",
+                    "ispw_user",
+                    "ispw_user"
             );
 
-            // (Opzionale) ping DB per verificare connessione
-            try (var c  = DbmsConnectionFactory.getInstance().getConnection();
+            // Ping DB per verificare connessione
+            try (var c = DbmsConnectionFactory.getInstance().getConnection();
                  var ps = c.prepareStatement("SELECT 1");
                  var rs = ps.executeQuery()) {
 
@@ -36,7 +45,7 @@ public final class AppBootstrapper {
                 }
 
             } catch (SQLException e) {
-                System.err.println("Errore connessione DB: " + e.getMessage());
+                LOGGER.log(Level.SEVERE, e, () -> "Errore connessione DB");
                 return;
             }
         }
@@ -48,7 +57,11 @@ public final class AppBootstrapper {
             try {
                 Files.createDirectories(root);
             } catch (java.io.IOException | SecurityException e) {
-                System.err.println("Impossibile creare directory root per FILE_SYSTEM: " + root);
+                LOGGER.log(
+                        Level.SEVERE,
+                        e,
+                        () -> "Impossibile creare directory root per FILE_SYSTEM: " + root
+                );
                 return;
             }
             fsRoot = root;
@@ -58,32 +71,27 @@ public final class AppBootstrapper {
         // 2c) Config IN_MEMORY seed root (solo se IN_MEMORY)
         Path seedRoot = null;
         if (config.persistency() == PersistencyProvider.IN_MEMORY) {
-            // la tua cartella seed (solo lettura per pre-caricare cache)
             seedRoot = Paths.get("C:\\Users\\User\\ISPW_Project\\Progetto_ISPW\\seed");
             if (!Files.exists(seedRoot)) {
-                System.err.println("Cartella seed non trovata: " + seedRoot.toAbsolutePath());
+                Path finalSeedRoot = seedRoot;
+                LOGGER.severe(() -> "Cartella seed non trovata: " + finalSeedRoot.toAbsolutePath());
                 return;
             }
             System.out.println("IN_MEMORY seed root impostata su: " + seedRoot.toAbsolutePath());
         }
 
-        // 3) Configura persistenza (DAOFactory guidata dal provider)
-        //    - FILE_SYSTEM: root = fsRoot
-        //    - IN_MEMORY:   root = seedRoot (seed-only, non persistente)
-        //    - DBMS:        root = null
+        // 3) Configura persistenza
         Path rootForProvider = switch (config.persistency()) {
             case FILE_SYSTEM -> fsRoot;
-            case IN_MEMORY   -> seedRoot;
-            case DBMS        -> null;
+            case IN_MEMORY -> seedRoot;
+            case DBMS -> null;
         };
 
         DAOFactory.initialize(config.persistency(), rootForProvider);
 
-        // Se il tuo SetupBootstrapper fa cose diverse per provider, puoi passargli rootForProvider.
-        // (Non cambia nulla se internamente controlla il provider.)
         SetupBootstrapper.bootstrapIfNeeded(
-            config.persistency(),
-            rootForProvider
+                config.persistency(),
+                rootForProvider
         );
 
         System.out.println("Persistency provider: " + config.persistency());
