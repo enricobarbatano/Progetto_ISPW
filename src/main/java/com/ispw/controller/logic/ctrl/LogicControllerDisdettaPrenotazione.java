@@ -286,6 +286,9 @@ public class LogicControllerDisdettaPrenotazione implements CtrlDisdetta {
 
         //dopo averla creata in memoria la persisto
         richiestaDAO().store(richiesta);
+        
+        //notifico i gestori che ci sono richhieste di disdetta pending
+        notificaGestoriNuovaRichiesta(richiesta.getIdRichiesta(),idPrenotazione,user.getIdUtente());
 
         //faccio l'append dell'evento per tracciabilità
         appendLogSafe(user.getIdUtente(),
@@ -622,7 +625,33 @@ public class LogicControllerDisdettaPrenotazione implements CtrlDisdetta {
     // =====================================================================
     // HELPERS SPECIFICI DELLA DISDETTA
     // =====================================================================
+    /**
+ * Notifica tutti i gestori della presenza di una nuova richiesta di disdetta.
+ * Utilizza il DAO aggregato per recuperare gli utenti e filtra per ruolo GESTORE.
+ */
+    private void notificaGestoriNuovaRichiesta(int idRichiesta, int idPrenotazione, int idUtenteRichiedente) {
+        try {
+            List<GeneralUser> utenti = userDAO().findAll();
 
+            for (GeneralUser u : utenti) {
+
+                if (u.getRuolo() == Ruolo.GESTORE
+                        && u.getEmail() != null
+                        && !u.getEmail().isBlank()) {
+
+                    notiCtrl().inviaNotificaRichiestaDisdetta(
+                            toUtenteBean(u),
+                            "Nuova richiesta disdetta #" + idRichiesta +
+                            " per prenotazione #" + idPrenotazione +
+                            " (utente #" + idUtenteRichiedente + ")"
+                    );
+                }
+            }
+
+        } catch (Exception e) {
+            log().log(Level.FINE, "Notifica gestori fallita: {0}", e.getMessage());
+        }
+    }
     /**
      * Controlla se una prenotazione è futura e non annullata.
      */

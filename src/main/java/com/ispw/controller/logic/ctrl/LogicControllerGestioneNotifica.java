@@ -1,6 +1,8 @@
 package com.ispw.controller.logic.ctrl;
 
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,7 +13,17 @@ import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaGestioneAcc
 import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaPenalita;
 import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaPrenotazione;
 import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaRegistrazione;
+import com.ispw.dao.factory.DAOFactory;
+import com.ispw.dao.interfaces.GeneralUserDAO;
+import com.ispw.model.entity.GeneralUser;
+import com.ispw.service.ExternalServiceFactory;
+import com.ispw.service.interfaces.EmailNotification;
 
+/**
+ * Controller logico per la gestione delle notifiche.
+ * Tutte le operazioni vengono eseguite in modo asincrono
+ * per non bloccare il flusso principale dei casi d'uso.
+ */
 public class LogicControllerGestioneNotifica implements
         GestioneNotificaConfiguraRegole,
         GestioneNotificaPrenotazione,
@@ -21,143 +33,313 @@ public class LogicControllerGestioneNotifica implements
         GestioneNotificaPenalita {
 
     private static final String UTENTE_NULL = "utente=null";
+    private static final String PREFIX_INFO = "[NOTIFICA]";
+    private static final String PREFIX_WARN = "[NOTIFICA][WARN]";
+    private static final String MSG_AGGIORNAMENTO_ACCOUNT = "Aggiornamento account";
+    private static final String MSG_NOTIFICA_PENALITA = "Notifica penalita";
+    private static final String MSG_CONFERMA_PRENOTAZIONE = "Conferma prenotazione";
 
+
+    // Logger statico (best practice)
+    private static final Logger LOGGER =
+            Logger.getLogger(LogicControllerGestioneNotifica.class.getName());
+
+    // Executor per esecuzione asincrona
+    private final ExecutorService executor = Executors.newCachedThreadPool();
+
+    // Service per invio email (attore esterno)
+    private final EmailNotification emailService =
+            ExternalServiceFactory.createEmailService();
+
+    //DAO per per richiamare l'utente dal layer di persistenza
+    private GeneralUserDAO userDAO(){ 
+        return DAOFactory.getInstance().getGeneralUserDAO();
+    }
     // ===================== DISDETTA =====================
 
     @Override
+    public void inviaNotificaRichiestaDisdetta(UtenteBean gestore, String dettaglio) {
+        async(() -> {
+            if (gestore == null || gestore.getEmail() == null || gestore.getEmail().isBlank()) {
+                warn("Notifica richiesta disdetta", "EMAIL GESTORE NON VALIDA", dettaglio);
+                return;
+            }
+
+            info("Notifica richiesta disdetta", destinatario(gestore), dettaglio);
+
+            emailService.sendNotification(
+                    gestore.getEmail(),
+                    "Nuova richiesta disdetta",
+                    dettaglio
+            );
+        });
+    }
+
+    @Override
     public void inviaConfermaCancellazione(UtenteBean utente, String dettaglio) {
-        if (utente == null) {
-            warn("Conferma cancellazione", UTENTE_NULL, dettaglio);
-            return;
-        }
-        info("Conferma cancellazione", destinatario(utente), dettaglio);
+        async(() -> {
+            if (utente == null) {
+                warn("Conferma cancellazione", UTENTE_NULL, dettaglio);
+                return;
+            }
+
+            info("Conferma cancellazione", destinatario(utente), dettaglio);
+
+            // invio email reale
+            emailService.sendNotification(
+                    utente.getEmail(),
+                    "Cancellazione prenotazione",
+                    "La tua prenotazione è stata cancellata. Dettagli: " + dettaglio
+            );
+        });
     }
 
     // ===================== REGISTRAZIONE =====================
 
     @Override
     public void inviaConfermaRegistrazione(UtenteBean utente) {
-        if (utente == null) {
-            warn("Conferma registrazione", UTENTE_NULL, null);
-            return;
-        }
-        info("Conferma registrazione", destinatario(utente), null);
+        async(() -> {
+            if (utente == null) {
+                warn("Conferma registrazione", UTENTE_NULL, null);
+                return;
+            }
+
+            info("Conferma registrazione", destinatario(utente), null);
+
+            emailService.sendNotification(
+                    utente.getEmail(),
+                    "Registrazione completata",
+                    "La tua registrazione all'applicazione SportBooking è avvenuta con successo."
+            );
+        });
     }
 
     // ===================== ACCOUNT =====================
 
+    
     @Override
     public void inviaConfermaAggiornamentoAccount(UtenteBean utente) {
-        if (utente == null) {
-            warn("Aggiornamento account", UTENTE_NULL, null);
-            return;
-        }
-        info("Aggiornamento account", destinatario(utente), null);
+        async(() -> {
+            if (utente == null) {
+                warn(MSG_AGGIORNAMENTO_ACCOUNT, UTENTE_NULL, null);
+                return;
+            }
+
+            if (utente.getEmail() == null || utente.getEmail().isBlank()) {
+                warn(MSG_AGGIORNAMENTO_ACCOUNT, "EMAIL NON VALIDA", null);
+                return;
+            }
+
+            info("MSG_AGGIORNAMENTO_ACCOUNT", destinatario(utente), null);
+
+            emailService.sendNotification(
+                    utente.getEmail(),
+                    "MSG_AGGIORNAMENTO_ACCOUNT",
+                    "I tuoi dati sono stati aggiornati con successo."
+            );
+        });
     }
+
+
 
     // ===================== PENALITA =====================
 
     @Override
     public void inviaNotificaPenalita(String idUtente) {
-        final String dest = (idUtente == null || idUtente.trim().isEmpty())
-                ? "idUtente=VUOTO"
-                : "idUtente=" + idUtente.trim();
-        info("Notifica penalita", dest, null);
+        async(() -> {
+
+            // controllo input stringa
+            if (idUtente == null || idUtente.trim().isEmpty()) {
+                warn(MSG_NOTIFICA_PENALITA, "idUtente=VUOTO", null);
+                return;
+            }
+
+            try {
+                // conversione da String a int (dato che DAO usa int)
+                int id = Integer.parseInt(idUtente.trim());
+
+                // recupero utente dal DAO
+                GeneralUser user = userDAO().findById(id);
+
+                if (user == null) {
+                    warn(MSG_NOTIFICA_PENALITA, "UTENTE NON TROVATO: id=" + id, null);
+                    return;
+                }
+
+                // controllo email
+                if (user.getEmail() == null || user.getEmail().isBlank()) {
+                    warn(MSG_NOTIFICA_PENALITA, "EMAIL NON VALIDA per id=" + id, null);
+                    return;
+                }
+
+                // log informativo
+                info(MSG_NOTIFICA_PENALITA, "email=" + user.getEmail(), null);
+
+                // invio email reale
+                emailService.sendNotification(
+                        user.getEmail(),
+                        "MSG_NOTIFICA_PENALITA",
+                        "Hai ricevuto una penalità nel sistema."
+                );
+
+            } catch (NumberFormatException e) {
+                //idUtente non convertibile in intero
+                warn("MSG_NOTIFICA_PENALITA", "ID NON NUMERICO: " + idUtente, null);
+
+            } catch (Exception e) {
+                // errore generico
+                LOGGER.log(Level.SEVERE, "Errore invio MSG_NOTIFICA_PENALITA", e);
+            }
+        });
     }
 
     // ===================== PRENOTAZIONE =====================
 
     @Override
     public void inviaConfermaPrenotazione(UtenteBean utente, String dettaglio) {
-        if (utente == null) {
-            warn("Conferma prenotazione", UTENTE_NULL, dettaglio);
-            return;
-        }
-        info("Conferma prenotazione", destinatario(utente), dettaglio);
+        async(() -> {
+            if (utente == null) {
+                warn(MSG_CONFERMA_PRENOTAZIONE, UTENTE_NULL, dettaglio);
+                return;
+            }
+
+            info("MSG_CONFERMA_PRENOTAZIONE", destinatario(utente), dettaglio);
+
+            emailService.sendNotification(
+                    utente.getEmail(),
+                    "MSG_CONFERMA_PRENOTAZIONE",
+                    "Prenotazione confermata. Dettagli: " + dettaglio
+            );
+        });
     }
 
     @Override
     public void impostaPromemoria(int idPrenotazione, int minutiAnticipo) {
-        if (idPrenotazione <= 0) {
-            warn("Imposta promemoria", "idPrenotazione non valido: " + idPrenotazione, null);
-            return;
-        }
-        if (minutiAnticipo <= 0) {
-            warn("Imposta promemoria", "minutiAnticipo non valido: " + minutiAnticipo, null);
-            return;
-        }
-        log().log(Level.FINE,
-            "[PROMEMORIA] Prenotazione#{0} -> scheduling promemoria {1} minuti prima ... riuscito",
-            new Object[]{idPrenotazione, minutiAnticipo});
+        async(() -> {
+            if (idPrenotazione <= 0) {
+                warn("Imposta promemoria",
+                        "idPrenotazione non valido: " + idPrenotazione, null);
+                return;
+            }
+
+            if (minutiAnticipo <= 0) {
+                warn("Imposta promemoria",
+                        "minutiAnticipo non valido: " + minutiAnticipo, null);
+                return;
+            }
+
+            LOGGER.log(Level.FINE,
+                    "[PROMEMORIA] Prenotazione#{0} -> scheduling promemoria {1} minuti prima ... riuscito",
+                    new Object[]{idPrenotazione, minutiAnticipo});
+        });
     }
 
     // ===================== REGOLE =====================
 
     @Override
     public void inviaNotificaAggiornamentoRegole() {
-        info("Aggiornamento regole", "BROADCAST: utenti interessati", null);
+        async(() -> {
+            info("Aggiornamento regole", "BROADCAST: utenti interessati", null);
+
+            try {
+                for (GeneralUser user : userDAO().findAll()) {
+
+                    if (user.getEmail() != null && !user.getEmail().isBlank()) {
+                        emailService.sendNotification(
+                                user.getEmail(),
+                                "Aggiornamento regole",
+                                "Le regole del sistema sono state aggiornate."
+                        );
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Errore invio broadcast", e);
+            }
+        });
     }
+
 
     // ===================== LOGICA =====================
 
-    /** Log INFO standardizzato. */
+    /**
+     * Log informativo standardizzato.
+     */
     private void info(String tipo, String destinatario, String dettaglio) {
-        final String msg = composeInfo("[NOTIFICA]", tipo, destinatario, dettaglio);
-        log().log(Level.INFO, msg);
+        final String msg = composeInfo(PREFIX_INFO, tipo, destinatario, dettaglio);
+        LOGGER.log(Level.INFO, msg);
     }
 
-    /** Log WARNING standardizzato. */
+    /**
+     * Log di warning standardizzato.
+     */
     private void warn(String contesto, String problema, String dettaglio) {
-        final String msg = composeWarn("[NOTIFICA][WARN]", contesto, problema, dettaglio);
-        log().log(Level.WARNING, msg);
+        final String msg = composeWarn(PREFIX_WARN, contesto, problema, dettaglio);
+        LOGGER.log(Level.WARNING, msg);
     }
 
-    private String composeInfo(String prefix, String a, String b, String maybeDettaglio) {
+    /**
+     * Costruzione messaggio informativo.
+     */
+    private String composeInfo(String prefix, String a, String b, String dettaglio) {
         final StringBuilder sb = new StringBuilder(96)
                 .append(prefix).append(' ')
                 .append(Objects.toString(a, ""))
                 .append(" -> ")
                 .append(Objects.toString(b, ""));
-        if (maybeDettaglio != null && !maybeDettaglio.isBlank()) {
-            sb.append(" | dettaglio=\"").append(maybeDettaglio).append('"');
+
+        if (dettaglio != null && !dettaglio.isBlank()) {
+            sb.append(" | dettaglio=\"").append(dettaglio).append('"');
         }
+
         sb.append(" ... inviato");
         return sb.toString();
     }
 
-    private String composeWarn(String prefix, String a, String b, String maybeDettaglio) {
+    /**
+     * Costruzione messaggio warning.
+     */
+    private String composeWarn(String prefix, String a, String b, String dettaglio) {
         final StringBuilder sb = new StringBuilder(96)
                 .append(prefix).append(' ')
                 .append(Objects.toString(a, ""))
                 .append(" -> ")
                 .append(Objects.toString(b, ""));
-        if (maybeDettaglio != null && !maybeDettaglio.isBlank()) {
-            sb.append(" | dettaglio=\"").append(maybeDettaglio).append('"');
+
+        if (dettaglio != null && !dettaglio.isBlank()) {
+            sb.append(" | dettaglio=\"").append(dettaglio).append('"');
         }
-        // niente "riuscito" sui warning
+
         return sb.toString();
     }
 
-    /** Descrittore leggibile del destinatario dal bean utente. */
+    /**
+     * Restituisce il destinatario leggibile.
+     */
     private String destinatario(UtenteBean utente) {
         if (utente == null) return UTENTE_NULL;
 
-        // Se UtenteBean ha getter standard, li usiamo (senza cambiare dipendenze).
-        // In caso contrario, fallback su toString().
         try {
             String email = utente.getEmail();
             if (email != null && !email.isBlank()) {
                 return "email=" + email.trim();
             }
         } catch (RuntimeException ignore) {
-            // fallback sotto
+            // fallback
         }
 
         return utente.toString();
     }
 
-    @SuppressWarnings("java:S1312")
-    private Logger log() {
-        return Logger.getLogger(getClass().getName());
+    /**
+     * Wrapper per esecuzione asincrona tramite thread pool.
+     */
+    private void async(Runnable task) {
+        executor.submit(() -> {
+            try {
+                task.run();
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Errore task asincrono", e);
+            }
+        });
     }
 }

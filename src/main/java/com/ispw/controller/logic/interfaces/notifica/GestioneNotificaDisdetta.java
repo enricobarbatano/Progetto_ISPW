@@ -4,4 +4,8 @@ import com.ispw.bean.UtenteBean;
 
 public interface GestioneNotificaDisdetta {
     void inviaConfermaCancellazione(UtenteBean utente, String dettaglio);
+    
+
+    void inviaNotificaRichiestaDisdetta(UtenteBean gestore, String dettaglio);
+
 }

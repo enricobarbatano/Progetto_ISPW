@@ -39,6 +39,13 @@
             <scope>test</scope>
         </dependency>
 
+    <!-- ✅ Jakarta Mail (invio email) -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+
         <!-- ✅ H2 per test DB -->
         <dependency>
             <groupId>com.h2database</groupId>
