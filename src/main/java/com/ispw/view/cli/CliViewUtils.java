@@ -48,7 +48,7 @@ public final class CliViewUtils {
      */
     public static void printMessages(String error, String success) {
         if (error != null && !error.isBlank()) {
-            System.err.println("[ERRORE] " + error);
+            System.out.println("[ERRORE] " + error);
         }
 
         if (success != null && !success.isBlank()) {
