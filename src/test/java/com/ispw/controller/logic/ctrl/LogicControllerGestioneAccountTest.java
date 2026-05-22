@@ -1,3 +1,7 @@
+
+/**
+ * Test class developed by Enrico Barbatano.
+ */
 package com.ispw.controller.logic.ctrl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

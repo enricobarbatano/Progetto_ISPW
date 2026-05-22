@@ -3,13 +3,13 @@ package com.ispw.controller.graphic.abstracts;
 import java.util.Map;
 
 import com.ispw.bean.DatiRegistrazioneBean;
-import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.bean.UtenteBean;
 import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
 import com.ispw.controller.graphic.interfaces.GraphicControllerRegistrazione;
 import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
 import com.ispw.controller.logic.LogicControllerFactory;
 import com.ispw.controller.logic.interfaces.CtrlRegistrazione;
+
 
 /**
  * Controller grafico astratto del caso d'uso "Registrazione".
@@ -85,19 +85,12 @@ public abstract class AbstractGraphicControllerRegistrazione implements GraphicC
     // OPERAZIONI LOGICHE DELEGATE
     // =====================================================================
 
-    /**
-     * Registra un nuovo utente tramite controller logico.
-     *
-     * Questo metodo resta protected perché viene usato dalle classi concrete
-     * dopo aver raccolto i dati dalla view.
-     */
-    protected EsitoOperazioneBean registraNuovoUtente(DatiRegistrazioneBean bean) {
-        return logicController().registraNuovoUtente(bean);
-    }
-
+    
     /**
      * Conferma un nuovo account tramite controller logico.
+     * 
      */
+
     protected void confermaNuovoAccount(UtenteBean utente) {
         logicController().confermaNuovoAccount(utente);
     }

@@ -74,4 +74,9 @@ final class LogicControllerHelper {
     static String safe(String s) {
         return s == null ? "" : s;
     }
+
+    static boolean isValidEmailFormat(String email) {
+    return email != null && email.contains("@") && email.contains(".");
+    }
+
 }

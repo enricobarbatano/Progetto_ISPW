@@ -12,9 +12,10 @@ import com.ispw.view.interfaces.ViewRegistrazione;
 /**
  * View CLI registrazione.
  *
- * ✅ NON crea Bean
- * ✅ NON usa Map
- * ✅ passa parametri primitivi
+ * NON crea Bean.
+ * NON gestisce eccezioni.
+ * NON chiama direttamente il logic controller.
+ * Legge solo i dati grezzi dalla console e li passa al graphic controller.
  */
 public class CLIRegistrazioneView extends GenericViewCLI
         implements ViewRegistrazione, NavigableController {
@@ -35,6 +36,8 @@ public class CLIRegistrazioneView extends GenericViewCLI
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
 
+        showRouteError(params);
+
         System.out.println("\n=== REGISTRAZIONE ===");
 
         System.out.print("Nome: ");
@@ -49,7 +52,6 @@ public class CLIRegistrazioneView extends GenericViewCLI
         System.out.print("Password: ");
         String password = in.nextLine();
 
-        // ✅ FIX: uso enum Ruolo
         controller.inviaDatiRegistrazione(
                 nome,
                 cognome,
@@ -57,5 +59,16 @@ public class CLIRegistrazioneView extends GenericViewCLI
                 password,
                 Ruolo.UTENTE
         );
+    }
+
+    private void showRouteError(Map<String, Object> params) {
+        if (params == null) {
+            return;
+        }
+
+        Object error = params.get(GraphicControllerUtils.KEY_ERROR);
+        if (error != null) {
+            System.out.println("[ERRORE] " + error);
+        }
     }
 }

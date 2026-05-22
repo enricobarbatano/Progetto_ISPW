@@ -34,13 +34,20 @@ public class RegistrazioneFXMLController {
 
     private GUIGraphicControllerRegistrazione controller;
 
-    @FXML private Label lblError;
+    @FXML
+    private Label lblError;
 
-    @FXML private TextField txtNome;
-    @FXML private TextField txtCognome;
-    @FXML private TextField txtEmail;
+    @FXML
+    private TextField txtNome;
 
-    @FXML private PasswordField txtPassword;
+    @FXML
+    private TextField txtCognome;
+
+    @FXML
+    private TextField txtEmail;
+
+    @FXML
+    private PasswordField txtPassword;
 
     /**
      * Inizializza il controller FXML con il graphic controller.
@@ -88,11 +95,6 @@ public class RegistrazioneFXMLController {
             return;
         }
 
-        if (password.length() < 6) {
-            setError("La password deve avere almeno 6 caratteri");
-            return;
-        }
-
         controller.inviaDatiRegistrazione(
                 nome,
                 cognome,
@@ -133,7 +135,14 @@ public class RegistrazioneFXMLController {
     }
 
     /**
-     * Mostra un messaggio di errore.
+     * Mostra un messaggio di errore ricevuto dalla GUIView.
+     */
+    public void showError(String message) {
+        setError(message);
+    }
+
+    /**
+     * Mostra un messaggio di errore nella label dedicata.
      */
     private void setError(Object value) {
         if (lblError != null) {

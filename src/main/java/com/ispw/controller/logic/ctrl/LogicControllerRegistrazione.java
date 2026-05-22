@@ -14,6 +14,11 @@ import com.ispw.controller.logic.interfaces.notifica.GestioneNotificaRegistrazio
 import com.ispw.dao.factory.DAOFactory;
 import com.ispw.dao.interfaces.GeneralUserDAO;
 import com.ispw.dao.interfaces.LogDAO;
+import com.ispw.exception.registration.EmailAlreadyExistsException;
+import com.ispw.exception.registration.InvalidEmailFormatException;
+import com.ispw.exception.registration.InvalidRegistrationDataException;
+import com.ispw.exception.registration.PasswordTooShortException;
+import com.ispw.exception.registration.RegistrationException;
 import com.ispw.model.entity.GeneralUser;
 import com.ispw.model.entity.SystemLog;
 import com.ispw.model.entity.UtenteFinale;
@@ -43,8 +48,6 @@ import com.ispw.model.enums.TipoOperazione;
  */
 public class LogicControllerRegistrazione implements CtrlRegistrazione {
 
-    private static final String MSG_DATI_KO = "Dati registrazione o servizio notifica non validi";
-    private static final String MSG_EMAIL_DUP = "Email gia registrata";
     private static final String MSG_REG_OK = "Registrazione avviata. Controlla la tua email per la conferma.";
 
     @SuppressWarnings("java:S1312")
@@ -95,64 +98,72 @@ public class LogicControllerRegistrazione implements CtrlRegistrazione {
      * - restituisce l'esito al layer grafico.
      */
     @Override
-    public EsitoOperazioneBean registraNuovoUtente(DatiRegistrazioneBean datiInput) {
-        //controllo che i dati minimi di registrazione siano validi e che il servizio notifica sia disponibile
-        if (!isValid(datiInput) || notiCtrl() == null) {
-            log().warning("[REG] Input non valido per registrazione");
-            return LogicControllerHelper.esito(false, MSG_DATI_KO);
-        }
+    public EsitoOperazioneBean registraNuovoUtente(DatiRegistrazioneBean datiInput)
+        throws RegistrationException {
 
-        //normalizzo l'email prima di usarla per ricerca e salvataggio
-        final String emailNorm = LogicControllerHelper.normalizeEmail(datiInput.getEmail());
-
-        //verifico che non esista già un utente con la stessa email
-        final GeneralUser existing = userDAO().findByEmail(emailNorm);
-        if (existing != null) {
-            log().log(Level.WARNING, "[REG] Email gia presente: {0}", emailNorm);
-            return LogicControllerHelper.esito(false, MSG_EMAIL_DUP);
-        }
-
-        //creo un nuovo utente finale in stato DA_CONFERMARE
-        final UtenteFinale nuovo = new UtenteFinale();
-        nuovo.setNome(datiInput.getNome());
-        nuovo.setCognome(datiInput.getCognome());
-        nuovo.setEmail(emailNorm);
-        nuovo.setPassword(datiInput.getPassword());
-        nuovo.setStatoAccount(StatoAccount.DA_CONFERMARE);
-        nuovo.setRuolo(Ruolo.UTENTE);
-
-        /*
-         * Store instradato dalla facade GeneralUserDAO.
-         * Il controller non conosce il DAO concreto dell'utente finale.
-         */
-        userDAO().store(nuovo);
-
-        //registro l'avvio della registrazione nel log applicativo
-        appendLog(nuovo.getIdUtente(),
-                TipoOperazione.REGISTRAZIONE_ACCOUNT,
-                "Registrazione avviata; richiesta conferma inviata");
-
-        //invio la notifica di conferma registrazione
-        inviaNotificaConfermaRegistrazione(toBean(nuovo));
-
-        /*
-         * Simulazione conferma immediata.
-         * Nel sistema reale questa parte potrebbe essere attivata da link email.
-         */
-        nuovo.setStatoAccount(StatoAccount.ATTIVO);
-        userDAO().store(nuovo);
-
-        //registro l'attivazione simulata nel log applicativo
-        appendLog(nuovo.getIdUtente(),
-                TipoOperazione.ACCOUNT_ATTIVATO,
-                "Conferma registrazione completata (simulata)");
-
-        log().log(Level.INFO, "[REG] Registrazione creata per utente #{0} ({1})",
-                new Object[]{nuovo.getIdUtente(), nuovo.getEmail()});
-
-        //ritorno l'esito al graphic controller
-        return LogicControllerHelper.esito(true, MSG_REG_OK);
+    // 1) Validazione base (dati null/mancanti)
+    if (!isValid(datiInput)) {
+        log().warning("[REG] Input non valido");
+        throw new InvalidRegistrationDataException();
     }
+
+    // 2) Validazione password (Internal Step 4a)
+    if (datiInput.getPassword().length() < 6) {
+        throw new PasswordTooShortException();
+    }
+
+    // 3) Validazione formato email (Internal Step 4b)
+    if (!LogicControllerHelper.isValidEmailFormat(datiInput.getEmail())) {
+        throw new InvalidEmailFormatException();
+    }
+
+    // 4) Normalizzazione email
+    final String emailNorm =
+            LogicControllerHelper.normalizeEmail(datiInput.getEmail());
+
+    // 5) Controllo unicità email (Internal Step 5a)
+    final GeneralUser existing = userDAO().findByEmail(emailNorm);
+    if (existing != null) {
+        log().log(Level.WARNING,
+                "[REG] Email gia presente: {0}", emailNorm);
+        throw new EmailAlreadyExistsException();
+    }
+
+    // 6) Creazione utente
+    final UtenteFinale nuovo = new UtenteFinale();
+    nuovo.setNome(datiInput.getNome());
+    nuovo.setCognome(datiInput.getCognome());
+    nuovo.setEmail(emailNorm);
+    nuovo.setPassword(datiInput.getPassword());
+    nuovo.setStatoAccount(StatoAccount.DA_CONFERMARE);
+    nuovo.setRuolo(Ruolo.UTENTE);
+
+    // 7) Persistenza
+    userDAO().store(nuovo);
+
+    // 8) Logging
+    appendLog(nuovo.getIdUtente(),
+            TipoOperazione.REGISTRAZIONE_ACCOUNT,
+            "Registrazione avviata; richiesta conferma inviata");
+
+    // 9) Notifica
+    inviaNotificaConfermaRegistrazione(toBean(nuovo));
+
+    // 10) Simulazione attivazione
+    nuovo.setStatoAccount(StatoAccount.ATTIVO);
+    userDAO().store(nuovo);
+
+    appendLog(nuovo.getIdUtente(),
+            TipoOperazione.ACCOUNT_ATTIVATO,
+            "Conferma registrazione completata (simulata)");
+
+    log().log(Level.INFO,
+            "[REG] Registrazione creata per utente #{0} ({1})",
+            new Object[]{nuovo.getIdUtente(), nuovo.getEmail()});
+
+    // 11) SUCCESSO (non eccezione)
+    return LogicControllerHelper.esito(true, MSG_REG_OK);
+}
 
     // STEP 2: conferma nuovo account
 

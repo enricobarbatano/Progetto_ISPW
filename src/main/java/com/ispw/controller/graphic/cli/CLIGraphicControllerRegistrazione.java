@@ -8,13 +8,16 @@ import com.ispw.bean.EsitoOperazioneBean;
 import com.ispw.controller.graphic.abstracts.AbstractGraphicControllerRegistrazione;
 import com.ispw.controller.graphic.interfaces.GraphicControllerNavigation;
 import com.ispw.controller.graphic.interfaces.GraphicControllerUtils;
+import com.ispw.exception.registration.EmailAlreadyExistsException;
+import com.ispw.exception.registration.InvalidEmailFormatException;
+import com.ispw.exception.registration.PasswordTooShortException;
+import com.ispw.exception.registration.RegistrationException;
 import com.ispw.model.enums.Ruolo;
 
 /**
- * CLI controller registrazione
+ * CLI controller registrazione.
  *
- * riceve dati grezzi (NON Map)
- *crea bean nel controller
+ * Riceve dati grezzi, crea il bean e delega al logic controller.
  */
 public class CLIGraphicControllerRegistrazione extends AbstractGraphicControllerRegistrazione {
 
@@ -34,9 +37,6 @@ public class CLIGraphicControllerRegistrazione extends AbstractGraphicController
         );
     }
 
-    /**
-     *  VERSIONE CORRETTA (senza Map)
-     */
     @Override
     public void inviaDatiRegistrazione(
             String nome,
@@ -45,31 +45,34 @@ public class CLIGraphicControllerRegistrazione extends AbstractGraphicController
             String password,
             Ruolo ruolo
     ) {
-
         if (!hasText(nome) || !hasText(cognome) || !hasText(email) || !hasText(password)) {
             notifyError(GraphicControllerUtils.MSG_CAMPI_OBBLIGATORI_MANCANTI);
             return;
         }
 
-        DatiRegistrazioneBean bean =
-                buildRegistrazioneBean(nome, cognome, email, password);
+        DatiRegistrazioneBean bean = buildRegistrazioneBean(nome, cognome, email, password);
 
-        EsitoOperazioneBean esito = registraNuovoUtente(bean);
+        try {
+            EsitoOperazioneBean esito = logicController().registraNuovoUtente(bean);
 
-        if (esito != null && esito.isSuccesso()) {
-            vaiAlLogin();
-        } else {
-            notifyError(GraphicControllerUtils.MSG_REGISTRAZIONE_NON_RIUSCITA);
+            if (esito != null && esito.isSuccesso()) {
+                vaiAlLogin();
+            }
+
+        } catch (PasswordTooShortException | InvalidEmailFormatException | EmailAlreadyExistsException e) {
+            notifyError(e.getMessage());
+
+        } catch (RegistrationException e) {
+            notifyError("Errore durante la registrazione");
         }
     }
 
     @Override
     protected void goToLogin() {
-    if (navigator != null) {
-        navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN);
+        if (navigator != null) {
+            navigator.goTo(GraphicControllerUtils.ROUTE_LOGIN);
+        }
     }
-    }
-
 
     private void notifyError(String message) {
         GraphicControllerUtils.notifyError(

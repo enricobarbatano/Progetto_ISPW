@@ -67,6 +67,7 @@ public class GUIRegistrazioneView extends GenericViewGUI
      * In caso di errore di caricamento o inizializzazione,
      * viene mostrata una schermata di fallback.
      */
+    
     @Override
     public void onShow(Map<String, Object> params) {
         super.onShow(params);
@@ -78,8 +79,16 @@ public class GUIRegistrazioneView extends GenericViewGUI
             Parent root = loader.load();
 
             RegistrazioneFXMLController fx = loader.getController();
+
             fx.init(controller);
-            fx.render(getLastParams());
+
+            // IMPORTANTE: passa params
+            fx.render(params);
+
+            //NUOVO: gestisci errore
+            if (params != null && params.containsKey("error")) {
+                fx.showError((String) params.get("error"));
+            }
 
             GuiLauncher.setRoot(root);
 
@@ -92,5 +101,6 @@ public class GUIRegistrazioneView extends GenericViewGUI
             GuiLauncher.setRoot(fallback);
         }
     }
+
 }
 

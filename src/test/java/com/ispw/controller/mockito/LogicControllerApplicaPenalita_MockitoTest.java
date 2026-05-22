@@ -1,3 +1,7 @@
+
+/**
+ * Test class developed by Enrico Barbatano.
+ */
 package com.ispw.controller.mockito;
 
 import java.math.BigDecimal;
