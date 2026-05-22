@@ -179,7 +179,7 @@ public class LogicControllerGestioneNotifica implements
                 emailService.sendNotification(
                         user.getEmail(),
                         "MSG_NOTIFICA_PENALITA",
-                        "Hai ricevuto una penalità nel sistema."
+                        "Hai ricevuto una penalità dal gestore."
                 );
 
             } catch (NumberFormatException e) {
@@ -213,26 +213,7 @@ public class LogicControllerGestioneNotifica implements
         });
     }
 
-    @Override
-    public void impostaPromemoria(int idPrenotazione, int minutiAnticipo) {
-        async(() -> {
-            if (idPrenotazione <= 0) {
-                warn("Imposta promemoria",
-                        "idPrenotazione non valido: " + idPrenotazione, null);
-                return;
-            }
-
-            if (minutiAnticipo <= 0) {
-                warn("Imposta promemoria",
-                        "minutiAnticipo non valido: " + minutiAnticipo, null);
-                return;
-            }
-
-            LOGGER.log(Level.FINE,
-                    "[PROMEMORIA] Prenotazione#{0} -> scheduling promemoria {1} minuti prima ... riuscito",
-                    new Object[]{idPrenotazione, minutiAnticipo});
-        });
-    }
+    
 
     // ===================== REGOLE =====================
 
