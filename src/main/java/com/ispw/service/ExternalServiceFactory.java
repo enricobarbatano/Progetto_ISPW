@@ -5,9 +5,9 @@ import com.ispw.service.interfaces.EmailNotification;
  * Factory per la creazione dei servizi esterni.
  */public final class ExternalServiceFactory {
 
-    private static final String EMAIL = "enrybarba2002@gmail.com";
+    private static final String EMAIL = "sportbooking26@gmail.com";
     @SuppressWarnings("java:S2068")
-    private static final String APP_PASSWORD = "lxci mjtu jhlt zokg";
+    private static final String APP_PASSWORD = "uclw mvww kyhv lwmf";
 
     private ExternalServiceFactory() {
         throw new UnsupportedOperationException("Utility class");
