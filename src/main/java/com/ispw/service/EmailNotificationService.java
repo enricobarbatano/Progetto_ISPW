@@ -39,11 +39,24 @@ public class EmailNotificationService implements EmailNotification {
     }
 
     /**
-     * Invia una email utilizzando protocollo SMTP.
+     * Invia una email utilizzando protocollo SMTP in un thread separato per evitare blocchi.
      */
     @Override
     public void sendNotification(String to, String subject, String messageText) {
+        // Esecuzione in thread separato per non bloccare il flusso principale
+        new Thread(() -> {
+            try {
+                sendEmailAsync(to, subject, messageText);
+            } catch (MessagingException e) {
+                LOGGER.log(Level.SEVERE, "Errore invio email in thread", e);
+            }
+        }).start();
+    }
 
+    /**
+     * Logica effettiva di invio email (eseguita in thread separato).
+     */
+    private void sendEmailAsync(String to, String subject, String messageText) throws MessagingException {
         // Configurazione proprietà SMTP per Gmail
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
