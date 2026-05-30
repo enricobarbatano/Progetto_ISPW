@@ -23,6 +23,7 @@ public final class CliViewUtils {
 
     /**
      * Chiede all'utente se vuole tornare alla home.
+     * Attende che i log asincroni si completino e sincronizza lo stdout.
      *
      * @param in scanner da cui leggere la risposta
      * @param goHome azione da eseguire se l'utente conferma
@@ -32,7 +33,20 @@ public final class CliViewUtils {
             return;
         }
 
-        System.out.print("Torna alla home? [s/N]: ");
+        // Attendi completamento log asincroni
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        // Sincronizza stdout con lock
+        synchronized (System.out) {
+            System.out.flush();
+            System.out.print("Torna alla home? [s/N]: ");
+            System.out.flush();
+        }
+
         String ans = in.nextLine().trim();
 
         if ("s".equalsIgnoreCase(ans) && goHome != null) {

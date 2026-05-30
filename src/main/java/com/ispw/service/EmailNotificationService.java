@@ -39,24 +39,23 @@ public class EmailNotificationService implements EmailNotification {
     }
 
     /**
-     * Invia una email utilizzando protocollo SMTP in un thread separato per evitare blocchi.
+     * Invia una email utilizzando protocollo SMTP.
+     * NOTA: Questo metodo viene sempre chiamato da un thread asincrono
+     * (LogicControllerGestioneNotifica.async), quindi non aggiunge un altro thread.
      */
     @Override
     public void sendNotification(String to, String subject, String messageText) {
-        // Esecuzione in thread separato per non bloccare il flusso principale
-        new Thread(() -> {
-            try {
-                sendEmailAsync(to, subject, messageText);
-            } catch (MessagingException e) {
-                LOGGER.log(Level.SEVERE, "Errore invio email in thread", e);
-            }
-        }).start();
+        try {
+            sendEmailSync(to, subject, messageText);
+        } catch (MessagingException e) {
+            LOGGER.log(Level.SEVERE, "Errore invio email", e);
+        }
     }
 
     /**
-     * Logica effettiva di invio email (eseguita in thread separato).
+     * Logica effettiva di invio email (eseguita nel thread del chiamante).
      */
-    private void sendEmailAsync(String to, String subject, String messageText) throws MessagingException {
+    private void sendEmailSync(String to, String subject, String messageText) throws MessagingException {
         // Configurazione proprietà SMTP per Gmail
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -74,27 +73,22 @@ public class EmailNotificationService implements EmailNotification {
             }
         );
 
-        try {
-            // Creazione messaggio email
-            Message msg = new MimeMessage(session);
+        // Creazione messaggio email
+        Message msg = new MimeMessage(session);
 
-            msg.setFrom(new InternetAddress(from));
+        msg.setFrom(new InternetAddress(from));
 
-            msg.setRecipients(
-                Message.RecipientType.TO,
-                InternetAddress.parse(to)
-            );
+        msg.setRecipients(
+            Message.RecipientType.TO,
+            InternetAddress.parse(to)
+        );
 
-            msg.setSubject(subject);
-            msg.setText(messageText);
+        msg.setSubject(subject);
+        msg.setText(messageText);
 
-            // Invio effettivo dell'email
-            Transport.send(msg);
+        // Invio effettivo dell'email
+        Transport.send(msg);
 
-            LOGGER.log(Level.INFO, "Email inviata a: {0}", to);
-        } catch (MessagingException e) {
-            // Logging errore senza bloccare il flusso principale
-            LOGGER.log(Level.SEVERE, "Errore invio email", e);
-        }
+        LOGGER.log(Level.INFO, "Email inviata a: {0}", to);
     }
 }
