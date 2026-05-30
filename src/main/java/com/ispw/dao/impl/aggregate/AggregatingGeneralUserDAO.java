@@ -54,7 +54,7 @@ public final class AggregatingGeneralUserDAO implements GeneralUserDAO {
 
     @Override
     public List<GeneralUser> findAll() {
-        // Merge gestori + utenti finali (dedupe per id, gestore ha precedenza se collisione)
+        // Merge gestori + utenti finali 
         Map<Integer, GeneralUser> byId = new LinkedHashMap<>();
 
         List<Gestore> gestori = gestoreDAO.findAll();
@@ -95,7 +95,6 @@ public final class AggregatingGeneralUserDAO implements GeneralUserDAO {
     @Override
     public GeneralUser create(Integer id) {
         // Per compatibilità col tuo vecchio BaseGeneralUserDAO: default = UtenteFinale
-        // (Se vuoi creare un Gestore, usa GestoreDAO.create direttamente)
         return utenteFinaleDAO.create(id);
     }
 

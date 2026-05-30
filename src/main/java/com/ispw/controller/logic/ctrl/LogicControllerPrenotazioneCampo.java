@@ -292,7 +292,7 @@ public class LogicControllerPrenotazioneCampo implements CtrlPrenotazione {
         }
 
         if (esito.isSuccesso()) {
-            postPagamentoActions(prenotazione, user.getEmail(), sessione);
+            postPagamentoActions(prenotazione, user.getEmail(), dati.getCredenziale(), sessione);
         }
 
         return esito;
@@ -437,9 +437,10 @@ public class LogicControllerPrenotazioneCampo implements CtrlPrenotazione {
      */
     private void postPagamentoActions(Prenotazione prenotazione,
                                       String email,
+                                      String codiceFiscale,
                                       SessioneUtenteBean sessione) {
         confermaPrenotazione(prenotazione);
-        generaFatturaPrenotazione(prenotazione, email);
+        generaFatturaPrenotazione(prenotazione, email, codiceFiscale);
         inviaNotificaPrenotazione(prenotazione, sessione);
     }
 
@@ -453,9 +454,10 @@ public class LogicControllerPrenotazioneCampo implements CtrlPrenotazione {
     /**
      * Genera la fattura collegata alla prenotazione.
      */
-    private void generaFatturaPrenotazione(Prenotazione prenotazione, String email) {
+    private void generaFatturaPrenotazione(Prenotazione prenotazione, String email, String codiceFiscale) {
         DatiFatturaBean fatt = new DatiFatturaBean();
-        fatt.setCodiceFiscaleCliente(email);
+        fatt.setEmail(email);
+        fatt.setCodiceFiscaleCliente(codiceFiscale);
 
         fattCtrl().generaFatturaPrenotazione(fatt, prenotazione.getIdPrenotazione());
     }
