@@ -6,7 +6,6 @@ package com.ispw.controller.mockito;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.ZoneId;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -109,7 +108,7 @@ class LogicControllerApplicaPenalitaMockitoTest extends UnitTestBase {
         DatiPenalitaBean dati = new DatiPenalitaBean();
         dati.setIdUtente(10);
         dati.setMotivazione("Danni al campo");
-        dati.setDataDecorrenza(LocalDate.now(ZoneId.systemDefault()));
+        dati.setDataDecorrenza(LocalDate.of(2026, 6, 6));
         dati.setImporto(new BigDecimal("30.00"));
 
         DatiPagamentoBean pay = new DatiPagamentoBean();
