@@ -1,6 +1,7 @@
 package com.ispw.view.gui.fxml;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 
@@ -257,7 +258,7 @@ public class PrenotazioneFXMLController {
         }
 
         if (datePicker != null) {
-            datePicker.setValue(LocalDate.now());
+            datePicker.setValue(LocalDate.now(ZoneId.systemDefault()));
         }
 
         if (comboOra != null && !comboOra.getItems().isEmpty()) {
@@ -309,7 +310,7 @@ public class PrenotazioneFXMLController {
         datePicker.setEditable(false);
 
         if (datePicker.getValue() == null) {
-            datePicker.setValue(LocalDate.now());
+            datePicker.setValue(LocalDate.now(ZoneId.systemDefault()));
         }
     }
 

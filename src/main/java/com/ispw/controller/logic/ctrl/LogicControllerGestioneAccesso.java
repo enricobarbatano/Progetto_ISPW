@@ -1,6 +1,8 @@
 package com.ispw.controller.logic.ctrl;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
@@ -193,7 +195,7 @@ public class LogicControllerGestioneAccesso implements CtrlAccesso {
 
         //creo il log applicativo dell'accesso eseguito
         SystemLog sl = new SystemLog();
-        sl.setTimestamp(LocalDateTime.now());
+        sl.setTimestamp(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
         sl.setTipoOperazione(TipoOperazione.ACCESSO_ESEGUITO);
         sl.setIdUtenteCoinvolto(user.getIdUtente());
         sl.setDescrizione("Login effettuato per utente " + email);

@@ -1,6 +1,8 @@
 package com.ispw.controller.logic.ctrl;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -291,7 +293,7 @@ public class LogicControllerRegistrazione implements CtrlRegistrazione {
      */
     private void appendLog(int idUtente, TipoOperazione tipo, String descrizione) {
         final SystemLog logEntry = new SystemLog();
-        logEntry.setTimestamp(LocalDateTime.now());
+        logEntry.setTimestamp(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
         logEntry.setTipoOperazione(tipo);
         logEntry.setIdUtenteCoinvolto(idUtente);
         logEntry.setDescrizione(LogicControllerHelper.safe(descrizione));

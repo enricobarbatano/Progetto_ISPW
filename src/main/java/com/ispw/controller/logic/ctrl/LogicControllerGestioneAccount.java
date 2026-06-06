@@ -1,6 +1,8 @@
 package com.ispw.controller.logic.ctrl;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -445,7 +447,7 @@ public class LogicControllerGestioneAccount implements CtrlGestioneAccount {
     private void appendLogSafe(int idUtente, String descr, TipoOperazione tipo) {
         try {
             SystemLog l = new SystemLog();
-            l.setTimestamp(LocalDateTime.now());
+            l.setTimestamp(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
             l.setIdUtenteCoinvolto(idUtente);
             l.setDescrizione(LogicControllerHelper.safe(descr));
             l.setTipoOperazione(tipo);

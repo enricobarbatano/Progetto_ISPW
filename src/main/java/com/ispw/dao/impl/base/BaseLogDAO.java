@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -147,7 +149,7 @@ public class BaseLogDAO implements LogDAO {
         }
 
         if (log.getTimestamp() == null) {
-            log.setTimestamp(LocalDateTime.now());
+            log.setTimestamp(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
         }
 
         ensureSeeded();

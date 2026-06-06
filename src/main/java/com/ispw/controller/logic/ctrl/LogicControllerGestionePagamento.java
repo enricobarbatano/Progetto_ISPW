@@ -2,6 +2,8 @@ package com.ispw.controller.logic.ctrl;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -96,7 +98,7 @@ public class LogicControllerGestionePagamento
         float importo = Math.max(0f, dati.getImporto());
         pay.setImportoFinale(BigDecimal.valueOf(importo));
         pay.setMetodo(metodo);
-        pay.setDataPagamento(LocalDateTime.now());
+        pay.setDataPagamento(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
 
         /*
          * Gateway fittizio:
@@ -155,7 +157,7 @@ public class LogicControllerGestionePagamento
         StatoPagamento statoRimborso = pickStato("RIMBORSATO", "REFUNDED");
 
         pay.setStato(statoRimborso);
-        pay.setDataPagamento(LocalDateTime.now());
+        pay.setDataPagamento(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
         pagamentoDAO().store(pay);
     }
 
@@ -191,7 +193,7 @@ public class LogicControllerGestionePagamento
         float importo = Math.max(0f, dati.getImporto());
         pay.setImportoFinale(BigDecimal.valueOf(importo));
         pay.setMetodo(metodo);
-        pay.setDataPagamento(LocalDateTime.now());
+        pay.setDataPagamento(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
 
         boolean ok = importo > 0f;
         StatoPagamento stato = ok ? statoOk() : statoKo();
@@ -241,7 +243,7 @@ public class LogicControllerGestionePagamento
         bean.setSuccesso(ok);
         bean.setStato(resolveStatoPagamentoOutput(stato, ok));
         bean.setIdTransazione(resolveTxId(idTx));
-        bean.setDataPagamento(LocalDateTime.now());
+        bean.setDataPagamento(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
         bean.setMessaggio(msg);
 
         return bean;

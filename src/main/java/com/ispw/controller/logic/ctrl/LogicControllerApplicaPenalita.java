@@ -3,6 +3,8 @@ package com.ispw.controller.logic.ctrl;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -327,7 +329,7 @@ public final class LogicControllerApplicaPenalita implements CtrlApplicaPenalita
      */
     private void normalizeFattura(DatiFatturaBean fat) {
         if (fat.getDataOperazione() == null) {
-            fat.setDataOperazione(LocalDate.now());
+            fat.setDataOperazione(LocalDate.now(ZoneId.systemDefault()));
         }
     }
 
@@ -352,7 +354,7 @@ public final class LogicControllerApplicaPenalita implements CtrlApplicaPenalita
             SystemLog sl = new SystemLog();
             sl.setIdUtenteCoinvolto(idUtente);
             sl.setDescrizione(descrizione);
-            sl.setTimestamp(LocalDateTime.now());
+            sl.setTimestamp(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
 
             ldao.append(sl);
         } catch (RuntimeException ex) {

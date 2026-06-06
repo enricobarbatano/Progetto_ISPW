@@ -3,6 +3,8 @@ package com.ispw.controller.logic.ctrl;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -166,7 +168,7 @@ public class LogicControllerDisdettaPrenotazione implements CtrlDisdetta {
         List<Prenotazione> prenotazioni = prenotazioneDAO().findByUtente(user.getIdUtente());
 
         //memorizza il time attuale
-        LocalDateTime now = LocalDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault());
 
         //genera una lista riepilogo prenotazione bean vuota
         List<RiepilogoPrenotazioneBean> out = new ArrayList<>();
@@ -278,7 +280,7 @@ public class LogicControllerDisdettaPrenotazione implements CtrlDisdetta {
         RichiestaDisdettaRimborso richiesta = new RichiestaDisdettaRimborso();
         richiesta.setIdPrenotazione(idPrenotazione);
         richiesta.setIdUtente(user.getIdUtente());
-        richiesta.setTimestampRichiesta(LocalDateTime.now());
+        richiesta.setTimestampRichiesta(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
         richiesta.setPenaleStimata(BigDecimal.valueOf(penale));
         richiesta.setRimborsoStimato(BigDecimal.valueOf(rimborsoStimato));
         richiesta.setStato(StatoRichiestaDisdetta.PENDING);
@@ -498,7 +500,7 @@ public class LogicControllerDisdettaPrenotazione implements CtrlDisdetta {
             return invalidoEsito();
         }
 
-        if (!isCancellablePrenotazione(prenotazione, LocalDateTime.now())) {
+        if (!isCancellablePrenotazione(prenotazione, ZonedDateTime.now(ZoneId.systemDefault()))) {
             return invalidoEsito();
         }
 
@@ -530,8 +532,8 @@ public class LogicControllerDisdettaPrenotazione implements CtrlDisdetta {
      * Altrimenti viene usato il valore configurato nelle regole penalità.
      */
     private float calcolaPenale(Prenotazione prenotazione, RegoleTempistiche rt, RegolePenalita rp) {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime start = LocalDateTime.of(prenotazione.getData(), prenotazione.getOraInizio());
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault());
+        ZonedDateTime start = ZonedDateTime.of(prenotazione.getData(), prenotazione.getOraInizio(), ZoneId.systemDefault());
         long minResidui = Duration.between(now, start).toMinutes();
 
         int preavvisoMin = 0;
@@ -655,7 +657,7 @@ public class LogicControllerDisdettaPrenotazione implements CtrlDisdetta {
     /**
      * Controlla se una prenotazione è futura e non annullata.
      */
-    private boolean isCancellablePrenotazione(Prenotazione prenotazione, LocalDateTime now) {
+    private boolean isCancellablePrenotazione(Prenotazione prenotazione, ZonedDateTime now) {
         if (prenotazione == null || prenotazione.getStato() == StatoPrenotazione.ANNULLATA) {
             return false;
         }
@@ -664,7 +666,7 @@ public class LogicControllerDisdettaPrenotazione implements CtrlDisdetta {
             return false;
         }
 
-        LocalDateTime inizio = LocalDateTime.of(prenotazione.getData(), prenotazione.getOraInizio());
+        ZonedDateTime inizio = ZonedDateTime.of(prenotazione.getData(), prenotazione.getOraInizio(), ZoneId.systemDefault());
         return inizio.isAfter(now);
     }
 
@@ -731,7 +733,7 @@ public class LogicControllerDisdettaPrenotazione implements CtrlDisdetta {
     private void appendLogSafe(int idUtente, String descr) {
         try {
             SystemLog systemLog = new SystemLog();
-            systemLog.setTimestamp(LocalDateTime.now());
+            systemLog.setTimestamp(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
             systemLog.setIdUtenteCoinvolto(idUtente);
             systemLog.setDescrizione(LogicControllerHelper.safe(descr));
             logDAO().append(systemLog);

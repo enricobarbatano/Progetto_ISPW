@@ -7,6 +7,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -138,7 +140,7 @@ public class LogDAODbms extends BaseLogDAO {
         log.setIdLog(rs.getInt("id_log"));
 
         Timestamp ts = rs.getTimestamp("timestamp");
-        log.setTimestamp(ts != null ? ts.toLocalDateTime() : LocalDateTime.now());
+        log.setTimestamp(ts != null ? ts.toLocalDateTime() : LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
 
         String tipo = rs.getString("tipo_operazione");
         if (tipo != null) {

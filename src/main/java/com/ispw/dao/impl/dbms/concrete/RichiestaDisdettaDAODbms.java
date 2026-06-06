@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -171,7 +174,7 @@ public class RichiestaDisdettaDAODbms extends BaseRichiestaDisdettaDAO {
              PreparedStatement ps = c.prepareStatement(SQL_UPDATE_STATO)) {
 
             ps.setString(1, stato.name());
-            ps.setTimestamp(2, Timestamp.valueOf(java.time.LocalDateTime.now()));
+            ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault()))));
 
             if (idGestore != null) {
                 ps.setInt(3, idGestore);
@@ -248,7 +251,7 @@ public class RichiestaDisdettaDAODbms extends BaseRichiestaDisdettaDAO {
         if (r.getTimestampRichiesta() != null) {
             ps.setTimestamp(3, Timestamp.valueOf(r.getTimestampRichiesta()));
         } else {
-            ps.setTimestamp(3, Timestamp.valueOf(java.time.LocalDateTime.now()));
+            ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault()))));
         }
 
         if (r.getTimestampDecisione() != null) {

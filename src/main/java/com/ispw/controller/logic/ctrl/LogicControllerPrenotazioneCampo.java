@@ -4,6 +4,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.logging.Level;
@@ -480,7 +482,7 @@ public class LogicControllerPrenotazioneCampo implements CtrlPrenotazione {
         bean.setSuccesso(false);
         bean.setStato(STATO_KO);
         bean.setIdTransazione("TX-" + System.currentTimeMillis());
-        bean.setDataPagamento(LocalDateTime.now());
+        bean.setDataPagamento(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
         bean.setMessaggio(messaggio);
 
         return bean;

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -70,7 +72,7 @@ public class RichiestaDisdettaDAOFileSystem extends BaseRichiestaDisdettaDAO {
         }
 
         // default di dominio
-        if (entity.getTimestampRichiesta() == null) entity.setTimestampRichiesta(LocalDateTime.now());
+        if (entity.getTimestampRichiesta() == null) entity.setTimestampRichiesta(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
         if (entity.getStato() == null) entity.setStato(StatoRichiestaDisdetta.PENDING);
 
         // upsert (remove + add)
@@ -97,7 +99,7 @@ public class RichiestaDisdettaDAOFileSystem extends BaseRichiestaDisdettaDAO {
         for (RichiestaDisdettaRimborso r : all) {
             if (r != null && r.getIdRichiesta() == idRichiesta) {
                 r.setStato(stato);
-                r.setTimestampDecisione(LocalDateTime.now());
+                r.setTimestampDecisione(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
                 r.setIdGestoreDecisione(idGestore);
                 r.setNotaGestore(notaGestore);
                 break;

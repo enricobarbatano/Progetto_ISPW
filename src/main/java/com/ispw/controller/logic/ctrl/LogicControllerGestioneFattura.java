@@ -1,6 +1,7 @@
 package com.ispw.controller.logic.ctrl;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,7 +55,7 @@ public class LogicControllerGestioneFattura
             return null;
         }
 
-        final LocalDate emissione = (dati.getDataOperazione() != null) ? dati.getDataOperazione() : LocalDate.now();
+        final LocalDate emissione = (dati.getDataOperazione() != null) ? dati.getDataOperazione() : LocalDate.now(ZoneId.systemDefault());
 
         final int idUtente = resolveIdUtente(dati);
         if (idUtente <= 0) {
@@ -94,7 +95,7 @@ public class LogicControllerGestioneFattura
         }
 
         final int idPrenotazioneFittizio = -Math.abs(idPenalita);
-        final LocalDate emissione = (dati.getDataOperazione() != null) ? dati.getDataOperazione() : LocalDate.now();
+        final LocalDate emissione = (dati.getDataOperazione() != null) ? dati.getDataOperazione() : LocalDate.now(ZoneId.systemDefault());
 
         final int idUtente = resolveIdUtente(dati);
         if (idUtente <= 0) {
@@ -126,7 +127,7 @@ public class LogicControllerGestioneFattura
             return;
         }
 
-        final LocalDate oggi = LocalDate.now();
+        final LocalDate oggi = LocalDate.now(ZoneId.systemDefault());
 
         // Uso API standard del DAO (evita dipendere da metodi non garantiti)
         Prenotazione p = prenotazioneDAO().load(idPrenotazione);

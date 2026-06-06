@@ -1,6 +1,8 @@
 package com.ispw.controller.logic.ctrl;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -419,7 +421,7 @@ public class LogicControllerConfiguraRegole implements CtrlGestioneRegole {
     private void appendLogSafe(String descr) {
         try {
             SystemLog l = new SystemLog();
-            l.setTimestamp(LocalDateTime.now());
+            l.setTimestamp(LocalDateTime.from(ZonedDateTime.now(ZoneId.systemDefault())));
             l.setIdUtenteCoinvolto(0); // sistema
             l.setDescrizione(Objects.toString(descr, ""));
             logDAO().append(l);
