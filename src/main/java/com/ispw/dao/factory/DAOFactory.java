@@ -23,7 +23,7 @@ public abstract class DAOFactory {
 
     private static Path fileSystemRoot;
 
-    // ✅ IN_MEMORY seed root (solo lettura; non persiste)
+    //  IN_MEMORY seed root (solo lettura; non persiste)
     private static Path seedRoot;
 
     /**

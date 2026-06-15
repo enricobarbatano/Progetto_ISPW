@@ -2,6 +2,7 @@ package com.ispw.dao.factory;
 
 import java.nio.file.Path;
 
+import com.ispw.dao.impl.aggregate.AggregatingGeneralUserDAO;
 import com.ispw.dao.impl.filesystem.concrete.CampoDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.FatturaDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.GestoreDAOFileSystem;
@@ -13,8 +14,6 @@ import com.ispw.dao.impl.filesystem.concrete.RegolePenalitaDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.RegoleTempisticheDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.RichiestaDisdettaDAOFileSystem;
 import com.ispw.dao.impl.filesystem.concrete.UtenteFinaleDAOFileSystem;
-
-
 import com.ispw.dao.interfaces.CampoDAO;
 import com.ispw.dao.interfaces.FatturaDAO;
 import com.ispw.dao.interfaces.GeneralUserDAO;
@@ -74,7 +73,7 @@ public final class FileSystemDAOFactory extends DAOFactory {
     @Override
     public synchronized GeneralUserDAO getGeneralUserDAO() {
         if (generalUserDAO == null) {
-        generalUserDAO = new com.ispw.dao.impl.aggregate.AggregatingGeneralUserDAO(
+        generalUserDAO = new AggregatingGeneralUserDAO(
                 getGestoreDAO(),
                 getUtenteFinaleDAO()
         );

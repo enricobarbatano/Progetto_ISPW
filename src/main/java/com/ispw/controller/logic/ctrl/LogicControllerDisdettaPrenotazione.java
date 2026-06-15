@@ -302,7 +302,7 @@ public class LogicControllerDisdettaPrenotazione implements CtrlDisdetta {
         //ritorno l'esito al graphic controller
         return LogicControllerHelper.esito(true, MSG_RICHIESTA_OK);
     }
-
+    
     // STEP 2: GESTORE consulta richieste PENDING
 
     /**
@@ -567,7 +567,7 @@ public class LogicControllerDisdettaPrenotazione implements CtrlDisdetta {
     /**
      * Libera lo slot occupato dalla prenotazione.
      *
-     * È best-effort: se fallisce, il flusso non viene interrotto.
+     * 
      */
     private void liberaRisorsa(int idPrenotazione) {
         try {

@@ -1,6 +1,6 @@
 package com.ispw.dao.factory;
 
-
+import com.ispw.dao.impl.aggregate.AggregatingGeneralUserDAO;
 import com.ispw.dao.impl.base.BaseCampoDAO;
 import com.ispw.dao.impl.base.BaseFatturaDAO;
 import com.ispw.dao.impl.base.BaseGestoreDAO;
@@ -67,7 +67,7 @@ public final class MemoryDAOFactory extends DAOFactory {
     @Override
     public synchronized GeneralUserDAO getGeneralUserDAO() {
         if (generalUserDAO == null) {
-        generalUserDAO = new com.ispw.dao.impl.aggregate.AggregatingGeneralUserDAO(
+        generalUserDAO = new AggregatingGeneralUserDAO(
             getGestoreDAO(),
             getUtenteFinaleDAO()
         );
